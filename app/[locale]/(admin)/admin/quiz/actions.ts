@@ -1,0 +1,184 @@
+"use server";
+
+import { z } from "zod";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { dispatchQuizReminders } from "@/lib/notifications/quiz-reminder-emails";
+import { getActiveBranding } from "@/lib/competition";
+import type { QuizTranslations } from "@/lib/quiz";
+import {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  isLocale,
+  localePath,
+} from "@/lib/i18n";
+
+// Non-default locales that can carry a quiz translation. The default locale is
+// canonical and lives in the base prompt/options columns. Derived from
+// SUPPORTED_LOCALES so adding a locale never needs a second edit here.
+const TRANSLATABLE_LOCALES = SUPPORTED_LOCALES.filter(
+  (l) => l !== DEFAULT_LOCALE,
+);
+
+async function assertAdmin() {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in");
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .single();
+  if (!profile?.is_admin) throw new Error("Admin only");
+}
+
+const questionSchema = z
+  .object({
+    prompt: z.string().trim().min(1),
+    options: z.array(z.string().trim().min(1)).min(2).max(4),
+    correct_index: z.number().int().min(0).max(3),
+    active_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
+  })
+  .refine((d) => d.correct_index < d.options.length, {
+    message: "Correct option must be one of the filled options",
+    path: ["correct_index"],
+  });
+
+function revalidateQuiz() {
+  // Routes are locale-prefixed (localePrefix: "always"); bare paths wouldn't match.
+  for (const l of SUPPORTED_LOCALES) {
+    revalidatePath(`/${l}/admin/quiz`);
+    revalidatePath(`/${l}/quiz`);
+  }
+}
+
+// Build the optional ES/FR translations from the form. `filledSlots` are the
+// raw 0..3 option indices that survived the English blank-filter, so a
+// translation's options stay positionally aligned with the English options
+// (and thus with correct_index). A locale block is included only when its
+// prompt is non-blank; if included, every aligned option must be non-blank and
+// match the English option count — otherwise the submit is rejected so a
+// half-translated question can never be stored.
+function buildTranslations(
+  formData: FormData,
+  filledSlots: number[],
+): QuizTranslations {
+  const translations: QuizTranslations = {};
+  for (const locale of TRANSLATABLE_LOCALES) {
+    const prompt = ((formData.get(`${locale}_prompt`) as string) ?? "").trim();
+    const rawOptions = filledSlots.map((i) =>
+      ((formData.get(`${locale}_option_${i}`) as string) ?? "").trim(),
+    );
+    const anyContent = prompt !== "" || rawOptions.some(Boolean);
+    if (!anyContent) continue; // fully blank block → no translation
+
+    if (prompt === "" || rawOptions.some((o) => o === "")) {
+      throw new Error(
+        `Incomplete ${locale.toUpperCase()} translation: provide a prompt and every option, or leave the whole block blank`,
+      );
+    }
+    translations[locale] = { prompt, options: rawOptions };
+  }
+  return translations;
+}
+
+export async function saveQuestion(formData: FormData) {
+  await assertAdmin();
+
+  // The dropdown's correct_index points at the ORIGINAL 4 slots. Compacting
+  // blank options would shift it, so resolve correctness against the raw slots
+  // first, then remap the index to the compacted list.
+  const rawOptions = [0, 1, 2, 3].map((i) =>
+    ((formData.get(`option_${i}`) as string) ?? "").trim(),
+  );
+  const correctRaw = Number(formData.get("correct_index"));
+  if (
+    !Number.isInteger(correctRaw) ||
+    correctRaw < 0 ||
+    correctRaw > 3 ||
+    !rawOptions[correctRaw]
+  ) {
+    throw new Error("Correct option must be one of the filled options");
+  }
+
+  const filledSlots = [0, 1, 2, 3].filter((i) => rawOptions[i]);
+  const options = filledSlots.map((i) => rawOptions[i]);
+  // New index = how many filled slots precede the chosen one.
+  const correct_index = rawOptions.slice(0, correctRaw).filter(Boolean).length;
+
+  const parsed = questionSchema.parse({
+    prompt: formData.get("prompt"),
+    options,
+    correct_index,
+    active_on: formData.get("active_on"),
+  });
+
+  const translations = buildTranslations(formData, filledSlots);
+
+  const admin = createAdminSupabaseClient();
+  const { error } = await admin.from("quiz_questions").insert({
+    prompt: parsed.prompt,
+    options: parsed.options,
+    correct_index: parsed.correct_index,
+    active_on: parsed.active_on,
+    translations,
+  });
+  if (error) throw new Error(error.message);
+
+  revalidateQuiz();
+}
+
+// Admin force re-send of the day's quiz reminder. Unlike the cron, this
+// bypasses the at-most-once ledger so it re-emails opted-in, still-unanswered
+// users who were already reminded today (opted-out / answered users stay
+// excluded). The dispatch summary travels back via query params after the
+// redirect, since the page is server-rendered. A missing active question is
+// surfaced explicitly so the UI can tell a true no-op apart from "0 pending".
+export async function resendQuizReminder(formData: FormData): Promise<void> {
+  await assertAdmin();
+
+  const rawLocale = formData.get("locale");
+  const locale =
+    typeof rawLocale === "string" && isLocale(rawLocale)
+      ? rawLocale
+      : DEFAULT_LOCALE;
+
+  // No active question for the current UTC day → nothing to send. Re-check here
+  // (the dispatcher would also no-op) so the UI can show a distinct message.
+  const admin = createAdminSupabaseClient();
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: question, error } = await admin
+    .from("quiz_questions")
+    .select("id")
+    .eq("active_on", today)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+
+  if (!question) {
+    redirect(localePath(locale, "/admin/quiz?resendQuiz=1&resendQuizNoQuestion=1"));
+  }
+
+  const { emailFromName } = await getActiveBranding();
+  const summary = await dispatchQuizReminders(emailFromName, { force: true });
+
+  const params = new URLSearchParams({
+    resendQuiz: "1",
+    resendQuizEmailed: String(summary.emailed),
+    resendQuizFailed: String(summary.failed),
+    resendQuizSkipped: String(summary.skipped),
+  });
+  redirect(localePath(locale, `/admin/quiz?${params.toString()}`));
+}
+
+export async function deleteQuestion(formData: FormData) {
+  await assertAdmin();
+  const id = z.string().uuid().parse(formData.get("id"));
+  const admin = createAdminSupabaseClient();
+  const { error } = await admin.from("quiz_questions").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidateQuiz();
+}

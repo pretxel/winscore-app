@@ -1,0 +1,63 @@
+import { localePath, type Locale } from "@/lib/i18n";
+
+// Mirrors the prediction form's MAX_GOALS; share URLs are user-editable so
+// the clamp is the only guarantee the rendered numbers stay sane.
+export const MAX_SHARE_GOALS = 20;
+
+export function clampGoals(value: unknown): number | null {
+  const n =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && value.trim() !== ""
+        ? Number(value)
+        : NaN;
+  if (!Number.isFinite(n)) return null;
+  return Math.min(MAX_SHARE_GOALS, Math.max(0, Math.floor(n)));
+}
+
+export function buildPickSharePath(
+  locale: Locale,
+  matchId: string,
+  homeGoals: number,
+  awayGoals: number,
+): string {
+  const h = clampGoals(homeGoals) ?? 0;
+  const a = clampGoals(awayGoals) ?? 0;
+  return `${localePath(locale, `/share/pick/${matchId}`)}?h=${h}&a=${a}`;
+}
+
+export function buildRankSharePath(locale: Locale, userId: string): string {
+  // No score params: the landing page and OG card re-derive the standing live
+  // from v_leaderboard_overall, so the URL only needs to identify the user.
+  return localePath(locale, `/share/rank/${userId}`);
+}
+
+export function buildQuizSharePath(locale: Locale, userId: string): string {
+  // Like rank sharing: the landing page and OG card re-derive the quiz standing
+  // live from v_quiz_standing, so the URL only identifies the user.
+  return localePath(locale, `/share/quiz/${userId}`);
+}
+
+// Canonicalize a head-to-head pair into a single deterministic order
+// (lexicographic by user_id). `a/b` and `b/a` collapse to the same ordered
+// tuple so one rivalry maps to one URL and one cacheable OG card.
+export function canonicalH2HPair(idA: string, idB: string): readonly [string, string] {
+  return idA <= idB ? [idA, idB] : [idB, idA];
+}
+
+export function buildH2HPath(locale: Locale, idA: string, idB: string): string {
+  // The landing page and OG card re-derive both standings live from
+  // v_leaderboard_overall + scores, so the URL only identifies the two users.
+  const [first, second] = canonicalH2HPair(idA, idB);
+  return localePath(locale, `/h2h/${first}/${second}`);
+}
+
+export function buildTweetIntentUrl(text: string, url: string): string {
+  const params = new URLSearchParams({ text, url });
+  return `https://twitter.com/intent/tweet?${params.toString()}`;
+}
+
+export function buildFacebookShareUrl(url: string): string {
+  const params = new URLSearchParams({ u: url });
+  return `https://www.facebook.com/sharer/sharer.php?${params.toString()}`;
+}

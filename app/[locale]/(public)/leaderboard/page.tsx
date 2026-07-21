@@ -1,0 +1,299 @@
+import Link from "next/link";
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { LeaderboardLive } from "@/components/leaderboard-live";
+import { LeaderboardTable } from "@/components/leaderboard-table";
+import { LeaderboardSegmentSwitcher } from "@/components/leaderboard-segment-switcher";
+import { LeaderboardViewTracker } from "./leaderboard-view-tracker";
+import { LeaderboardChallenge } from "./leaderboard-challenge";
+import { ShareButtons } from "@/components/share-buttons";
+import type { LeaderboardRow } from "@/lib/db";
+import { ArrowRightIcon } from "lucide-react";
+import { buildRankSharePath } from "@/lib/share";
+import { env } from "@/lib/env";
+import { getActiveCompetition } from "@/lib/competition";
+import { getStageLabel, sortedStages } from "@/lib/competition-schema";
+import {
+  currentWeekBoundsUtc,
+  parseSegmentParam,
+  reconcileStageParam,
+  resolveSegment,
+} from "@/lib/leaderboard-segment";
+import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "leaderboard" });
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: { canonical: "/leaderboard" },
+    openGraph: {
+      title: t("ogTitle"),
+      description: t("ogDescription"),
+      url: "/leaderboard",
+      type: "website",
+    },
+  };
+}
+
+export default async function LeaderboardPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ segment?: string | string[]; stage?: string | string[] }>;
+}) {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
+  setRequestLocale(locale);
+
+  const { segment: segmentParam, stage: stageParam } = await searchParams;
+
+  const t = await getTranslations("leaderboard");
+  const tShare = await getTranslations("shareRank");
+  const tH2H = await getTranslations("h2h");
+
+  // Resolve the active competition's stages so `?stage=` is validated against
+  // the real keys (drop unknowns), mirroring how /matches reconciles params.
+  const activeCompetition = await getActiveCompetition();
+  const format = activeCompetition?.format ?? null;
+  const stageKeys = format ? sortedStages(format).map((s) => s.key) : [];
+  const stageOptions = format
+    ? sortedStages(format).map((s) => ({
+        key: s.key,
+        label: getStageLabel(format, s.key, locale),
+      }))
+    : [];
+
+  // Parse the URL switch, then reconcile against the available stages. A
+  // `stage` segment with no valid stage falls back to overall (no redirect/404).
+  const requestedSegment = parseSegmentParam(segmentParam);
+  const activeStage = reconcileStageParam(stageParam, stageKeys);
+  const segment = resolveSegment(requestedSegment, activeStage);
+
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Branch the data source by segment. All three return the LeaderboardRow
+  // shape (same columns and tie-breakers), so the rendering below is identical.
+  let data: LeaderboardRow[] | null = null;
+  let error: { message: string } | null = null;
+  if (segment === "week") {
+    const { fromTs, toTs } = currentWeekBoundsUtc();
+    const res = await supabase.rpc("leaderboard_for_window", {
+      from_ts: fromTs,
+      to_ts: toTs,
+    });
+    data = res.data as LeaderboardRow[] | null;
+    error = res.error;
+  } else if (segment === "stage" && activeStage) {
+    const res = await supabase.rpc("leaderboard_for_stage", {
+      stage_key: activeStage,
+    });
+    data = res.data as LeaderboardRow[] | null;
+    error = res.error;
+  } else {
+    const res = await supabase
+      .from("v_leaderboard_overall")
+      .select("*")
+      .order("rank", { ascending: true });
+    data = res.data as LeaderboardRow[] | null;
+    error = res.error;
+  }
+
+  const loadError = error?.message ?? null;
+  // Log the raw cause server-side; never render exception text to the user.
+  if (loadError) console.error("[leaderboard] load failed:", loadError);
+  const rows: LeaderboardRow[] = (data ?? []) as LeaderboardRow[];
+
+  const myRow = user ? rows.find((r) => r.user_id === user.id) : undefined;
+  const players = rows.length;
+  const leader = rows[0];
+  const topRows = rows.slice(0, 10);
+
+  const boardLabels = {
+    rank: t("headerRank"),
+    player: t("headerPlayer"),
+    points: t("headerPoints"),
+    exact: t("headerExact"),
+    winnerGd: t("headerWinnerGd"),
+    wins: t("headerWins"),
+    exactHint: t("headerExactHint"),
+    winnerGdHint: t("headerWinnerGdHint"),
+    winsHint: t("headerWinsHint"),
+    you: t("you"),
+    noName: t("noName"),
+  };
+
+  return (
+    <main className="mx-auto max-w-4xl px-4 py-10">
+      <LeaderboardViewTracker />
+      <header className="border-border mb-6 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-muted-foreground font-mono text-[11px] tracking-[0.24em] uppercase">
+            {t("eyebrow")}
+          </p>
+          <h1
+            className="font-heading mt-1 text-4xl font-semibold tracking-tight sm:text-5xl"
+            style={{ fontStretch: "condensed" }}
+          >
+            {t("headline")}
+          </h1>
+          <p className="text-muted-foreground mt-2 max-w-md text-sm">{t("lede")}</p>
+        </div>
+
+        {leader ? (
+          <div className="border-pitch/30 bg-pitch text-pitch-foreground rounded-xl border px-4 py-3 shadow-sm">
+            <div className="text-pitch-foreground/70 font-mono text-[10px] tracking-[0.22em] uppercase">
+              {t("leaderLabel")}
+            </div>
+            <div className="font-heading mt-1 text-lg font-semibold tracking-tight">
+              {leader.display_name ?? "—"}
+            </div>
+            <div className="text-pitch-foreground/80 mt-0.5 font-mono text-xs tracking-[0.18em] uppercase">
+              {t("leaderStat", {
+                points: leader.total_points ?? 0,
+                count: players,
+              })}
+            </div>
+          </div>
+        ) : null}
+      </header>
+
+      <LeaderboardSegmentSwitcher
+        basePath={localePath(locale, "/leaderboard")}
+        activeSegment={segment}
+        activeStage={activeStage}
+        stages={stageOptions}
+        labels={{
+          group: t("segmentGroup"),
+          overall: t("segmentOverall"),
+          week: t("segmentWeek"),
+          stage: t("segmentStage"),
+        }}
+      />
+
+      {loadError ? (
+        <div
+          role="alert"
+          className="border-border bg-card mx-auto max-w-md rounded-xl border p-6 text-center"
+        >
+          <p className="text-foreground text-base font-semibold">{t("loadFailedTitle")}</p>
+          <p className="text-muted-foreground mt-2 text-sm">{t("loadFailedBody")}</p>
+          <a
+            href={localePath(locale, "/leaderboard")}
+            className="bg-primary text-primary-foreground focus-visible:ring-ring focus-visible:ring-offset-background mt-5 inline-flex min-h-11 items-center justify-center rounded-lg px-5 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
+            {t("loadFailedRetry")}
+          </a>
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="border-border bg-muted/30 rounded-xl border border-dashed p-10 text-center">
+          <p className="text-muted-foreground font-mono text-[11px] tracking-[0.24em] uppercase">
+            {t("emptyTitle")}
+          </p>
+          <p className="text-muted-foreground mx-auto mt-2 max-w-sm text-sm">{t("emptyBody")}</p>
+          <Link
+            href={localePath(locale, "/matches")}
+            className="text-foreground hover:text-pitch mt-4 inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 hover:underline"
+          >
+            {t("browseMatches")} <ArrowRightIcon className="size-3.5" />
+          </Link>
+        </div>
+      ) : segment === "overall" ? (
+        // Realtime only for the all-time board (it re-fetches v_leaderboard_overall
+        // on score changes). Windowed/stage segments render a static table — a
+        // live refetch would replace their rows with the overall board.
+        <LeaderboardLive initialRows={topRows} currentUserId={user?.id} labels={boardLabels} />
+      ) : (
+        <LeaderboardTable rows={topRows} currentUserId={user?.id} labels={boardLabels} />
+      )}
+
+      {myRow ? (
+        <section className="mt-6">
+          <p className="text-muted-foreground mb-3 font-mono text-[11px] tracking-[0.2em] uppercase">
+            {tShare("heading")}
+          </p>
+          <ShareButtons
+            context="rank"
+            shareUrl={`${env.siteUrl}${buildRankSharePath(locale, myRow.user_id)}`}
+            shareText={tShare("shareText", {
+              rank: myRow.rank ?? 0,
+              count: players,
+              points: myRow.total_points ?? 0,
+            })}
+            labels={{
+              x: tShare("shareOnX"),
+              facebook: tShare("shareOnFacebook"),
+              native: tShare("shareNative"),
+              copy: tShare("copyLink"),
+              copied: tShare("copied"),
+            }}
+          />
+
+          <LeaderboardChallenge
+            locale={locale}
+            meId={myRow.user_id}
+            meName={myRow.display_name ?? t("noName")}
+            siteUrl={env.siteUrl}
+            opponents={topRows
+              .filter((r) => r.user_id !== myRow.user_id)
+              .map((r) => ({
+                userId: r.user_id,
+                name: r.display_name ?? t("noName"),
+              }))}
+            labels={{
+              heading: tH2H("challengeHeading"),
+              body: tH2H("challengeBody"),
+              pick: tH2H("challengePick"),
+              shareTextTemplate: tH2H.raw("shareText"),
+              x: tH2H("shareOnX"),
+              facebook: tH2H("shareOnFacebook"),
+              native: tH2H("shareNative"),
+              copy: tH2H("copyLink"),
+              copied: tH2H("copied"),
+            }}
+          />
+        </section>
+      ) : null}
+
+      {user && !myRow && rows.length > 0 ? (
+        <div className="border-border bg-card mt-6 flex flex-col items-start gap-3 rounded-xl border border-dashed p-5 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-medium">{t("notYetTitle")}</p>
+            <p className="text-muted-foreground mt-1">{t("notYetBody")}</p>
+          </div>
+          <Link
+            href={localePath(locale, "/matches")}
+            className="text-foreground hover:text-pitch inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 hover:underline"
+          >
+            {t("browseMatches")} <ArrowRightIcon className="size-3.5" />
+          </Link>
+        </div>
+      ) : null}
+
+      {user ? (
+        <div className="border-border bg-card mt-6 flex flex-col items-start gap-3 rounded-xl border border-dashed p-5 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-medium">{t("inviteCtaTitle")}</p>
+            <p className="text-muted-foreground mt-1">{t("inviteCtaBody")}</p>
+          </div>
+          <Link
+            href={localePath(locale, "/groups")}
+            className="text-foreground hover:text-pitch inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 hover:underline"
+          >
+            {t("inviteCtaLink")} <ArrowRightIcon className="size-3.5" />
+          </Link>
+        </div>
+      ) : null}
+    </main>
+  );
+}

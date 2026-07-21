@@ -1,0 +1,296 @@
+"use client";
+
+import { useEffect, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { MinusIcon, PlusIcon, Loader2Icon, CheckIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { KickoffCountdown } from "@/components/kickoff-countdown";
+import { ShareButtons } from "@/components/share-buttons";
+import { buildPickSharePath } from "@/lib/share";
+import type { Locale } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
+import { submitPrediction } from "./actions";
+
+const MAX_GOALS = 20;
+
+export function PredictionForm({
+  matchId,
+  homeTeam,
+  awayTeam,
+  kickoffAt,
+  initial,
+  isAdmin = false,
+  locale,
+  shareBaseUrl,
+}: {
+  matchId: string;
+  homeTeam: string;
+  awayTeam: string;
+  kickoffAt: string;
+  initial: { home_goals: number; away_goals: number } | null;
+  isAdmin?: boolean;
+  locale: Locale;
+  shareBaseUrl: string;
+}) {
+  const t = useTranslations("predictionForm");
+  const tShare = useTranslations("sharePick");
+  const [home, setHome] = useState<number>(initial?.home_goals ?? 0);
+  const [away, setAway] = useState<number>(initial?.away_goals ?? 0);
+  const [touched, setTouched] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [lockedNow, setLockedNow] = useState(false);
+  // Last successfully-saved scoreline. Drives the inline share CTA so it always
+  // advertises what is actually saved, decoupled from the live steppers.
+  const [sharedPick, setSharedPick] = useState<{
+    home: number;
+    away: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const kickoff = new Date(kickoffAt).getTime();
+    const tick = () => setLockedNow(Date.now() >= kickoff);
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [kickoffAt]);
+
+  const initialPick =
+    initial?.home_goals !== undefined && initial?.away_goals !== undefined;
+  const isDirty =
+    !initialPick ||
+    touched ||
+    home !== initial?.home_goals ||
+    away !== initial?.away_goals;
+
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (isAdmin) return;
+    if (home < 0 || away < 0 || home > MAX_GOALS || away > MAX_GOALS) {
+      toast.error(t("scoresOutOfRange", { max: MAX_GOALS }));
+      return;
+    }
+    startTransition(async () => {
+      const result = await submitPrediction({
+        matchId,
+        homeGoals: home,
+        awayGoals: away,
+      });
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      trackEvent("prediction_submitted", { match_id: matchId });
+      toast.success(t("pickLocked"));
+      setTouched(false);
+      setSharedPick({ home, away });
+    });
+  }
+
+  return (
+    <>
+    <form
+      onSubmit={onSubmit}
+      className="rounded-xl border border-border bg-card p-5 shadow-sm"
+    >
+      <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-5">
+        <ScoreStepper
+          id={`home-${matchId}`}
+          team={homeTeam}
+          value={home}
+          onChange={(v) => {
+            setHome(v);
+            setTouched(true);
+            setSharedPick(null);
+          }}
+          disabled={lockedNow || isPending || isAdmin}
+          tDecrease={t("decreaseAria", { team: homeTeam })}
+          tIncrease={t("increaseAria", { team: homeTeam })}
+          tInputAria={t("homeAria", { team: homeTeam })}
+        />
+
+        <div className="flex flex-col items-center gap-1">
+          <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+            vs
+          </span>
+          <span className="font-mono text-2xl font-semibold text-muted-foreground">
+            –
+          </span>
+        </div>
+
+        <ScoreStepper
+          id={`away-${matchId}`}
+          team={awayTeam}
+          value={away}
+          onChange={(v) => {
+            setAway(v);
+            setTouched(true);
+            setSharedPick(null);
+          }}
+          disabled={lockedNow || isPending || isAdmin}
+          align="end"
+          tDecrease={t("decreaseAria", { team: awayTeam })}
+          tIncrease={t("increaseAria", { team: awayTeam })}
+          tInputAria={t("awayAria", { team: awayTeam })}
+        />
+      </div>
+
+      <div className="mt-5 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+          {isAdmin ? (
+            <span className="font-mono uppercase tracking-[0.2em]">
+              {t("adminBlocked")}
+            </span>
+          ) : lockedNow ? (
+            <span className="font-mono uppercase tracking-[0.2em]">
+              {t("lockedAtKickoff")}
+            </span>
+          ) : (
+            <>
+              <KickoffCountdown
+                kickoffAt={kickoffAt}
+                lockedLabel={t("lockedAtKickoff")}
+              />
+              <span>{initialPick ? t("lastSaveWins") : t("submitFirst")}</span>
+            </>
+          )}
+        </div>
+
+        <Button
+          type="submit"
+          disabled={lockedNow || isPending || isAdmin || (initialPick && !isDirty)}
+          className={cn(
+            "h-10 gap-2 px-5 text-sm font-semibold uppercase tracking-[0.16em]",
+          )}
+        >
+          {isPending ? (
+            <>
+              <Loader2Icon className="size-4 animate-spin" /> {t("saving")}
+            </>
+          ) : initialPick ? (
+            isDirty ? (
+              <>
+                <CheckIcon className="size-4" /> {t("updatePick")}
+              </>
+            ) : (
+              <>
+                <CheckIcon className="size-4" /> {t("saved")}
+              </>
+            )
+          ) : (
+            <>
+              <CheckIcon className="size-4" /> {t("submitPick")}
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
+
+    {sharedPick ? (
+      <section className="mt-4 rounded-xl border border-border bg-card p-5 shadow-sm motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300">
+        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+          {tShare("heading")}
+        </p>
+        <ShareButtons
+          context="pick"
+          shareUrl={`${shareBaseUrl}${buildPickSharePath(locale, matchId, sharedPick.home, sharedPick.away)}`}
+          shareText={tShare("shareText", {
+            home: homeTeam,
+            away: awayTeam,
+            h: sharedPick.home,
+            a: sharedPick.away,
+          })}
+          labels={{
+            x: tShare("shareOnX"),
+            facebook: tShare("shareOnFacebook"),
+            native: tShare("shareNative"),
+            copy: tShare("copyLink"),
+            copied: tShare("copied"),
+          }}
+        />
+      </section>
+    ) : null}
+    </>
+  );
+}
+
+function ScoreStepper({
+  id,
+  team,
+  value,
+  onChange,
+  disabled,
+  align = "start",
+  tDecrease,
+  tIncrease,
+  tInputAria,
+}: {
+  id: string;
+  team: string;
+  value: number;
+  onChange: (v: number) => void;
+  disabled?: boolean;
+  align?: "start" | "end";
+  tDecrease: string;
+  tIncrease: string;
+  tInputAria: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-2",
+        align === "end" && "items-end text-right",
+      )}
+    >
+      <div className="min-w-0">
+        <div className="mt-0.5 truncate font-heading text-sm font-semibold tracking-tight sm:text-base">
+          {team}
+        </div>
+      </div>
+      <div className="inline-flex w-full items-center justify-between gap-1 rounded-xl border border-border bg-muted/30 p-1">
+        <Button
+          type="button"
+          size="icon-sm"
+          variant="outline"
+          disabled={disabled || value <= 0}
+          aria-label={tDecrease}
+          onClick={() => onChange(Math.max(0, value - 1))}
+          className="size-9 shrink-0 bg-background"
+        >
+          <MinusIcon />
+        </Button>
+        <input
+          id={id}
+          type="number"
+          inputMode="numeric"
+          min={0}
+          max={MAX_GOALS}
+          value={value}
+          onChange={(e) => {
+            const next = Number(e.target.value);
+            if (Number.isFinite(next)) {
+              onChange(Math.min(MAX_GOALS, Math.max(0, Math.floor(next))));
+            }
+          }}
+          disabled={disabled}
+          aria-label={tInputAria}
+          className={cn(
+            "min-w-0 flex-1 bg-transparent text-center font-mono text-3xl font-semibold tabular-nums leading-none text-foreground outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none disabled:opacity-50 sm:text-4xl",
+          )}
+        />
+        <Button
+          type="button"
+          size="icon-sm"
+          variant="outline"
+          disabled={disabled || value >= MAX_GOALS}
+          aria-label={tIncrease}
+          onClick={() => onChange(Math.min(MAX_GOALS, value + 1))}
+          className="size-9 shrink-0 bg-background"
+        >
+          <PlusIcon />
+        </Button>
+      </div>
+    </div>
+  );
+}
