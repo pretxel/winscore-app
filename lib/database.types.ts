@@ -46,6 +46,7 @@ export type Database = {
           format_config: Json
           id: string
           is_active: boolean
+          is_live: boolean
           kind: string
           name: string
           opening_away: string | null
@@ -65,6 +66,7 @@ export type Database = {
           format_config: Json
           id?: string
           is_active?: boolean
+          is_live?: boolean
           kind?: string
           name: string
           opening_away?: string | null
@@ -84,6 +86,7 @@ export type Database = {
           format_config?: Json
           id?: string
           is_active?: boolean
+          is_live?: boolean
           kind?: string
           name?: string
           opening_away?: string | null
@@ -1378,7 +1381,15 @@ export type Database = {
         Returns: boolean
       }
       compute_match_scores: { Args: { p_match_id: string }; Returns: undefined }
-      create_group: { Args: { p_name: string }; Returns: string }
+      create_group: {
+        Args: { p_name: string; p_competition_id?: string }
+        Returns: string
+      }
+      league_id_for_slug: { Args: { p_slug: string }; Returns: string }
+      set_league_live: {
+        Args: { p_id: string; p_live: boolean }
+        Returns: undefined
+      }
       generate_join_code: { Args: { p_prefix?: string }; Returns: string }
       set_active_competition: { Args: { p_id: string }; Returns: undefined }
       group_preview: {

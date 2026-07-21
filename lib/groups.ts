@@ -73,6 +73,94 @@ export async function listMyGroups(): Promise<GroupSummary[]> {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
+export type PoolSummary = GroupSummary & { competitionId: string };
+
+export type LeaguePools = {
+  competitionId: string;
+  slug: string;
+  name: string;
+  shortName: string;
+  pools: PoolSummary[];
+};
+
+// The caller's pools grouped by league, for the cross-league home. Each entry is
+// one league the user owns or belongs to a pool in, with that league's pools.
+// Returns [] when signed out. RLS scopes reads to the caller's own pools.
+export async function listMyPoolsByLeague(): Promise<LeaguePools[]> {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: memberships } = await supabase
+    .from("group_members")
+    .select("role, group_id, groups(id, name, join_code, owner_id, competition_id)")
+    .eq("user_id", user.id);
+
+  const rows = memberships ?? [];
+  const groupIds = rows.map((m) => m.group_id);
+  if (groupIds.length === 0) return [];
+
+  const { data: allMembers } = await supabase
+    .from("group_members")
+    .select("group_id")
+    .in("group_id", groupIds);
+
+  const counts = new Map<string, number>();
+  for (const m of allMembers ?? []) {
+    counts.set(m.group_id, (counts.get(m.group_id) ?? 0) + 1);
+  }
+
+  const competitionIds = Array.from(
+    new Set(
+      rows
+        .map((m) => m.groups?.competition_id)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  );
+  const { data: comps } = await supabase
+    .from("competitions")
+    .select("id, slug, name, short_name")
+    .in("id", competitionIds);
+  const compById = new Map((comps ?? []).map((c) => [c.id, c]));
+
+  const byLeague = new Map<string, LeaguePools>();
+  for (const m of rows) {
+    const group = m.groups;
+    if (!group?.competition_id) continue;
+    const comp = compById.get(group.competition_id);
+    if (!comp) continue;
+    let lane = byLeague.get(comp.id);
+    if (!lane) {
+      lane = {
+        competitionId: comp.id,
+        slug: comp.slug,
+        name: comp.name,
+        shortName: comp.short_name,
+        pools: [],
+      };
+      byLeague.set(comp.id, lane);
+    }
+    lane.pools.push({
+      id: group.id,
+      name: group.name,
+      joinCode: group.join_code,
+      role: m.role as GroupMemberRole,
+      isOwner: group.owner_id === user.id,
+      memberCount: counts.get(group.id) ?? 1,
+      competitionId: comp.id,
+    });
+  }
+
+  return Array.from(byLeague.values())
+    .map((lane) => ({
+      ...lane,
+      pools: lane.pools.sort((a, b) => a.name.localeCompare(b.name)),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 // Full detail for one group, or null when the caller is not a member (RLS
 // returns no group row in that case).
 export async function getGroup(groupId: string): Promise<GroupDetail | null> {
