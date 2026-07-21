@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Bricolage_Grotesque, JetBrains_Mono, Manrope } from "next/font/google";
+import { Archivo_Black, JetBrains_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -14,9 +14,13 @@ const manrope = Manrope({
   display: "swap",
 });
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+// Matchday-board display face — a heavy editorial grotesque for headings,
+// league nameplates, and the hero. Confident and blocky (not a condensed
+// grotesque like Oswald), it reads as a scoreboard nameplate.
+const archivo = Archivo_Black({
+  variable: "--font-archivo",
   subsets: ["latin"],
+  weight: ["400"],
   display: "swap",
 });
 
@@ -137,13 +141,12 @@ export default async function RootLayout({
       lang={locale}
       dir="ltr"
       suppressHydrationWarning
-      className={`${manrope.variable} ${bricolage.variable} ${jetbrains.variable} h-full antialiased`}
+      className={`${manrope.variable} ${archivo.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
           disableTransitionOnChange
         >
           {children}
