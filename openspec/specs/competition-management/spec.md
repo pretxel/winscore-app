@@ -37,50 +37,63 @@ The admin competition form SHALL allow configuring league-stage competitions. Th
 - **THEN** the form shows all 5 tabs (Identity, Dates, Format, Providers, Branding) pre-populated with Liga MX values
 - **AND** the format tab shows the league stage and liguilla knockout stages with their multipliers
 
-### Requirement: At most one active competition
+### Requirement: Multiple leagues may be live concurrently
 
-The system SHALL guarantee that no more than one competition has `is_active = true` at any time, enforced by a partial unique index on `(is_active) WHERE is_active`.
+The system SHALL allow any number of competitions to be **live** at the same time via a per-row `is_live` boolean. There SHALL be no uniqueness constraint on `is_live`; the previous single-active partial unique index is removed. A league being live means users may create and play pools in it; toggling one league's `is_live` SHALL NOT affect any other league.
 
-#### Scenario: Second active competition rejected
+#### Scenario: Two leagues live at once
 
-- **WHEN** a write attempts to set `is_active = true` on a second competition while another is already active
-- **THEN** the database rejects the write with a unique-violation
+- **WHEN** `world-cup-2026` and `la-liga` both have `is_live = true`
+- **THEN** the database accepts both
+- **AND** users can create pools in either league
 
-### Requirement: Active competition switched only via a guarded RPC
+#### Scenario: Taking a league offline leaves others live
 
-The system SHALL expose `set_active_competition(p_id uuid)` as the sole mutation path for `is_active`. It SHALL require admin privileges, raise if `p_id` does not exist, and flip the active flag in a single statement so the single-active invariant always holds.
+- **WHEN** an admin sets `la-liga` `is_live = false` while `world-cup-2026` stays live
+- **THEN** `la-liga` is no longer startable
+- **AND** `world-cup-2026` remains live and unaffected
 
-#### Scenario: Admin switches the active competition
+### Requirement: League live status toggled per league via a guarded RPC
 
-- **WHEN** an admin calls `set_active_competition` with an existing competition id
-- **THEN** that competition becomes the only one with `is_active = true`
-- **AND** affected paths and the leaderboard cache tag are revalidated
+The system SHALL expose `set_league_live(p_id uuid, p_live boolean)` as the sole mutation path for `is_live`. It SHALL require admin privileges, raise if `p_id` does not exist, set only the target league's flag, and revalidate that league's affected paths and leaderboard cache tag. It SHALL NOT displace any other league's live status.
 
-#### Scenario: Non-admin cannot switch
+#### Scenario: Admin brings a league online
 
-- **WHEN** a non-admin user calls `set_active_competition`
-- **THEN** the call is rejected and no `is_active` value changes
+- **WHEN** an admin calls `set_league_live` with an existing id and `true`
+- **THEN** that league's `is_live` becomes true without changing any other league
+- **AND** the league's paths and leaderboard cache tag are revalidated
 
-#### Scenario: Unknown competition id raises
+#### Scenario: Non-admin cannot toggle
 
-- **WHEN** `set_active_competition` is called with an id that does not exist
-- **THEN** the function raises an error
-- **AND** the previously active competition remains active
+- **WHEN** a non-admin calls `set_league_live`
+- **THEN** the call is rejected and no `is_live` value changes
 
-### Requirement: Active competition resolution helper
+#### Scenario: Unknown league id raises
 
-The system SHALL provide `active_competition_id()` (SQL, `stable`, `security definer`, granted to anon and authenticated) returning the id of the active competition, and a request-cached `getActiveCompetition()` in the application layer, used by views, RLS, domain, UI, sync, and branding.
+- **WHEN** `set_league_live` is called with an id that does not exist
+- **THEN** the function raises an error and no `is_live` value changes
 
-#### Scenario: Helper returns the active competition
+### Requirement: League resolution from route or pool context
 
-- **WHEN** `active_competition_id()` is evaluated while `world-cup-2026` is active
-- **THEN** it returns that competition's id
+The system SHALL resolve the current league from the request context — a `[league]` route segment or a pool's `competition_id` — rather than from a single global active competition. `getLeagueFromContext()` (request-cached) SHALL return the league for the current route/pool, and `active_competition_id()` is replaced by `league_id_for_slug(slug)` used by views, RLS, domain, UI, and sync scoped to that league. There is no single global "active competition".
 
-#### Scenario: No active competition
+#### Scenario: Route segment resolves the league
 
-- **WHEN** no competition has `is_active = true`
-- **THEN** `active_competition_id()` returns NULL
-- **AND** `getActiveCompetition()` resolves to a "no competition selected" state without throwing
+- **WHEN** a request targets `/la-liga/...`
+- **THEN** `getLeagueFromContext()` resolves to the La Liga competition
+- **AND** fixtures, scoring, and standings on that request are scoped to La Liga
+
+#### Scenario: Pool resolves its own league
+
+- **WHEN** a member opens a pool
+- **THEN** the league resolves from the pool's `competition_id`
+- **AND** does not depend on any global active flag
+
+#### Scenario: Unknown or non-live league
+
+- **WHEN** a request targets a league slug that does not exist or is not live
+- **THEN** resolution returns a "league unavailable" state without throwing
+- **AND** the UI routes to the league catalog
 
 ### Requirement: Managed competition context (admin-only) distinct from the active competition
 

@@ -85,7 +85,7 @@ export const env = {
   facebookAppId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID ?? null,
   // Google Analytics 4 measurement ID. Defaults to the project's stream so
   // analytics works without extra config; override per-environment if needed.
-  gaMeasurementId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-18P5786JW2",
+  gaMeasurementId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-0ZBXBL2XDH",
   // Web Push (VAPID). The public key is client-readable (the subscribe flow
   // passes it to pushManager.subscribe); the private key + subject are
   // server-only (the send path signs with them). All nullable on purpose — when

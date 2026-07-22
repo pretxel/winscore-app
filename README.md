@@ -123,6 +123,7 @@ update public.profiles
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only — keep it secret)
    - `NEXT_PUBLIC_SITE_URL` (your production domain, e.g. `https://winscore.me`)
+   - `NEXT_PUBLIC_GA_MEASUREMENT_ID` (Google Analytics 4 measurement ID, e.g. `G-0ZBXBL2XDH`)
 4. **Update Supabase Auth → URL Configuration:**
    - Site URL: your production URL.
    - Additional Redirect URLs: `https://YOUR-DOMAIN/auth/callback` and (for previews)
