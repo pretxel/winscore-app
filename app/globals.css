@@ -61,8 +61,8 @@
   --card-foreground: oklch(0.18 0.018 250);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.018 250);
-  /* Pitch green — grounded, tournament-grade */
-  --primary: oklch(0.43 0.13 158);
+  /* Brand blue — anchored on #135FD1 */
+  --primary: oklch(0.513 0.19 260);
   --primary-foreground: oklch(0.985 0.006 92);
   --secondary: oklch(0.955 0.01 92);
   --secondary-foreground: oklch(0.2 0.018 250);
@@ -77,8 +77,8 @@
      Inputs keep a slightly lighter border so fields don't read as heavier. */
   --border: oklch(0.64 0.016 92);
   --input: oklch(0.72 0.014 92);
-  --ring: oklch(0.43 0.13 158);
-  --chart-1: oklch(0.43 0.13 158);
+  --ring: oklch(0.513 0.19 260);
+  --chart-1: oklch(0.513 0.19 260);
   --chart-2: oklch(0.78 0.16 78);
   --chart-3: oklch(0.6 0.22 27);
   --chart-4: oklch(0.55 0.14 232);
@@ -86,14 +86,14 @@
   --radius: 0.5rem;
   --sidebar: oklch(0.97 0.008 92);
   --sidebar-foreground: oklch(0.18 0.018 250);
-  --sidebar-primary: oklch(0.43 0.13 158);
+  --sidebar-primary: oklch(0.513 0.19 260);
   --sidebar-primary-foreground: oklch(0.985 0.006 92);
   --sidebar-accent: oklch(0.93 0.07 92);
   --sidebar-accent-foreground: oklch(0.28 0.05 60);
   --sidebar-border: oklch(0.9 0.012 92);
-  --sidebar-ring: oklch(0.43 0.13 158);
+  --sidebar-ring: oklch(0.513 0.19 260);
   /* Custom tournament tokens */
-  --pitch: oklch(0.43 0.13 158);
+  --pitch: oklch(0.513 0.19 260);
   --pitch-foreground: oklch(0.985 0.006 92);
   --flag: oklch(0.82 0.17 82);
   --flag-foreground: oklch(0.24 0.05 60);
@@ -110,8 +110,8 @@
   --popover: oklch(0.225 0.02 205);
   --popover-foreground: oklch(0.97 0.008 92);
   /* Floodlit emerald */
-  --primary: oklch(0.78 0.17 158);
-  --primary-foreground: oklch(0.16 0.04 158);
+  --primary: oklch(0.78 0.15 260);
+  --primary-foreground: oklch(0.16 0.04 260);
   --secondary: oklch(0.27 0.018 205);
   --secondary-foreground: oklch(0.97 0.008 92);
   --muted: oklch(0.235 0.016 205);
@@ -123,43 +123,25 @@
      surface (WCAG 1.4.11 non-text contrast) instead of near-invisible hairlines. */
   --border: oklch(1 0 0 / 36%);
   --input: oklch(1 0 0 / 30%);
-  --ring: oklch(0.78 0.17 158);
-  --chart-1: oklch(0.78 0.17 158);
+  --ring: oklch(0.78 0.15 260);
+  --chart-1: oklch(0.78 0.15 260);
   --chart-2: oklch(0.82 0.17 82);
   --chart-3: oklch(0.7 0.2 22);
   --chart-4: oklch(0.65 0.15 232);
   --chart-5: oklch(0.44 0.012 205);
   --sidebar: oklch(0.21 0.02 205);
   --sidebar-foreground: oklch(0.97 0.008 92);
-  --sidebar-primary: oklch(0.78 0.17 158);
-  --sidebar-primary-foreground: oklch(0.16 0.04 158);
+  --sidebar-primary: oklch(0.78 0.15 260);
+  --sidebar-primary-foreground: oklch(0.16 0.04 260);
   --sidebar-accent: oklch(0.3 0.05 82);
   --sidebar-accent-foreground: oklch(0.92 0.12 92);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.78 0.17 158);
-  --pitch: oklch(0.78 0.17 158);
+  --sidebar-ring: oklch(0.78 0.15 260);
+  --pitch: oklch(0.78 0.15 260);
   --pitch-foreground: oklch(0.14 0.014 250);
   --flag: oklch(0.82 0.17 82);
   --flag-foreground: oklch(0.16 0.04 60);
   --live: oklch(0.7 0.2 22);
-}
-
-/* The public landing page uses a blue identity while competition-scoped pages
-   keep their existing palette. This selector also colors the shared chrome. */
-body:has(.landing-blue) {
-  --primary: oklch(0.48 0.17 255);
-  --primary-foreground: oklch(0.985 0.006 92);
-  --ring: oklch(0.48 0.17 255);
-  --pitch: oklch(0.48 0.17 255);
-  --pitch-foreground: oklch(0.985 0.006 92);
-}
-
-.dark body:has(.landing-blue) {
-  --primary: oklch(0.72 0.15 250);
-  --primary-foreground: oklch(0.16 0.03 250);
-  --ring: oklch(0.72 0.15 250);
-  --pitch: oklch(0.72 0.15 250);
-  --pitch-foreground: oklch(0.14 0.02 250);
 }
 
 @layer base {
