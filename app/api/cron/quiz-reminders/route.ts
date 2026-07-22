@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@/lib/env";
 import { dispatchQuizReminders } from "@/lib/notifications/quiz-reminder-emails";
-import { getActiveBranding } from "@/lib/competition";
+import { forEachLiveLeague, sumDispatch } from "@/lib/cron/for-each-league";
 import { recordRun } from "@/lib/operations/record-run";
 import { isOperationEnabled } from "@/lib/operations/settings";
 
@@ -40,16 +40,21 @@ export async function GET(request: NextRequest) {
   // accurate status='error' row (and re-throws), which we catch here to keep the
   // unchanged 200/zero-summary response.
   let summary = { emailed: 0, failed: 0, skipped: 0 };
+  let leaguesProcessed = 0;
   try {
     const recorded = await recordRun("quiz_reminders", "cron", async () => {
-      const { emailFromName } = await getActiveBranding();
-      return await dispatchQuizReminders(emailFromName);
+      const { results, leaguesProcessed: n } = await forEachLiveLeague((ctx) =>
+        dispatchQuizReminders(ctx.branding.emailFromName, undefined, ctx.slug),
+      );
+      leaguesProcessed = n;
+      return sumDispatch(results);
     });
     summary = recorded.summary;
   } catch (err) {
     console.error("[cron:quiz-reminders] dispatch failed:", err);
   }
 
-  console.log(`[cron:quiz-reminders] summary:`, JSON.stringify(summary));
-  return NextResponse.json(summary);
+  const logged = { ...summary, leaguesProcessed };
+  console.log(`[cron:quiz-reminders] summary:`, JSON.stringify(logged));
+  return NextResponse.json(logged);
 }

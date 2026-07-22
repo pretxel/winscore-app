@@ -30,6 +30,9 @@ export type RunSyncOptions = {
   // Which competition to sync. Defaults to the active competition, so the cron
   // route stays parameterless while admin can sync a non-active draft.
   competitionId?: string;
+  // League slug for the `x-league` header, scoping the score recompute + views
+  // to this league. The per-league cron loop passes it alongside competitionId.
+  leagueSlug?: string;
 };
 
 // Per-day fallback sources cost one request per date; during a normal World
@@ -216,7 +219,7 @@ export async function runSync(opts: RunSyncOptions = {}): Promise<RunSummary> {
     staleResolved: 0,
   };
 
-  const admin = createAdminSupabaseClient();
+  const admin = createAdminSupabaseClient(opts.leagueSlug);
 
   // Resolve the competition to sync (default: the active one) and its provider
   // config. Loading and the dedupe key are scoped to this competition so two

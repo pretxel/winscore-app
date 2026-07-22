@@ -15,7 +15,7 @@ cutover behind `pnpm typecheck`.
 
 - [x] 2.1 Migration: redefine `active_competition_id()` to resolve the `x-league` request header (`current_setting('request.headers', true)::json ->> 'x-league'` → league id) with a single-active fallback. Scopes every existing competition-scoped view/RLS/function to the request league unchanged. **Needs live-DB smoke test (RLS).**
 - [x] 2.2 `createServerSupabaseClient(leagueSlug?)`: inject `global.headers['x-league']` when a league is in context.
-- [ ] 2.3 Update the 8 cron routes to iterate `listLiveLeagues()` and dispatch per league (create a per-league client so the header scopes each run); add a per-league count to each cron summary log.
+- [x] 2.3 Update the 8 cron routes to iterate `listLiveLeagues()` and dispatch per league (create a per-league client so the header scopes each run); add a per-league count to each cron summary log.
 - [ ] 2.4 Retarget page/UI + `lib` helper callers (`bracket.ts`, `group-table.ts`, `news-sync.ts`, pages) to resolve league from route/pool and pass the slug to the client; `pnpm typecheck` enumerates the sites.
 
 ## 3. Routing — `[league]` segment

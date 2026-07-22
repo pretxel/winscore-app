@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@/lib/env";
 import { runNewsSync } from "@/lib/news-sync";
+import { forEachLiveLeague } from "@/lib/cron/for-each-league";
 import { recordRun } from "@/lib/operations/record-run";
 import { isOperationEnabled } from "@/lib/operations/settings";
 
@@ -32,11 +33,30 @@ export async function GET(request: NextRequest) {
   // 2. Token gate. Skip (not error) when the upstream token is absent.
   if (!env.newsApiToken) return skipped("missing-env");
 
-  // 3. Sync + record. A thrown step (upstream fetch / existing-news load) is
-  //    recorded (status='error') and RE-THROWN, so the route still 500s as
-  //    before. The recorded summary is what we return.
-  const { summary } = await recordRun("sync_news", "cron", runNewsSync);
+  // 3. Sync + record, once per live league (each pass scoped to its league via
+  //    the x-league header + its own news query). A thrown step (upstream fetch
+  //    / existing-news load) is recorded (status='error') and RE-THROWN, so the
+  //    route still 500s as before. Pre-cutover (no live league) it runs once
+  //    unscoped. The recorded summary aggregates every pass.
+  let leaguesProcessed = 0;
+  const { summary } = await recordRun("sync_news", "cron", async () => {
+    const { results, leaguesProcessed: n } = await forEachLiveLeague((ctx) =>
+      runNewsSync({ newsQuery: ctx.branding.newsQuery, leagueSlug: ctx.slug }),
+    );
+    leaguesProcessed = n;
+    return results.reduce(
+      (a, s) => ({
+        fetched: a.fetched + s.fetched,
+        inserted: a.inserted + s.inserted,
+        updated: a.updated + s.updated,
+        skipped: a.skipped + s.skipped,
+        errors: a.errors + s.errors,
+      }),
+      { fetched: 0, inserted: 0, updated: 0, skipped: 0, errors: 0 },
+    );
+  });
 
-  console.log(`[cron:sync-news] summary:`, JSON.stringify(summary));
-  return NextResponse.json(summary);
+  const logged = { ...summary, leaguesProcessed };
+  console.log(`[cron:sync-news] summary:`, JSON.stringify(logged));
+  return NextResponse.json(logged);
 }

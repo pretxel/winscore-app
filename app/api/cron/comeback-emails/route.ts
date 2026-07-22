@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@/lib/env";
 import { dispatchComebackEmails } from "@/lib/notifications/comeback-emails";
-import { getActiveBranding } from "@/lib/competition";
+import { forEachLiveLeague, sumDispatch } from "@/lib/cron/for-each-league";
 import { recordRun } from "@/lib/operations/record-run";
 import { isOperationEnabled } from "@/lib/operations/settings";
 
@@ -40,16 +40,21 @@ export async function GET(request: NextRequest) {
   // accurate status='error' row (and re-throws), which we catch here to keep the
   // unchanged 200/zero-summary response.
   let summary = { emailed: 0, failed: 0, skipped: 0 };
+  let leaguesProcessed = 0;
   try {
     const recorded = await recordRun("comeback_emails", "cron", async () => {
-      const { emailFromName } = await getActiveBranding();
-      return await dispatchComebackEmails(emailFromName);
+      const { results, leaguesProcessed: n } = await forEachLiveLeague((ctx) =>
+        dispatchComebackEmails(ctx.branding.emailFromName, ctx.slug),
+      );
+      leaguesProcessed = n;
+      return sumDispatch(results);
     });
     summary = recorded.summary;
   } catch (err) {
     console.error("[cron:comeback-emails] dispatch failed:", err);
   }
 
-  console.log(`[cron:comeback-emails] summary:`, JSON.stringify(summary));
-  return NextResponse.json(summary);
+  const logged = { ...summary, leaguesProcessed };
+  console.log(`[cron:comeback-emails] summary:`, JSON.stringify(logged));
+  return NextResponse.json(logged);
 }

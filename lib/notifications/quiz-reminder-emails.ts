@@ -233,6 +233,7 @@ interface PreparedMessage {
 export async function dispatchQuizReminders(
   fromName?: string,
   opts?: { force?: boolean },
+  leagueSlug?: string,
 ): Promise<DispatchSummary> {
   const force = opts?.force ?? false;
   const senderMisconfigured = warnIfSenderMisconfigured();
@@ -242,7 +243,7 @@ export async function dispatchQuizReminders(
     return { ...ZERO, ...flag };
   }
 
-  const admin = createAdminSupabaseClient();
+  const admin = createAdminSupabaseClient(leagueSlug);
 
   // Today's active question. None → nothing to remind about.
   const today = todayUtcDate();

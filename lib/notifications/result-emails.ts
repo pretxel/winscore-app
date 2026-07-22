@@ -439,6 +439,7 @@ async function dispatchPending(
 // not yet emailed. Idempotent across runs via the result_email_log ledger.
 export async function dispatchResultEmails(
   fromName?: string,
+  leagueSlug?: string,
 ): Promise<DispatchSummary> {
   const senderMisconfigured = warnIfSenderMisconfigured("dispatch");
   if (!env.resendApiKey) {
@@ -446,7 +447,7 @@ export async function dispatchResultEmails(
     return { ...ZERO, ...(senderMisconfigured ? { senderMisconfigured } : {}) };
   }
 
-  const admin = createAdminSupabaseClient();
+  const admin = createAdminSupabaseClient(leagueSlug);
   const scored = await loadScoredFinals(admin);
 
   const { data: ledgerData, error: ledgerErr } = await admin
@@ -508,13 +509,13 @@ export async function forceDispatchResultEmails(
 // ledger), so re-running sync-matches never re-pushes. No-ops when VAPID is
 // unset. Isolated by the caller: a failure never aborts the sync or the
 // result-email send.
-export async function dispatchStandingChangedPush(): Promise<PushDispatchSummary> {
+export async function dispatchStandingChangedPush(leagueSlug?: string): Promise<PushDispatchSummary> {
   if (!isWebPushConfigured()) {
     console.log("[result-emails] VAPID unset — skipping push");
     return { ...ZERO_PUSH };
   }
 
-  const admin = createAdminSupabaseClient();
+  const admin = createAdminSupabaseClient(leagueSlug);
   const scored = await loadScoredFinals(admin);
 
   // Push-specific ledger: a (match,user) is pending for PUSH when scored on a

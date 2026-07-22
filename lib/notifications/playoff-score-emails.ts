@@ -220,7 +220,7 @@ async function loadProfiles(admin: AdminClient): Promise<RecipientProfile[]> {
 // competition is active, or when the day has no finished playoff matches.
 // Per-batch failures are logged and counted, never aborting the rest; ledger
 // rows are written only for batches Resend accepted, so failures retry next run.
-export async function dispatchPlayoffScoreEmail(fromName?: string): Promise<DispatchSummary> {
+export async function dispatchPlayoffScoreEmail(fromName?: string, leagueSlug?: string): Promise<DispatchSummary> {
   const senderMisconfigured = warnIfSenderMisconfigured("dispatch");
   const withFlag = (s: DispatchSummary): DispatchSummary =>
     senderMisconfigured ? { ...s, senderMisconfigured } : s;
@@ -230,7 +230,7 @@ export async function dispatchPlayoffScoreEmail(fromName?: string): Promise<Disp
     return withFlag({ ...ZERO });
   }
 
-  const admin = createAdminSupabaseClient();
+  const admin = createAdminSupabaseClient(leagueSlug);
   const digestDate = utcToday();
   const window = utcDayWindow(digestDate);
 

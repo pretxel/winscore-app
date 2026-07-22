@@ -309,7 +309,7 @@ interface PreparedMessage {
 // is unset, or when no matches are scheduled for today. Per-recipient failures
 // are logged and counted, never aborting the rest; ledger rows are written only
 // for messages Resend accepted, so failures retry on a later run the same day.
-export async function dispatchPredictionReminders(fromName?: string): Promise<DispatchSummary> {
+export async function dispatchPredictionReminders(fromName?: string, leagueSlug?: string): Promise<DispatchSummary> {
   const senderMisconfigured = warnIfSenderMisconfigured();
   const flag = senderMisconfigured ? { senderMisconfigured } : {};
   if (!env.resendApiKey) {
@@ -317,7 +317,7 @@ export async function dispatchPredictionReminders(fromName?: string): Promise<Di
     return { ...ZERO, ...flag };
   }
 
-  const admin = createAdminSupabaseClient();
+  const admin = createAdminSupabaseClient(leagueSlug);
 
   const today = todayUtcDate();
   const window = utcDayWindow(today);
@@ -456,13 +456,13 @@ async function loadPushedUserIds(admin: AdminClient, date: string): Promise<stri
 // player per UTC day via prediction_reminder_push_log (written only after a
 // successful send). No-ops when VAPID is unset. Isolated by the caller: a
 // failure here never affects the email send or the run summary.
-export async function dispatchMatchNeededPush(): Promise<PushDispatchSummary> {
+export async function dispatchMatchNeededPush(leagueSlug?: string): Promise<PushDispatchSummary> {
   if (!isWebPushConfigured()) {
     console.log("[prediction-reminders] VAPID unset — skipping push");
     return { ...ZERO_PUSH };
   }
 
-  const admin = createAdminSupabaseClient();
+  const admin = createAdminSupabaseClient(leagueSlug);
   const today = todayUtcDate();
   const window = utcDayWindow(today);
 

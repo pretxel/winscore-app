@@ -211,14 +211,14 @@ async function loadBoard(admin: AdminClient): Promise<BoardRow[]> {
 // results_digest_log ledger. No-ops when RESEND_API_KEY is unset. Per-batch
 // failures are logged and counted, never aborting the rest; ledger rows are
 // written only for batches Resend accepted, so failures retry next run that day.
-export async function dispatchResultsDigest(fromName?: string): Promise<DispatchSummary> {
+export async function dispatchResultsDigest(fromName?: string, leagueSlug?: string): Promise<DispatchSummary> {
   const senderMisconfigured = warnIfSenderMisconfigured("dispatch");
   if (!env.resendApiKey) {
     console.log("[results-digest] RESEND_API_KEY unset — skipping dispatch");
     return { ...ZERO, ...(senderMisconfigured ? { senderMisconfigured } : {}) };
   }
 
-  const admin = createAdminSupabaseClient();
+  const admin = createAdminSupabaseClient(leagueSlug);
   const digestDate = utcToday();
 
   // Active players (in the view = at least one scored prediction; admins already

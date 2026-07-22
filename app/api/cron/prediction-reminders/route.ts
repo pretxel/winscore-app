@@ -4,7 +4,7 @@ import {
   dispatchPredictionReminders,
   dispatchMatchNeededPush,
 } from "@/lib/notifications/prediction-reminder-emails";
-import { getActiveBranding } from "@/lib/competition";
+import { forEachLiveLeague } from "@/lib/cron/for-each-league";
 import { recordRun } from "@/lib/operations/record-run";
 import { isOperationEnabled } from "@/lib/operations/settings";
 
@@ -42,27 +42,45 @@ export async function GET(request: NextRequest) {
   // into ret‑storming. recordRun captures every run; on a throw it records an
   // accurate status='error' row (and re-throws), which we catch here to keep the
   // unchanged 200/zero-summary response.
-  let summary = { emailed: 0, failed: 0, skipped: 0 };
+  let summary = { emailed: 0, failed: 0, skipped: 0, pushed: 0 };
+  let leaguesProcessed = 0;
   try {
     const recorded = await recordRun("prediction_reminders", "cron", async () => {
-      const { emailFromName } = await getActiveBranding();
-      const emailSummary = await dispatchPredictionReminders(emailFromName);
-      // Web Push rides the SAME run, reusing the pending set. Isolated: a push
-      // failure is logged and never affects the email summary or the run.
-      let pushed = 0;
-      try {
-        const push = await dispatchMatchNeededPush();
-        pushed = push.pushed;
-      } catch (err) {
-        console.error("[cron:prediction-reminders] push dispatch failed:", err);
-      }
-      return { ...emailSummary, pushed };
+      const { results, leaguesProcessed: n } = await forEachLiveLeague(
+        async (ctx) => {
+          const emailSummary = await dispatchPredictionReminders(
+            ctx.branding.emailFromName,
+            ctx.slug,
+          );
+          // Web Push rides the SAME run, reusing the pending set. Isolated: a
+          // push failure is logged and never affects the email summary or run.
+          let pushed = 0;
+          try {
+            const push = await dispatchMatchNeededPush(ctx.slug);
+            pushed = push.pushed;
+          } catch (err) {
+            console.error("[cron:prediction-reminders] push dispatch failed:", err);
+          }
+          return { ...emailSummary, pushed };
+        },
+      );
+      leaguesProcessed = n;
+      return results.reduce(
+        (a, s) => ({
+          emailed: a.emailed + s.emailed,
+          failed: a.failed + s.failed,
+          skipped: a.skipped + s.skipped,
+          pushed: a.pushed + s.pushed,
+        }),
+        { emailed: 0, failed: 0, skipped: 0, pushed: 0 },
+      );
     });
     summary = recorded.summary;
   } catch (err) {
     console.error("[cron:prediction-reminders] dispatch failed:", err);
   }
 
-  console.log(`[cron:prediction-reminders] summary:`, JSON.stringify(summary));
-  return NextResponse.json(summary);
+  const logged = { ...summary, leaguesProcessed };
+  console.log(`[cron:prediction-reminders] summary:`, JSON.stringify(logged));
+  return NextResponse.json(logged);
 }

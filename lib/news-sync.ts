@@ -32,11 +32,14 @@ function toRow(a: NewsArticle) {
 // feed, returning a count summary. Shared by the sync-news cron and the admin
 // "Run now" trigger so both go through identical logic. Assumes the caller has
 // already gated on env.newsApiToken (the cron returns a 204 skip when unset).
-export async function runNewsSync(): Promise<NewsSyncSummary> {
+export async function runNewsSync(
+  opts: { newsQuery?: string; leagueSlug?: string } = {},
+): Promise<NewsSyncSummary> {
   if (!env.newsApiToken) throw new Error("NEWS_API_TOKEN is not set");
 
-  // The search query comes from the active competition's branding.
-  const { newsQuery } = await getActiveBranding();
+  // The search query comes from the league's branding — the per-league cron loop
+  // passes it; unscoped callers fall back to the active competition's branding.
+  const newsQuery = opts.newsQuery ?? (await getActiveBranding()).newsQuery;
   const { articles, rawCount } = await fetchNewsFeed(
     env.newsApiToken,
     env.newsApiUrl ?? undefined,
@@ -53,7 +56,7 @@ export async function runNewsSync(): Promise<NewsSyncSummary> {
 
   if (articles.length === 0) return summary;
 
-  const admin = createAdminSupabaseClient();
+  const admin = createAdminSupabaseClient(opts.leagueSlug);
 
   // Partition into new vs existing for an accurate summary.
   const keys = articles.map((a) => a.dedupKey);

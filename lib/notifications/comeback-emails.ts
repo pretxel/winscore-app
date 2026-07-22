@@ -355,7 +355,7 @@ interface PreparedMessage {
 // RESEND_API_KEY is unset, or when no pickable matches exist. Per-recipient
 // failures are logged and counted, never aborting the rest; ledger rows are
 // written only for batches Resend accepted, so failures retry on a later run.
-export async function dispatchComebackEmails(fromName?: string): Promise<DispatchSummary> {
+export async function dispatchComebackEmails(fromName?: string, leagueSlug?: string): Promise<DispatchSummary> {
   const senderMisconfigured = warnIfSenderMisconfigured();
   const flag = senderMisconfigured ? { senderMisconfigured } : {};
   if (!env.resendApiKey) {
@@ -363,7 +363,7 @@ export async function dispatchComebackEmails(fromName?: string): Promise<Dispatc
     return { ...ZERO, ...flag };
   }
 
-  const admin = createAdminSupabaseClient();
+  const admin = createAdminSupabaseClient(leagueSlug);
 
   // Actionable matches first: none → nobody gets a dead-end nudge.
   const pickableMatches = await loadPickableMatches(admin);
