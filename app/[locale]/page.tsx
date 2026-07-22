@@ -216,23 +216,11 @@ function Hero({ locale, t }: { locale: Locale; t: T }) {
           className="rise relative overflow-hidden rounded-2xl ring-1 ring-border bg-card shadow-[0_24px_60px_-24px_rgba(15,23,42,0.18)] dark:shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)]"
           style={{ animationDelay: "120ms" }}
         >
-          <div className="bg-scoreboard relative px-5 py-4 text-pitch-foreground">
-            <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.24em] text-pitch-foreground/70">
-              <span>{t("demoMatchday")}</span>
-              <span className="live-pulse">{t("demoLive")}</span>
-            </div>
-            <div className="mt-3">
-              <MiniBracket />
-            </div>
-          </div>
-          <div className="grid grid-cols-3 divide-x divide-border bg-card text-center">
-            <Stat label={t("demoYourPick")} value="2 – 1" mono accent="pitch" />
-            <Stat label={t("demoPoints")} value="+5" mono accent="flag" />
-            <Stat label={t("demoDailyRank")} value="↑12" mono />
-          </div>
-          <div className="border-t border-border bg-muted/40 px-5 py-3 text-[11px] text-muted-foreground">
-            {t("demoFootnote")}
-          </div>
+          <img
+            src="/leagues-world.jpeg"
+            alt="Football leagues around the world"
+            className="h-auto w-full"
+          />
         </div>
       </div>
     </section>
