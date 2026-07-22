@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { listMyGroups } from "@/lib/groups";
+import { listLiveLeagues } from "@/lib/competition";
 import { CreateGroupForm, JoinGroupForm } from "./group-forms";
 import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 import { ChevronRightIcon, CrownIcon, UsersIcon } from "lucide-react";
@@ -31,6 +32,7 @@ export default async function GroupsPage({
 
   const t = await getTranslations("groups");
   const groups = await listMyGroups();
+  const leagues = await listLiveLeagues();
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -52,7 +54,7 @@ export default async function GroupsPage({
           <h2 className="mb-3 font-heading text-base font-semibold">
             {t("createTitle")}
           </h2>
-          <CreateGroupForm locale={locale} />
+          <CreateGroupForm locale={locale} leagues={leagues} />
         </section>
         <section className="rounded-xl border border-border bg-card p-4">
           <h2 className="mb-3 font-heading text-base font-semibold">

@@ -16,7 +16,13 @@ import {
 
 const INITIAL: GroupActionState = {};
 
-export function CreateGroupForm({ locale }: { locale: string }) {
+export function CreateGroupForm({
+  locale,
+  leagues,
+}: {
+  locale: string;
+  leagues: { id: string; name: string }[];
+}) {
   const t = useTranslations("groups");
   const [state, formAction, pending] = useActionState(
     createGroupAction,
@@ -27,12 +33,40 @@ export function CreateGroupForm({ locale }: { locale: string }) {
     if (state.error) toast.error(t(state.error));
   }, [state, t]);
 
+  if (leagues.length === 0) {
+    return (
+      <p className="text-muted-foreground text-sm">{t("noLiveLeagues")}</p>
+    );
+  }
+
   return (
     <form action={formAction} className="flex flex-col gap-2">
       <input type="hidden" name="locale" value={locale} />
       <Label
+        htmlFor="group-league"
+        className="text-muted-foreground font-mono text-[10px] tracking-[0.2em] uppercase"
+      >
+        {t("leagueEyebrow")}
+      </Label>
+      <select
+        id="group-league"
+        name="competitionId"
+        required
+        defaultValue=""
+        className="border-input bg-background focus-visible:ring-ring h-11 rounded-md border px-3 text-sm focus-visible:ring-2 focus-visible:outline-none"
+      >
+        <option value="" disabled>
+          {t("createLeaguePlaceholder")}
+        </option>
+        {leagues.map((l) => (
+          <option key={l.id} value={l.id}>
+            {l.name}
+          </option>
+        ))}
+      </select>
+      <Label
         htmlFor="group-name"
-        className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
+        className="text-muted-foreground font-mono text-[10px] tracking-[0.2em] uppercase"
       >
         {t("createNameLabel")}
       </Label>

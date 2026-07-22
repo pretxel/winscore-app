@@ -56,10 +56,15 @@ export async function createGroupAction(
   const locale = resolveLocale(formData);
   const parsed = nameSchema.safeParse(formData.get("name"));
   if (!parsed.success) return { error: "errorInvalidName" };
+  // The pool is created in a chosen live league; the RPC guards that the
+  // competition exists and is live.
+  const competition = idSchema.safeParse(formData.get("competitionId"));
+  if (!competition.success) return { error: "errorNoLeague" };
 
   const { supabase } = await requireUserClient();
   const { data: groupId, error } = await supabase.rpc("create_group", {
     p_name: parsed.data,
+    p_competition_id: competition.data,
   });
   if (error) return { error: "errorGeneric" };
 

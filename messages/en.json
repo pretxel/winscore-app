@@ -175,7 +175,8 @@
     "memberCount": "{count, plural, one {# member} other {# members}}",
     "emptyTitle": "No groups yet",
     "emptyLede": "Start a group in any live league, or browse what's on.",
-    "browseLeagues": "Browse leagues"
+    "browseLeagues": "Browse leagues",
+    "joinByCode": "Join by code"
   },
   "howItWorks": {
     "title": "How it works",
@@ -771,7 +772,10 @@
     "errorInvalidCode": "That invite code isn't valid.",
     "errorGeneric": "Something went wrong. Please try again.",
     "leagueEyebrow": "League",
-    "viewFixtures": "View fixtures"
+    "viewFixtures": "View fixtures",
+    "createLeaguePlaceholder": "Choose a league",
+    "noLiveLeagues": "No live leagues to create a group in yet.",
+    "errorNoLeague": "Choose a live league."
   },
   "groupInvite": {
     "subject": "{inviter} invited you to join {group}",

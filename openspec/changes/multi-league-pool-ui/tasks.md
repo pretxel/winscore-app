@@ -29,9 +29,9 @@ cutover behind `pnpm typecheck`.
 
 - [x] 4.1 Cross-league home: stacked `LeagueLane`s (rail + pool cards + live/next fixtures + "Start a pool"); empty state shows the catalog + primary create action. Data: `listMyPoolsByLeague()` + `getLeagueLaneFixtures()` (`lib/home.ts`). Also repointed the global nav (matches/standings/bracket/leaderboard/my-picks are league-scoped now → nav routes to `/catalog`). `home` + `nav.leagues` i18n keys added to all 4 locales. typecheck + lint + build green.
 - [x] 4.2 League catalog page: live leagues as startable options. Data: `listLiveLeagues()`. Matchday-board cards (LeagueRail + edition code + browse/start actions), `catalog` i18n namespace across 4 locales, localized `generateMetadata`.
-- [ ] 4.3 Create-pool flow (coupon aesthetic): select live league → name → create (pass `p_competition_id`) → surface `join_code`.
+- [x] 4.3 Create-pool flow: `CreateGroupForm` gains a live-league `<select>` (from `listLiveLeagues()`); `createGroupAction` passes `p_competition_id` to `create_group` (RPC guards live-league); redirect to the pool dashboard surfaces the `join_code` (InviteShare). `groups` create-league i18n across 4 locales.
 - [x] 4.4 Pool dashboard: single-league focus via `getLeagueForPool` — league header + its live/next fixtures (`FixturesStrip`, shared with the home lane) + "View fixtures" link; pool standings already scoped by the pool's competition (`getGroupBoard`). `groups.leagueEyebrow`/`viewFixtures` i18n across 4 locales.
-- [ ] 4.5 Join-by-code entry point on the home and pool dashboard.
+- [x] 4.5 Join-by-code entry point: "Join by code" links on the cross-league home (lanes header + empty state) → `/groups` join form; the pool dashboard already surfaces the join code via `InviteShare`. `home.joinByCode` i18n across 4 locales.
 
 ## 5. Cutover (cleanup migration)
 

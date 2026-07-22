@@ -175,7 +175,8 @@
     "memberCount": "{count, plural, one {# membre} other {# membres}}",
     "emptyTitle": "Aucun groupe pour l'instant",
     "emptyLede": "Créez un groupe dans une ligue active ou parcourez les ligues.",
-    "browseLeagues": "Parcourir les ligues"
+    "browseLeagues": "Parcourir les ligues",
+    "joinByCode": "Rejoindre avec un code"
   },
   "howItWorks": {
     "title": "Fonctionnement",
@@ -771,7 +772,10 @@
     "errorInvalidCode": "Ce code d'invitation n'est pas valide.",
     "errorGeneric": "Une erreur est survenue. Réessayez.",
     "leagueEyebrow": "Ligue",
-    "viewFixtures": "Voir les matchs"
+    "viewFixtures": "Voir les matchs",
+    "createLeaguePlaceholder": "Choisir une ligue",
+    "noLiveLeagues": "Aucune ligue active pour créer un groupe.",
+    "errorNoLeague": "Choisissez une ligue active."
   },
   "groupInvite": {
     "subject": "{inviter} vous invite à rejoindre {group}",

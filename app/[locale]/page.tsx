@@ -67,9 +67,17 @@ export default async function HomePage({
       );
       return (
         <main className="mx-auto max-w-5xl px-4 py-8 sm:py-10">
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-            {t("lanesEyebrow")}
-          </p>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <p className="text-muted-foreground font-mono text-[11px] tracking-[0.24em] uppercase">
+              {t("lanesEyebrow")}
+            </p>
+            <Link
+              href={localePath(locale, "/groups")}
+              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+            >
+              {t("joinByCode")}
+            </Link>
+          </div>
           <div className="grid gap-4">
             {lanes.map(({ lane, fixtures }) => (
               <LeagueLane
@@ -123,6 +131,12 @@ function EmptyGroupsHome({ locale, t }: { locale: Locale; t: T }) {
         >
           {t("browseLeagues")}
           <ArrowRightIcon className="ml-1 size-4" />
+        </Link>
+        <Link
+          href={localePath(locale, "/groups")}
+          className={cn(buttonVariants({ variant: "ghost", size: "lg" }))}
+        >
+          {t("joinByCode")}
         </Link>
       </div>
     </main>
