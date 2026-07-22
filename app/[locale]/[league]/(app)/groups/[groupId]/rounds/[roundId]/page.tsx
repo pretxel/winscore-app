@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { MatchdayPredictionBoard } from "./prediction-board";
+import { WalletLinkButton } from "@/components/wallet/wallet-link-button";
 
 export default async function RoundSheetPage({
   params,
@@ -193,7 +194,7 @@ export default async function RoundSheetPage({
         </>
       )}
 
-      {/* Wager rail placeholder (task 3.5: default-off) */}
+      {/* Wager rail — wallet connection + wager entry */}
       {user && isMember && !isAdmin && (
         <>
           <Separator />
@@ -201,10 +202,11 @@ export default async function RoundSheetPage({
             <CardHeader>
               <CardTitle className="text-base">{t("wagerRail.title")}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 {t("wagerRail.unavailable")}
               </p>
+              <WalletLinkButton />
             </CardContent>
           </Card>
         </>
