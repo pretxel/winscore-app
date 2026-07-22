@@ -111,7 +111,6 @@ export async function SiteFooter() {
           >
             {t("howItWorks")}
           </Link>
-          <span className="text-muted-foreground/70">{t("hosts")}</span>
         </div>
       </div>
     </footer>

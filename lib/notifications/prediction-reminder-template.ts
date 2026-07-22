@@ -7,17 +7,7 @@
 // and pass already-localized copy in `strings` plus the resolved fixture rows in
 // `matches`, keeping this fully unit-testable.
 
-const C = {
-  background: "#FAF9F4",
-  card: "#FFFFFF",
-  ink: "#1B2330",
-  muted: "#6B7280",
-  border: "#E5E2D7",
-  pitch: "#135FD1",
-  pitchFg: "#FAF9F4",
-  flag: "#E7B53C",
-  flagFg: "#3A2E14",
-} as const;
+import { C } from "./email-theme";
 
 const SANS =
   "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";

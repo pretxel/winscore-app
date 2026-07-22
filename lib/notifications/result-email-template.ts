@@ -12,21 +12,7 @@ import type { HitType } from "@/lib/db";
 // Palette — fixed hex equivalents of the app's light-theme oklch tokens.
 // Kept here (not in globals.css) because mail clients can't resolve var()/oklch.
 // ---------------------------------------------------------------------------
-const C = {
-  background: "#FAF9F4",
-  card: "#FFFFFF",
-  ink: "#1B2330",
-  muted: "#6B7280",
-  border: "#E5E2D7",
-  pitch: "#135FD1",
-  pitchFg: "#FAF9F4",
-  flag: "#E7B53C",
-  flagFg: "#3A2E14",
-  live: "#D6402F",
-  // Soft tints used for the per-match outcome chips.
-  pitchTint: "#E7EFFC",
-  mutedTint: "#F0EEE6",
-} as const;
+import { C } from "./email-theme";
 
 const SANS =
   "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
