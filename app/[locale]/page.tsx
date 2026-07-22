@@ -6,14 +6,10 @@ import {
   ArrowRightIcon,
   BrainIcon,
   NewspaperIcon,
-  TargetIcon,
-  TrophyIcon,
   UsersIcon,
-  ZapIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
-import { MiniBracket } from "@/components/mini-bracket";
 import { Logotype } from "@/components/logotype";
 import { TournamentCountdown } from "@/components/tournament-countdown";
 import { ScoringExplainer } from "@/components/scoring-explainer";
@@ -96,7 +92,6 @@ export default async function HomePage({
     <main className="landing-blue">
       <Hero locale={locale} t={t} />
       <TournamentCountdown />
-      <ScoringSection locale={locale} t={t} />
       <ScoringExplainer locale={locale} />
       <Cadence t={t} />
       <FeatureSections locale={locale} t={t} />
@@ -203,12 +198,6 @@ function Hero({ locale, t }: { locale: Locale; t: T }) {
             >
               {t("ctaBrowse")}
             </Link>
-            <Link
-              href="#scoring"
-              className="text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-            >
-              {t("ctaScoring")}
-            </Link>
           </div>
         </div>
 
@@ -223,176 +212,6 @@ function Hero({ locale, t }: { locale: Locale; t: T }) {
           />
         </div>
       </div>
-    </section>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  mono,
-  accent,
-}: {
-  label: string;
-  value: string;
-  mono?: boolean;
-  accent?: "pitch" | "flag";
-}) {
-  return (
-    <div className="px-3 py-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-        {label}
-      </div>
-      <div
-        className={cn(
-          "mt-1 text-xl font-semibold leading-none",
-          mono && "font-mono tabular-nums",
-          accent === "pitch" && "text-pitch",
-          accent === "flag" && "text-flag",
-        )}
-      >
-        {value}
-      </div>
-    </div>
-  );
-}
-
-function ScoringSection({ locale, t }: { locale: Locale; t: T }) {
-  const scoringTiers: Array<{
-    pts: number;
-    titleKey:
-      | "scoringTierExactTitle"
-      | "scoringTierWinnerGdTitle"
-      | "scoringTierWinnerTitle"
-      | "scoringTierMissTitle";
-    detailKey:
-      | "scoringTierExactDetail"
-      | "scoringTierWinnerGdDetail"
-      | "scoringTierWinnerDetail"
-      | "scoringTierMissDetail";
-    Icon: React.ComponentType<{ className?: string }>;
-    accent: "pitch" | "flag" | "muted" | "ghost";
-  }> = [
-    {
-      pts: 5,
-      titleKey: "scoringTierExactTitle",
-      detailKey: "scoringTierExactDetail",
-      Icon: TargetIcon,
-      accent: "pitch",
-    },
-    {
-      pts: 3,
-      titleKey: "scoringTierWinnerGdTitle",
-      detailKey: "scoringTierWinnerGdDetail",
-      Icon: ZapIcon,
-      accent: "flag",
-    },
-    {
-      pts: 1,
-      titleKey: "scoringTierWinnerTitle",
-      detailKey: "scoringTierWinnerDetail",
-      Icon: TrophyIcon,
-      accent: "muted",
-    },
-    {
-      pts: 0,
-      titleKey: "scoringTierMissTitle",
-      detailKey: "scoringTierMissDetail",
-      Icon: ArrowRightIcon,
-      accent: "ghost",
-    },
-  ];
-
-  return (
-    <section
-      id="scoring"
-      className="relative mx-auto max-w-6xl px-4 py-16 sm:py-20"
-    >
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-            {t("scoringEyebrow")}
-          </p>
-          <h2
-            className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl"
-            style={{ fontStretch: "condensed" }}
-          >
-            {t("scoringHeadline")}
-          </h2>
-        </div>
-        <p className="mt-2 max-w-xs text-sm text-muted-foreground sm:text-right">
-          {t("scoringSubtitle")}
-        </p>
-      </div>
-
-      <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {scoringTiers.map((tier, i) => {
-          const accentRing =
-            tier.accent === "pitch"
-              ? "ring-pitch/40"
-              : tier.accent === "flag"
-                ? "ring-flag/50"
-                : "ring-border";
-          const accentBg =
-            tier.accent === "pitch"
-              ? "bg-pitch text-pitch-foreground"
-              : tier.accent === "flag"
-                ? "bg-flag text-flag-foreground"
-                : tier.accent === "muted"
-                  ? "bg-muted text-muted-foreground"
-                  : "bg-secondary text-muted-foreground/80";
-          return (
-            <li
-              key={tier.pts}
-              className={cn(
-                "group relative flex flex-col justify-between overflow-hidden rounded-xl bg-card p-5 ring-1 transition-shadow hover:shadow-lg",
-                accentRing,
-              )}
-            >
-              <div className="flex items-start justify-between">
-                <div
-                  className={cn(
-                    "grid size-9 place-items-center rounded-md",
-                    accentBg,
-                  )}
-                >
-                  <tier.Icon className="size-4" />
-                </div>
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                  {String(i + 1).padStart(2, "0")} / 04
-                </span>
-              </div>
-              <div className="mt-8">
-                <div className="flex items-baseline gap-1">
-                  <span className="font-mono text-5xl font-semibold leading-none tracking-tight tabular-nums">
-                    {tier.pts}
-                  </span>
-                  <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    {t("scoringPts")}
-                  </span>
-                </div>
-                <div className="mt-2 font-heading text-base font-semibold tracking-tight">
-                  {t(tier.titleKey)}
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {t(tier.detailKey)}
-                </p>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-
-      <p className="mt-8 text-sm text-muted-foreground">
-        {t("scoringFootnote")}{" "}
-        <Link
-          href={localePath(locale, "/how-it-works")}
-          className="font-medium text-foreground underline underline-offset-4 hover:text-pitch"
-        >
-          {t("scoringFootnoteLink")}
-        </Link>
-        .
-      </p>
     </section>
   );
 }
