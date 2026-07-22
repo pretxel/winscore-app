@@ -354,3 +354,80 @@ export function DeleteGroupButton({
     </Dialog>
   );
 }
+
+export function WagerConfigPanel({
+  groupId,
+  locale,
+  wagerEnabled,
+  stakeDisplay,
+  tokenSymbol,
+}: {
+  groupId: string;
+  locale: string;
+  wagerEnabled: boolean;
+  stakeDisplay?: string;
+  tokenSymbol?: string;
+}) {
+  const t = useTranslations("wager");
+  const [open, setOpen] = useState(false);
+
+  if (!wagerEnabled) {
+    return (
+      <div className="rounded-lg border border-dashed border-muted p-4 space-y-3">
+        <p className="text-sm text-muted-foreground">
+          Matchday wagers are not configured for this pool.
+        </p>
+        <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+          Enable Wagers
+        </Button>
+
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Enable Matchday Wagers</DialogTitle>
+              <DialogDescription>
+                This will allow pool members to stake tokens on their round predictions using Solana Devnet.
+              </DialogDescription>
+            </DialogHeader>
+            <form
+              action={async (formData: FormData) => {
+                setOpen(false);
+              }}
+              className="space-y-4"
+            >
+              <input type="hidden" name="group_id" value={groupId} />
+              <input type="hidden" name="locale" value={locale} />
+              <div className="space-y-2">
+                <Label>Stake per round</Label>
+                <Input name="stake" placeholder="1" defaultValue="1" />
+                <p className="text-xs text-muted-foreground">
+                  Fixed stake in {tokenSymbol ?? "tokens"} per participant per round.
+                </p>
+              </div>
+              <DialogFooter>
+                <DialogClose render={<Button variant="outline" />}>
+                  Cancel
+                </DialogClose>
+                <Button type="submit">Enable Wagers</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-pitch/20 bg-pitch/5 p-4 space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium">Matchday Wagers</span>
+        <span className="rounded-full bg-pitch/10 px-2 py-0.5 text-xs text-pitch font-medium">
+          Active
+        </span>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Stake: {stakeDisplay ?? "1"} {tokenSymbol ?? "TOKEN"} per round · Solana Devnet
+      </p>
+    </div>
+  );
+}

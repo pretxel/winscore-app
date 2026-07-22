@@ -97,6 +97,21 @@ export const env = {
   vapidPublicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null,
   vapidPrivateKey: process.env.VAPID_PRIVATE_KEY ?? null,
   vapidSubject: process.env.VAPID_SUBJECT ?? null,
+
+  // Solana wager configuration. All nullable so the build doesn't crash on
+  // cold envs. WAGER_CLUSTER must be "devnet" for MVP; any other value
+  // (including mainnet-beta) fails closed. Private RPC credentials and
+  // authority details are server-only.
+  wagerCluster: process.env.WAGER_CLUSTER ?? null,
+  wagerRpcUrl: process.env.WAGER_RPC_URL ?? null,
+  wagerWsUrl: process.env.WAGER_WS_URL ?? null,
+  wagerRpcApiKey: process.env.WAGER_RPC_API_KEY ?? null,
+  wagerProgramId: process.env.WAGER_PROGRAM_ID ?? null,
+  wagerApprovedMint: process.env.WAGER_APPROVED_MINT ?? null,
+  wagerTokenProgram: process.env.WAGER_TOKEN_PROGRAM ?? null,
+  wagerUiEnabled: process.env.WAGER_UI_ENABLED ?? null,
+  wagerDepositsEnabled: process.env.WAGER_DEPOSITS_ENABLED ?? null,
+  wagerSettlementEnabled: process.env.WAGER_SETTLEMENT_ENABLED ?? null,
 };
 
 export function requireServiceRoleKey(): string {

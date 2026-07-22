@@ -39,7 +39,18 @@ export const footballDataProvider: ResultProvider = {
         `Football-Data fetch failed: ${resp.status} ${resp.statusText}`,
       );
     }
-    const body = (await resp.json()) as { matches?: RemoteMatch[] };
-    return body.matches ?? [];
+    const body = (await resp.json()) as {
+      matches?: (RemoteMatch & { matchday?: number; stage?: string })[];
+    };
+    return (body.matches ?? []).map((m) => ({
+      ...m,
+      // Preserve reliable provider round key: combine stage + matchday when available.
+      // Example: "REGULAR_SEASON:3" or "GROUP_STAGE:1"
+      // Falls back to the API's stage field alone.
+      stage:
+        m.stage && m.matchday != null
+          ? `${m.stage}:${m.matchday}`
+          : m.stage ?? null,
+    }));
   },
 };

@@ -378,6 +378,32 @@
     "summaryDisclaimer": "AI-generated summary",
     "recapImageAlt": "Comic recap of {home} vs {away}"
   },
+  "matchdaySheet": {
+    "fixtures": "fixtures",
+    "statusPending": "Not yet open",
+    "statusActive": "Open for picks",
+    "statusClosed": "Closed",
+    "signInToPick": "Sign in to submit your matchday picks.",
+    "notMember": "You are not a member of this pool.",
+    "adminBlocked": "Admins can't submit picks.",
+    "poolNotFound": "Pool not found.",
+    "roundNotFound": "Round not found.",
+    "saveAllPicks": "Save all picks",
+    "saving": "Saving…",
+    "saved": "{count, plural, =0 {No new picks saved} one {# pick saved} other {# picks saved}}",
+    "lockedCount": "{count} locked",
+    "allPicksComplete": "All picks saved — good luck!",
+    "picksRemaining": "{remaining} pick{remaining, plural, =1 {} other {s}} remaining",
+    "locked": "Locked",
+    "picked": "Picked",
+    "errorInvalidInput": "Invalid prediction data. Check your scores.",
+    "errorNotSignedIn": "Please sign in to submit picks.",
+    "errorNotMember": "You must be a pool member to submit picks.",
+    "wagerRail": {
+      "title": "Matchday Wager",
+      "unavailable": "Wagering is not available for this round. Free picks are always on."
+    }
+  },
   "recapReactions": {
     "heading": "React to this recap",
     "toggleAria": "{label} ({count})",
@@ -980,6 +1006,7 @@
       "dashboard": "Dashboard",
       "competitions": "Competitions",
       "fixtures": "Fixtures",
+      "rounds": "Rounds",
       "quiz": "Quiz",
       "sectionLabel": "Admin",
       "operations": "Operations"
@@ -1243,7 +1270,52 @@
     "revealStateOn": "Revealed",
     "revealStateOff": "Hidden",
     "revealShow": "Reveal",
-    "revealHide": "Hide"
+    "revealHide": "Hide",
+    "rounds": {
+      "title": "Competition Rounds",
+      "description": "Manage competition rounds, assign fixtures, and review provider data.",
+      "tabs": {
+        "rounds": "Rounds",
+        "unmapped": "Unmapped fixtures",
+        "create": "New round"
+      },
+      "empty": "No rounds created yet.",
+      "allMapped": "All fixtures are assigned to a round.",
+      "unmappedDescription": "These fixtures have no round assigned. Select a round from the same competition to assign them.",
+      "fixtures": "fixtures",
+      "opens": "Opens",
+      "selectRound": "Select round…",
+      "assign": "Assign",
+      "markReviewed": "Mark reviewed",
+      "close": "Close",
+      "closeConfirm": "This will close the round and prevent further edits. Continue?",
+      "createTitle": "Create a competition round",
+      "status": {
+        "pending": "Pending",
+        "active": "Active",
+        "closed": "Closed",
+        "review": "Needs review"
+      },
+      "reviewStatus": {
+        "unmapped": "Unmapped",
+        "mapped": "Mapped",
+        "conflict": "Conflict",
+        "changed": "Changed",
+        "reviewed": "Reviewed"
+      },
+      "form": {
+        "competition": "Competition",
+        "selectComp": "Select a competition…",
+        "roundKey": "Round key",
+        "roundNumber": "Round number",
+        "displayOrder": "Display order",
+        "labels": "Labels (en, es, fr, de)",
+        "opensAt": "Opens at",
+        "adminClosesAt": "Admin close (optional)",
+        "status": "Status",
+        "providerMetadata": "Provider metadata"
+      }
+    }
   },
   "error": {
     "eyebrow": "Stoppage time",
@@ -1337,6 +1409,33 @@
     "ctaLabel": "Answer today's question",
     "footer": "You're getting this because you're playing Winscore. The quiz resets every day at midnight UTC.",
     "unsubscribeLabel": "Unsubscribe from daily quiz reminders"
+  },
+  "wager": {
+    "railTitle": "Matchday Wager",
+    "unavailable": "Wagering is not available for this round. Free picks are always on.",
+    "needPicks": "Complete all your free picks first, then the wager option will unlock.",
+    "linkWallet": "Link a Solana wallet to enable wagering for this round.",
+    "linkWalletCta": "Link Wallet",
+    "notEligible": "Eligibility checks must pass before entering a wager. Check your profile settings.",
+    "stake": "Stake",
+    "pot": "Pot",
+    "participants": "Participants",
+    "closes": "Closes",
+    "wallet": "Wallet not linked",
+    "oracle": "Winscore oracle · Immutable snapshot",
+    "enterWager": "Enter Wager — {stake} {token}",
+    "consentTitle": "Confirm Your Entry",
+    "consentBody": "By confirming, your wallet will sign a transaction transferring exactly {stake} {token} to the escrow program on Solana Devnet. Devnet tokens have no real value. Winscore is the settlement oracle. Rules are final.",
+    "back": "Back",
+    "consentConfirm": "I Understand — Sign Transaction",
+    "awaitingSignature": "Awaiting signature…",
+    "awaitingBody": "Confirm the transaction in your wallet.",
+    "confirmed": "Entry Confirmed",
+    "confirmedBody": "Your {stake} {token} has been deposited. Results will be settled after the round closes.",
+    "failed": "Entry Failed",
+    "tryAgain": "Try Again",
+    "explorer": "Explorer",
+    "devnetBadge": "Devnet"
   },
   "welcomeEmail": {
     "subject": "Welcome to Winscore",

@@ -378,6 +378,32 @@
     "summaryDisclaimer": "KI-generierte Zusammenfassung",
     "recapImageAlt": "Comic-Rückblick: {home} gegen {away}"
   },
+  "matchdaySheet": {
+    "fixtures": "Spiele",
+    "statusPending": "Noch nicht geöffnet",
+    "statusActive": "Für Tipps geöffnet",
+    "statusClosed": "Geschlossen",
+    "signInToPick": "Melden Sie sich an, um Ihre Tipps abzugeben.",
+    "notMember": "Sie sind kein Mitglied dieses Pools.",
+    "adminBlocked": "Administratoren können keine Tipps abgeben.",
+    "poolNotFound": "Pool nicht gefunden.",
+    "roundNotFound": "Spieltag nicht gefunden.",
+    "saveAllPicks": "Alle speichern",
+    "saving": "Wird gespeichert…",
+    "saved": "{count, plural, =0 {Keine neuen Tipps} one {# Tipp gespeichert} other {# Tipps gespeichert}}",
+    "lockedCount": "{count} gesperrt",
+    "allPicksComplete": "Alle Tipps gespeichert — viel Glück!",
+    "picksRemaining": "Noch {remaining} Tipp{remaining, plural, =1 {} other {s}}",
+    "locked": "Gesperrt",
+    "picked": "Getippt",
+    "errorInvalidInput": "Ungültige Tippdaten. Überprüfen Sie Ihre Spielstände.",
+    "errorNotSignedIn": "Bitte melden Sie sich an, um Tipps abzugeben.",
+    "errorNotMember": "Sie müssen Pool-Mitglied sein, um Tipps abzugeben.",
+    "wagerRail": {
+      "title": "Spieltag-Wette",
+      "unavailable": "Wetten sind für diesen Spieltag nicht verfügbar. Kostenlose Tipps sind immer aktiv."
+    }
+  },
   "recapReactions": {
     "heading": "Reagiere auf diesen Rückblick",
     "toggleAria": "{label} ({count})",
@@ -980,6 +1006,7 @@
       "dashboard": "Dashboard",
       "competitions": "Wettbewerbe",
       "fixtures": "Spielplan",
+      "rounds": "Spieltage",
       "quiz": "Quiz",
       "sectionLabel": "Administration",
       "operations": "Betrieb"
@@ -1243,7 +1270,52 @@
     "revealStateOn": "Sichtbar",
     "revealStateOff": "Verborgen",
     "revealShow": "Anzeigen",
-    "revealHide": "Verbergen"
+    "revealHide": "Verbergen",
+    "rounds": {
+      "title": "Wettbewerbs-Spieltage",
+      "description": "Verwalten Sie Spieltage, weisen Sie Spiele zu und überprüfen Sie Provider-Daten.",
+      "tabs": {
+        "rounds": "Spieltage",
+        "unmapped": "Nicht zugewiesene Spiele",
+        "create": "Neuer Spieltag"
+      },
+      "empty": "Noch keine Spieltage erstellt.",
+      "allMapped": "Alle Spiele sind einem Spieltag zugewiesen.",
+      "unmappedDescription": "Diese Spiele haben keinen Spieltag. Wählen Sie einen Spieltag derselben Liga zur Zuweisung.",
+      "fixtures": "Spiele",
+      "opens": "Öffnet",
+      "selectRound": "Spieltag wählen…",
+      "assign": "Zuweisen",
+      "markReviewed": "Als geprüft markieren",
+      "close": "Schließen",
+      "closeConfirm": "Dadurch wird der Spieltag geschlossen und weitere Bearbeitungen verhindert. Fortfahren?",
+      "createTitle": "Einen Wettbewerbs-Spieltag erstellen",
+      "status": {
+        "pending": "Ausstehend",
+        "active": "Aktiv",
+        "closed": "Geschlossen",
+        "review": "Prüfung nötig"
+      },
+      "reviewStatus": {
+        "unmapped": "Nicht zugeordnet",
+        "mapped": "Zugeordnet",
+        "conflict": "Konflikt",
+        "changed": "Geändert",
+        "reviewed": "Geprüft"
+      },
+      "form": {
+        "competition": "Wettbewerb",
+        "selectComp": "Wettbewerb wählen…",
+        "roundKey": "Spieltagsschlüssel",
+        "roundNumber": "Spieltagsnummer",
+        "displayOrder": "Anzeigereihenfolge",
+        "labels": "Bezeichnungen (en, es, fr, de)",
+        "opensAt": "Öffnungszeit",
+        "adminClosesAt": "Admin-Schließzeit (optional)",
+        "status": "Status",
+        "providerMetadata": "Provider-Metadaten"
+      }
+    }
   },
   "error": {
     "eyebrow": "Nachspielzeit",
@@ -1337,6 +1409,33 @@
     "ctaLabel": "Heutige Frage beantworten",
     "footer": "Du erhältst diese E-Mail, weil du bei Winscore teilnimmst. Das Quiz wird jeden Tag um Mitternacht UTC zurückgesetzt.",
     "unsubscribeLabel": "Erinnerungen zum täglichen Quiz abbestellen"
+  },
+  "wager": {
+    "railTitle": "Spieltag-Wette",
+    "unavailable": "Wetten sind für diesen Spieltag nicht verfügbar. Kostenlose Tipps sind immer aktiv.",
+    "needPicks": "Gib zuerst alle deine Tipps ab, dann wird die Wett-Option freigeschaltet.",
+    "linkWallet": "Verknüpfe eine Solana-Wallet, um Wetten zu aktivieren.",
+    "linkWalletCta": "Wallet verknüpfen",
+    "notEligible": "Die Berechtigungsprüfungen müssen bestanden werden, bevor du wetten kannst. Überprüfe dein Profil.",
+    "stake": "Einsatz",
+    "pot": "Pott",
+    "participants": "Teilnehmer",
+    "closes": "Schließt",
+    "wallet": "Wallet nicht verknüpft",
+    "oracle": "Winscore Orakel · Unveränderlicher Snapshot",
+    "enterWager": "Teilnehmen — {stake} {token}",
+    "consentTitle": "Teilnahme bestätigen",
+    "consentBody": "Durch die Bestätigung signiert deine Wallet eine Transaktion, die genau {stake} {token} an das Treuhandprogramm auf Solana Devnet überweist. Devnet-Token haben keinen realen Wert. Winscore ist das Abrechnungsorakel. Die Regeln sind endgültig.",
+    "back": "Zurück",
+    "consentConfirm": "Ich verstehe — Transaktion signieren",
+    "awaitingSignature": "Warte auf Unterschrift…",
+    "awaitingBody": "Bestätige die Transaktion in deiner Wallet.",
+    "confirmed": "Teilnahme bestätigt",
+    "confirmedBody": "Deine {stake} {token} wurden hinterlegt. Die Ergebnisse werden nach Schließung des Spieltags abgerechnet.",
+    "failed": "Teilnahme fehlgeschlagen",
+    "tryAgain": "Erneut versuchen",
+    "explorer": "Explorer",
+    "devnetBadge": "Devnet"
   },
   "welcomeEmail": {
     "subject": "Willkommen bei Winscore",

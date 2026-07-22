@@ -7,6 +7,7 @@ import { ManagedContextBar } from "@/components/admin/managed-context-bar";
 const NAV = [
   { href: "/admin", key: "dashboard" },
   { href: "/admin/competitions", key: "competitions" },
+  { href: "/admin/rounds", key: "rounds" },
   { href: "/admin/matches", key: "fixtures" },
   { href: "/admin/quiz", key: "quiz" },
   { href: "/admin/operations", key: "operations" },

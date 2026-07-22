@@ -11,6 +11,9 @@ export type RemoteMatch = {
   score?: {
     fullTime?: { home: number | null; away: number | null } | null;
   } | null;
+  /** Provider's round key (e.g. football-data "Regular Season - 1", "Matchday 3").
+   *  Preserved verbatim for admin round assignment review. Never inferred from dates. */
+  stage?: string | null;
 };
 
 export type LocalMatch = {
@@ -43,6 +46,22 @@ export type RunSummary = {
   source: SyncSource | "none";
   stale: number;
   staleResolved: number;
+};
+
+/** Round review state surfaced when provider round data conflicts with existing assignments. */
+export type RoundReviewState =
+  | "unmapped"   // No provider round key mapped to a competition_round
+  | "mapped"     // Provider round key matches existing assignment
+  | "conflict"   // Provider round key differs from existing assignment
+  | "changed"    // Previously reviewed, now different
+  | "reviewed";  // Admin has confirmed the assignment
+
+/** Per-match round metadata preserved during sync for admin review. */
+export type MatchRoundContext = {
+  matchId: string;
+  providerRoundKey: string | null;
+  assignedRoundId: string | null;
+  reviewState: RoundReviewState;
 };
 
 export interface ResultProvider {

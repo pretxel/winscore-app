@@ -378,6 +378,32 @@
     "summaryDisclaimer": "Resumen generado por IA",
     "recapImageAlt": "Resumen cómic de {home} vs {away}"
   },
+  "matchdaySheet": {
+    "fixtures": "partidos",
+    "statusPending": "Aún no abierta",
+    "statusActive": "Abierta para pronósticos",
+    "statusClosed": "Cerrada",
+    "signInToPick": "Inicia sesión para enviar tus pronósticos.",
+    "notMember": "No eres miembro de este grupo.",
+    "adminBlocked": "Los administradores no pueden hacer pronósticos.",
+    "poolNotFound": "Grupo no encontrado.",
+    "roundNotFound": "Ronda no encontrada.",
+    "saveAllPicks": "Guardar todos",
+    "saving": "Guardando…",
+    "saved": "{count, plural, =0 {Sin pronósticos nuevos} one {# pronóstico guardado} other {# pronósticos guardados}}",
+    "lockedCount": "{count} bloqueados",
+    "allPicksComplete": "¡Todos los pronósticos guardados, buena suerte!",
+    "picksRemaining": "{remaining} pronóstico{remaining, plural, =1 {} other {s}} restante{remaining, plural, =1 {} other {s}}",
+    "locked": "Bloqueado",
+    "picked": "Pronosticado",
+    "errorInvalidInput": "Datos de pronóstico inválidos. Revisa tus marcadores.",
+    "errorNotSignedIn": "Inicia sesión para enviar pronósticos.",
+    "errorNotMember": "Debes ser miembro del grupo para enviar pronósticos.",
+    "wagerRail": {
+      "title": "Apuesta de la jornada",
+      "unavailable": "Las apuestas no están disponibles para esta ronda. Los pronósticos gratuitos siempre están activos."
+    }
+  },
   "recapReactions": {
     "heading": "Reacciona a este resumen",
     "toggleAria": "{label} ({count})",
@@ -980,6 +1006,7 @@
       "dashboard": "Panel",
       "competitions": "Competiciones",
       "fixtures": "Partidos",
+      "rounds": "Rondas",
       "quiz": "Quiz",
       "sectionLabel": "Admin",
       "operations": "Operaciones"
@@ -1243,7 +1270,52 @@
     "revealStateOn": "Visible",
     "revealStateOff": "Oculta",
     "revealShow": "Mostrar",
-    "revealHide": "Ocultar"
+    "revealHide": "Ocultar",
+    "rounds": {
+      "title": "Rondas de la competición",
+      "description": "Gestiona las rondas, asigna partidos y revisa los datos del proveedor.",
+      "tabs": {
+        "rounds": "Rondas",
+        "unmapped": "Partidos sin asignar",
+        "create": "Nueva ronda"
+      },
+      "empty": "No hay rondas creadas todavía.",
+      "allMapped": "Todos los partidos están asignados a una ronda.",
+      "unmappedDescription": "Estos partidos no tienen ronda asignada. Selecciona una ronda de la misma competición para asignarlos.",
+      "fixtures": "partidos",
+      "opens": "Abre",
+      "selectRound": "Seleccionar ronda…",
+      "assign": "Asignar",
+      "markReviewed": "Marcar revisado",
+      "close": "Cerrar",
+      "closeConfirm": "Esto cerrará la ronda e impedirá más ediciones. ¿Continuar?",
+      "createTitle": "Crear una ronda de competición",
+      "status": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "closed": "Cerrada",
+        "review": "Necesita revisión"
+      },
+      "reviewStatus": {
+        "unmapped": "Sin mapear",
+        "mapped": "Mapeada",
+        "conflict": "Conflicto",
+        "changed": "Cambiada",
+        "reviewed": "Revisada"
+      },
+      "form": {
+        "competition": "Competición",
+        "selectComp": "Seleccionar competición…",
+        "roundKey": "Clave de ronda",
+        "roundNumber": "Número de ronda",
+        "displayOrder": "Orden de visualización",
+        "labels": "Etiquetas (en, es, fr, de)",
+        "opensAt": "Fecha de apertura",
+        "adminClosesAt": "Cierre admin (opcional)",
+        "status": "Estado",
+        "providerMetadata": "Metadatos del proveedor"
+      }
+    }
   },
   "error": {
     "eyebrow": "Tiempo añadido",
@@ -1337,6 +1409,33 @@
     "ctaLabel": "Responder la pregunta de hoy",
     "footer": "Recibes esto porque participas en Winscore. El quiz se reinicia cada día a medianoche UTC.",
     "unsubscribeLabel": "Cancelar los recordatorios del quiz diario"
+  },
+  "wager": {
+    "railTitle": "Apuesta de la jornada",
+    "unavailable": "Las apuestas no están disponibles para esta ronda. Los pronósticos gratuitos siempre están activos.",
+    "needPicks": "Completa todos tus pronósticos primero, luego la opción de apuesta se desbloqueará.",
+    "linkWallet": "Vincula una wallet de Solana para habilitar las apuestas.",
+    "linkWalletCta": "Vincular Wallet",
+    "notEligible": "Las comprobaciones de elegibilidad deben pasar antes de apostar. Revisa tu perfil.",
+    "stake": "Apuesta",
+    "pot": "Bote",
+    "participants": "Participantes",
+    "closes": "Cierra",
+    "wallet": "Wallet no vinculada",
+    "oracle": "Oráculo Winscore · Instantánea inmutable",
+    "enterWager": "Entrar — {stake} {token}",
+    "consentTitle": "Confirma tu entrada",
+    "consentBody": "Al confirmar, tu wallet firmará una transacción enviando exactamente {stake} {token} al programa de custodia en Solana Devnet. Los tokens de Devnet no tienen valor real. Winscore es el oráculo de liquidación. Las reglas son definitivas.",
+    "back": "Volver",
+    "consentConfirm": "Entiendo — Firmar transacción",
+    "awaitingSignature": "Esperando firma…",
+    "awaitingBody": "Confirma la transacción en tu wallet.",
+    "confirmed": "Entrada confirmada",
+    "confirmedBody": "Tus {stake} {token} han sido depositados. Los resultados se liquidarán al cerrar la ronda.",
+    "failed": "Entrada fallida",
+    "tryAgain": "Reintentar",
+    "explorer": "Explorador",
+    "devnetBadge": "Devnet"
   },
   "welcomeEmail": {
     "subject": "Bienvenido a Winscore",

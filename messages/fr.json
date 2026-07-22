@@ -378,6 +378,32 @@
     "summaryDisclaimer": "Résumé généré par IA",
     "recapImageAlt": "Résumé BD de {home} contre {away}"
   },
+  "matchdaySheet": {
+    "fixtures": "matchs",
+    "statusPending": "Pas encore ouverte",
+    "statusActive": "Ouverte aux pronostics",
+    "statusClosed": "Fermée",
+    "signInToPick": "Connectez-vous pour soumettre vos pronostics.",
+    "notMember": "Vous n'êtes pas membre de ce groupe.",
+    "adminBlocked": "Les administrateurs ne peuvent pas faire de pronostics.",
+    "poolNotFound": "Groupe introuvable.",
+    "roundNotFound": "Journée introuvable.",
+    "saveAllPicks": "Tout enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "{count, plural, =0 {Aucun pronostic enregistré} one {# pronostic enregistré} other {# pronostics enregistrés}}",
+    "lockedCount": "{count} verrouillés",
+    "allPicksComplete": "Tous les pronostics enregistrés — bonne chance !",
+    "picksRemaining": "{remaining} pronostic{remaining, plural, =1 {} other {s}} restant{remaining, plural, =1 {} other {s}}",
+    "locked": "Verrouillé",
+    "picked": "Pronostiqué",
+    "errorInvalidInput": "Données de pronostic invalides. Vérifiez vos scores.",
+    "errorNotSignedIn": "Connectez-vous pour soumettre des pronostics.",
+    "errorNotMember": "Vous devez être membre du groupe pour soumettre des pronostics.",
+    "wagerRail": {
+      "title": "Pari de la journée",
+      "unavailable": "Les paris ne sont pas disponibles pour cette journée. Les pronostics gratuits restent actifs."
+    }
+  },
   "recapReactions": {
     "heading": "Réagissez à ce résumé",
     "toggleAria": "{label} ({count})",
@@ -980,6 +1006,7 @@
       "dashboard": "Tableau de bord",
       "competitions": "Compétitions",
       "fixtures": "Matchs",
+      "rounds": "Journées",
       "quiz": "Quiz",
       "sectionLabel": "Admin",
       "operations": "Opérations"
@@ -1243,7 +1270,52 @@
     "revealStateOn": "Affiché",
     "revealStateOff": "Masqué",
     "revealShow": "Afficher",
-    "revealHide": "Masquer"
+    "revealHide": "Masquer",
+    "rounds": {
+      "title": "Journées de compétition",
+      "description": "Gérez les journées, attribuez les matchs et révisez les données du fournisseur.",
+      "tabs": {
+        "rounds": "Journées",
+        "unmapped": "Matchs non attribués",
+        "create": "Nouvelle journée"
+      },
+      "empty": "Aucune journée créée pour le moment.",
+      "allMapped": "Tous les matchs sont attribués à une journée.",
+      "unmappedDescription": "Ces matchs n'ont pas de journée attribuée. Sélectionnez une journée de la même compétition pour les attribuer.",
+      "fixtures": "matchs",
+      "opens": "Ouvre",
+      "selectRound": "Sélectionner une journée…",
+      "assign": "Attribuer",
+      "markReviewed": "Marquer comme révisé",
+      "close": "Fermer",
+      "closeConfirm": "Cela fermera la journée et empêchera toute modification. Continuer ?",
+      "createTitle": "Créer une journée de compétition",
+      "status": {
+        "pending": "En attente",
+        "active": "Active",
+        "closed": "Fermée",
+        "review": "À réviser"
+      },
+      "reviewStatus": {
+        "unmapped": "Non mappée",
+        "mapped": "Mappée",
+        "conflict": "Conflit",
+        "changed": "Modifiée",
+        "reviewed": "Révisée"
+      },
+      "form": {
+        "competition": "Compétition",
+        "selectComp": "Sélectionner une compétition…",
+        "roundKey": "Clé de journée",
+        "roundNumber": "Numéro de journée",
+        "displayOrder": "Ordre d'affichage",
+        "labels": "Libellés (en, es, fr, de)",
+        "opensAt": "Date d'ouverture",
+        "adminClosesAt": "Fermeture admin (optionnel)",
+        "status": "Statut",
+        "providerMetadata": "Métadonnées du fournisseur"
+      }
+    }
   },
   "error": {
     "eyebrow": "Temps additionnel",
@@ -1337,6 +1409,33 @@
     "ctaLabel": "Répondre à la question du jour",
     "footer": "Vous recevez ceci car vous participez au pool de la Coupe du monde. Le quiz se réinitialise chaque jour à minuit UTC.",
     "unsubscribeLabel": "Se désabonner des rappels du quiz quotidien"
+  },
+  "wager": {
+    "railTitle": "Pari de la journée",
+    "unavailable": "Les paris ne sont pas disponibles pour cette journée. Les pronostics gratuits restent actifs.",
+    "needPicks": "Complétez d'abord tous vos pronostics, puis l'option de pari se débloquera.",
+    "linkWallet": "Liez un portefeuille Solana pour activer les paris.",
+    "linkWalletCta": "Lier le portefeuille",
+    "notEligible": "Les vérifications d'éligibilité doivent être réussies avant de parier. Vérifiez votre profil.",
+    "stake": "Mise",
+    "pot": "Cagnotte",
+    "participants": "Participants",
+    "closes": "Ferme",
+    "wallet": "Portefeuille non lié",
+    "oracle": "Oracle Winscore · Instantané immuable",
+    "enterWager": "Participer — {stake} {token}",
+    "consentTitle": "Confirmez votre participation",
+    "consentBody": "En confirmant, votre portefeuille signera une transaction transférant exactement {stake} {token} au programme de dépôt sur Solana Devnet. Les jetons Devnet n'ont aucune valeur réelle. Winscore est l'oracle de règlement. Les règles sont définitives.",
+    "back": "Retour",
+    "consentConfirm": "Je comprends — Signer la transaction",
+    "awaitingSignature": "En attente de signature…",
+    "awaitingBody": "Confirmez la transaction dans votre portefeuille.",
+    "confirmed": "Participation confirmée",
+    "confirmedBody": "Vos {stake} {token} ont été déposés. Les résultats seront réglés après la clôture de la journée.",
+    "failed": "Échec de la participation",
+    "tryAgain": "Réessayer",
+    "explorer": "Explorateur",
+    "devnetBadge": "Devnet"
   },
   "welcomeEmail": {
     "subject": "Bienvenue dans le pool de la Coupe du monde",

@@ -7,38 +7,93 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
+      comeback_email_log: {
+        Row: {
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comeback_email_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competition_rounds: {
+        Row: {
+          admin_closes_at: string | null
+          competition_id: string
+          created_at: string
+          display_order: number
+          id: string
+          labels: Json
+          opens_at: string
+          provider_metadata: Json
+          provider_review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          round_key: string
+          round_number: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_closes_at?: string | null
+          competition_id: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          labels?: Json
+          opens_at: string
+          provider_metadata?: Json
+          provider_review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          round_key: string
+          round_number?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_closes_at?: string | null
+          competition_id?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          labels?: Json
+          opens_at?: string
+          provider_metadata?: Json
+          provider_review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          round_key?: string
+          round_number?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_rounds_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       competitions: {
         Row: {
           branding: Json
@@ -102,47 +157,38 @@ export type Database = {
         }
         Relationships: []
       }
-      groups: {
+      group_invite_log: {
         Row: {
-          competition_id: string
-          created_at: string
-          id: string
-          join_code: string
-          name: string
-          owner_id: string
-          updated_at: string
+          group_id: string
+          inviter_id: string
+          recipient_email: string
+          sent_at: string
         }
         Insert: {
-          competition_id?: string
-          created_at?: string
-          id?: string
-          join_code: string
-          name: string
-          owner_id: string
-          updated_at?: string
+          group_id: string
+          inviter_id: string
+          recipient_email: string
+          sent_at?: string
         }
         Update: {
-          competition_id?: string
-          created_at?: string
-          id?: string
-          join_code?: string
-          name?: string
-          owner_id?: string
-          updated_at?: string
+          group_id?: string
+          inviter_id?: string
+          recipient_email?: string
+          sent_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "groups_owner_id_fkey"
-            columns: ["owner_id"]
+            foreignKeyName: "group_invite_log_group_id_fkey"
+            columns: ["group_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "groups"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "groups_competition_id_fkey"
-            columns: ["competition_id"]
+            foreignKeyName: "group_invite_log_inviter_id_fkey"
+            columns: ["inviter_id"]
             isOneToOne: false
-            referencedRelation: "competitions"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -187,42 +233,6 @@ export type Database = {
           {
             foreignKeyName: "group_members_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      group_invite_log: {
-        Row: {
-          group_id: string
-          inviter_id: string
-          recipient_email: string
-          sent_at: string
-        }
-        Insert: {
-          group_id: string
-          inviter_id: string
-          recipient_email: string
-          sent_at?: string
-        }
-        Update: {
-          group_id?: string
-          inviter_id?: string
-          recipient_email?: string
-          sent_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "group_invite_log_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "groups"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "group_invite_log_inviter_id_fkey"
-            columns: ["inviter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -278,6 +288,127 @@ export type Database = {
           },
         ]
       }
+      group_wager_configs: {
+        Row: {
+          approved_mint: string
+          approved_token_program: string
+          cluster: string
+          created_at: string
+          enabled: boolean
+          group_id: string
+          id: string
+          limits: Json
+          stake_base_units: number
+          updated_at: string
+          verified_decimals: number
+        }
+        Insert: {
+          approved_mint: string
+          approved_token_program: string
+          cluster?: string
+          created_at?: string
+          enabled?: boolean
+          group_id: string
+          id?: string
+          limits?: Json
+          stake_base_units: number
+          updated_at?: string
+          verified_decimals: number
+        }
+        Update: {
+          approved_mint?: string
+          approved_token_program?: string
+          cluster?: string
+          created_at?: string
+          enabled?: boolean
+          group_id?: string
+          id?: string
+          limits?: Json
+          stake_base_units?: number
+          updated_at?: string
+          verified_decimals?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_wager_configs_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: true
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          competition_id: string
+          created_at: string
+          id: string
+          join_code: string
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          competition_id: string
+          created_at?: string
+          id?: string
+          join_code: string
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          competition_id?: string
+          created_at?: string
+          id?: string
+          join_code?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "groups_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "groups_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leaderboard_rank_daily: {
+        Row: {
+          rank: number
+          snapshot_date: string
+          user_id: string
+        }
+        Insert: {
+          rank: number
+          snapshot_date: string
+          user_id: string
+        }
+        Update: {
+          rank?: number
+          snapshot_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leaderboard_rank_daily_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leaderboard_rank_snapshot: {
         Row: {
           captured_at: string
@@ -313,123 +444,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      quiz_questions: {
-        Row: {
-          active_on: string
-          correct_index: number
-          created_at: string
-          id: string
-          options: string[]
-          prompt: string
-          translations: Json
-          updated_at: string
-        }
-        Insert: {
-          active_on: string
-          correct_index: number
-          created_at?: string
-          id?: string
-          options: string[]
-          prompt: string
-          translations?: Json
-          updated_at?: string
-        }
-        Update: {
-          active_on?: string
-          correct_index?: number
-          created_at?: string
-          id?: string
-          options?: string[]
-          prompt?: string
-          translations?: Json
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      quiz_answers: {
-        Row: {
-          answered_at: string
-          choice_index: number
-          id: string
-          is_correct: boolean
-          question_id: string
-          user_id: string
-        }
-        Insert: {
-          answered_at?: string
-          choice_index: number
-          id?: string
-          is_correct: boolean
-          question_id: string
-          user_id: string
-        }
-        Update: {
-          answered_at?: string
-          choice_index?: number
-          id?: string
-          is_correct?: boolean
-          question_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "quiz_answers_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "quiz_questions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "quiz_answers_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      news_articles: {
-        Row: {
-          created_at: string
-          dedup_key: string
-          external_id: string | null
-          id: string
-          image_url: string | null
-          published_at: string
-          source: string | null
-          source_url: string
-          summary: string | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          dedup_key: string
-          external_id?: string | null
-          id?: string
-          image_url?: string | null
-          published_at: string
-          source?: string | null
-          source_url: string
-          summary?: string | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          dedup_key?: string
-          external_id?: string | null
-          id?: string
-          image_url?: string | null
-          published_at?: string
-          source?: string | null
-          source_url?: string
-          summary?: string | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
       }
       match_events: {
         Row: {
@@ -552,33 +566,6 @@ export type Database = {
           },
         ]
       }
-      recap_reactions: {
-        Row: {
-          created_at: string
-          id: string
-          match_id: string
-          reaction: string
-          summary_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          match_id: string
-          reaction: string
-          summary_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          match_id?: string
-          reaction?: string
-          summary_id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       match_summary_images: {
         Row: {
           created_at: string
@@ -619,7 +606,22 @@ export type Database = {
           summary_id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "match_summary_images_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_summary_images_summary_id_fkey"
+            columns: ["summary_id"]
+            isOneToOne: true
+            referencedRelation: "match_summaries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       matches: {
         Row: {
@@ -633,6 +635,7 @@ export type Database = {
           id: string
           kickoff_at: string
           leg: number | null
+          round_id: string | null
           stage: string
           status: string
           tie_key: string | null
@@ -642,9 +645,7 @@ export type Database = {
         Insert: {
           away_score?: number | null
           away_team: string
-          // NOT NULL in the DB; optional here so admin actions can stamp it
-          // server-side (the managed competition) before the write.
-          competition_id?: string
+          competition_id: string
           created_at?: string
           group_code?: string | null
           home_score?: number | null
@@ -652,6 +653,7 @@ export type Database = {
           id?: string
           kickoff_at: string
           leg?: number | null
+          round_id?: string | null
           stage: string
           status?: string
           tie_key?: string | null
@@ -669,6 +671,7 @@ export type Database = {
           id?: string
           kickoff_at?: string
           leg?: number | null
+          round_id?: string | null
           stage?: string
           status?: string
           tie_key?: string | null
@@ -683,49 +686,56 @@ export type Database = {
             referencedRelation: "competitions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "matches_round_competition_fk"
+            columns: ["round_id", "competition_id"]
+            isOneToOne: false
+            referencedRelation: "competition_rounds"
+            referencedColumns: ["id", "competition_id"]
+          },
         ]
       }
-      predictions: {
+      news_articles: {
         Row: {
-          away_goals: number
-          home_goals: number
+          created_at: string
+          dedup_key: string
+          external_id: string | null
           id: string
-          match_id: string
-          submitted_at: string
-          user_id: string
+          image_url: string | null
+          published_at: string
+          source: string | null
+          source_url: string
+          summary: string | null
+          title: string
+          updated_at: string
         }
         Insert: {
-          away_goals: number
-          home_goals: number
+          created_at?: string
+          dedup_key: string
+          external_id?: string | null
           id?: string
-          match_id: string
-          submitted_at?: string
-          user_id: string
+          image_url?: string | null
+          published_at: string
+          source?: string | null
+          source_url: string
+          summary?: string | null
+          title: string
+          updated_at?: string
         }
         Update: {
-          away_goals?: number
-          home_goals?: number
+          created_at?: string
+          dedup_key?: string
+          external_id?: string | null
           id?: string
-          match_id?: string
-          submitted_at?: string
-          user_id?: string
+          image_url?: string | null
+          published_at?: string
+          source?: string | null
+          source_url?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "predictions_match_id_fkey"
-            columns: ["match_id"]
-            isOneToOne: false
-            referencedRelation: "matches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "predictions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       operation_runs: {
         Row: {
@@ -784,6 +794,32 @@ export type Database = {
         }
         Relationships: []
       }
+      playoff_score_email_log: {
+        Row: {
+          digest_date: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          digest_date: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          digest_date?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playoff_score_email_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prediction_reminder_log: {
         Row: {
           reminder_date: string
@@ -836,43 +872,41 @@ export type Database = {
           },
         ]
       }
-      push_subscriptions: {
+      predictions: {
         Row: {
-          auth: string
-          created_at: string
-          endpoint: string
-          failure_count: number
+          away_goals: number
+          home_goals: number
           id: string
-          last_seen_at: string
-          p256dh: string
-          user_agent: string | null
+          match_id: string
+          submitted_at: string
           user_id: string
         }
         Insert: {
-          auth: string
-          created_at?: string
-          endpoint: string
-          failure_count?: number
+          away_goals: number
+          home_goals: number
           id?: string
-          last_seen_at?: string
-          p256dh: string
-          user_agent?: string | null
+          match_id: string
+          submitted_at?: string
           user_id: string
         }
         Update: {
-          auth?: string
-          created_at?: string
-          endpoint?: string
-          failure_count?: number
+          away_goals?: number
+          home_goals?: number
           id?: string
-          last_seen_at?: string
-          p256dh?: string
-          user_agent?: string | null
+          match_id?: string
+          submitted_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "push_subscriptions_user_id_fkey"
+            foreignKeyName: "predictions_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "predictions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -922,6 +956,132 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          failure_count: number
+          id: string
+          last_seen_at: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          failure_count?: number
+          id?: string
+          last_seen_at?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          failure_count?: number
+          id?: string
+          last_seen_at?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_answers: {
+        Row: {
+          answered_at: string
+          choice_index: number
+          id: string
+          is_correct: boolean
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          answered_at?: string
+          choice_index: number
+          id?: string
+          is_correct: boolean
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          answered_at?: string
+          choice_index?: number
+          id?: string
+          is_correct?: boolean
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "v_quiz_questions_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_answers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_questions: {
+        Row: {
+          active_on: string
+          correct_index: number
+          created_at: string
+          id: string
+          options: string[]
+          prompt: string
+          translations: Json
+          updated_at: string
+        }
+        Insert: {
+          active_on: string
+          correct_index: number
+          created_at?: string
+          id?: string
+          options: string[]
+          prompt: string
+          translations?: Json
+          updated_at?: string
+        }
+        Update: {
+          active_on?: string
+          correct_index?: number
+          created_at?: string
+          id?: string
+          options?: string[]
+          prompt?: string
+          translations?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       quiz_reminder_log: {
         Row: {
           question_id: string
@@ -947,97 +1107,14 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "quiz_reminder_log_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "v_quiz_questions_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "quiz_reminder_log_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      streak_freezes: {
-        Row: {
-          amount: number | null
-          consumed_day: string | null
-          created_at: string
-          id: string
-          kind: string
-          row_kind: string
-          user_id: string
-          week_start: string | null
-        }
-        Insert: {
-          amount?: number | null
-          consumed_day?: string | null
-          created_at?: string
-          id?: string
-          kind: string
-          row_kind: string
-          user_id: string
-          week_start?: string | null
-        }
-        Update: {
-          amount?: number | null
-          consumed_day?: string | null
-          created_at?: string
-          id?: string
-          kind?: string
-          row_kind?: string
-          user_id?: string
-          week_start?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "streak_freezes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      leaderboard_rank_daily: {
-        Row: {
-          rank: number
-          snapshot_date: string
-          user_id: string
-        }
-        Insert: {
-          rank: number
-          snapshot_date: string
-          user_id: string
-        }
-        Update: {
-          rank?: number
-          snapshot_date?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "leaderboard_rank_daily_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      comeback_email_log: {
-        Row: {
-          sent_at: string
-          user_id: string
-        }
-        Insert: {
-          sent_at?: string
-          user_id: string
-        }
-        Update: {
-          sent_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comeback_email_log_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1071,6 +1148,55 @@ export type Database = {
           },
           {
             foreignKeyName: "recap_digest_email_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recap_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          match_id: string
+          reaction: string
+          summary_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_id: string
+          reaction: string
+          summary_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_id?: string
+          reaction?: string
+          summary_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recap_reactions_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recap_reactions_summary_id_fkey"
+            columns: ["summary_id"]
+            isOneToOne: false
+            referencedRelation: "match_summaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recap_reactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1144,32 +1270,6 @@ export type Database = {
           },
         ]
       }
-      playoff_score_email_log: {
-        Row: {
-          digest_date: string
-          sent_at: string
-          user_id: string
-        }
-        Insert: {
-          digest_date: string
-          sent_at?: string
-          user_id: string
-        }
-        Update: {
-          digest_date?: string
-          sent_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "playoff_score_email_log_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       results_digest_log: {
         Row: {
           digest_date: string
@@ -1219,29 +1319,6 @@ export type Database = {
           },
         ]
       }
-      winners_email_log: {
-        Row: {
-          sent_at: string
-          user_id: string
-        }
-        Insert: {
-          sent_at?: string
-          user_id: string
-        }
-        Update: {
-          sent_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "winners_email_log_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       scores: {
         Row: {
           computed_at: string
@@ -1281,6 +1358,668 @@ export type Database = {
           },
         ]
       }
+      streak_freezes: {
+        Row: {
+          amount: number | null
+          consumed_day: string | null
+          created_at: string
+          id: string
+          kind: string
+          row_kind: string
+          user_id: string
+          week_start: string | null
+        }
+        Insert: {
+          amount?: number | null
+          consumed_day?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          row_kind: string
+          user_id: string
+          week_start?: string | null
+        }
+        Update: {
+          amount?: number | null
+          consumed_day?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          row_kind?: string
+          user_id?: string
+          week_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "streak_freezes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wager_chain_events: {
+        Row: {
+          block_slot: number | null
+          block_time: string | null
+          claim_pda: string | null
+          commitment: string | null
+          entry_pda: string | null
+          event_type: string
+          id: string
+          intent_id: string | null
+          observed_at: string
+          parsed_data: Json
+          rpc_node: string | null
+          transaction_signature: string | null
+          wager_round_pda: string | null
+        }
+        Insert: {
+          block_slot?: number | null
+          block_time?: string | null
+          claim_pda?: string | null
+          commitment?: string | null
+          entry_pda?: string | null
+          event_type: string
+          id?: string
+          intent_id?: string | null
+          observed_at?: string
+          parsed_data?: Json
+          rpc_node?: string | null
+          transaction_signature?: string | null
+          wager_round_pda?: string | null
+        }
+        Update: {
+          block_slot?: number | null
+          block_time?: string | null
+          claim_pda?: string | null
+          commitment?: string | null
+          entry_pda?: string | null
+          event_type?: string
+          id?: string
+          intent_id?: string | null
+          observed_at?: string
+          parsed_data?: Json
+          rpc_node?: string | null
+          transaction_signature?: string | null
+          wager_round_pda?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_chain_events_intent_id_fkey"
+            columns: ["intent_id"]
+            isOneToOne: false
+            referencedRelation: "wager_intents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wager_claims: {
+        Row: {
+          award_base_units: number
+          claim_pda: string
+          claim_signature: string | null
+          claimed_at: string | null
+          created_at: string
+          entry_id: string
+          id: string
+          settlement_id: string
+          state: string
+          user_id: string
+          wager_round_id: string
+          wallet_address: string
+        }
+        Insert: {
+          award_base_units: number
+          claim_pda: string
+          claim_signature?: string | null
+          claimed_at?: string | null
+          created_at?: string
+          entry_id: string
+          id?: string
+          settlement_id: string
+          state?: string
+          user_id: string
+          wager_round_id: string
+          wallet_address: string
+        }
+        Update: {
+          award_base_units?: number
+          claim_pda?: string
+          claim_signature?: string | null
+          claimed_at?: string | null
+          created_at?: string
+          entry_id?: string
+          id?: string
+          settlement_id?: string
+          state?: string
+          user_id?: string
+          wager_round_id?: string
+          wallet_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_claims_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "wager_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_claims_settlement_id_fkey"
+            columns: ["settlement_id"]
+            isOneToOne: false
+            referencedRelation: "wager_settlements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_claims_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_claims_wager_round_id_fkey"
+            columns: ["wager_round_id"]
+            isOneToOne: false
+            referencedRelation: "wager_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wager_entries: {
+        Row: {
+          confirmed_at: string
+          created_at: string
+          entry_pda: string
+          group_id: string
+          id: string
+          intent_id: string
+          round_id: string
+          stake_base_units: number
+          state: string
+          transaction_signature: string | null
+          updated_at: string
+          user_id: string
+          wager_round_id: string
+          wallet_address: string
+        }
+        Insert: {
+          confirmed_at?: string
+          created_at?: string
+          entry_pda: string
+          group_id: string
+          id?: string
+          intent_id: string
+          round_id: string
+          stake_base_units: number
+          state?: string
+          transaction_signature?: string | null
+          updated_at?: string
+          user_id: string
+          wager_round_id: string
+          wallet_address: string
+        }
+        Update: {
+          confirmed_at?: string
+          created_at?: string
+          entry_pda?: string
+          group_id?: string
+          id?: string
+          intent_id?: string
+          round_id?: string
+          stake_base_units?: number
+          state?: string
+          transaction_signature?: string | null
+          updated_at?: string
+          user_id?: string
+          wager_round_id?: string
+          wallet_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_entries_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_entries_intent_id_fkey"
+            columns: ["intent_id"]
+            isOneToOne: false
+            referencedRelation: "wager_intents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_entries_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "competition_rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_entries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_entries_wager_round_id_fkey"
+            columns: ["wager_round_id"]
+            isOneToOne: false
+            referencedRelation: "wager_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wager_entry_predictions: {
+        Row: {
+          away_goals: number
+          created_at: string
+          entry_id: string | null
+          home_goals: number
+          id: string
+          intent_id: string
+          match_id: string
+          source_submitted_at: string
+        }
+        Insert: {
+          away_goals: number
+          created_at?: string
+          entry_id?: string | null
+          home_goals: number
+          id?: string
+          intent_id: string
+          match_id: string
+          source_submitted_at: string
+        }
+        Update: {
+          away_goals?: number
+          created_at?: string
+          entry_id?: string | null
+          home_goals?: number
+          id?: string
+          intent_id?: string
+          match_id?: string
+          source_submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_entry_predictions_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "wager_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_entry_predictions_intent_id_fkey"
+            columns: ["intent_id"]
+            isOneToOne: false
+            referencedRelation: "wager_intents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_entry_predictions_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wager_intents: {
+        Row: {
+          canonicalization_version: number
+          consent_accepted_at: string | null
+          consent_version: string | null
+          created_at: string
+          eligibility_check: Json
+          group_id: string
+          id: string
+          idempotency_key: string
+          pick_commitment: string
+          round_id: string
+          state: string
+          updated_at: string
+          user_id: string
+          wager_round_id: string | null
+          wallet_link_id: string
+        }
+        Insert: {
+          canonicalization_version?: number
+          consent_accepted_at?: string | null
+          consent_version?: string | null
+          created_at?: string
+          eligibility_check?: Json
+          group_id: string
+          id?: string
+          idempotency_key: string
+          pick_commitment: string
+          round_id: string
+          state?: string
+          updated_at?: string
+          user_id: string
+          wager_round_id?: string | null
+          wallet_link_id: string
+        }
+        Update: {
+          canonicalization_version?: number
+          consent_accepted_at?: string | null
+          consent_version?: string | null
+          created_at?: string
+          eligibility_check?: Json
+          group_id?: string
+          id?: string
+          idempotency_key?: string
+          pick_commitment?: string
+          round_id?: string
+          state?: string
+          updated_at?: string
+          user_id?: string
+          wager_round_id?: string | null
+          wallet_link_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_intents_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_intents_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "competition_rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_intents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_intents_wager_round_id_fkey"
+            columns: ["wager_round_id"]
+            isOneToOne: false
+            referencedRelation: "wager_rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_intents_wallet_link_id_fkey"
+            columns: ["wallet_link_id"]
+            isOneToOne: false
+            referencedRelation: "wallet_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wager_rounds: {
+        Row: {
+          approved_mint: string
+          approved_token_program: string
+          closes_at: string
+          cluster: string
+          created_at: string
+          group_id: string
+          id: string
+          participant_count: number
+          pot_total_base_units: number
+          program_version: number
+          round_id: string
+          settlement_authority: string | null
+          stake_base_units: number
+          state: string
+          updated_at: string
+          verified_decimals: number
+          wager_config_id: string
+        }
+        Insert: {
+          approved_mint: string
+          approved_token_program: string
+          closes_at: string
+          cluster?: string
+          created_at?: string
+          group_id: string
+          id?: string
+          participant_count?: number
+          pot_total_base_units?: number
+          program_version?: number
+          round_id: string
+          settlement_authority?: string | null
+          stake_base_units: number
+          state?: string
+          updated_at?: string
+          verified_decimals: number
+          wager_config_id: string
+        }
+        Update: {
+          approved_mint?: string
+          approved_token_program?: string
+          closes_at?: string
+          cluster?: string
+          created_at?: string
+          group_id?: string
+          id?: string
+          participant_count?: number
+          pot_total_base_units?: number
+          program_version?: number
+          round_id?: string
+          settlement_authority?: string | null
+          stake_base_units?: number
+          state?: string
+          updated_at?: string
+          verified_decimals?: number
+          wager_config_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_rounds_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_rounds_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "competition_rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wager_rounds_wager_config_id_fkey"
+            columns: ["wager_config_id"]
+            isOneToOne: false
+            referencedRelation: "group_wager_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wager_settlements: {
+        Row: {
+          correction_delay_elapsed_at: string | null
+          created_at: string
+          id: string
+          manifest_canonical_bytes: string | null
+          manifest_hash: string
+          merkle_root: string
+          settled_at: string | null
+          settlement_signature: string | null
+          total_distributable: number
+          wager_round_id: string
+          winner_count: number
+        }
+        Insert: {
+          correction_delay_elapsed_at?: string | null
+          created_at?: string
+          id?: string
+          manifest_canonical_bytes?: string | null
+          manifest_hash: string
+          merkle_root: string
+          settled_at?: string | null
+          settlement_signature?: string | null
+          total_distributable: number
+          wager_round_id: string
+          winner_count: number
+        }
+        Update: {
+          correction_delay_elapsed_at?: string | null
+          created_at?: string
+          id?: string
+          manifest_canonical_bytes?: string | null
+          manifest_hash?: string
+          merkle_root?: string
+          settled_at?: string | null
+          settlement_signature?: string | null
+          total_distributable?: number
+          wager_round_id?: string
+          winner_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_settlements_wager_round_id_fkey"
+            columns: ["wager_round_id"]
+            isOneToOne: true
+            referencedRelation: "wager_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallet_link_challenges: {
+        Row: {
+          cluster: string
+          consumed: boolean
+          created_at: string
+          domain: string
+          expires_at: string
+          id: string
+          issued_at: string
+          message_text: string
+          nonce: string
+          user_id: string
+          wallet_address: string
+        }
+        Insert: {
+          cluster?: string
+          consumed?: boolean
+          created_at?: string
+          domain: string
+          expires_at: string
+          id?: string
+          issued_at?: string
+          message_text: string
+          nonce: string
+          user_id: string
+          wallet_address: string
+        }
+        Update: {
+          cluster?: string
+          consumed?: boolean
+          created_at?: string
+          domain?: string
+          expires_at?: string
+          id?: string
+          issued_at?: string
+          message_text?: string
+          nonce?: string
+          user_id?: string
+          wallet_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_link_challenges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallet_links: {
+        Row: {
+          challenge_id: string
+          cluster: string
+          created_at: string
+          id: string
+          is_active: boolean
+          linked_at: string
+          signature_bytes: string
+          unlinked_at: string | null
+          user_id: string
+          wallet_address: string
+        }
+        Insert: {
+          challenge_id: string
+          cluster?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          linked_at?: string
+          signature_bytes: string
+          unlinked_at?: string | null
+          user_id: string
+          wallet_address: string
+        }
+        Update: {
+          challenge_id?: string
+          cluster?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          linked_at?: string
+          signature_bytes?: string
+          unlinked_at?: string | null
+          user_id?: string
+          wallet_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_links_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "wallet_link_challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      winners_email_log: {
+        Row: {
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "winners_email_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       v_leaderboard_overall: {
@@ -1304,25 +2043,6 @@ export type Database = {
           },
         ]
       }
-      v_quiz_questions_public: {
-        Row: {
-          active_on: string | null
-          id: string | null
-          options: string[] | null
-          prompt: string | null
-          translations: Json | null
-        }
-        Relationships: []
-      }
-      v_recap_reaction_counts: {
-        Row: {
-          count: number | null
-          match_id: string | null
-          reaction: string | null
-          summary_id: string | null
-        }
-        Relationships: []
-      }
       v_quiz_leaderboard: {
         Row: {
           display_name: string | null
@@ -1341,6 +2061,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      v_quiz_questions_public: {
+        Row: {
+          active_on: string | null
+          id: string | null
+          options: string[] | null
+          prompt: string | null
+          translations: Json | null
+        }
+        Insert: {
+          active_on?: string | null
+          id?: string | null
+          options?: string[] | null
+          prompt?: string | null
+          translations?: Json | null
+        }
+        Update: {
+          active_on?: string | null
+          id?: string | null
+          options?: string[] | null
+          prompt?: string | null
+          translations?: Json | null
+        }
+        Relationships: []
       }
       v_quiz_standing: {
         Row: {
@@ -1361,40 +2105,116 @@ export type Database = {
           },
         ]
       }
+      v_recap_reaction_counts: {
+        Row: {
+          count: number | null
+          match_id: string | null
+          reaction: string | null
+          summary_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recap_reactions_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recap_reactions_summary_id_fkey"
+            columns: ["summary_id"]
+            isOneToOne: false
+            referencedRelation: "match_summaries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      answer_quiz: {
-        Args: { p_question_id: string; p_choice: number }
-        Returns: { is_correct: boolean; correct_index: number }[]
-      }
-      toggle_recap_reaction: {
-        Args: { p_summary_id: string; p_reaction: string; p_on: boolean }
-        Returns: { reaction: string; count: number }[]
-      }
       active_competition_id: { Args: never; Returns: string }
-      grant_streak_freeze: {
-        Args: { p_kind: string; p_amount: number }
-        Returns: number
+      answer_quiz: {
+        Args: { p_choice: number; p_question_id: string }
+        Returns: {
+          correct_index: number
+          is_correct: boolean
+        }[]
       }
-      consume_streak_freeze: {
-        Args: { p_kind: string; p_consumed_day: string }
-        Returns: boolean
-      }
-      compute_match_scores: { Args: { p_match_id: string }; Returns: undefined }
-      create_group: {
-        Args: { p_name: string; p_competition_id?: string }
-        Returns: string
-      }
-      league_id_for_slug: { Args: { p_slug: string }; Returns: string }
-      set_league_live: {
-        Args: { p_id: string; p_live: boolean }
+      assign_fixture_to_round: {
+        Args: { p_match_id: string; p_round_id: string }
         Returns: undefined
       }
+      check_round_close_shortening: {
+        Args: { p_match_id: string }
+        Returns: string
+      }
+      close_round: { Args: { p_round_id: string }; Returns: undefined }
+      compute_match_scores: { Args: { p_match_id: string }; Returns: undefined }
+      configure_pool_wager: {
+        Args: {
+          p_approved_mint: string
+          p_approved_token_program: string
+          p_cluster?: string
+          p_group_id: string
+          p_limits?: Json
+          p_stake_base_units: number
+          p_verified_decimals: number
+        }
+        Returns: string
+      }
+      consume_streak_freeze: {
+        Args: { p_consumed_day: string; p_kind: string }
+        Returns: boolean
+      }
+      create_competition_round: {
+        Args: {
+          p_admin_closes_at?: string
+          p_competition_id: string
+          p_display_order?: number
+          p_labels?: Json
+          p_opens_at: string
+          p_provider_metadata?: Json
+          p_round_key: string
+          p_round_number?: number
+          p_status?: string
+        }
+        Returns: string
+      }
+      create_group:
+        | { Args: { p_name: string }; Returns: string }
+        | {
+            Args: { p_competition_id?: string; p_name: string }
+            Returns: string
+          }
+      create_wager_intent_and_snapshot: {
+        Args: {
+          p_canonicalization_version?: number
+          p_consent_version?: string
+          p_eligibility_check?: Json
+          p_group_id: string
+          p_pick_commitment?: string
+          p_round_id: string
+          p_user_id: string
+          p_wallet_link_id: string
+        }
+        Returns: string
+      }
+      disable_pool_wager: { Args: { p_group_id: string }; Returns: undefined }
+      flag_rounds_for_shortening: { Args: never; Returns: string[] }
       generate_join_code: { Args: { p_prefix?: string }; Returns: string }
-      set_active_competition: { Args: { p_id: string }; Returns: undefined }
+      grant_streak_freeze: {
+        Args: { p_amount: number; p_kind: string }
+        Returns: number
+      }
       group_preview: {
         Args: { p_code: string }
-        Returns: { id: string; name: string }[]
+        Returns: {
+          id: string
+          name: string
+        }[]
+      }
+      initialize_wager_round: {
+        Args: { p_group_id: string; p_round_id: string }
+        Returns: string
       }
       is_admin: { Args: never; Returns: boolean }
       is_group_member: { Args: { p_group_id: string }; Returns: boolean }
@@ -1402,24 +2222,6 @@ export type Database = {
       join_group: {
         Args: { p_code: string; p_invited_by?: string }
         Returns: string
-      }
-      leaderboard_for_group: {
-        Args: { p_group_id: string }
-        Returns: {
-          display_name: string
-          exact_hits: number
-          first_submit: string
-          rank: number
-          total_points: number
-          user_id: string
-          winner_gd_hits: number
-          winner_hits: number
-        }[]
-      }
-      leave_group: { Args: { p_group_id: string }; Returns: undefined }
-      remove_group_member: {
-        Args: { p_group_id: string; p_user_id: string }
-        Returns: undefined
       }
       leaderboard_for_day: {
         Args: { d: string; tz?: string }
@@ -1434,8 +2236,8 @@ export type Database = {
           winner_hits: number
         }[]
       }
-      leaderboard_for_window: {
-        Args: { from_ts: string; to_ts: string }
+      leaderboard_for_group: {
+        Args: { p_group_id: string }
         Returns: {
           display_name: string
           exact_hits: number
@@ -1460,6 +2262,92 @@ export type Database = {
           winner_hits: number
         }[]
       }
+      leaderboard_for_window: {
+        Args: { from_ts: string; to_ts: string }
+        Returns: {
+          display_name: string
+          exact_hits: number
+          first_submit: string
+          rank: number
+          total_points: number
+          user_id: string
+          winner_gd_hits: number
+          winner_hits: number
+        }[]
+      }
+      league_id_for_slug: { Args: { p_slug: string }; Returns: string }
+      leave_group: { Args: { p_group_id: string }; Returns: undefined }
+      mark_round_reviewed: {
+        Args: { p_provider_review_status?: string; p_round_id: string }
+        Returns: undefined
+      }
+      remove_group_member: {
+        Args: { p_group_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      resolve_stage_multiplier: {
+        Args: { p_competition_id: string; p_stage_key: string }
+        Returns: number
+      }
+      round_can_accept_wager: { Args: { p_round_id: string }; Returns: boolean }
+      round_effective_close: { Args: { p_round_id: string }; Returns: string }
+      round_eligible_fixtures: {
+        Args: { p_round_id: string }
+        Returns: {
+          away_team: string
+          group_code: string
+          home_team: string
+          kickoff_at: string
+          match_id: string
+          stage: string
+          status: string
+        }[]
+      }
+      score_prediction: {
+        Args: {
+          p_away_pick: number
+          p_away_result: number
+          p_home_pick: number
+          p_home_result: number
+          p_multiplier?: number
+        }
+        Returns: {
+          hit_type: string
+          points: number
+        }[]
+      }
+      set_active_competition: { Args: { p_id: string }; Returns: undefined }
+      set_league_live: {
+        Args: { p_id: string; p_live: boolean }
+        Returns: undefined
+      }
+      toggle_recap_reaction: {
+        Args: { p_on: boolean; p_reaction: string; p_summary_id: string }
+        Returns: {
+          count: number
+          reaction: string
+        }[]
+      }
+      unassign_fixture_from_round: {
+        Args: { p_match_id: string }
+        Returns: undefined
+      }
+      update_competition_round: {
+        Args: {
+          p_admin_closes_at?: string
+          p_display_order?: number
+          p_labels?: Json
+          p_opens_at?: string
+          p_provider_metadata?: Json
+          p_provider_review_status?: string
+          p_round_id: string
+          p_round_key?: string
+          p_round_number?: number
+          p_status?: string
+        }
+        Returns: undefined
+      }
+      validate_format_config: { Args: { p_config: Json }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
@@ -1588,10 +2476,8 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },
 } as const
+

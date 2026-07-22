@@ -1,0 +1,41 @@
+-- ============= Round Backfill Template =============
+-- Populate competition_rounds from trusted provider data.
+-- NEVER infer rounds from dates, ISO weeks, or temporal proximity.
+-- Each insert must be explicitly reviewed against the provider's round naming.
+--
+-- Insert pattern:
+--   select public.create_competition_round(
+--     p_competition_id := '<comp uuid>',
+--     p_round_key := '<provider round key>',      -- e.g. 'Regular Season - 1', 'Matchday 1'
+--     p_round_number := <n>,                      -- optional display number
+--     p_labels := '{"en": "Matchday 1", "es": "Jornada 1", "fr": "Journée 1", "de": "Spieltag 1"}',
+--     p_display_order := <n>,
+--     p_opens_at := '<open timestamp>',
+--     p_admin_closes_at := null,                  -- set if admin wants earlier close
+--     p_status := 'active',
+--     p_provider_metadata := '{}'::jsonb
+--   );
+--
+-- After creating rounds, assign fixtures:
+--   select public.assign_fixture_to_round(p_match_id := '<match uuid>', p_round_id := '<round uuid>');
+--
+-- Leave ambiguous matches UNASSIGNED (round_id remains null).
+-- They will appear in the admin review queue with provider_review_status = 'unmapped'.
+--
+-- ====================================================
+
+-- Example for a known competition (replace with actual IDs):
+-- select public.create_competition_round(
+--   (select id from public.competitions where slug = 'world-cup-2026'),
+--   'Group Stage - Matchday 1',
+--   1,
+--   '{"en": "Matchday 1", "es": "Jornada 1", "fr": "Journée 1", "de": "Spieltag 1"}',
+--   1,
+--   '2026-06-11 00:00:00+00',
+--   null,
+--   'active',
+--   '{"provider": "football-data", "provider_round": "Regular Season - 1"}'::jsonb
+-- );
+
+-- After data is validated:
+--   select public.mark_round_reviewed('<round uuid>', 'reviewed');
