@@ -38,14 +38,14 @@ export async function SiteNav() {
     emailPrefs = normalizeEmailPrefs(data?.email_prefs);
   }
 
+  // Matches/standings/bracket/leaderboard/my-picks are now league-scoped (under
+  // /[league]) and can't be linked without a league, so the global nav routes to
+  // the league catalog instead; per-league pages are reached from the home lanes,
+  // the catalog, and pool dashboards.
   const links = [
-    { href: lp("/matches"), label: t("matches") },
-    { href: lp("/standings"), label: t("standings") },
-    { href: lp("/bracket"), label: t("bracket") },
+    { href: lp("/catalog"), label: t("leagues") },
     { href: lp("/news"), label: t("news") },
     { href: lp("/quiz"), label: t("quiz") },
-    { href: lp("/leaderboard"), label: t("leaderboard") },
-    ...(user ? [{ href: lp("/my-picks"), label: t("myPicks") }] : []),
     ...(user ? [{ href: lp("/groups"), label: t("groups") }] : []),
     ...(isAdmin ? [{ href: lp("/admin/matches"), label: t("admin") }] : []),
   ];

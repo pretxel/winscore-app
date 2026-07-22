@@ -20,10 +20,10 @@ import { Logotype } from "@/components/logotype";
 import { TournamentCountdown } from "@/components/tournament-countdown";
 import { RecentRecapImages } from "@/components/recent-recap-images";
 import { ScoringExplainer } from "@/components/scoring-explainer";
-import { StandingCards } from "@/components/standing-cards";
-import { StandingCardsTracker } from "@/components/standing-cards-tracker";
+import { LeagueLane } from "@/components/league-lane";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getStandingSummary } from "@/lib/standing-summary";
+import { listMyPoolsByLeague } from "@/lib/groups";
+import { getLeagueLaneFixtures } from "@/lib/home";
 
 export async function generateMetadata({
   params,
@@ -47,28 +47,48 @@ export default async function HomePage({
   setRequestLocale(locale);
   const t = await getTranslations("home");
 
-  // Signed-in visitors get a real standing-cards strip above the hero. Anonymous
-  // visitors hit no authed query and see the static marketing landing unchanged,
-  // preserving the public page's SEO/perf characteristics.
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const standingSummary = user ? await getStandingSummary(user.id) : null;
+
+  // Signed-in visitors get the cross-league home: one lane per league they hold a
+  // group in, with that league's live/next fixtures. No groups yet → an empty
+  // state pointing at create + the catalog. Anonymous visitors see the static
+  // marketing landing unchanged, preserving the public page's SEO/perf.
+  if (user) {
+    const leagues = await listMyPoolsByLeague();
+    if (leagues.length > 0) {
+      const lanes = await Promise.all(
+        leagues.map(async (lane) => ({
+          lane,
+          fixtures: await getLeagueLaneFixtures(lane.slug),
+        })),
+      );
+      return (
+        <main className="mx-auto max-w-5xl px-4 py-8 sm:py-10">
+          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+            {t("lanesEyebrow")}
+          </p>
+          <div className="grid gap-4">
+            {lanes.map(({ lane, fixtures }) => (
+              <LeagueLane
+                key={lane.competitionId}
+                lane={lane}
+                fixtures={fixtures}
+                locale={locale}
+                t={t}
+              />
+            ))}
+          </div>
+        </main>
+      );
+    }
+    return <EmptyGroupsHome locale={locale} t={t} />;
+  }
 
   return (
     <main>
-      {standingSummary ? (
-        <section className="border-b border-border/70 bg-muted/30">
-          <div className="mx-auto max-w-6xl px-4 py-6">
-            <StandingCardsTracker />
-            <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-              {t("standingEyebrow")}
-            </p>
-            <StandingCards summary={standingSummary} />
-          </div>
-        </section>
-      ) : null}
       <Hero locale={locale} t={t} />
       <TournamentCountdown />
       <ScoringSection locale={locale} t={t} />
@@ -77,6 +97,34 @@ export default async function HomePage({
       <Cadence t={t} />
       <FeatureSections locale={locale} t={t} />
       <RecentRecapImages locale={locale} />
+    </main>
+  );
+}
+
+// Signed-in, but not in any group yet: point at group creation and the league
+// catalog. Uses the same matchday-board type scale as the lanes home.
+function EmptyGroupsHome({ locale, t }: { locale: Locale; t: T }) {
+  return (
+    <main className="mx-auto flex max-w-2xl flex-col items-center px-4 py-20 text-center">
+      <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+        {t("emptyTitle")}
+      </h1>
+      <p className="text-muted-foreground mt-4 max-w-md">{t("emptyLede")}</p>
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <Link
+          href={localePath(locale, "/groups")}
+          className={cn(buttonVariants({ size: "lg" }))}
+        >
+          {t("startGroup")}
+        </Link>
+        <Link
+          href={localePath(locale, "/catalog")}
+          className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
+        >
+          {t("browseLeagues")}
+          <ArrowRightIcon className="ml-1 size-4" />
+        </Link>
+      </div>
     </main>
   );
 }

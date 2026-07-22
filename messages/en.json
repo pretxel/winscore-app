@@ -15,6 +15,7 @@
     "description": "Predict every World Cup 2026 match. Submit scores before kickoff, earn points on results, and climb a daily and overall leaderboard."
   },
   "nav": {
+    "leagues": "Leagues",
     "matches": "Matches",
     "standings": "Standings",
     "bracket": "Bracket",
@@ -166,7 +167,15 @@
     "quizTitle": "Daily Call",
     "quizCopy": "One World Cup trivia question a day. Answer before midnight UTC, keep your streak, and climb the quiz board.",
     "quizCta": "Play today's question",
-    "standingEyebrow": "Your standing"
+    "standingEyebrow": "Your standing",
+    "lanesEyebrow": "Your leagues",
+    "startGroup": "Start a group",
+    "allFixtures": "All fixtures",
+    "groupCount": "{count, plural, one {# group} other {# groups}}",
+    "memberCount": "{count, plural, one {# member} other {# members}}",
+    "emptyTitle": "No groups yet",
+    "emptyLede": "Start a group in any live league, or browse what's on.",
+    "browseLeagues": "Browse leagues"
   },
   "howItWorks": {
     "title": "How it works",

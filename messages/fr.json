@@ -15,6 +15,7 @@
     "description": "Pronostiquez chaque match de la Coupe du monde 2026. Soumettez vos scores avant le coup d'envoi, gagnez des points sur les résultats et grimpez au classement quotidien et général."
   },
   "nav": {
+    "leagues": "Ligues",
     "matches": "Matchs",
     "standings": "Poules",
     "bracket": "Tableau",
@@ -166,7 +167,15 @@
     "quizTitle": "Défi du Jour",
     "quizCopy": "Une question de quiz Coupe du monde par jour. Répondez avant minuit UTC, gardez votre série et grimpez au classement.",
     "quizCta": "Jouer la question du jour",
-    "standingEyebrow": "Votre classement"
+    "standingEyebrow": "Votre classement",
+    "lanesEyebrow": "Vos ligues",
+    "startGroup": "Créer un groupe",
+    "allFixtures": "Tous les matchs",
+    "groupCount": "{count, plural, one {# groupe} other {# groupes}}",
+    "memberCount": "{count, plural, one {# membre} other {# membres}}",
+    "emptyTitle": "Aucun groupe pour l'instant",
+    "emptyLede": "Créez un groupe dans une ligue active ou parcourez les ligues.",
+    "browseLeagues": "Parcourir les ligues"
   },
   "howItWorks": {
     "title": "Fonctionnement",

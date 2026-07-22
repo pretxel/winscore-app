@@ -15,6 +15,7 @@
     "description": "Pronostica cada partido del Mundial 2026. Envía tus marcadores antes del inicio, gana puntos con los resultados y sube en la clasificación diaria y general."
   },
   "nav": {
+    "leagues": "Ligas",
     "matches": "Partidos",
     "standings": "Posiciones",
     "bracket": "Eliminatorias",
@@ -166,7 +167,15 @@
     "quizTitle": "Reto Diario",
     "quizCopy": "Una pregunta de trivia del Mundial al día. Responde antes de medianoche UTC, mantén tu racha y sube en la clasificación.",
     "quizCta": "Jugar la pregunta de hoy",
-    "standingEyebrow": "Tu posición"
+    "standingEyebrow": "Tu posición",
+    "lanesEyebrow": "Tus ligas",
+    "startGroup": "Crear un grupo",
+    "allFixtures": "Todos los partidos",
+    "groupCount": "{count, plural, one {# grupo} other {# grupos}}",
+    "memberCount": "{count, plural, one {# miembro} other {# miembros}}",
+    "emptyTitle": "Aún no tienes grupos",
+    "emptyLede": "Crea un grupo en cualquier liga activa o explora las disponibles.",
+    "browseLeagues": "Explorar ligas"
   },
   "howItWorks": {
     "title": "Cómo funciona",

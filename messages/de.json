@@ -15,6 +15,7 @@
     "description": "Tippen Sie jedes Spiel der Weltmeisterschaft 2026. Geben Sie Ihre Ergebnisse vor dem Anpfiff ab, sammeln Sie Punkte für richtige Tipps und steigen Sie in der täglichen und der Gesamtrangliste auf."
   },
   "nav": {
+    "leagues": "Ligen",
     "matches": "Spiele",
     "standings": "Tabelle",
     "bracket": "K.-o.-Runde",
@@ -166,7 +167,15 @@
     "quizTitle": "Tägliche Frage",
     "quizCopy": "Eine WM-Quizfrage pro Tag. Antworte vor Mitternacht UTC, halte deine Serie am Leben und klettere in der Quiz-Rangliste nach oben.",
     "quizCta": "Heutige Frage spielen",
-    "standingEyebrow": "Dein Stand"
+    "standingEyebrow": "Dein Stand",
+    "lanesEyebrow": "Deine Ligen",
+    "startGroup": "Gruppe erstellen",
+    "allFixtures": "Alle Spiele",
+    "groupCount": "{count, plural, one {# Gruppe} other {# Gruppen}}",
+    "memberCount": "{count, plural, one {# Mitglied} other {# Mitglieder}}",
+    "emptyTitle": "Noch keine Gruppen",
+    "emptyLede": "Starte eine Gruppe in einer aktiven Liga oder sieh dich um.",
+    "browseLeagues": "Ligen durchsuchen"
   },
   "howItWorks": {
     "title": "How it works",
