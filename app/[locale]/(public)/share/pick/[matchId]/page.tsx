@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { LocalTime } from "@/components/local-time";
-import { TeamFlag } from "@/components/team-flag";
 import { StageIcon } from "@/components/stage-icon";
 import { buttonVariants } from "@/components/ui/button";
 import { clampGoals } from "@/lib/share";
@@ -149,7 +148,6 @@ export default async function SharePickPage({
         <div className="relative flex flex-col gap-3 px-6 pt-3 pb-6 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6 sm:px-8">
           <div className="min-w-0">
             <div className="mt-1 flex items-center gap-2 sm:gap-3">
-              <TeamFlag team={match.home_team} size="lg" />
               <span
                 className="min-w-0 truncate font-heading text-2xl font-semibold leading-tight sm:text-3xl"
                 style={{ fontStretch: "condensed" }}
@@ -181,7 +179,6 @@ export default async function SharePickPage({
               >
                 {match.away_team}
               </span>
-              <TeamFlag team={match.away_team} size="lg" />
             </div>
           </div>
         </div>

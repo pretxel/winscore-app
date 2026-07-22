@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
-import { flagSlug } from "@/lib/team-flag";
 import { clampGoals } from "@/lib/share";
 import { isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import type { Database } from "@/lib/database.types";
@@ -30,29 +29,7 @@ function initials(team: string): string {
     .join("");
 }
 
-async function flagDataUri(
-  origin: string,
-  team: string,
-): Promise<string | null> {
-  const slug = flagSlug(team);
-  if (!slug) return null;
-  try {
-    const res = await fetch(`${origin}/flags/${slug}.svg`);
-    if (!res.ok) return null;
-    const buf = Buffer.from(await res.arrayBuffer());
-    return `data:image/svg+xml;base64,${buf.toString("base64")}`;
-  } catch {
-    return null;
-  }
-}
-
-function TeamBlock({
-  name,
-  flag,
-}: {
-  name: string;
-  flag: string | null;
-}) {
+function TeamBlock({ name }: { name: string }) {
   return (
     <div
       style={{
@@ -63,34 +40,23 @@ function TeamBlock({
         width: 380,
       }}
     >
-      {flag ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={flag}
-          width={150}
-          height={110}
-          alt=""
-          style={{ borderRadius: 12, objectFit: "cover" }}
-        />
-      ) : (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 150,
-            height: 110,
-            borderRadius: 12,
-            backgroundColor: "rgba(251,250,246,0.12)",
-            color: FG,
-            fontFamily: OG_FONT_FAMILY.heading,
-            fontSize: 44,
-            fontWeight: 700,
-          }}
-        >
-          {initials(name)}
-        </div>
-      )}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 150,
+          height: 110,
+          borderRadius: 12,
+          backgroundColor: "rgba(251,250,246,0.12)",
+          color: FG,
+          fontFamily: OG_FONT_FAMILY.heading,
+          fontSize: 44,
+          fontWeight: 700,
+        }}
+      >
+        {initials(name)}
+      </div>
       <div
         style={{
           display: "flex",
@@ -150,11 +116,6 @@ export async function GET(request: Request) {
     timeZone: "UTC",
   });
 
-  const [homeFlag, awayFlag] = await Promise.all([
-    flagDataUri(url.origin, match.home_team),
-    flagDataUri(url.origin, match.away_team),
-  ]);
-
   return new ImageResponse(
     (
       <div
@@ -212,7 +173,7 @@ export async function GET(request: Request) {
             justifyContent: "space-between",
           }}
         >
-          <TeamBlock name={match.home_team} flag={homeFlag} />
+          <TeamBlock name={match.home_team} />
           <div
             style={{
               display: "flex",
@@ -224,7 +185,7 @@ export async function GET(request: Request) {
           >
             {hasScores ? `${h}–${a}` : "vs"}
           </div>
-          <TeamBlock name={match.away_team} flag={awayFlag} />
+          <TeamBlock name={match.away_team} />
         </div>
 
         <div

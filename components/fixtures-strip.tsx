@@ -1,6 +1,5 @@
 import { Scoreline } from "@/components/scoreline";
 import { LocalTime } from "@/components/local-time";
-import { TeamFlag } from "@/components/team-flag";
 import type { LaneFixture } from "@/lib/home";
 
 // Compact horizontal strip of a league's live/next fixtures. Live matches show a
@@ -16,8 +15,10 @@ export function FixturesStrip({ fixtures }: { fixtures: LaneFixture[] }) {
           key={f.id}
           className="border-border bg-background/50 flex shrink-0 flex-col gap-1.5 rounded-lg border px-3 py-2"
         >
-          <div className="flex items-center gap-2">
-            <TeamFlag team={f.homeTeam} size="sm" className="h-3 w-4" />
+          <div className="flex min-w-52 items-center justify-between gap-2">
+            <span className="max-w-24 truncate text-xs font-medium" title={f.homeTeam}>
+              {f.homeTeam}
+            </span>
             {f.status === "live" ? (
               <Scoreline home={f.homeScore} away={f.awayScore} />
             ) : (
@@ -25,7 +26,12 @@ export function FixturesStrip({ fixtures }: { fixtures: LaneFixture[] }) {
                 <LocalTime iso={f.kickoffAt} format="time" />
               </span>
             )}
-            <TeamFlag team={f.awayTeam} size="sm" className="h-3 w-4" />
+            <span
+              className="max-w-24 truncate text-right text-xs font-medium"
+              title={f.awayTeam}
+            >
+              {f.awayTeam}
+            </span>
           </div>
           {f.status === "live" ? (
             <span className="text-live inline-flex items-center gap-1 font-mono text-[10px] tracking-widest uppercase">

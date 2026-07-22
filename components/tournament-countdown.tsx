@@ -5,7 +5,7 @@ import { LiveMatchList } from "@/components/live-match-list";
 import { getActiveCompetition } from "@/lib/competition";
 import { getLiveAndNextUp } from "@/lib/matches/live";
 import { TOURNAMENT_OPENING, TOURNAMENT_START_ISO } from "@/lib/tournament";
-import { flagSlug } from "@/lib/team-flag";
+import { isConfirmedMatch } from "@/lib/match-utils";
 import type { Locale } from "@/lib/i18n";
 
 type OpeningMatch = {
@@ -36,9 +36,9 @@ async function fetchOpeningMatch(
 
 function looksLikeRealFixture(m: OpeningMatch): boolean {
   // The seed has placeholders like "2nd Group A" / "Winner R32-1" for knockout
-  // slots. Treat anything without a flag slug as a placeholder so the subhead
-  // doesn't read like a bracket diagram.
-  return flagSlug(m.home_team) !== null && flagSlug(m.away_team) !== null;
+  // slots. Keep those out of the subhead without coupling confirmation to a
+  // country-only flag mapping; club teams are valid participants too.
+  return isConfirmedMatch(m);
 }
 
 export async function TournamentCountdown() {

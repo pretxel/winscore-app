@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { ChevronDownIcon } from "lucide-react";
-import { TeamFlag } from "@/components/team-flag";
 import { useQueryParamWriter } from "@/components/use-query-param-writer";
 import { cn } from "@/lib/utils";
 
@@ -95,7 +94,6 @@ export function MatchTeamFilter({
             active={selectedKeys.has(team.toLowerCase())}
             onClick={() => toggle(team)}
           >
-            <TeamFlag team={team} size="sm" />
             <span>{team}</span>
           </Chip>
         ))}

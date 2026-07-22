@@ -7,7 +7,6 @@ import { CheckIcon, ChevronDownIcon } from "lucide-react";
 import {
   SUPPORTED_LOCALES,
   LOCALE_LABELS,
-  LOCALE_FLAG_SLUG,
   isLocale,
   type Locale,
 } from "@/lib/i18n";
@@ -68,14 +67,12 @@ export function LocaleList({
                   : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
               )}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/flags/${LOCALE_FLAG_SLUG[loc]}.svg`}
-                alt=""
-                width={20}
-                height={15}
-                className="shrink-0 rounded-[2px] object-cover ring-1 ring-black/10 dark:ring-white/10"
-              />
+              <span
+                aria-hidden
+                className="w-7 shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+              >
+                {loc}
+              </span>
               <span className="flex-1 font-medium">{LOCALE_LABELS[loc]}</span>
               {active ? (
                 <CheckIcon
@@ -115,7 +112,6 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   }, [open]);
 
   const currentLocale: Locale = isLocale(current) ? current : "en";
-  const currentSlug = LOCALE_FLAG_SLUG[currentLocale];
 
   return (
     <div ref={rootRef} className={cn("relative", className)}>
@@ -129,14 +125,6 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           "inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         )}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`/flags/${currentSlug}.svg`}
-          alt=""
-          width={16}
-          height={12}
-          className="rounded-[2px] object-cover ring-1 ring-black/10 dark:ring-white/10"
-        />
         <span className="text-foreground">{currentLocale}</span>
         <ChevronDownIcon
           aria-hidden

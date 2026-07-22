@@ -1,4 +1,4 @@
-// World Cup Pools Web Push service worker.
+// Winscore Web Push service worker.
 //
 // Minimal by design: it ONLY handles `push` and `notificationclick`. It does
 // not intercept `fetch` and does not cache anything, so it never alters the
@@ -15,7 +15,7 @@ self.addEventListener("push", (event) => {
     payload = {};
   }
 
-  const title = payload.title || "World Cup Pools";
+  const title = payload.title || "Winscore";
   const options = {
     body: payload.body || "",
     data: { url: payload.url || "/" },

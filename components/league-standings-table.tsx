@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { TeamFlag } from "@/components/team-flag";
 import type { GroupTeamRow } from "@/lib/group-standings";
 import { cn } from "@/lib/utils";
 
@@ -82,7 +81,6 @@ export async function LeagueStandingsTable({
                       <span className="w-3.5 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">
                         {row.rank}
                       </span>
-                      <TeamFlag team={row.team} size="sm" />
                       <span className="truncate font-medium">{row.team}</span>
                     </div>
                   </td>

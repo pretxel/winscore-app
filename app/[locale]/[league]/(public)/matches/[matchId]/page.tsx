@@ -7,7 +7,6 @@ import { LocalTime } from "@/components/local-time";
 import { MatchStateBadge } from "@/components/match-state-badge";
 import { KickoffCountdown } from "@/components/kickoff-countdown";
 import { buttonVariants } from "@/components/ui/button";
-import { TeamFlag } from "@/components/team-flag";
 import { StageIcon } from "@/components/stage-icon";
 import { VenueImage } from "@/components/venue-image";
 import { isConfirmedMatch, lockReason } from "@/lib/match-utils";
@@ -401,7 +400,6 @@ export default async function MatchDetailPage({
               {t("home")}
             </div>
             <div className="mt-1 flex items-center gap-2 sm:gap-3">
-              <TeamFlag team={match.home_team} size="lg" />
               <span
                 className="min-w-0 truncate font-heading text-2xl font-semibold leading-tight sm:text-4xl"
                 style={{ fontStretch: "condensed" }}
@@ -441,7 +439,6 @@ export default async function MatchDetailPage({
               >
                 {match.away_team}
               </span>
-              <TeamFlag team={match.away_team} size="lg" />
             </div>
           </div>
         </div>

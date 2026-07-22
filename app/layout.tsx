@@ -35,10 +35,9 @@ const siteUrl = env.siteUrl;
 // /_not-found, so it must NOT touch the DB at build). Per-locale + competition
 // branding is applied request-side in [locale]/layout, OG routes, and nav.
 const siteName = "Winscore";
-const defaultTitle =
-  "Winscore — World Cup 2026: Daily Predictions & Live Leaderboard";
+const defaultTitle = "Winscore — Daily Predictions & Live Leaderboard";
 const defaultDescription =
-  "Predict every World Cup 2026 match. Submit scores before kickoff, earn points on results, and climb a daily and overall leaderboard.";
+  "Predict every match. Submit scores before kickoff, earn points on results, and climb a daily and overall leaderboard.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -50,15 +49,13 @@ export const metadata: Metadata = {
   applicationName: siteName,
   keywords: [
     "Winscore",
-    "World Cup 2026",
-    "World Cup pool",
-    "FIFA World Cup predictions",
-    "score prediction game",
+    "football pool",
     "soccer pool",
+    "score prediction game",
     "football predictor",
-    "World Cup leaderboard",
+    "match predictions",
+    "live leaderboard",
     "daily predictions",
-    "WC26",
   ],
   authors: [{ name: siteName }],
   creator: siteName,

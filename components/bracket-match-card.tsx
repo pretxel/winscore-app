@@ -1,5 +1,4 @@
 import { LocalTime } from "@/components/local-time";
-import { TeamFlag } from "@/components/team-flag";
 import type { BracketSlotMatch, ResolvedParticipant } from "@/lib/bracket-core";
 import { cn } from "@/lib/utils";
 
@@ -84,14 +83,6 @@ function ParticipantRow({
         won && "bg-pitch/5",
       )}
     >
-      {resolved ? (
-        <TeamFlag team={p.team!} size="sm" />
-      ) : (
-        <span
-          aria-hidden
-          className="inline-block h-[15px] w-5 shrink-0 rounded-[2px] bg-muted ring-1 ring-border"
-        />
-      )}
       <span
         className={cn(
           "min-w-0 flex-1 truncate",

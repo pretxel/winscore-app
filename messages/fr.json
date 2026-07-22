@@ -11,8 +11,8 @@
     "tryAgain": "Réessayer"
   },
   "siteMeta": {
-    "title": "Winscore — Coupe du monde 2026 : Pronostics quotidiens et classement en direct",
-    "description": "Pronostiquez chaque match de la Coupe du monde 2026. Soumettez vos scores avant le coup d'envoi, gagnez des points sur les résultats et grimpez au classement quotidien et général."
+    "title": "Winscore — Pronostics quotidiens et classement en direct",
+    "description": "Pronostiquez chaque match. Soumettez vos scores avant le coup d'envoi, gagnez des points sur les résultats et grimpez au classement quotidien et général."
   },
   "nav": {
     "leagues": "Ligues",
@@ -97,13 +97,13 @@
     "winner": "Vainqueur"
   },
   "home": {
-    "title": "Winscore — Coupe du Monde 2026 : Pronostics & Classement",
-    "description": "Pronostiquez chaque match de la Coupe du Monde 2026. Saisissez les scores avant le coup d'envoi, gagnez des points sur les résultats et grimpez dans un unique classement global.",
-    "eyebrow": "FIFA Coupe du Monde 2026",
-    "hostsLine": "USA · Canada · Mexique",
+    "title": "Winscore — Pronostics football et classements en direct",
+    "description": "Pronostiquez les matchs des ligues actives. Saisissez les scores avant le coup d'envoi, rejoignez des pools privés et grimpez dans les classements en direct.",
+    "eyebrow": "Pronostics football au quotidien",
+    "hostsLine": "Chaque ligue · Chaque journée",
     "headlineLine1": "Donnez le score.",
     "headlineLine2": "Grimpez au classement.",
-    "lede": "Un seul pool global. Saisissez un score exact pour chaque rencontre avant le coup d'envoi et votre rang bouge dès le coup de sifflet final. Sans configuration, sans frais, sans excuses.",
+    "lede": "Pronostiquez les scores exacts des ligues que vous suivez. Rejoignez des pools privés, modifiez vos choix jusqu'au coup d'envoi et voyez chaque résultat rebattre le classement. Sans configuration, sans frais, sans excuses.",
     "ctaSignIn": "Connectez-vous pour jouer",
     "ctaBrowse": "Voir les matchs",
     "ctaScoring": "Comment ça marque",
@@ -152,10 +152,6 @@
     "liveVs": "vs",
     "liveViewAll": "Voir tous les matchs",
     "liveKickoffSoon": "Coup d'envoi",
-    "recapGalleryEyebrow": "04 · BD des matchs",
-    "recapGalleryHeadline": "Matchs récents, en BD.",
-    "recapImageAlt": "Résumé BD de {home} contre {away}",
-    "recapReactionCount": "{count, plural, one {# réaction} other {# réactions}}",
     "featuresEyebrow": "03 · Encore plus à jouer",
     "featuresHeadline": "Au-delà du tableau.",
     "groupsTitle": "Groupes d'amis",

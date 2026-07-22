@@ -7,7 +7,6 @@ import {
   type MatchEvent,
   type MatchEventType,
 } from "@/lib/matches/match-events";
-import { TeamFlag } from "@/components/team-flag";
 
 const POLL_MS = 15_000;
 
@@ -107,7 +106,6 @@ export function LiveEventsFeed({
         {/* Live scoreline — derived from goal events, updates in place. */}
         <div className="flex items-center justify-center gap-3 border-b border-border px-4 py-4 sm:gap-5">
           <span className="flex min-w-0 items-center gap-2">
-            <TeamFlag team={homeTeam} size="sm" />
             <span className="truncate font-heading text-sm font-semibold sm:text-base">
               {homeTeam}
             </span>
@@ -121,7 +119,6 @@ export function LiveEventsFeed({
             <span className="truncate font-heading text-sm font-semibold sm:text-base">
               {awayTeam}
             </span>
-            <TeamFlag team={awayTeam} size="sm" />
           </span>
           {minute ? (
             <span className="shrink-0 font-mono text-[11px] tabular-nums text-muted-foreground">
