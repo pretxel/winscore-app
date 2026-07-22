@@ -23,7 +23,7 @@ cutover behind `pnpm typecheck`.
 - [x] 3.1 Add the `[league]` route segment (inside `[locale]`); move `matches`, `matches/[matchId]`, `leaderboard`, `my-picks`, `standings`, `bracket` under `/[locale]/[league]/…`. (Auth for `my-picks` preserved via `[league]/(app)/layout.tsx`.)
 - [x] 3.2 Resolve the league per route via `getLeagueFromContext({ slug })` (in `[league]/layout.tsx` + each page); unknown/non-live slug → redirect to the catalog.
 - [x] 3.3 308-redirect legacy paths (`/matches`, `/leaderboard`, …) to the league catalog (`next.config.ts` `redirects()`, locale-constrained).
-- [ ] 3.4 Per-league `generateMetadata`: canonical done (`/${league}/…`); **edition subtitle still pending**.
+- [x] 3.4 Per-league `generateMetadata`: canonical (`/${league}/…`) + edition subtitle (`· ${short_name}`) on matches/leaderboard/standings/bracket. matchId keeps its match-unique title.
 
 ## 4. Screens
 

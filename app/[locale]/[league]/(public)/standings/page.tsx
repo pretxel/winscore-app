@@ -18,7 +18,7 @@ export async function generateMetadata({
   const namespace = comp && leagueStageKey(comp.format) ? "leagueStandings" : "groupStandings";
   const t = await getTranslations({ locale, namespace });
   return {
-    title: t("title"),
+    title: comp ? `${t("title")} · ${comp.short_name}` : t("title"),
     description: t("description"),
     alternates: { canonical: `/${league}/standings` },
     openGraph: {

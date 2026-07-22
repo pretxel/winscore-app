@@ -55,8 +55,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, league } = await params;
   const t = await getTranslations({ locale, namespace: "matches" });
+  const comp = await getLeagueFromContext({ slug: league });
   return {
-    title: t("title"),
+    title: comp ? `${t("title")} · ${comp.short_name}` : t("title"),
     description: t("description"),
     alternates: { canonical: `/${league}/matches` },
     openGraph: {
