@@ -1,6 +1,6 @@
 // Pure, dependency-free renderer for the weekly Saturday playoff-score email.
 // Mirrors results-digest-template.ts: the web leaderboard's visual language
-// (pitch-green header, cream body, mono uppercase labels) using email-safe HTML
+// (blue header, cream body, mono uppercase labels) using email-safe HTML
 // — table layout, inline styles, fixed hex colors (no oklch, CSS variables, or
 // stylesheets).
 //
@@ -20,13 +20,15 @@ const C = {
   ink: "#1B2330",
   muted: "#6B7280",
   border: "#E5E2D7",
-  pitch: "#1B7A4D",
+  pitch: "#135FD1",
   pitchFg: "#FAF9F4",
   mutedTint: "#F0EEE6",
 } as const;
 
-const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS =
+  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO =
+  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // One finished knockout match. Scores are nullable defensively, though a `final`
 // match should always carry both. `resultNote` is an optional knockout decider
@@ -102,8 +104,8 @@ function renderHeader(): string {
   return `
     <tr>
       <td style="background-color:${C.pitch};padding:22px 28px;">
-        <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WC</span>
-        <span style="display:inline-block;margin:0 6px;padding:2px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:16px;font-weight:800;letter-spacing:-1px;color:${C.pitch};vertical-align:middle;">26</span>
+        <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WIN</span>
+        <span style="display:inline-block;margin:0 6px;padding:3px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:12px;font-weight:800;letter-spacing:0;color:${C.pitch};vertical-align:middle;">SCORE</span>
         <span style="font-family:${MONO};font-size:12px;font-weight:600;letter-spacing:0.3em;color:${C.pitchFg};vertical-align:middle;">POOL</span>
       </td>
     </tr>`;
@@ -124,7 +126,11 @@ function renderIntro(s: PlayoffScoreStrings): string {
     </tr>`;
 }
 
-function renderMatchRow(match: PlayoffScoreMatch, s: PlayoffScoreStrings, zebra: string): string {
+function renderMatchRow(
+  match: PlayoffScoreMatch,
+  s: PlayoffScoreStrings,
+  zebra: string,
+): string {
   const eyebrow = match.stageLabel
     ? `<div style="margin-bottom:4px;">${monoLabel(match.stageLabel, C.muted)}</div>`
     : "";
@@ -189,7 +195,9 @@ function renderFooter(s: PlayoffScoreStrings): string {
 
 // --- public renderer -------------------------------------------------------
 
-export function renderPlayoffScoreEmail(data: PlayoffScoreData): PlayoffScoreRendered {
+export function renderPlayoffScoreEmail(
+  data: PlayoffScoreData,
+): PlayoffScoreRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>
@@ -232,7 +240,9 @@ function renderText(data: PlayoffScoreData): string {
   for (const m of data.matches) {
     const stage = m.stageLabel ? `[${m.stageLabel}] ` : "";
     const note = m.resultNote ? ` (${m.resultNote})` : "";
-    lines.push(`  ${stage}${m.home} ${scoreText(m, s.scoreSeparator)} ${m.away}${note}`);
+    lines.push(
+      `  ${stage}${m.home} ${scoreText(m, s.scoreSeparator)} ${m.away}${note}`,
+    );
   }
   lines.push("");
   lines.push(`${s.ctaLabel}: ${data.bracketUrl}`);

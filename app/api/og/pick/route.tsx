@@ -15,11 +15,10 @@ export const dynamic = "force-dynamic";
 
 const WIDTH = 1200;
 const HEIGHT = 630;
-// Brand pitch green (oklch(0.43 0.13 158) ≈) and its foreground, hex for Satori.
-const PITCH = "#15714b";
-const PITCH_DARK = "#0e5238";
+// Winscore blue and its darker shade, expressed as hex for Satori.
+const PITCH = "#135fd1";
+const PITCH_DARK = "#0d47a8";
 const FG = "#fbfaf6";
-
 
 function initials(team: string): string {
   return team
@@ -46,13 +45,7 @@ async function flagDataUri(
   }
 }
 
-function TeamBlock({
-  name,
-  flag,
-}: {
-  name: string;
-  flag: string | null;
-}) {
+function TeamBlock({ name, flag }: { name: string; flag: string | null }) {
   return (
     <div
       style={{
@@ -124,7 +117,9 @@ export async function GET(request: Request) {
   const supabase = createClient<Database>(env.supabaseUrl, env.supabaseAnonKey);
   const { data: match } = await supabase
     .from("matches")
-    .select("home_team, away_team, stage, group_code, kickoff_at, competition_id")
+    .select(
+      "home_team, away_team, stage, group_code, kickoff_at, competition_id",
+    )
     .eq("id", matchId)
     .maybeSingle();
   if (!match) return new Response("Match not found", { status: 404 });
@@ -133,12 +128,11 @@ export async function GET(request: Request) {
   // the raw stage key if the competition or stage can't be resolved.
   const { data: comp } = await supabase
     .from("competitions")
-    .select("format_config, branding")
+    .select("format_config")
     .eq("id", match.competition_id)
     .maybeSingle();
   const parsedFormat = comp ? safeParseFormatConfig(comp.format_config) : null;
-  const brandCode =
-    (comp?.branding as { brandCode?: string } | null)?.brandCode ?? "WC26";
+  const brandCode = "WINSCORE";
   const stageName = parsedFormat?.success
     ? getStageLabel(parsedFormat.data, match.stage, locale)
     : match.stage;
@@ -156,94 +150,92 @@ export async function GET(request: Request) {
   ]);
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        backgroundImage: `linear-gradient(135deg, ${PITCH} 0%, ${PITCH_DARK} 100%)`,
+        padding: 56,
+      }}
+    >
       <div
         style={{
-          width: "100%",
-          height: "100%",
           display: "flex",
-          flexDirection: "column",
-          backgroundImage: `linear-gradient(135deg, ${PITCH} 0%, ${PITCH_DARK} 100%)`,
-          padding: 56,
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              color: FG,
-              fontFamily: OG_FONT_FAMILY.mono,
-              fontSize: 28,
-              fontWeight: 700,
-              letterSpacing: 6,
-              textTransform: "uppercase",
-              opacity: 0.85,
-            }}
-          >
-            {stageLabel}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              color: FG,
-              fontFamily: OG_FONT_FAMILY.mono,
-              fontSize: 28,
-              fontWeight: 700,
-              letterSpacing: 6,
-              textTransform: "uppercase",
-              opacity: 0.85,
-            }}
-          >
-            {brandCode} POOL
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <TeamBlock name={match.home_team} flag={homeFlag} />
-          <div
-            style={{
-              display: "flex",
-              color: FG,
-              fontFamily: OG_FONT_FAMILY.heading,
-              fontSize: hasScores ? 150 : 72,
-              fontWeight: 800,
-            }}
-          >
-            {hasScores ? `${h}–${a}` : "vs"}
-          </div>
-          <TeamBlock name={match.away_team} flag={awayFlag} />
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
             color: FG,
             fontFamily: OG_FONT_FAMILY.mono,
-            fontSize: 26,
+            fontSize: 28,
             fontWeight: 700,
-            letterSpacing: 4,
+            letterSpacing: 6,
             textTransform: "uppercase",
-            opacity: 0.7,
+            opacity: 0.85,
           }}
         >
-          {kickoff}
+          {stageLabel}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            color: FG,
+            fontFamily: OG_FONT_FAMILY.mono,
+            fontSize: 28,
+            fontWeight: 700,
+            letterSpacing: 6,
+            textTransform: "uppercase",
+            opacity: 0.85,
+          }}
+        >
+          {brandCode} POOL
         </div>
       </div>
-    ),
+
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <TeamBlock name={match.home_team} flag={homeFlag} />
+        <div
+          style={{
+            display: "flex",
+            color: FG,
+            fontFamily: OG_FONT_FAMILY.heading,
+            fontSize: hasScores ? 150 : 72,
+            fontWeight: 800,
+          }}
+        >
+          {hasScores ? `${h}–${a}` : "vs"}
+        </div>
+        <TeamBlock name={match.away_team} flag={awayFlag} />
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          color: FG,
+          fontFamily: OG_FONT_FAMILY.mono,
+          fontSize: 26,
+          fontWeight: 700,
+          letterSpacing: 4,
+          textTransform: "uppercase",
+          opacity: 0.7,
+        }}
+      >
+        {kickoff}
+      </div>
+    </div>,
     {
       width: WIDTH,
       height: HEIGHT,

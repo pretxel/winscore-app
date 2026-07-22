@@ -11,8 +11,8 @@
     "tryAgain": "Réessayer"
   },
   "siteMeta": {
-    "title": "Winscore — Coupe du monde 2026 : Pronostics quotidiens et classement en direct",
-    "description": "Pronostiquez chaque match de la Coupe du monde 2026. Soumettez vos scores avant le coup d'envoi, gagnez des points sur les résultats et grimpez au classement quotidien et général."
+    "title": "Winscore — Pronostics de football et classements en direct",
+    "description": "Pronostiquez les matchs de football, saisissez vos scores avant le coup d'envoi, gagnez des points et grimpez dans les classements en direct."
   },
   "nav": {
     "leagues": "Ligues",
@@ -62,9 +62,9 @@
     }
   },
   "footer": {
-    "tournament": "Coupe du monde 2026 · 11 juin – 19 juil. 2026",
+    "tournament": "Pronostics de football · Ligues en direct",
     "howItWorks": "Fonctionnement",
-    "hosts": "USA · Canada · Mexique"
+    "hosts": "Pronostiquer · Marquer · Grimper"
   },
   "languageSwitcher": {
     "label": "Langue",
@@ -97,10 +97,9 @@
     "winner": "Vainqueur"
   },
   "home": {
-    "title": "Winscore — Coupe du Monde 2026 : Pronostics & Classement",
-    "description": "Pronostiquez chaque match de la Coupe du Monde 2026. Saisissez les scores avant le coup d'envoi, gagnez des points sur les résultats et grimpez dans un unique classement global.",
-    "eyebrow": "FIFA Coupe du Monde 2026",
-    "hostsLine": "USA · Canada · Mexique",
+    "title": "Winscore — Pronostics de football et classements",
+    "description": "Pronostiquez les matchs de football, saisissez vos scores avant le coup d'envoi, gagnez des points et grimpez dans les classements en direct.",
+    "eyebrow": "Pools de pronostics de football",
     "headlineLine1": "Donnez le score.",
     "headlineLine2": "Grimpez au classement.",
     "lede": "Un seul pool global. Saisissez un score exact pour chaque rencontre avant le coup d'envoi et votre rang bouge dès le coup de sifflet final. Sans configuration, sans frais, sans excuses.",
@@ -162,10 +161,10 @@
     "groupsCopy": "Lancez un groupe privé, partagez un code et affrontez sur un mini classement les gens que vous connaissez vraiment.",
     "groupsCta": "Créer un groupe",
     "newsTitle": "Actualités",
-    "newsCopy": "Les dernières actualités de la Coupe du monde 2026, mises à jour au fil de la journée. Touchez un article pour le lire à la source.",
+    "newsCopy": "Les dernières actualités du football, mises à jour au fil de la journée. Touchez un article pour le lire à la source.",
     "newsCta": "Lire les actualités",
     "quizTitle": "Défi du Jour",
-    "quizCopy": "Une question de quiz Coupe du monde par jour. Répondez avant minuit UTC, gardez votre série et grimpez au classement.",
+    "quizCopy": "Une question de quiz football par jour. Répondez avant minuit UTC, gardez votre série et grimpez au classement.",
     "quizCta": "Jouer la question du jour",
     "standingEyebrow": "Votre classement",
     "lanesEyebrow": "Vos ligues",
@@ -442,31 +441,31 @@
     "copyLink": "Copier le lien",
     "copied": "Lien copié",
     "pageTitle": "{home} {h}–{a} {away} — prono partagé",
-    "pageDescription": "Un prono Coupe du Monde 2026 pour {home} vs {away}. Faites votre propre prono avant le coup d'envoi.",
+    "pageDescription": "Un prono football pour {home} vs {away}. Faites votre propre prono avant le coup d'envoi.",
     "pageEyebrow": "Prono partagé",
-    "pageHeading": "Prono Coupe du Monde 2026",
+    "pageHeading": "Prono football",
     "cta": "Faites votre prono",
-    "ogAlt": "Prono partagé Coupe du Monde 2026 : {home} {h}–{a} {away}"
+    "ogAlt": "Prono football partagé : {home} {h}–{a} {away}"
   },
   "shareQuiz": {
     "heading": "Partagez votre série",
-    "shareText": "Je suis #{rank} sur {count} au quiz quotidien de la Coupe du Monde 2026 — {points} pts et une série de {streak} jours. Essaie de me rattraper.",
+    "shareText": "Je suis #{rank} sur {count} au quiz quotidien Winscore — {points} pts et une série de {streak} jours. Essaie de me rattraper.",
     "shareOnX": "Partager sur X",
     "shareOnFacebook": "Partager sur Facebook",
     "shareNative": "Partager…",
     "copyLink": "Copier le lien",
     "copied": "Lien copié",
     "pageEyebrow": "Série partagée",
-    "pageHeading": "Quiz quotidien Coupe du Monde 2026",
+    "pageHeading": "Quiz quotidien Winscore",
     "pageTitle": "Série de {streak} jours, {points} pts — Winscore",
-    "pageDescription": "{name} tient une série de {streak} jours au quiz quotidien de la Coupe du Monde 2026 — {points} pts, classé #{rank} sur {count}. Répondez à la question du jour et lancez votre propre série.",
+    "pageDescription": "{name} tient une série de {streak} jours au quiz quotidien Winscore — {points} pts, classé #{rank} sur {count}. Répondez à la question du jour et lancez votre propre série.",
     "streakLabel": "Série",
     "pointsLabel": "Points",
     "rankLabel": "Rang",
     "answeredLabel": "Répondues",
     "statPlayers": "sur {count, plural, one {# joueur} other {# joueurs}}",
     "cta": "Jouer au quiz du jour",
-    "ogAlt": "Quiz quotidien Coupe du Monde 2026 : série de {streak} jours, {points} points, rang #{rank}"
+    "ogAlt": "Quiz quotidien Winscore : série de {streak} jours, {points} points, rang #{rank}"
   },
   "shareRank": {
     "heading": "Partagez votre classement",
@@ -1265,7 +1264,7 @@
     "browseMatches": "Voir les matchs"
   },
   "email": {
-    "subject": "+{points} pts dans votre pool Coupe du Monde",
+    "subject": "+{points} pts dans votre pool Winscore",
     "preheader": "Découvrez où les derniers résultats vous placent au classement.",
     "eyebrow": "Résultats à l'instant",
     "heading": "{name}, votre classement vient de changer",
@@ -1290,12 +1289,12 @@
     "ctaLabel": "Voir le classement complet",
     "footer": "Vous recevez ceci car un match que vous avez pronostiqué vient de se terminer. Les points se mettent à jour automatiquement à chaque résultat.",
     "magicLink": {
-      "preheader": "Votre lien de connexion sécurisé pour le pool de la Coupe du monde.",
+      "preheader": "Votre lien de connexion sécurisé pour Winscore.",
       "eyebrow": "Connexion sécurisée",
       "fallbackLabel": "Le bouton ne fonctionne pas ? Copiez-collez ce lien dans votre navigateur :",
       "expiryNote": "Ce lien expire dans 1 heure et ne peut être utilisé qu'une seule fois.",
       "ignoreNote": "Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.",
-      "footer": "Vous recevez cet e-mail car cette adresse a été saisie pour se connecter au pool de la Coupe du monde.",
+      "footer": "Vous recevez cet e-mail car cette adresse a été saisie pour se connecter à Winscore.",
       "actions": {
         "magiclink": {
           "subject": "Votre lien de connexion",
@@ -1336,21 +1335,21 @@
     "eyebrow": "Quiz quotidien",
     "heading": "{name}, la question du jour est disponible",
     "headingNoName": "La question du jour est disponible",
-    "intro": "Une nouvelle question de quiz sur la Coupe du monde vous attend. Répondez avant la fin de la journée pour gagner des points et garder votre série.",
+    "intro": "Une nouvelle question de quiz football vous attend. Répondez avant la fin de la journée pour gagner des points et garder votre série.",
     "streakLine": "Vous êtes sur une série de {days} jours — ne la laissez pas filer.",
     "ctaLabel": "Répondre à la question du jour",
-    "footer": "Vous recevez ceci car vous participez au pool de la Coupe du monde. Le quiz se réinitialise chaque jour à minuit UTC.",
+    "footer": "Vous recevez ceci car vous jouez sur Winscore. Le quiz se réinitialise chaque jour à minuit UTC.",
     "unsubscribeLabel": "Se désabonner des rappels du quiz quotidien"
   },
   "welcomeEmail": {
-    "subject": "Bienvenue dans le pool de la Coupe du monde",
+    "subject": "Bienvenue sur Winscore",
     "preheader": "Vos premiers pronostics, le quiz quotidien et le classement vous attendent.",
     "eyebrow": "Vous y êtes",
     "heading": "Bienvenue, {name} !",
     "headingNoName": "Bienvenue dans le pool !",
     "intro": "Tout est prêt. Voici les trois premières choses à faire — chacune prend moins d'une minute.",
     "quizTitle": "Répondez au quiz quotidien",
-    "quizBlurb": "Une question de quiz sur la Coupe du monde chaque jour. Lancez une série et accumulez des points.",
+    "quizBlurb": "Une question de quiz football chaque jour. Lancez une série et accumulez des points.",
     "quizCta": "Jouer au quiz du jour",
     "groupsTitle": "Créez ou rejoignez un groupe",
     "groupsBlurb": "Affrontez vos amis en tête-à-tête dans votre propre mini-ligue privée.",
@@ -1358,7 +1357,7 @@
     "leaderboardTitle": "Consultez le classement",
     "leaderboardBlurb": "Voyez où vous vous situez par rapport aux autres et grimpez dans le classement.",
     "leaderboardCta": "Voir le classement",
-    "footer": "Vous recevez ceci car vous venez de rejoindre le pool de la Coupe du monde. À bientôt sur le terrain."
+    "footer": "Vous recevez ceci car vous venez de rejoindre Winscore. À bientôt sur le terrain."
   },
   "predictionEmail": {
     "subject": "Les matchs du jour — envoyez vos pronostics",
@@ -1370,11 +1369,11 @@
     "listLabel": "À pronostiquer",
     "vs": "vs",
     "ctaLabel": "Faire mes pronostics",
-    "footer": "Vous recevez ceci car vous participez au pool de la Coupe du monde. Les pronostics se ferment au coup d'envoi de chaque match.",
+    "footer": "Vous recevez ceci car vous jouez sur Winscore. Les pronostics se ferment au coup d'envoi de chaque match.",
     "unsubscribeLabel": "Se désabonner des rappels de pronostics quotidiens"
   },
   "resultsDigest": {
-    "subject": "Votre récap quotidien du pool Coupe du Monde",
+    "subject": "Votre récap quotidien Winscore",
     "preheader": "Le top 5 d'hier, votre rang et les plus gros mouvements.",
     "eyebrow": "Résumé quotidien des résultats",
     "heading": "{name}, voici comment le pool a évolué",
@@ -1394,7 +1393,7 @@
     "droppedLabel": "A chuté",
     "youLabel": "Vous",
     "ctaLabel": "Voir le classement complet",
-    "footer": "Vous recevez ce récap quotidien de votre pool Coupe du Monde. Vous pouvez le désactiver dans les préférences e-mail de votre compte."
+    "footer": "Vous recevez ce récap quotidien de votre pool Winscore. Vous pouvez le désactiver dans les préférences e-mail de votre compte."
   },
   "playoffScoreEmail": {
     "subject": "Résultats des playoffs du samedi",
@@ -1418,7 +1417,7 @@
     "matchCtaLabel": "Voir le match",
     "shareCtaLabel": "Partager",
     "shareText": "Regardez cette BD de récap de match · Winscore",
-    "footer": "Vous recevez ce résumé de BD de récap de votre pool Coupe du Monde. Vous pouvez le désactiver dans les préférences e-mail de votre compte."
+    "footer": "Vous recevez ce résumé de BD de votre pool Winscore. Vous pouvez le désactiver dans les préférences e-mail de votre compte."
   },
   "comebackEmail": {
     "subject": "Vos pronostics nous manquent — le pool continue",
@@ -1434,7 +1433,7 @@
     "matchesLabel": "Prochains à pronostiquer",
     "vs": "vs",
     "ctaLabel": "Faire mes pronostics",
-    "footer": "Vous recevez ceci car vous participez au pool de la Coupe du monde et n'avez pas pronostiqué depuis un moment.",
+    "footer": "Vous recevez ceci car vous jouez sur Winscore et n'avez pas pronostiqué depuis un moment.",
     "unsubscribeLabel": "Se désabonner des e-mails de retour"
   },
   "scoreRulesEmail": {
@@ -1465,7 +1464,7 @@
     "pointsLabel": "pts",
     "youLabel": "Vous",
     "ctaLabel": "Voir le classement final",
-    "footer": "Vous recevez cet e-mail parce que vous avez joué au pool de la Coupe du monde et terminé sur le podium.",
+    "footer": "Vous recevez cet e-mail parce que vous avez joué sur Winscore et terminé sur le podium.",
     "madeWithLove": "Fait avec amour :) — pretxel",
     "comingSoon": "Bientôt : La Liga Pool"
   },

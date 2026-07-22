@@ -63,9 +63,6 @@ const PRODUCT_NAME = "Winscore";
 // product name.
 const FALLBACK_SHORT_NAME = "World Cup 2026";
 const FALLBACK_BRAND_CODE = "WC26";
-// Email sender name stays competition-scoped (each competition sets its own in
-// `branding.emailFromName`); this is only the cold-DB fallback.
-const FALLBACK_EMAIL_FROM_NAME = "World Cup Pools";
 const FALLBACK_NEWS_QUERY = '"World Cup 2026" OR "FIFA World Cup 2026"';
 
 export type ResolvedBranding = {
@@ -91,7 +88,7 @@ export function resolveBranding(
     siteName: PRODUCT_NAME,
     brandCode: b?.brandCode ?? FALLBACK_BRAND_CODE,
     ogAlt: b?.ogAlt ?? `${shortName} · ${PRODUCT_NAME}`,
-    emailFromName: b?.emailFromName ?? FALLBACK_EMAIL_FROM_NAME,
+    emailFromName: PRODUCT_NAME,
     newsQuery: b?.newsQuery ?? FALLBACK_NEWS_QUERY,
   };
 }

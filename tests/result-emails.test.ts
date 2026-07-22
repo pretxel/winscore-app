@@ -83,7 +83,7 @@ describe("renderResultEmail", () => {
     expect(out.html).not.toContain("class=");
   });
 
-  it("colors the outcome chip per hit type (exact = gold, winner/GD = green)", () => {
+  it("colors the outcome chip per hit type (exact = gold, winner/GD = blue)", () => {
     const exact = renderResultEmail(makeData());
     expect(exact.html).toContain("#E7B53C"); // flag gold for exact
 
@@ -101,7 +101,7 @@ describe("renderResultEmail", () => {
         ],
       }),
     );
-    expect(wgd.html).toContain("#1B7A4D"); // pitch green for winner/GD
+    expect(wgd.html).toContain("#135FD1"); // blue for winner/GD
     expect(wgd.html).toContain("Winner + GD");
   });
 
@@ -135,7 +135,9 @@ describe("renderResultEmail", () => {
   });
 
   it("escapes HTML in names to prevent injection", () => {
-    const out = renderResultEmail(makeData({ displayName: "<script>alert(1)</script>" }));
+    const out = renderResultEmail(
+      makeData({ displayName: "<script>alert(1)</script>" }),
+    );
     expect(out.html).not.toContain("<script>alert(1)</script>");
     expect(out.html).toContain("&lt;script&gt;");
   });
@@ -151,12 +153,14 @@ describe("renderResultEmail", () => {
 
   it("renders the resolved rank-delta line in both HTML and text", () => {
     const out = renderResultEmail(
-      makeData({ rankDelta: { direction: "up", magnitude: 3, previousRank: 10 } }),
+      makeData({
+        rankDelta: { direction: "up", magnitude: 3, previousRank: 10 },
+      }),
     );
     expect(out.html).toContain("You moved up 3 to #7.");
     expect(out.text).toContain("You moved up 3 to #7.");
-    // `up` movement uses the pitch-green accent.
-    expect(out.html).toContain("#1B7A4D");
+    // `up` movement uses the blue accent.
+    expect(out.html).toContain("#135FD1");
   });
 
   it("renders the neutral delta line without a numeric movement", () => {
@@ -205,9 +209,18 @@ describe("computeRankDelta", () => {
   });
 
   it("reports a missing previous rank as new", () => {
-    expect(computeRankDelta(null, 7)).toEqual({ direction: "new", magnitude: 0 });
-    expect(computeRankDelta(undefined, 7)).toEqual({ direction: "new", magnitude: 0 });
-    expect(computeRankDelta(10, null)).toEqual({ direction: "new", magnitude: 0 });
+    expect(computeRankDelta(null, 7)).toEqual({
+      direction: "new",
+      magnitude: 0,
+    });
+    expect(computeRankDelta(undefined, 7)).toEqual({
+      direction: "new",
+      magnitude: 0,
+    });
+    expect(computeRankDelta(10, null)).toEqual({
+      direction: "new",
+      magnitude: 0,
+    });
   });
 });
 
@@ -270,7 +283,10 @@ describe("computePendingByUser", () => {
 
   it("only the unsent pairs survive a partial ledger", () => {
     const pending = computePendingByUser(
-      [scoredRow({ user_id: "u1", match_id: "m1" }), scoredRow({ user_id: "u2", match_id: "m1" })],
+      [
+        scoredRow({ user_id: "u1", match_id: "m1" }),
+        scoredRow({ user_id: "u2", match_id: "m1" }),
+      ],
       [{ match_id: "m1", user_id: "u1" }],
     );
     expect(pending).toHaveLength(1);
@@ -376,7 +392,9 @@ vi.mock("@/lib/supabase/admin", () => ({
         const chain: {
           select: () => typeof chain;
           eq: (col: string, val: unknown) => typeof chain;
-          then: (resolve: (v: { data: unknown[]; error: null }) => unknown) => unknown;
+          then: (
+            resolve: (v: { data: unknown[]; error: null }) => unknown,
+          ) => unknown;
         } = {
           select: () => chain,
           eq: (col: string, val: unknown) => {
@@ -423,9 +441,10 @@ vi.mock("@/lib/supabase/admin", () => ({
 beforeEach(() => {
   batchSendMock.mockReset();
   upsertMock.mockReset().mockResolvedValue({ error: null });
-  getUserByIdMock
-    .mockReset()
-    .mockResolvedValue({ data: { user: { email: "player@wc26pool.com" } }, error: null });
+  getUserByIdMock.mockReset().mockResolvedValue({
+    data: { user: { email: "player@wc26pool.com" } },
+    error: null,
+  });
   scoredData = [
     {
       user_id: "u1",
@@ -465,7 +484,8 @@ afterEach(() => {
 describe("dispatchResultEmails", () => {
   it("no-ops without throwing when RESEND_API_KEY is unset", async () => {
     resendApiKey = null;
-    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary).toEqual({ emailed: 0, failed: 0, skipped: 0 });
     expect(batchSendMock).not.toHaveBeenCalled();
@@ -473,7 +493,8 @@ describe("dispatchResultEmails", () => {
 
   it("writes ledger rows only after Resend accepts the batch", async () => {
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary.emailed).toBe(1);
     expect(batchSendMock).toHaveBeenCalledTimes(1);
@@ -489,7 +510,8 @@ describe("dispatchResultEmails", () => {
       data: null,
       error: { message: "rate limited" },
     });
-    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary.failed).toBe(1);
     expect(summary.emailed).toBe(0);
@@ -499,7 +521,8 @@ describe("dispatchResultEmails", () => {
   it("skips recipients whose email cannot be resolved", async () => {
     getUserByIdMock.mockResolvedValue({ data: { user: null }, error: null });
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary.skipped).toBe(1);
     expect(summary.emailed).toBe(0);
@@ -508,7 +531,8 @@ describe("dispatchResultEmails", () => {
 
   it("does nothing when every scored pair is already in the ledger", async () => {
     ledgerData = [{ match_id: "m1", user_id: "u1" }];
-    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary).toEqual({ emailed: 0, failed: 0, skipped: 0 });
     expect(batchSendMock).not.toHaveBeenCalled();
@@ -516,7 +540,8 @@ describe("dispatchResultEmails", () => {
 
   it("excludes a player who opted out of result emails", async () => {
     prefsData = [{ id: "u1", email_prefs: { result: false } }];
-    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary).toEqual({ emailed: 0, failed: 0, skipped: 0 });
     expect(batchSendMock).not.toHaveBeenCalled();
@@ -525,7 +550,8 @@ describe("dispatchResultEmails", () => {
   it("still emails a player with no explicit result preference", async () => {
     prefsData = [{ id: "u1", email_prefs: {} }];
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary.emailed).toBe(1);
   });
@@ -540,7 +566,8 @@ describe("forceDispatchResultEmails", () => {
     // The same pair the cron path would suppress.
     ledgerData = [{ match_id: "m1", user_id: "u1" }];
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { forceDispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { forceDispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await forceDispatchResultEmails("m1");
     expect(summary.emailed).toBe(1);
     expect(batchSendMock).toHaveBeenCalledTimes(1);
@@ -548,10 +575,14 @@ describe("forceDispatchResultEmails", () => {
 
   it("scopes the scored query to the target match_id at the data layer", async () => {
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { forceDispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { forceDispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     await forceDispatchResultEmails("m1");
     expect(scoredEqCalls).toContainEqual({ col: "match_id", val: "m1" });
-    expect(scoredEqCalls).toContainEqual({ col: "matches.status", val: "final" });
+    expect(scoredEqCalls).toContainEqual({
+      col: "matches.status",
+      val: "final",
+    });
   });
 
   it("re-stamps the ledger so a later cron run does not re-email the pair", async () => {
@@ -562,7 +593,10 @@ describe("forceDispatchResultEmails", () => {
     await mod.forceDispatchResultEmails("m1");
     expect(upsertMock).toHaveBeenCalledWith(
       [{ match_id: "m1", user_id: "u1" }],
-      expect.objectContaining({ onConflict: "match_id,user_id", ignoreDuplicates: true }),
+      expect.objectContaining({
+        onConflict: "match_id,user_id",
+        ignoreDuplicates: true,
+      }),
     );
 
     // Simulate the stamp landing, then the cron sees the pair as already sent.
@@ -575,7 +609,8 @@ describe("forceDispatchResultEmails", () => {
 
   it("no-ops without throwing when RESEND_API_KEY is unset", async () => {
     resendApiKey = null;
-    const { forceDispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { forceDispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await forceDispatchResultEmails("m1");
     expect(summary).toEqual({ emailed: 0, failed: 0, skipped: 0 });
     expect(batchSendMock).not.toHaveBeenCalled();
@@ -584,7 +619,8 @@ describe("forceDispatchResultEmails", () => {
   it("counts an unresolvable email as skipped, not failed", async () => {
     getUserByIdMock.mockResolvedValue({ data: { user: null }, error: null });
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { forceDispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { forceDispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await forceDispatchResultEmails("m1");
     expect(summary.skipped).toBe(1);
     expect(summary.emailed).toBe(0);
@@ -615,7 +651,8 @@ describe("forceDispatchResultEmails", () => {
       display_name: "Player",
     }));
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { forceDispatchResultEmails } = await import("@/lib/notifications/result-emails");
+    const { forceDispatchResultEmails } =
+      await import("@/lib/notifications/result-emails");
     const summary = await forceDispatchResultEmails("m1");
     expect(summary.emailed).toBe(150);
     expect(batchSendMock).toHaveBeenCalledTimes(2);

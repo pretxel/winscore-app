@@ -11,8 +11,8 @@
     "tryAgain": "Reintentar"
   },
   "siteMeta": {
-    "title": "Winscore — Mundial 2026: Pronósticos diarios y clasificación en vivo",
-    "description": "Pronostica cada partido del Mundial 2026. Envía tus marcadores antes del inicio, gana puntos con los resultados y sube en la clasificación diaria y general."
+    "title": "Winscore — Pronósticos de fútbol y clasificaciones en vivo",
+    "description": "Pronostica partidos de fútbol, envía tus marcadores antes del inicio, gana puntos y sube en las clasificaciones en vivo."
   },
   "nav": {
     "leagues": "Ligas",
@@ -62,9 +62,9 @@
     }
   },
   "footer": {
-    "tournament": "Mundial 2026 · 11 jun – 19 jul 2026",
+    "tournament": "Pronósticos de fútbol · Ligas en vivo",
     "howItWorks": "Cómo funciona",
-    "hosts": "EE. UU. · Canadá · México"
+    "hosts": "Pronostica · Puntúa · Escala"
   },
   "languageSwitcher": {
     "label": "Idioma",
@@ -97,10 +97,9 @@
     "winner": "Ganador"
   },
   "home": {
-    "title": "Winscore — Mundial 2026: Pronósticos y Clasificación",
-    "description": "Pronostica cada partido del Mundial 2026. Envía marcadores antes del inicio, gana puntos con los resultados y sube en una única clasificación global.",
-    "eyebrow": "FIFA Mundial 2026",
-    "hostsLine": "EE. UU. · Canadá · México",
+    "title": "Winscore — Pronósticos de fútbol y clasificaciones",
+    "description": "Pronostica partidos de fútbol, envía tus marcadores antes del inicio, gana puntos y sube en las clasificaciones en vivo.",
+    "eyebrow": "Pools de pronósticos de fútbol",
     "headlineLine1": "Acierta el marcador.",
     "headlineLine2": "Escala la tabla.",
     "lede": "Un único pool global. Envía un marcador exacto para cada partido antes del inicio y tu posición se mueve al sonar el silbato final. Sin configuración, sin cuotas, sin excusas.",
@@ -162,10 +161,10 @@
     "groupsCopy": "Crea un grupo privado, comparte un código y compite en una mini clasificación con la gente que conoces de verdad.",
     "groupsCta": "Crear un grupo",
     "newsTitle": "Noticias",
-    "newsCopy": "Las últimas noticias del Mundial 2026, actualizadas durante el día. Toca cualquier historia para leerla en la fuente.",
+    "newsCopy": "Las últimas noticias de fútbol, actualizadas durante el día. Toca cualquier historia para leerla en la fuente.",
     "newsCta": "Leer las noticias",
     "quizTitle": "Reto Diario",
-    "quizCopy": "Una pregunta de trivia del Mundial al día. Responde antes de medianoche UTC, mantén tu racha y sube en la clasificación.",
+    "quizCopy": "Una pregunta de trivia de fútbol al día. Responde antes de medianoche UTC, mantén tu racha y sube en la clasificación.",
     "quizCta": "Jugar la pregunta de hoy",
     "standingEyebrow": "Tu posición",
     "lanesEyebrow": "Tus ligas",
@@ -442,31 +441,31 @@
     "copyLink": "Copiar enlace",
     "copied": "Enlace copiado",
     "pageTitle": "{home} {h}–{a} {away} — pronóstico compartido",
-    "pageDescription": "Un pronóstico del Mundial 2026 para {home} vs {away}. Haz tu propio pronóstico antes del inicio.",
+    "pageDescription": "Un pronóstico de fútbol para {home} vs {away}. Haz tu propio pronóstico antes del inicio.",
     "pageEyebrow": "Pronóstico compartido",
-    "pageHeading": "Pronóstico del Mundial 2026",
+    "pageHeading": "Pronóstico de fútbol",
     "cta": "Haz tu propio pronóstico",
-    "ogAlt": "Pronóstico compartido del Mundial 2026: {home} {h}–{a} {away}"
+    "ogAlt": "Pronóstico de fútbol compartido: {home} {h}–{a} {away}"
   },
   "shareQuiz": {
     "heading": "Comparte tu racha",
-    "shareText": "Voy #{rank} de {count} en el quiz diario del Mundial 2026 — {points} pts y una racha de {streak} días. A ver si me alcanzas.",
+    "shareText": "Voy #{rank} de {count} en el quiz diario de Winscore — {points} pts y una racha de {streak} días. A ver si me alcanzas.",
     "shareOnX": "Compartir en X",
     "shareOnFacebook": "Compartir en Facebook",
     "shareNative": "Compartir…",
     "copyLink": "Copiar enlace",
     "copied": "Enlace copiado",
     "pageEyebrow": "Racha compartida",
-    "pageHeading": "Quiz diario del Mundial 2026",
+    "pageHeading": "Quiz diario de Winscore",
     "pageTitle": "Racha de {streak} días, {points} pts — Winscore",
-    "pageDescription": "{name} lleva una racha de {streak} días en el quiz diario del Mundial 2026 — {points} pts, puesto #{rank} de {count}. Responde la pregunta de hoy y empieza tu propia racha.",
+    "pageDescription": "{name} lleva una racha de {streak} días en el quiz diario de Winscore — {points} pts, puesto #{rank} de {count}. Responde la pregunta de hoy y empieza tu propia racha.",
     "streakLabel": "Racha",
     "pointsLabel": "Puntos",
     "rankLabel": "Puesto",
     "answeredLabel": "Respondidas",
     "statPlayers": "de {count, plural, one {# jugador} other {# jugadores}}",
     "cta": "Jugar el quiz de hoy",
-    "ogAlt": "Quiz diario del Mundial 2026: racha de {streak} días, {points} puntos, puesto #{rank}"
+    "ogAlt": "Quiz diario de Winscore: racha de {streak} días, {points} puntos, puesto #{rank}"
   },
   "shareRank": {
     "heading": "Comparte tu posición",
@@ -782,9 +781,9 @@
     "preheader": "Toca el enlace para unirte a {group} y empezar a competir.",
     "eyebrow": "Invitación al grupo",
     "heading": "Únete a {group}",
-    "intro": "{inviter} te invitó a {group} en el Pool del Mundial. Únete al grupo para competir en su tabla con los mismos pronósticos.",
+    "intro": "{inviter} te invitó a {group} en Winscore. Únete al grupo para competir en su tabla con los mismos pronósticos.",
     "joinCta": "Unirme al grupo",
-    "footer": "Recibes esto porque alguien te invitó a un grupo del Pool del Mundial. Si no lo esperabas, puedes ignorar este correo.",
+    "footer": "Recibes esto porque alguien te invitó a un grupo de Winscore. Si no lo esperabas, puedes ignorar este correo.",
     "inviteLabel": "Invitar por correo",
     "inviteHint": "Envía un enlace directo para unirse al buzón de tus amigos.",
     "recipientsLabel": "Correos de los destinatarios",
@@ -1265,7 +1264,7 @@
     "browseMatches": "Ver partidos"
   },
   "email": {
-    "subject": "+{points} pts en tu quiniela del Mundial",
+    "subject": "+{points} pts en tu pool de Winscore",
     "preheader": "Mira cómo te dejaron los últimos resultados en la tabla.",
     "eyebrow": "Resultados recién llegados",
     "heading": "{name}, tu posición acaba de cambiar",
@@ -1290,12 +1289,12 @@
     "ctaLabel": "Ver tabla completa",
     "footer": "Recibes esto porque acaba de terminar un partido que pronosticaste. Los puntos se actualizan automáticamente con cada resultado.",
     "magicLink": {
-      "preheader": "Tu enlace seguro para entrar a la quiniela del Mundial.",
+      "preheader": "Tu enlace seguro para entrar a Winscore.",
       "eyebrow": "Inicio de sesión seguro",
       "fallbackLabel": "¿El botón no funciona? Copia y pega este enlace en tu navegador:",
       "expiryNote": "Este enlace caduca en 1 hora y se puede usar una sola vez.",
       "ignoreNote": "Si no lo solicitaste, puedes ignorar este correo.",
-      "footer": "Recibes este correo porque alguien introdujo esta dirección para entrar a la quiniela del Mundial.",
+      "footer": "Recibes este correo porque alguien introdujo esta dirección para entrar a Winscore.",
       "actions": {
         "magiclink": {
           "subject": "Tu enlace de acceso",
@@ -1336,21 +1335,21 @@
     "eyebrow": "Quiz diario",
     "heading": "{name}, la pregunta de hoy ya está disponible",
     "headingNoName": "La pregunta de hoy ya está disponible",
-    "intro": "Te espera una nueva pregunta de trivia del Mundial. Respóndela antes de que acabe el día para ganar puntos y mantener tu racha.",
+    "intro": "Te espera una nueva pregunta de trivia de fútbol. Respóndela antes de que acabe el día para ganar puntos y mantener tu racha.",
     "streakLine": "Llevas una racha de {days} días — no la dejes escapar.",
     "ctaLabel": "Responder la pregunta de hoy",
-    "footer": "Recibes esto porque participas en la quiniela del Mundial. El quiz se reinicia cada día a medianoche UTC.",
+    "footer": "Recibes esto porque juegas en Winscore. El quiz se reinicia cada día a medianoche UTC.",
     "unsubscribeLabel": "Cancelar los recordatorios del quiz diario"
   },
   "welcomeEmail": {
-    "subject": "Bienvenido a la quiniela del Mundial",
+    "subject": "Bienvenido a Winscore",
     "preheader": "Tus primeros pronósticos, el quiz diario y la clasificación te esperan.",
     "eyebrow": "Ya estás dentro",
     "heading": "¡Bienvenido, {name}!",
     "headingNoName": "¡Bienvenido a la quiniela!",
     "intro": "Ya está todo listo. Aquí tienes las tres primeras cosas que hacer — cada una lleva menos de un minuto.",
     "quizTitle": "Responde el quiz diario",
-    "quizBlurb": "Una pregunta de trivia del Mundial cada día. Crea una racha y suma puntos.",
+    "quizBlurb": "Una pregunta de trivia de fútbol cada día. Crea una racha y suma puntos.",
     "quizCta": "Jugar el quiz de hoy",
     "groupsTitle": "Crea o únete a un grupo",
     "groupsBlurb": "Compite mano a mano con tus amigos en tu propia miniliga privada.",
@@ -1358,7 +1357,7 @@
     "leaderboardTitle": "Mira la clasificación",
     "leaderboardBlurb": "Comprueba tu posición frente a los demás y escala puestos.",
     "leaderboardCta": "Ver la clasificación",
-    "footer": "Recibes esto porque acabas de unirte a la quiniela del Mundial. Nos vemos en el campo."
+    "footer": "Recibes esto porque acabas de unirte a Winscore. Nos vemos en el campo."
   },
   "predictionEmail": {
     "subject": "Los partidos de hoy — envía tus pronósticos",
@@ -1370,11 +1369,11 @@
     "listLabel": "Pendientes de pronosticar",
     "vs": "vs",
     "ctaLabel": "Hacer mis pronósticos",
-    "footer": "Recibes esto porque participas en la quiniela del Mundial. Los pronósticos se cierran al inicio de cada partido.",
+    "footer": "Recibes esto porque juegas en Winscore. Los pronósticos se cierran al inicio de cada partido.",
     "unsubscribeLabel": "Cancelar los recordatorios de pronósticos diarios"
   },
   "resultsDigest": {
-    "subject": "Tu resumen diario del Mundial",
+    "subject": "Tu resumen diario de Winscore",
     "preheader": "El top 5 de ayer, tu posición y quienes más se movieron.",
     "eyebrow": "Resumen diario de resultados",
     "heading": "{name}, así se movió la quiniela",
@@ -1394,7 +1393,7 @@
     "droppedLabel": "Bajó",
     "youLabel": "Tú",
     "ctaLabel": "Ver clasificación completa",
-    "footer": "Recibes este resumen diario de tu quiniela del Mundial. Puedes desactivarlo en las preferencias de correo de tu cuenta."
+    "footer": "Recibes este resumen diario de tu pool de Winscore. Puedes desactivarlo en las preferencias de correo de tu cuenta."
   },
   "playoffScoreEmail": {
     "subject": "Resultados de los playoffs del sábado",
@@ -1418,7 +1417,7 @@
     "matchCtaLabel": "Ver partido",
     "shareCtaLabel": "Compartir",
     "shareText": "Mira este cómic de recap del partido · Winscore",
-    "footer": "Recibes este resumen de cómics de recap de tu quiniela del Mundial. Puedes desactivarlo en las preferencias de correo de tu cuenta."
+    "footer": "Recibes este resumen de cómics de tu pool de Winscore. Puedes desactivarlo en las preferencias de correo de tu cuenta."
   },
   "comebackEmail": {
     "subject": "Echamos de menos tus pronósticos — la quiniela sigue",
@@ -1434,7 +1433,7 @@
     "matchesLabel": "Próximos por pronosticar",
     "vs": "vs",
     "ctaLabel": "Hacer mis pronósticos",
-    "footer": "Recibes esto porque participas en la quiniela del Mundial y hace tiempo que no pronosticas.",
+    "footer": "Recibes esto porque juegas en Winscore y hace tiempo que no pronosticas.",
     "unsubscribeLabel": "Cancelar los correos de regreso"
   },
   "scoreRulesEmail": {
@@ -1465,7 +1464,7 @@
     "pointsLabel": "pts",
     "youLabel": "Tú",
     "ctaLabel": "Ver la clasificación final",
-    "footer": "Recibes este correo porque jugaste la quiniela del Mundial y terminaste en el podio.",
+    "footer": "Recibes este correo porque jugaste en Winscore y terminaste en el podio.",
     "madeWithLove": "Hecho con amor :) — pretxel",
     "comingSoon": "Próximamente: La Liga Pool"
   },

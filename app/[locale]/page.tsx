@@ -15,7 +15,6 @@ import { cn } from "@/lib/utils";
 import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 import { MiniBracket } from "@/components/mini-bracket";
 import { TeamFlagWall } from "@/components/team-flag-wall";
-import { TeamFlag } from "@/components/team-flag";
 import { Logotype } from "@/components/logotype";
 import { TournamentCountdown } from "@/components/tournament-countdown";
 import { RecentRecapImages } from "@/components/recent-recap-images";
@@ -96,7 +95,7 @@ export default async function HomePage({
   }
 
   return (
-    <main>
+    <main className="landing-blue">
       <Hero locale={locale} t={t} />
       <TournamentCountdown />
       <ScoringSection locale={locale} t={t} />
@@ -163,13 +162,6 @@ function Hero({ locale, t }: { locale: Locale; t: T }) {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/60 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground backdrop-blur">
             <span aria-hidden className="size-1.5 rounded-full bg-flag" />
             {t("eyebrow")}
-            <span className="text-muted-foreground/40">·</span>
-            <span className="inline-flex items-center gap-1">
-              <TeamFlag team="United States" size="sm" className="h-3 w-4" />
-              <TeamFlag team="Canada" size="sm" className="h-3 w-4" />
-              <TeamFlag team="Mexico" size="sm" className="h-3 w-4" />
-            </span>
-            {t("hostsLine")}
           </div>
 
           <div className="mt-4">
@@ -295,10 +287,34 @@ function ScoringSection({ locale, t }: { locale: Locale; t: T }) {
     Icon: React.ComponentType<{ className?: string }>;
     accent: "pitch" | "flag" | "muted" | "ghost";
   }> = [
-    { pts: 5, titleKey: "scoringTierExactTitle", detailKey: "scoringTierExactDetail", Icon: TargetIcon, accent: "pitch" },
-    { pts: 3, titleKey: "scoringTierWinnerGdTitle", detailKey: "scoringTierWinnerGdDetail", Icon: ZapIcon, accent: "flag" },
-    { pts: 1, titleKey: "scoringTierWinnerTitle", detailKey: "scoringTierWinnerDetail", Icon: TrophyIcon, accent: "muted" },
-    { pts: 0, titleKey: "scoringTierMissTitle", detailKey: "scoringTierMissDetail", Icon: ArrowRightIcon, accent: "ghost" },
+    {
+      pts: 5,
+      titleKey: "scoringTierExactTitle",
+      detailKey: "scoringTierExactDetail",
+      Icon: TargetIcon,
+      accent: "pitch",
+    },
+    {
+      pts: 3,
+      titleKey: "scoringTierWinnerGdTitle",
+      detailKey: "scoringTierWinnerGdDetail",
+      Icon: ZapIcon,
+      accent: "flag",
+    },
+    {
+      pts: 1,
+      titleKey: "scoringTierWinnerTitle",
+      detailKey: "scoringTierWinnerDetail",
+      Icon: TrophyIcon,
+      accent: "muted",
+    },
+    {
+      pts: 0,
+      titleKey: "scoringTierMissTitle",
+      detailKey: "scoringTierMissDetail",
+      Icon: ArrowRightIcon,
+      accent: "ghost",
+    },
   ];
 
   return (
@@ -441,7 +457,9 @@ function Cadence({ t }: { t: T }) {
                   {t(step.labelKey)}
                 </span>
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">{t(step.copyKey)}</p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                {t(step.copyKey)}
+              </p>
             </li>
           ))}
         </ol>
@@ -458,9 +476,27 @@ function FeatureSections({ locale, t }: { locale: Locale; t: T }) {
     href: string;
     Icon: React.ComponentType<{ className?: string }>;
   }> = [
-    { titleKey: "groupsTitle", copyKey: "groupsCopy", ctaKey: "groupsCta", href: "/groups", Icon: UsersIcon },
-    { titleKey: "newsTitle", copyKey: "newsCopy", ctaKey: "newsCta", href: "/news", Icon: NewspaperIcon },
-    { titleKey: "quizTitle", copyKey: "quizCopy", ctaKey: "quizCta", href: "/quiz", Icon: BrainIcon },
+    {
+      titleKey: "groupsTitle",
+      copyKey: "groupsCopy",
+      ctaKey: "groupsCta",
+      href: "/groups",
+      Icon: UsersIcon,
+    },
+    {
+      titleKey: "newsTitle",
+      copyKey: "newsCopy",
+      ctaKey: "newsCta",
+      href: "/news",
+      Icon: NewspaperIcon,
+    },
+    {
+      titleKey: "quizTitle",
+      copyKey: "quizCopy",
+      ctaKey: "quizCta",
+      href: "/quiz",
+      Icon: BrainIcon,
+    },
   ];
 
   return (

@@ -5,8 +5,17 @@ import { env } from "@/lib/env";
 import { isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import type { Database } from "@/lib/database.types";
 import { loadH2HStandings, loadRecentForm, type FormPip } from "@/lib/h2h";
-import { loadOgFonts, loadDisplayNameFallback, OG_FONT_FAMILY } from "@/lib/og-fonts";
-import { cardETag, ifNoneMatchSatisfied, notModified, OG_CACHE_CONTROL } from "@/lib/og-cache";
+import {
+  loadOgFonts,
+  loadDisplayNameFallback,
+  OG_FONT_FAMILY,
+} from "@/lib/og-fonts";
+import {
+  cardETag,
+  ifNoneMatchSatisfied,
+  notModified,
+  OG_CACHE_CONTROL,
+} from "@/lib/og-cache";
 
 // Node runtime (no `runtime = "edge"`): lib/og-fonts.ts reads font binaries via
 // node:fs/promises, and the @vercel/og Edge bundle cap does not apply.
@@ -18,9 +27,9 @@ const CARD_TOKEN = "h2h-1";
 
 const WIDTH = 1200;
 const HEIGHT = 630;
-// Brand pitch green (oklch(0.43 0.13 158) ≈) and its foreground, hex for Satori.
-const PITCH = "#15714b";
-const PITCH_DARK = "#0e5238";
+// Winscore blue and its darker shade, expressed as hex for Satori.
+const PITCH = "#135fd1";
+const PITCH_DARK = "#0d47a8";
 const FG = "#fbfaf6";
 
 function formToken(pips: FormPip[]): string {
@@ -38,7 +47,8 @@ function FormPips({ pips }: { pips: FormPip[] }) {
             width: 18,
             height: 18,
             borderRadius: 9,
-            backgroundColor: p.outcome === "hit" ? FG : "rgba(251,250,246,0.22)",
+            backgroundColor:
+              p.outcome === "hit" ? FG : "rgba(251,250,246,0.22)",
           }}
         />
       ))}
@@ -102,7 +112,14 @@ function Column({
         {name}
       </div>
       <div style={{ display: "flex", gap: 28, marginTop: 14 }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
           <div
             style={{
               display: "flex",
@@ -130,7 +147,14 @@ function Column({
             {pointsLabel}
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
           <div
             style={{
               display: "flex",

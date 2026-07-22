@@ -11,8 +11,8 @@
     "tryAgain": "Try again"
   },
   "siteMeta": {
-    "title": "Winscore — World Cup 2026: Daily Predictions & Live Leaderboard",
-    "description": "Predict every World Cup 2026 match. Submit scores before kickoff, earn points on results, and climb a daily and overall leaderboard."
+    "title": "Winscore — Football Predictions & Live Leaderboards",
+    "description": "Predict football matches, submit scores before kickoff, earn points on results, and climb live leaderboards."
   },
   "nav": {
     "leagues": "Leagues",
@@ -62,9 +62,9 @@
     }
   },
   "footer": {
-    "tournament": "World Cup 2026 · 11 Jun – 19 Jul 2026",
+    "tournament": "Football predictions · Live leagues",
     "howItWorks": "How it works",
-    "hosts": "USA · Canada · Mexico"
+    "hosts": "Pick · Score · Climb"
   },
   "languageSwitcher": {
     "label": "Language",
@@ -97,10 +97,9 @@
     "winner": "Winner"
   },
   "home": {
-    "title": "Winscore — World Cup 2026: Predictions & Leaderboard",
-    "description": "Predict every World Cup 2026 match. Submit scores before kickoff, earn points on results, and climb a single global leaderboard.",
-    "eyebrow": "FIFA World Cup 2026",
-    "hostsLine": "USA · Canada · Mexico",
+    "title": "Winscore — Football Predictions & Leaderboards",
+    "description": "Predict football matches, submit scores before kickoff, earn points on results, and climb live leaderboards.",
+    "eyebrow": "Football prediction pools",
     "headlineLine1": "Call the score.",
     "headlineLine2": "Climb the table.",
     "lede": "One global pool. Submit an exact-score pick for every fixture before kickoff and your ranking shifts the moment the final whistle blows. No setup, no fees, no excuses.",
@@ -162,10 +161,10 @@
     "groupsCopy": "Spin up a private group, share a code, and race a mini leaderboard against the people you actually know.",
     "groupsCta": "Create a group",
     "newsTitle": "News",
-    "newsCopy": "The latest World Cup 2026 headlines, refreshed through the day. Tap any story to read it at the source.",
+    "newsCopy": "The latest football headlines, refreshed through the day. Tap any story to read it at the source.",
     "newsCta": "Read the news",
     "quizTitle": "Daily Call",
-    "quizCopy": "One World Cup trivia question a day. Answer before midnight UTC, keep your streak, and climb the quiz board.",
+    "quizCopy": "One football trivia question a day. Answer before midnight UTC, keep your streak, and climb the quiz board.",
     "quizCta": "Play today's question",
     "standingEyebrow": "Your standing",
     "lanesEyebrow": "Your leagues",
@@ -442,31 +441,31 @@
     "copyLink": "Copy link",
     "copied": "Link copied",
     "pageTitle": "{home} {h}–{a} {away} — shared pick",
-    "pageDescription": "A World Cup 2026 prediction for {home} vs {away}. Make your own pick before kickoff.",
+    "pageDescription": "A football prediction for {home} vs {away}. Make your own pick before kickoff.",
     "pageEyebrow": "Shared pick",
-    "pageHeading": "World Cup 2026 prediction",
+    "pageHeading": "Football prediction",
     "cta": "Make your own pick",
-    "ogAlt": "Shared World Cup 2026 pick: {home} {h}–{a} {away}"
+    "ogAlt": "Shared football pick: {home} {h}–{a} {away}"
   },
   "shareQuiz": {
     "heading": "Share your quiz streak",
-    "shareText": "I'm #{rank} of {count} in the World Cup 2026 daily quiz — {points} pts and a {streak}-day streak. Catch me if you can.",
+    "shareText": "I'm #{rank} of {count} in the Winscore daily quiz — {points} pts and a {streak}-day streak. Catch me if you can.",
     "shareOnX": "Share on X",
     "shareOnFacebook": "Share on Facebook",
     "shareNative": "Share…",
     "copyLink": "Copy link",
     "copied": "Link copied",
     "pageEyebrow": "Shared quiz streak",
-    "pageHeading": "World Cup 2026 daily quiz",
+    "pageHeading": "Winscore daily quiz",
     "pageTitle": "{streak}-day quiz streak, {points} pts — Winscore",
-    "pageDescription": "{name} is on a {streak}-day streak in the World Cup 2026 daily quiz — {points} pts, ranked #{rank} of {count}. Answer today's question and start your own streak.",
+    "pageDescription": "{name} is on a {streak}-day streak in the Winscore daily quiz — {points} pts, ranked #{rank} of {count}. Answer today's question and start your own streak.",
     "streakLabel": "Streak",
     "pointsLabel": "Points",
     "rankLabel": "Rank",
     "answeredLabel": "Answered",
     "statPlayers": "of {count, plural, one {# player} other {# players}}",
     "cta": "Play today's quiz",
-    "ogAlt": "World Cup 2026 daily quiz: {streak}-day streak, {points} points, rank #{rank}"
+    "ogAlt": "Winscore daily quiz: {streak}-day streak, {points} points, rank #{rank}"
   },
   "shareRank": {
     "heading": "Share your standing",
@@ -1336,7 +1335,7 @@
     "eyebrow": "Daily quiz",
     "heading": "{name}, today's question is up",
     "headingNoName": "Today's question is up",
-    "intro": "A fresh World Cup trivia question is waiting. Answer it before the day ends to earn points and keep your streak alive.",
+    "intro": "A fresh football trivia question is waiting. Answer it before the day ends to earn points and keep your streak alive.",
     "streakLine": "You're on a {days}-day streak — don't let it slip.",
     "ctaLabel": "Answer today's question",
     "footer": "You're getting this because you're playing Winscore. The quiz resets every day at midnight UTC.",
@@ -1350,7 +1349,7 @@
     "headingNoName": "Welcome to the pool!",
     "intro": "You're all set. Here are the three things to do first — each takes less than a minute.",
     "quizTitle": "Answer the daily quiz",
-    "quizBlurb": "One World Cup trivia question every day. Build a streak and rack up points.",
+    "quizBlurb": "One football trivia question every day. Build a streak and rack up points.",
     "quizCta": "Play today's quiz",
     "groupsTitle": "Start or join a group",
     "groupsBlurb": "Compete head-to-head with friends in your own private mini-league.",
