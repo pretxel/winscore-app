@@ -1462,5 +1462,12 @@
     "footer": "Vous recevez cet e-mail parce que vous avez joué au pool de la Coupe du monde et terminé sur le podium.",
     "madeWithLove": "Fait avec amour :) — pretxel",
     "comingSoon": "Bientôt : La Liga Pool"
+  },
+  "catalog": {
+    "title": "Ligues",
+    "lede": "Toutes les ligues actives — créez un groupe dans l'une d'elles.",
+    "empty": "Aucune ligue active pour l'instant.",
+    "start": "Créer un groupe",
+    "fixtures": "Voir les matchs"
   }
 }

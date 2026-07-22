@@ -28,7 +28,7 @@ cutover behind `pnpm typecheck`.
 ## 4. Screens
 
 - [x] 4.1 Cross-league home: stacked `LeagueLane`s (rail + pool cards + live/next fixtures + "Start a pool"); empty state shows the catalog + primary create action. Data: `listMyPoolsByLeague()` + `getLeagueLaneFixtures()` (`lib/home.ts`). Also repointed the global nav (matches/standings/bracket/leaderboard/my-picks are league-scoped now → nav routes to `/catalog`). `home` + `nav.leagues` i18n keys added to all 4 locales. typecheck + lint + build green.
-- [ ] 4.2 League catalog page: live leagues as startable options. Data: `listLiveLeagues()`.
+- [x] 4.2 League catalog page: live leagues as startable options. Data: `listLiveLeagues()`. Matchday-board cards (LeagueRail + edition code + browse/start actions), `catalog` i18n namespace across 4 locales, localized `generateMetadata`.
 - [ ] 4.3 Create-pool flow (coupon aesthetic): select live league → name → create (pass `p_competition_id`) → surface `join_code`.
 - [ ] 4.4 Pool dashboard: single-league focus via `getLeagueForPool` — that league's fixtures, member predictions, pool standings.
 - [ ] 4.5 Join-by-code entry point on the home and pool dashboard.

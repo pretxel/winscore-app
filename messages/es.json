@@ -1462,5 +1462,12 @@
     "footer": "Recibes este correo porque jugaste la quiniela del Mundial y terminaste en el podio.",
     "madeWithLove": "Hecho con amor :) — pretxel",
     "comingSoon": "Próximamente: La Liga Pool"
+  },
+  "catalog": {
+    "title": "Ligas",
+    "lede": "Todas las ligas activas: crea un grupo en cualquiera.",
+    "empty": "Aún no hay ligas activas.",
+    "start": "Crear un grupo",
+    "fixtures": "Ver partidos"
   }
 }

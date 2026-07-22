@@ -1462,5 +1462,12 @@
     "footer": "Du erhältst diese E-Mail, weil du beim WM-Pool mitgespielt und das Podium erreicht hast.",
     "madeWithLove": "Mit Liebe gemacht :) — pretxel",
     "comingSoon": "Bald verfügbar: La Liga Pool"
+  },
+  "catalog": {
+    "title": "Ligen",
+    "lede": "Alle aktiven Ligen — starte in jeder eine Gruppe.",
+    "empty": "Noch keine aktiven Ligen.",
+    "start": "Gruppe erstellen",
+    "fixtures": "Spiele ansehen"
   }
 }

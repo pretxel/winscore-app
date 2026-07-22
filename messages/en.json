@@ -1462,5 +1462,12 @@
     "footer": "You're getting this because you played Winscore and finished on the podium.",
     "madeWithLove": "Made with love :) — pretxel",
     "comingSoon": "Coming soon: La Liga Pool"
+  },
+  "catalog": {
+    "title": "Leagues",
+    "lede": "Every live league — start a group in any of them.",
+    "empty": "No live leagues yet.",
+    "start": "Start a group",
+    "fixtures": "View fixtures"
   }
 }

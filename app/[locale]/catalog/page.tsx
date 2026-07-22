@@ -1,18 +1,29 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { setRequestLocale } from "next-intl/server";
+import { ArrowRightIcon, PlusIcon } from "lucide-react";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { listLiveLeagues } from "@/lib/competition";
+import { LeagueRail } from "@/components/league-rail";
 import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Leagues",
-  alternates: { canonical: "/catalog" },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "catalog" });
+  return {
+    title: t("title"),
+    description: t("lede"),
+    alternates: { canonical: "/catalog" },
+  };
+}
 
 // League catalog — the entry point to every live league and the redirect target
-// for legacy single-competition paths / unknown league slugs. This is the
-// functional stub; task 4.2 replaces it with the "matchday board" catalog
-// design (LeagueLane rails + startable options).
+// for legacy single-competition paths / unknown league slugs. Each live league is
+// a matchday-board card: its vertical nameplate rail, name + edition code, and
+// the two startable actions (browse fixtures, start a group).
 export default async function CatalogPage({
   params,
 }: {
@@ -21,27 +32,56 @@ export default async function CatalogPage({
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
+  const t = await getTranslations("catalog");
 
   const leagues = await listLiveLeagues();
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="font-heading text-3xl tracking-tight">Leagues</h1>
+    <main className="mx-auto max-w-4xl px-4 py-10 sm:py-14">
+      <header className="mb-8">
+        <h1 className="font-heading text-foreground text-3xl font-semibold tracking-tight sm:text-4xl">
+          {t("title")}
+        </h1>
+        <p className="text-muted-foreground mt-3 max-w-xl">{t("lede")}</p>
+      </header>
+
       {leagues.length === 0 ? (
-        <p className="text-muted-foreground mt-6">No live leagues yet.</p>
+        <p className="text-muted-foreground border-border rounded-xl border border-dashed px-6 py-12 text-center">
+          {t("empty")}
+        </p>
       ) : (
-        <ul className="mt-6 grid gap-3">
+        <ul className="grid gap-4">
           {leagues.map((league) => (
             <li key={league.id}>
-              <Link
-                href={localePath(locale, `/${league.slug}/matches`)}
-                className="border-border hover:bg-secondary flex items-center justify-between rounded-lg border px-4 py-3 transition-colors"
-              >
-                <span className="font-medium">{league.name}</span>
-                <span className="text-muted-foreground text-sm">
-                  {league.shortName}
-                </span>
-              </Link>
+              <div className="rise border-border bg-card flex overflow-hidden rounded-xl border">
+                <LeagueRail label={league.shortName || league.name} />
+                <div className="flex flex-1 flex-wrap items-center justify-between gap-4 p-4 sm:p-5">
+                  <div>
+                    <h2 className="font-heading text-foreground text-xl font-semibold tracking-tight">
+                      {league.name}
+                    </h2>
+                    <p className="text-muted-foreground font-mono text-[11px] tracking-[0.22em] uppercase">
+                      {league.brandCode}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={localePath(locale, `/${league.slug}/matches`)}
+                      className="border-border hover:bg-secondary inline-flex min-h-10 items-center gap-1 rounded-md border px-4 text-sm font-medium transition-colors"
+                    >
+                      {t("fixtures")}
+                      <ArrowRightIcon className="size-4" />
+                    </Link>
+                    <Link
+                      href={localePath(locale, "/groups")}
+                      className="bg-primary text-primary-foreground inline-flex min-h-10 items-center gap-1 rounded-md px-4 text-sm font-semibold"
+                    >
+                      <PlusIcon className="size-4" />
+                      {t("start")}
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </li>
           ))}
         </ul>
