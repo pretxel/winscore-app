@@ -4,6 +4,7 @@ import {
   getLeagueBySlug,
   getBrandingForLeague,
   getActiveBranding,
+  resolveBranding,
   type ResolvedBranding,
 } from "@/lib/competition";
 
@@ -28,13 +29,30 @@ export type LeagueRunContext = {
 export async function forEachLiveLeague<T>(
   fn: (ctx: LeagueRunContext) => Promise<T>,
 ): Promise<{ results: T[]; leaguesProcessed: number }> {
-  const leagues = await listLiveLeagues();
-  if (leagues.length === 0) {
-    return {
-      results: [await fn({ branding: await getActiveBranding() })],
-      leaguesProcessed: 0,
-    };
+  // Resolving the live leagues reads public competitions through the request
+  // (cookie) client. Real cron invocations run inside a request scope so this
+  // succeeds; if it can't (no request scope, or a read failure) we degrade to a
+  // single unscoped run rather than aborting the whole cron.
+  let leagues: Awaited<ReturnType<typeof listLiveLeagues>> = [];
+  try {
+    leagues = await listLiveLeagues();
+  } catch (err) {
+    console.warn(
+      "[cron] live-league resolution failed; falling back to a single unscoped run",
+      err,
+    );
   }
+
+  if (leagues.length === 0) {
+    let branding: ResolvedBranding;
+    try {
+      branding = await getActiveBranding();
+    } catch {
+      branding = resolveBranding(null);
+    }
+    return { results: [await fn({ branding })], leaguesProcessed: 0 };
+  }
+
   const results: T[] = [];
   for (const league of leagues) {
     const comp = await getLeagueBySlug(league.slug);

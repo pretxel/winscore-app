@@ -55,7 +55,9 @@ function req() {
 }
 
 beforeEach(() => {
-  h.runNewsSyncMock.mockReset().mockResolvedValue({ inserted: 2, errors: 0 });
+  h.runNewsSyncMock
+    .mockReset()
+    .mockResolvedValue({ fetched: 2, inserted: 2, updated: 0, skipped: 0, errors: 0 });
   h.recordRunMock
     .mockReset()
     .mockImplementation(async (_kind: string, _trigger: string, fn: () => Promise<unknown>) => ({
@@ -83,7 +85,14 @@ describe("cron kill switch (GET /api/cron/sync-news)", () => {
     const res = await GET(req());
     expect(res.status).toBe(200);
     expect(h.recordRunMock).toHaveBeenCalledWith("sync_news", "cron", expect.any(Function));
-    await expect(res.json()).resolves.toEqual({ inserted: 2, errors: 0 });
+    await expect(res.json()).resolves.toEqual({
+      fetched: 2,
+      inserted: 2,
+      updated: 0,
+      skipped: 0,
+      errors: 0,
+      leaguesProcessed: 0,
+    });
   });
 
   it("runs normally when the job is stored as enabled", async () => {

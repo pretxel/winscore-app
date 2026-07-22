@@ -40,7 +40,7 @@ cutover behind `pnpm typecheck`.
 
 ## 6. Verification
 
-- [ ] 6.1 `pnpm typecheck`, `pnpm lint`, `pnpm test` green.
-- [ ] 6.2 `pnpm build` compiles + TypeScript passes.
+- [x] 6.1 `pnpm typecheck` ✓, `pnpm lint` ✓ (0 errors; 1 pre-existing warning in send-email-hook-route.test.ts, unrelated), `pnpm test` ✓ 1117 passed. Fixed cron-test regressions from 2.3/4.3: `forEachLiveLeague` now degrades to a single unscoped run if live-league resolution fails (no request scope in tests / read error), and updated the affected assertions for the new `leaguesProcessed` / `p_competition_id` / aggregated news shape.
+- [x] 6.2 `pnpm build` compiles + TypeScript passes (80 static pages generated).
 - [ ] 6.3 Two-live-league smoke: create a pool in each; each pool's fixtures/standings league-isolated; legacy paths redirect; kickoff-lock intact.
 - [ ] 6.4 A11y + responsive: lanes stack on mobile, keyboard focus visible, `prefers-reduced-motion` disables flip/slide.

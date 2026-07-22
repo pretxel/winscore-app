@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const GROUP_ID = "22222222-2222-4222-8222-222222222222";
+const COMPETITION_ID = "33333333-3333-4333-8333-333333333333";
 const USER_ID = "33333333-3333-4333-8333-333333333333";
 
 const rpcMock = vi.fn();
@@ -66,10 +67,14 @@ describe("createGroupAction", () => {
   it("creates with a trimmed name then redirects to the new group", async () => {
     const { createGroupAction } = await importActions();
     await expect(
-      createGroupAction({}, fd({ name: "  Office Pool  " })),
+      createGroupAction(
+        {},
+        fd({ name: "  Office Pool  ", competitionId: COMPETITION_ID }),
+      ),
     ).rejects.toThrow(`REDIRECT:/en/groups/${GROUP_ID}`);
     expect(rpcMock).toHaveBeenCalledWith("create_group", {
       p_name: "Office Pool",
+      p_competition_id: COMPETITION_ID,
     });
   });
 });

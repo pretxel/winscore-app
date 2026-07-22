@@ -94,14 +94,24 @@ describe("GET /api/cron/playoff-score-saturday", () => {
       "cron",
       expect.any(Function),
     );
-    expect(h.dispatchMock).toHaveBeenCalledWith("WC Pool");
-    await expect(res.json()).resolves.toEqual({ emailed: 3, failed: 0, skipped: 1 });
+    expect(h.dispatchMock).toHaveBeenCalledWith("WC Pool", undefined);
+    await expect(res.json()).resolves.toEqual({
+      emailed: 3,
+      failed: 0,
+      skipped: 1,
+      leaguesProcessed: 0,
+    });
   });
 
   it("catches a dispatch failure and returns a zero summary (no 500)", async () => {
     h.recordRunMock.mockRejectedValue(new Error("boom"));
     const res = await GET(req({ authorization: "Bearer cron-secret" }));
     expect(res.status).toBe(200);
-    await expect(res.json()).resolves.toEqual({ emailed: 0, failed: 0, skipped: 0 });
+    await expect(res.json()).resolves.toEqual({
+      emailed: 0,
+      failed: 0,
+      skipped: 0,
+      leaguesProcessed: 0,
+    });
   });
 });
