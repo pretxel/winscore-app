@@ -2,10 +2,12 @@ import { cn } from "@/lib/utils";
 
 type Size = "xs" | "md" | "xl";
 
-// Competition-neutral Winscore wordmark. The compact form drops the Pool suffix.
+// Geometry constants tuned for the viewBox 0 0 240 64.
+// Full form: (blue W tile) | INSCORE | · {edition?}
+// Compact form (xs): the W tile alone, viewBox tightened to 0 0 64 64.
 
 const FULL_VIEWBOX = "0 0 240 64";
-const COMPACT_VIEWBOX = "0 0 160 64";
+const COMPACT_VIEWBOX = "0 0 64 64";
 
 const PIXEL_HEIGHT: Record<Size, number> = {
   xs: 22,
@@ -13,19 +15,25 @@ const PIXEL_HEIGHT: Record<Size, number> = {
   xl: 96,
 };
 
+const DISPLAY_FONT = "var(--font-archivo), 'Archivo Black', sans-serif";
+
 export function Logotype({
   size = "md",
   className,
   ariaLabel,
+  edition,
 }: {
   size?: Size;
   className?: string;
   ariaLabel?: string;
+  // Optional competition edition rendered as a small subtitle suffix after
+  // the wordmark. Omitted when unset.
+  edition?: string;
 }) {
   const compact = size === "xs";
   const viewBox = compact ? COMPACT_VIEWBOX : FULL_VIEWBOX;
   const heightPx = PIXEL_HEIGHT[size];
-  const widthPx = compact ? heightPx * (160 / 64) : heightPx * (240 / 64);
+  const widthPx = compact ? heightPx : heightPx * (240 / 64);
 
   return (
     <svg
@@ -38,66 +46,65 @@ export function Logotype({
       preserveAspectRatio="xMidYMid meet"
       className={cn("shrink-0 align-middle text-foreground", className)}
     >
-      <text
-        x="4"
-        y="43"
-        fontFamily="'Archivo Black', Arial Black, ui-sans-serif, sans-serif"
-        fontWeight="900"
-        fontSize="34"
-        letterSpacing="-1.5"
-        fill="currentColor"
-      >
-        WIN
-      </text>
-
+      {/* W tile: blue rounded square with the brand initial */}
       <g>
         <rect
-          x="76"
+          x={compact ? 8 : 4}
           y="8"
-          width="80"
+          width="48"
           height="48"
           rx="10"
           style={{ fill: "var(--pitch)" }}
         />
+        {/* Subtle inner highlight (pitch-stripe motif) */}
         <rect
-          x="76"
+          x={compact ? 8 : 4}
           y="8"
-          width="80"
+          width="48"
           height="16"
           rx="10"
           fill="white"
           fillOpacity="0.08"
         />
         <text
-          x="116"
-          y="39"
+          x={compact ? 32 : 28}
+          y="43"
           textAnchor="middle"
-          fontFamily="'JetBrains Mono', ui-monospace, SFMono-Regular, monospace"
-          fontWeight="800"
-          fontSize="14"
-          letterSpacing="0"
-          style={{ fill: "var(--pitch-foreground)" }}
+          style={{
+            fontFamily: DISPLAY_FONT,
+            fill: "var(--pitch-foreground)",
+          }}
+          fontSize="30"
+          letterSpacing="-1"
         >
-          SCORE
+          W
         </text>
       </g>
 
       {compact ? null : (
-        <g>
-          {/* divider dot */}
-          <circle cx="170" cy="32" r="2" fill="currentColor" opacity="0.5" />
-          {/* Pool suffix in mono */}
+        <g fill="currentColor">
+          {/* INSCORE — completes the WINSCORE wordmark after the W tile */}
           <text
-            x="180"
-            y="40"
-            fontFamily="'JetBrains Mono', ui-monospace, SFMono-Regular, monospace"
-            fontWeight="600"
-            fontSize="18"
-            letterSpacing="3"
-            fill="currentColor"
+            x="64"
+            y="43"
+            style={{ fontFamily: DISPLAY_FONT }}
+            fontSize="26"
+            letterSpacing="1"
           >
-            POOL
+            INSCORE
           </text>
+          {edition ? (
+            <text
+              x="200"
+              y="43"
+              style={{ fontFamily: DISPLAY_FONT }}
+              fontSize="16"
+              letterSpacing="1"
+              opacity="0.55"
+            >
+              {`· ${edition}`}
+            </text>
+          ) : null}
         </g>
       )}
     </svg>

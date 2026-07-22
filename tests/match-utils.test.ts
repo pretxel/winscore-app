@@ -105,12 +105,12 @@ describe("parseTeamParam", () => {
 });
 
 describe("filterableTeams", () => {
-  it("returns distinct country teams sorted alphabetically", () => {
-    const list = [team("Mexico", "Brazil"), team("Argentina", "Brazil")];
-    expect(filterableTeams(list)).toEqual(["Argentina", "Brazil", "Mexico"]);
+  it("returns distinct national and club teams sorted alphabetically", () => {
+    const list = [team("Mexico", "Brazil"), team("Club América", "Brazil")];
+    expect(filterableTeams(list)).toEqual(["Brazil", "Club América", "Mexico"]);
   });
 
-  it("excludes knockout placeholders with no flag mapping", () => {
+  it("excludes knockout placeholders without using a country registry", () => {
     const list = [team("2nd Group A", "1st Group B"), team("Brazil", "1st Group C")];
     expect(filterableTeams(list)).toEqual(["Brazil"]);
   });
@@ -332,8 +332,9 @@ describe("soonestPickableMatch", () => {
 });
 
 describe("isConfirmedMatch", () => {
-  it("is true when both teams are real countries", () => {
+  it("is true when both participants are real national or club teams", () => {
     expect(isConfirmedMatch(team("Brazil", "Mexico"))).toBe(true);
+    expect(isConfirmedMatch(team("Club América", "Cruz Azul"))).toBe(true);
   });
 
   it("is false when one side is a knockout placeholder", () => {
@@ -343,6 +344,7 @@ describe("isConfirmedMatch", () => {
 
   it("is false when both sides are placeholders", () => {
     expect(isConfirmedMatch(team("2nd Group A", "2nd Group B"))).toBe(false);
+    expect(isConfirmedMatch(team("TBD", "To be determined"))).toBe(false);
   });
 });
 

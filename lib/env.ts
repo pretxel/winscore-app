@@ -13,6 +13,8 @@ function resolveSiteUrl(): string {
   // Preview / branch deployments expose VERCEL_URL.
   const vercelUrl = process.env.VERCEL_URL;
   if (vercelUrl) return `https://${vercelUrl}`;
+  // Production default when no explicit URL or Vercel env is present.
+  if (process.env.NODE_ENV === "production") return "https://winscore.me";
   return "http://localhost:3000";
 }
 

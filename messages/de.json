@@ -11,8 +11,8 @@
     "tryAgain": "Erneut versuchen"
   },
   "siteMeta": {
-    "title": "Winscore — Fußballtipps & Live-Ranglisten",
-    "description": "Tippe Fußballspiele, gib deine Ergebnisse vor dem Anpfiff ab, sammle Punkte und klettere in Live-Ranglisten nach oben."
+    "title": "Winscore — Tägliche Tipps & Live-Rangliste",
+    "description": "Tippen Sie jedes Spiel. Geben Sie Ihre Ergebnisse vor dem Anpfiff ab, sammeln Sie Punkte für richtige Tipps und steigen Sie in der täglichen und der Gesamtrangliste auf."
   },
   "nav": {
     "leagues": "Ligen",
@@ -64,7 +64,7 @@
   "footer": {
     "tournament": "Fußballtipps · Live-Ligen",
     "howItWorks": "So funktioniert's",
-    "hosts": "Tippen · Punkten · Klettern"
+    "hosts": "USA · Kanada · Mexiko"
   },
   "languageSwitcher": {
     "label": "Sprache",
@@ -97,12 +97,13 @@
     "winner": "Sieger"
   },
   "home": {
-    "title": "Winscore — Fußballtipps & Ranglisten",
-    "description": "Tippe Fußballspiele, gib deine Ergebnisse vor dem Anpfiff ab, sammle Punkte und klettere in Live-Ranglisten nach oben.",
-    "eyebrow": "Fußball-Tipppools",
+    "title": "Winscore — Fußballtipps & Live-Ranglisten",
+    "description": "Tippe Spiele aus aktiven Ligen. Gib Ergebnisse vor dem Anpfiff ab, tritt in privaten Pools an und klettere in Live-Ranglisten.",
+    "eyebrow": "Tägliche Fußballtipps",
+    "hostsLine": "Jede Liga · Jeder Spieltag",
     "headlineLine1": "Sag das Ergebnis voraus.",
     "headlineLine2": "Klettere in der Tabelle.",
-    "lede": "Ein globaler Pool. Gib für jede Begegnung vor dem Anpfiff einen exakten Ergebnistipp ab — und deine Platzierung verschiebt sich in dem Moment, in dem der Schlusspfiff ertönt. Keine Einrichtung, keine Gebühren, keine Ausreden.",
+    "lede": "Tippe exakte Ergebnisse in den Ligen, die du verfolgst. Tritt privaten Pools bei, ändere Tipps bis zum Anpfiff und sieh zu, wie jedes Ergebnis die Tabelle neu ordnet. Keine Einrichtung, keine Gebühren, keine Ausreden.",
     "ctaSignIn": "Anmelden und mitspielen",
     "ctaBrowse": "Spiele durchstöbern",
     "ctaScoring": "So funktioniert die Punktevergabe",
@@ -151,10 +152,6 @@
     "liveVs": "gegen",
     "liveViewAll": "Alle Spiele ansehen",
     "liveKickoffSoon": "Anpfiff steht bevor",
-    "recapGalleryEyebrow": "04 · Match-Comics",
-    "recapGalleryHeadline": "Aktuelle Spiele, gezeichnet.",
-    "recapImageAlt": "Comic-Rückblick: {home} gegen {away}",
-    "recapReactionCount": "{count, plural, one {# Reaktion} other {# Reaktionen}}",
     "featuresEyebrow": "03 · Mehr zum Mitspielen",
     "featuresHeadline": "Mehr als nur der Turnierbaum.",
     "groupsTitle": "Freundesgruppen",
@@ -783,7 +780,7 @@
     "heading": "{group} beitreten",
     "intro": "{inviter} hat dich zu {group} bei Winscore eingeladen. Tritt der Gruppe bei, um auf ihrer Mini-Tabelle mit denselben Tipps mitzuspielen.",
     "joinCta": "Gruppe beitreten",
-    "footer": "Du erhältst diese E-Mail, weil dich jemand zu einer World-Cup-Pool-Gruppe eingeladen hat. Falls du das nicht erwartet hast, kannst du diese E-Mail ignorieren.",
+    "footer": "Du erhältst diese E-Mail, weil dich jemand zu einer Winscore-Gruppe eingeladen hat. Falls du das nicht erwartet hast, kannst du diese E-Mail ignorieren.",
     "inviteLabel": "Per E-Mail einladen",
     "inviteHint": "Schicke einen direkten Beitrittslink direkt in die Postfächer deiner Freunde.",
     "recipientsLabel": "E-Mail-Adressen der Empfänger",
@@ -1264,7 +1261,7 @@
     "browseMatches": "Spiele durchsuchen"
   },
   "email": {
-    "subject": "+{points} Pkt. in deinem World-Cup-Pool",
+    "subject": "+{points} Pkt. in deinem Winscore-Pool",
     "preheader": "Sieh, wo dich die neuesten Ergebnisse in der Rangliste platzieren.",
     "eyebrow": "Spielergebnisse sind da",
     "heading": "{name}, dein Stand hat sich gerade geändert",
@@ -1289,12 +1286,12 @@
     "ctaLabel": "Vollständige Rangliste ansehen",
     "footer": "Du erhältst diese E-Mail, weil ein von dir getipptes Spiel gerade beendet wurde. Die Punkte werden automatisch aktualisiert, sobald neue Ergebnisse eintreffen.",
     "magicLink": {
-      "preheader": "Dein sicherer Anmeldelink für den World-Cup-Pool.",
+      "preheader": "Dein sicherer Anmeldelink für deinen Winscore-Pool.",
       "eyebrow": "Sichere Anmeldung",
       "fallbackLabel": "Button funktioniert nicht? Kopiere diesen Link und füge ihn in deinen Browser ein:",
       "expiryNote": "Dieser Link ist 1 Stunde gültig und kann einmal verwendet werden.",
       "ignoreNote": "Wenn du das nicht angefordert hast, kannst du diese E-Mail ignorieren.",
-      "footer": "Du erhältst diese E-Mail, weil diese Adresse zur Anmeldung beim World-Cup-Pool eingegeben wurde.",
+      "footer": "Du erhältst diese E-Mail, weil diese Adresse zur Anmeldung bei Winscore eingegeben wurde.",
       "actions": {
         "magiclink": {
           "subject": "Dein Anmeldelink",
@@ -1373,7 +1370,7 @@
     "unsubscribeLabel": "Tägliche Tipp-Erinnerungen abbestellen"
   },
   "resultsDigest": {
-    "subject": "Deine tägliche WM-Pool-Zusammenfassung",
+    "subject": "Deine tägliche Winscore-Zusammenfassung",
     "preheader": "Die Top 5 von gestern, dein Rang und die größten Bewegungen.",
     "eyebrow": "Tägliche Ergebnisübersicht",
     "heading": "{name}, so hat sich der Pool bewegt",
@@ -1393,7 +1390,7 @@
     "droppedLabel": "Abgestiegen",
     "youLabel": "Du",
     "ctaLabel": "Gesamte Tabelle ansehen",
-    "footer": "Du erhältst diese tägliche Zusammenfassung deines WM-Pools. Du kannst sie in den E-Mail-Einstellungen deines Kontos deaktivieren."
+    "footer": "Du erhältst diese tägliche Zusammenfassung von Winscore. Du kannst sie in den E-Mail-Einstellungen deines Kontos deaktivieren."
   },
   "playoffScoreEmail": {
     "subject": "Playoff-Ergebnisse vom Samstag",
@@ -1417,7 +1414,7 @@
     "matchCtaLabel": "Spiel ansehen",
     "shareCtaLabel": "Teilen",
     "shareText": "Schau dir diesen Spiel-Recap-Comic an · Winscore",
-    "footer": "Du erhältst diese Recap-Comic-Übersicht deines WM-Pools. Du kannst sie in den E-Mail-Einstellungen deines Kontos deaktivieren."
+    "footer": "Du erhältst diese Recap-Comic-Übersicht von Winscore. Du kannst sie in den E-Mail-Einstellungen deines Kontos deaktivieren."
   },
   "comebackEmail": {
     "subject": "Deine Tipps fehlen uns — der Pool läuft weiter",
@@ -1464,7 +1461,7 @@
     "pointsLabel": "Pkt.",
     "youLabel": "Du",
     "ctaLabel": "Zur Endtabelle",
-    "footer": "Du erhältst diese E-Mail, weil du beim WM-Pool mitgespielt und das Podium erreicht hast.",
+    "footer": "Du erhältst diese E-Mail, weil du bei Winscore mitgespielt und das Podium erreicht hast.",
     "madeWithLove": "Mit Liebe gemacht :) — pretxel",
     "comingSoon": "Bald verfügbar: La Liga Pool"
   },

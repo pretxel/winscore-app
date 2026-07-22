@@ -13,13 +13,22 @@ describe("Logotype", () => {
     });
   }
 
-  it("compact size (xs) drops the · Pool suffix", () => {
+  it("compact size (xs) drops the INSCORE wordmark text", () => {
     const html = renderToString(React.createElement(Logotype, { size: "xs" }));
-    expect(html).not.toContain("POOL");
+    expect(html).not.toContain("INSCORE");
   });
 
-  it("non-compact sizes include the POOL suffix", () => {
+  it("non-compact sizes include the INSCORE wordmark text", () => {
     const html = renderToString(React.createElement(Logotype, { size: "md" }));
-    expect(html).toContain("POOL");
+    expect(html).toContain("INSCORE");
+  });
+
+  it("renders the edition suffix only when provided", () => {
+    const without = renderToString(React.createElement(Logotype, { size: "md" }));
+    expect(without).not.toContain("· ");
+    const withEdition = renderToString(
+      React.createElement(Logotype, { size: "md", edition: "26" }),
+    );
+    expect(withEdition).toContain("· 26");
   });
 });

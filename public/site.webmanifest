@@ -1,7 +1,7 @@
 {
-  "name": "World Cup 2026 Pool",
-  "short_name": "WC26 Pool",
-  "description": "Predict every World Cup 2026 match. Climb the daily leaderboard.",
+  "name": "Winscore",
+  "short_name": "Winscore",
+  "description": "Predict every match. Climb the daily leaderboard.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

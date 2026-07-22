@@ -11,8 +11,8 @@
     "tryAgain": "Try again"
   },
   "siteMeta": {
-    "title": "Winscore — Football Predictions & Live Leaderboards",
-    "description": "Predict football matches, submit scores before kickoff, earn points on results, and climb live leaderboards."
+    "title": "Winscore — Daily Predictions & Live Leaderboard",
+    "description": "Predict every match. Submit scores before kickoff, earn points on results, and climb a daily and overall leaderboard."
   },
   "nav": {
     "leagues": "Leagues",
@@ -64,7 +64,7 @@
   "footer": {
     "tournament": "Football predictions · Live leagues",
     "howItWorks": "How it works",
-    "hosts": "Pick · Score · Climb"
+    "hosts": "USA · Canada · Mexico"
   },
   "languageSwitcher": {
     "label": "Language",
@@ -97,12 +97,13 @@
     "winner": "Winner"
   },
   "home": {
-    "title": "Winscore — Football Predictions & Leaderboards",
-    "description": "Predict football matches, submit scores before kickoff, earn points on results, and climb live leaderboards.",
-    "eyebrow": "Football prediction pools",
+    "title": "Winscore — Football Predictions & Live Leaderboards",
+    "description": "Predict matches across live leagues. Submit scores before kickoff, compete in private pools, and climb live leaderboards.",
+    "eyebrow": "Daily football predictions",
+    "hostsLine": "Every league · Every matchday",
     "headlineLine1": "Call the score.",
     "headlineLine2": "Climb the table.",
-    "lede": "One global pool. Submit an exact-score pick for every fixture before kickoff and your ranking shifts the moment the final whistle blows. No setup, no fees, no excuses.",
+    "lede": "Pick exact scores across the leagues you follow. Join private pools, edit until kickoff, and watch every result reshape the table. No setup, no fees, no excuses.",
     "ctaSignIn": "Sign in to play",
     "ctaBrowse": "Browse matches",
     "ctaScoring": "How scoring works",
@@ -151,10 +152,6 @@
     "liveVs": "vs",
     "liveViewAll": "View all matches",
     "liveKickoffSoon": "Kicking off",
-    "recapGalleryEyebrow": "04 · Match comics",
-    "recapGalleryHeadline": "Recent matches, drawn.",
-    "recapImageAlt": "Comic recap of {home} vs {away}",
-    "recapReactionCount": "{count, plural, one {# reaction} other {# reactions}}",
     "featuresEyebrow": "03 · More to play",
     "featuresHeadline": "Beyond the bracket.",
     "groupsTitle": "Friends groups",
@@ -676,7 +673,7 @@
     "title": "Leaderboard",
     "description": "Winscore standings. The single overall ranking refreshes the moment an admin enters a final score.",
     "ogTitle": "Leaderboard · Winscore",
-    "ogDescription": "Overall standings for the World Cup 2026 prediction pool. Refreshes after every result.",
+    "ogDescription": "Overall standings for this league prediction pool. Refreshes after every result.",
     "eyebrow": "Standings",
     "headline": "Leaderboard",
     "lede": "One global ranking across the whole tournament. Standings refresh the moment an admin enters a final score.",

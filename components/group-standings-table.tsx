@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { TeamFlag } from "@/components/team-flag";
 import type { GroupTeamRow, SimulatedGroup } from "@/lib/group-standings";
 import { cn } from "@/lib/utils";
 
@@ -110,7 +109,6 @@ export async function GroupStandingsTable({
                       <span className="w-3.5 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">
                         {row.rank}
                       </span>
-                      <TeamFlag team={row.team} size="sm" />
                       <span
                         className={cn(
                           "truncate font-medium",

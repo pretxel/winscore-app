@@ -11,8 +11,8 @@
     "tryAgain": "Réessayer"
   },
   "siteMeta": {
-    "title": "Winscore — Pronostics de football et classements en direct",
-    "description": "Pronostiquez les matchs de football, saisissez vos scores avant le coup d'envoi, gagnez des points et grimpez dans les classements en direct."
+    "title": "Winscore — Pronostics quotidiens et classement en direct",
+    "description": "Pronostiquez chaque match. Soumettez vos scores avant le coup d'envoi, gagnez des points sur les résultats et grimpez au classement quotidien et général."
   },
   "nav": {
     "leagues": "Ligues",
@@ -64,7 +64,7 @@
   "footer": {
     "tournament": "Pronostics de football · Ligues en direct",
     "howItWorks": "Fonctionnement",
-    "hosts": "Pronostiquer · Marquer · Grimper"
+    "hosts": "USA · Canada · Mexique"
   },
   "languageSwitcher": {
     "label": "Langue",
@@ -97,12 +97,13 @@
     "winner": "Vainqueur"
   },
   "home": {
-    "title": "Winscore — Pronostics de football et classements",
-    "description": "Pronostiquez les matchs de football, saisissez vos scores avant le coup d'envoi, gagnez des points et grimpez dans les classements en direct.",
-    "eyebrow": "Pools de pronostics de football",
+    "title": "Winscore — Pronostics football et classements en direct",
+    "description": "Pronostiquez les matchs des ligues actives. Saisissez les scores avant le coup d'envoi, rejoignez des pools privés et grimpez dans les classements en direct.",
+    "eyebrow": "Pronostics football au quotidien",
+    "hostsLine": "Chaque ligue · Chaque journée",
     "headlineLine1": "Donnez le score.",
     "headlineLine2": "Grimpez au classement.",
-    "lede": "Un seul pool global. Saisissez un score exact pour chaque rencontre avant le coup d'envoi et votre rang bouge dès le coup de sifflet final. Sans configuration, sans frais, sans excuses.",
+    "lede": "Pronostiquez les scores exacts des ligues que vous suivez. Rejoignez des pools privés, modifiez vos choix jusqu'au coup d'envoi et voyez chaque résultat rebattre le classement. Sans configuration, sans frais, sans excuses.",
     "ctaSignIn": "Connectez-vous pour jouer",
     "ctaBrowse": "Voir les matchs",
     "ctaScoring": "Comment ça marque",
@@ -151,10 +152,6 @@
     "liveVs": "vs",
     "liveViewAll": "Voir tous les matchs",
     "liveKickoffSoon": "Coup d'envoi",
-    "recapGalleryEyebrow": "04 · BD des matchs",
-    "recapGalleryHeadline": "Matchs récents, en BD.",
-    "recapImageAlt": "Résumé BD de {home} contre {away}",
-    "recapReactionCount": "{count, plural, one {# réaction} other {# réactions}}",
     "featuresEyebrow": "03 · Encore plus à jouer",
     "featuresHeadline": "Au-delà du tableau.",
     "groupsTitle": "Groupes d'amis",
@@ -1264,7 +1261,7 @@
     "browseMatches": "Voir les matchs"
   },
   "email": {
-    "subject": "+{points} pts dans votre pool Winscore",
+    "subject": "+{points} pts dans votre pool Coupe du Monde",
     "preheader": "Découvrez où les derniers résultats vous placent au classement.",
     "eyebrow": "Résultats à l'instant",
     "heading": "{name}, votre classement vient de changer",
@@ -1289,12 +1286,12 @@
     "ctaLabel": "Voir le classement complet",
     "footer": "Vous recevez ceci car un match que vous avez pronostiqué vient de se terminer. Les points se mettent à jour automatiquement à chaque résultat.",
     "magicLink": {
-      "preheader": "Votre lien de connexion sécurisé pour Winscore.",
+      "preheader": "Votre lien de connexion sécurisé pour le pool de la Coupe du monde.",
       "eyebrow": "Connexion sécurisée",
       "fallbackLabel": "Le bouton ne fonctionne pas ? Copiez-collez ce lien dans votre navigateur :",
       "expiryNote": "Ce lien expire dans 1 heure et ne peut être utilisé qu'une seule fois.",
       "ignoreNote": "Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.",
-      "footer": "Vous recevez cet e-mail car cette adresse a été saisie pour se connecter à Winscore.",
+      "footer": "Vous recevez cet e-mail car cette adresse a été saisie pour se connecter au pool de la Coupe du monde.",
       "actions": {
         "magiclink": {
           "subject": "Votre lien de connexion",
@@ -1338,11 +1335,11 @@
     "intro": "Une nouvelle question de quiz football vous attend. Répondez avant la fin de la journée pour gagner des points et garder votre série.",
     "streakLine": "Vous êtes sur une série de {days} jours — ne la laissez pas filer.",
     "ctaLabel": "Répondre à la question du jour",
-    "footer": "Vous recevez ceci car vous jouez sur Winscore. Le quiz se réinitialise chaque jour à minuit UTC.",
+    "footer": "Vous recevez ceci car vous participez au pool de la Coupe du monde. Le quiz se réinitialise chaque jour à minuit UTC.",
     "unsubscribeLabel": "Se désabonner des rappels du quiz quotidien"
   },
   "welcomeEmail": {
-    "subject": "Bienvenue sur Winscore",
+    "subject": "Bienvenue dans le pool de la Coupe du monde",
     "preheader": "Vos premiers pronostics, le quiz quotidien et le classement vous attendent.",
     "eyebrow": "Vous y êtes",
     "heading": "Bienvenue, {name} !",
@@ -1357,7 +1354,7 @@
     "leaderboardTitle": "Consultez le classement",
     "leaderboardBlurb": "Voyez où vous vous situez par rapport aux autres et grimpez dans le classement.",
     "leaderboardCta": "Voir le classement",
-    "footer": "Vous recevez ceci car vous venez de rejoindre Winscore. À bientôt sur le terrain."
+    "footer": "Vous recevez ceci car vous venez de rejoindre le pool de la Coupe du monde. À bientôt sur le terrain."
   },
   "predictionEmail": {
     "subject": "Les matchs du jour — envoyez vos pronostics",
@@ -1369,11 +1366,11 @@
     "listLabel": "À pronostiquer",
     "vs": "vs",
     "ctaLabel": "Faire mes pronostics",
-    "footer": "Vous recevez ceci car vous jouez sur Winscore. Les pronostics se ferment au coup d'envoi de chaque match.",
+    "footer": "Vous recevez ceci car vous participez au pool de la Coupe du monde. Les pronostics se ferment au coup d'envoi de chaque match.",
     "unsubscribeLabel": "Se désabonner des rappels de pronostics quotidiens"
   },
   "resultsDigest": {
-    "subject": "Votre récap quotidien Winscore",
+    "subject": "Votre récap quotidien du pool Coupe du Monde",
     "preheader": "Le top 5 d'hier, votre rang et les plus gros mouvements.",
     "eyebrow": "Résumé quotidien des résultats",
     "heading": "{name}, voici comment le pool a évolué",
@@ -1393,7 +1390,7 @@
     "droppedLabel": "A chuté",
     "youLabel": "Vous",
     "ctaLabel": "Voir le classement complet",
-    "footer": "Vous recevez ce récap quotidien de votre pool Winscore. Vous pouvez le désactiver dans les préférences e-mail de votre compte."
+    "footer": "Vous recevez ce récap quotidien de votre pool Coupe du Monde. Vous pouvez le désactiver dans les préférences e-mail de votre compte."
   },
   "playoffScoreEmail": {
     "subject": "Résultats des playoffs du samedi",
@@ -1417,7 +1414,7 @@
     "matchCtaLabel": "Voir le match",
     "shareCtaLabel": "Partager",
     "shareText": "Regardez cette BD de récap de match · Winscore",
-    "footer": "Vous recevez ce résumé de BD de votre pool Winscore. Vous pouvez le désactiver dans les préférences e-mail de votre compte."
+    "footer": "Vous recevez ce résumé de BD de récap de votre pool Coupe du Monde. Vous pouvez le désactiver dans les préférences e-mail de votre compte."
   },
   "comebackEmail": {
     "subject": "Vos pronostics nous manquent — le pool continue",
@@ -1433,7 +1430,7 @@
     "matchesLabel": "Prochains à pronostiquer",
     "vs": "vs",
     "ctaLabel": "Faire mes pronostics",
-    "footer": "Vous recevez ceci car vous jouez sur Winscore et n'avez pas pronostiqué depuis un moment.",
+    "footer": "Vous recevez ceci car vous participez au pool de la Coupe du monde et n'avez pas pronostiqué depuis un moment.",
     "unsubscribeLabel": "Se désabonner des e-mails de retour"
   },
   "scoreRulesEmail": {
@@ -1464,7 +1461,7 @@
     "pointsLabel": "pts",
     "youLabel": "Vous",
     "ctaLabel": "Voir le classement final",
-    "footer": "Vous recevez cet e-mail parce que vous avez joué sur Winscore et terminé sur le podium.",
+    "footer": "Vous recevez cet e-mail parce que vous avez joué au pool de la Coupe du monde et terminé sur le podium.",
     "madeWithLove": "Fait avec amour :) — pretxel",
     "comingSoon": "Bientôt : La Liga Pool"
   },

@@ -1,5 +1,4 @@
 import type { MatchRow, MatchStatus } from "@/lib/db";
-import { flagSlug } from "@/lib/team-flag";
 
 export type LockReason = "final" | "cancelled" | "live" | "kickoff";
 
@@ -191,6 +190,16 @@ export function formatDayKeyLabel(dayKey: string, locale: string): string {
 
 type TeamPair = { home_team: string; away_team: string };
 
+// Seeded knockout slots are display labels, not confirmed participants. Keep
+// this name-based so club teams and future leagues are valid without a static
+// country registry.
+const PLACEHOLDER_PARTICIPANT = /^(?:Winner|Loser)\s+|^\d+(?:st|nd|rd|th)\s+|^Group\s+[A-Z]\b|^(?:TBD|TBC|To be determined)$/i;
+
+export function isConfirmedParticipantName(name: string): boolean {
+  const value = name.trim();
+  return value.length > 0 && !PLACEHOLDER_PARTICIPANT.test(value);
+}
+
 // Normalize a `?team=` value into a set of case-folded team keys. Accepts a
 // single comma-separated string ("Brazil,Argentina") and/or a repeated param
 // (["Brazil", "Mexico"]). Blank segments are dropped.
@@ -203,14 +212,13 @@ export function parseTeamParam(raw: string | string[] | undefined): Set<string> 
   return new Set(parts);
 }
 
-// Distinct real country teams present in a match list, sorted alphabetically
-// for a stable chip order. Knockout placeholders (values with no flag mapping,
-// e.g. "2nd Group A") are excluded.
+// Distinct confirmed teams present in a match list, sorted alphabetically for
+// a stable chip order. Seeded knockout placeholders are excluded.
 export function filterableTeams(matches: TeamPair[]): string[] {
   const teams = new Set<string>();
   for (const match of matches) {
-    if (flagSlug(match.home_team)) teams.add(match.home_team);
-    if (flagSlug(match.away_team)) teams.add(match.away_team);
+    if (isConfirmedParticipantName(match.home_team)) teams.add(match.home_team);
+    if (isConfirmedParticipantName(match.away_team)) teams.add(match.away_team);
   }
   return [...teams].sort((a, b) => a.localeCompare(b));
 }
@@ -344,10 +352,13 @@ export function parseMatchesTab(
   return "fixtures";
 }
 
-// A match is "confirmed" once both participants are real participating
-// countries. Knockout fixtures seed placeholder participants ("2nd Group A",
-// "Winner Match 73", …) that don't resolve to a flag; those stay unconfirmed
-// until an admin sets the real teams. Drives public visibility and pickability.
+// A match is "confirmed" once both participants are real teams. Knockout
+// fixtures seed placeholder participants ("2nd Group A", "Winner Match 73",
+// …); those stay unconfirmed until an admin sets the real teams. Drives public
+// visibility and pickability without requiring a country-only registry.
 export function isConfirmedMatch(match: TeamPair): boolean {
-  return flagSlug(match.home_team) !== null && flagSlug(match.away_team) !== null;
+  return (
+    isConfirmedParticipantName(match.home_team) &&
+    isConfirmedParticipantName(match.away_team)
+  );
 }

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { MatchStateBadge } from "@/components/match-state-badge";
-import { TeamFlag } from "@/components/team-flag";
 import { KickoffCountdown } from "@/components/kickoff-countdown";
 import { useLivePolling } from "@/hooks/use-live-polling";
 import { localePath, type Locale } from "@/lib/i18n";
@@ -108,12 +107,10 @@ function LiveRow({
 
       <div className="min-w-0 flex-1 font-heading text-sm font-semibold tracking-tight text-foreground sm:text-base">
         <span className="flex min-w-0 items-center gap-2">
-          <TeamFlag team={fixture.home_team} size="sm" />
           <span className="truncate">{fixture.home_team}</span>
           <span className="px-0.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             {vs}
           </span>
-          <TeamFlag team={fixture.away_team} size="sm" />
           <span className="truncate">{fixture.away_team}</span>
         </span>
       </div>
@@ -146,12 +143,10 @@ function NextUpCard({
         href={localePath(locale, `/matches/${fixture.id}`)}
         className="mt-2 inline-flex items-center justify-center gap-2 font-heading text-base font-semibold tracking-tight text-foreground underline-offset-4 hover:underline sm:text-lg"
       >
-        <TeamFlag team={fixture.home_team} size="sm" />
         <span>{fixture.home_team}</span>
         <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
           {labels.vs}
         </span>
-        <TeamFlag team={fixture.away_team} size="sm" />
         <span>{fixture.away_team}</span>
       </Link>
       <div className="mt-3 flex justify-center">

@@ -11,8 +11,8 @@
     "tryAgain": "Reintentar"
   },
   "siteMeta": {
-    "title": "Winscore — Pronósticos de fútbol y clasificaciones en vivo",
-    "description": "Pronostica partidos de fútbol, envía tus marcadores antes del inicio, gana puntos y sube en las clasificaciones en vivo."
+    "title": "Winscore — Pronósticos diarios y clasificación en vivo",
+    "description": "Pronostica cada partido. Envía tus marcadores antes del inicio, gana puntos con los resultados y sube en la clasificación diaria y general."
   },
   "nav": {
     "leagues": "Ligas",
@@ -64,7 +64,7 @@
   "footer": {
     "tournament": "Pronósticos de fútbol · Ligas en vivo",
     "howItWorks": "Cómo funciona",
-    "hosts": "Pronostica · Puntúa · Escala"
+    "hosts": "EE. UU. · Canadá · México"
   },
   "languageSwitcher": {
     "label": "Idioma",
@@ -97,12 +97,13 @@
     "winner": "Ganador"
   },
   "home": {
-    "title": "Winscore — Pronósticos de fútbol y clasificaciones",
-    "description": "Pronostica partidos de fútbol, envía tus marcadores antes del inicio, gana puntos y sube en las clasificaciones en vivo.",
-    "eyebrow": "Pools de pronósticos de fútbol",
+    "title": "Winscore — Pronósticos de fútbol y clasificaciones en vivo",
+    "description": "Pronostica partidos de ligas activas. Envía marcadores antes del inicio, compite en pools privados y sube en clasificaciones en vivo.",
+    "eyebrow": "Pronósticos diarios de fútbol",
+    "hostsLine": "Cada liga · Cada jornada",
     "headlineLine1": "Acierta el marcador.",
     "headlineLine2": "Escala la tabla.",
-    "lede": "Un único pool global. Envía un marcador exacto para cada partido antes del inicio y tu posición se mueve al sonar el silbato final. Sin configuración, sin cuotas, sin excusas.",
+    "lede": "Pronostica marcadores exactos en las ligas que sigues. Únete a pools privados, edita hasta el inicio y mira cómo cada resultado transforma la tabla. Sin configuración, sin cuotas, sin excusas.",
     "ctaSignIn": "Inicia sesión para jugar",
     "ctaBrowse": "Ver partidos",
     "ctaScoring": "Cómo se puntúa",
@@ -151,10 +152,6 @@
     "liveVs": "vs",
     "liveViewAll": "Ver todos los partidos",
     "liveKickoffSoon": "Comienza ya",
-    "recapGalleryEyebrow": "04 · Cómics del partido",
-    "recapGalleryHeadline": "Partidos recientes, dibujados.",
-    "recapImageAlt": "Resumen cómic de {home} vs {away}",
-    "recapReactionCount": "{count, plural, one {# reacción} other {# reacciones}}",
     "featuresEyebrow": "03 · Más para jugar",
     "featuresHeadline": "Más allá del cuadro.",
     "groupsTitle": "Grupos de amigos",
@@ -781,9 +778,9 @@
     "preheader": "Toca el enlace para unirte a {group} y empezar a competir.",
     "eyebrow": "Invitación al grupo",
     "heading": "Únete a {group}",
-    "intro": "{inviter} te invitó a {group} en Winscore. Únete al grupo para competir en su tabla con los mismos pronósticos.",
+    "intro": "{inviter} te invitó a {group} en el Pool del Mundial. Únete al grupo para competir en su tabla con los mismos pronósticos.",
     "joinCta": "Unirme al grupo",
-    "footer": "Recibes esto porque alguien te invitó a un grupo de Winscore. Si no lo esperabas, puedes ignorar este correo.",
+    "footer": "Recibes esto porque alguien te invitó a un grupo del Pool del Mundial. Si no lo esperabas, puedes ignorar este correo.",
     "inviteLabel": "Invitar por correo",
     "inviteHint": "Envía un enlace directo para unirse al buzón de tus amigos.",
     "recipientsLabel": "Correos de los destinatarios",
@@ -1264,7 +1261,7 @@
     "browseMatches": "Ver partidos"
   },
   "email": {
-    "subject": "+{points} pts en tu pool de Winscore",
+    "subject": "+{points} pts en tu quiniela de Winscore",
     "preheader": "Mira cómo te dejaron los últimos resultados en la tabla.",
     "eyebrow": "Resultados recién llegados",
     "heading": "{name}, tu posición acaba de cambiar",
@@ -1289,12 +1286,12 @@
     "ctaLabel": "Ver tabla completa",
     "footer": "Recibes esto porque acaba de terminar un partido que pronosticaste. Los puntos se actualizan automáticamente con cada resultado.",
     "magicLink": {
-      "preheader": "Tu enlace seguro para entrar a Winscore.",
+      "preheader": "Tu enlace seguro para entrar a tu quiniela de Winscore.",
       "eyebrow": "Inicio de sesión seguro",
       "fallbackLabel": "¿El botón no funciona? Copia y pega este enlace en tu navegador:",
       "expiryNote": "Este enlace caduca en 1 hora y se puede usar una sola vez.",
       "ignoreNote": "Si no lo solicitaste, puedes ignorar este correo.",
-      "footer": "Recibes este correo porque alguien introdujo esta dirección para entrar a Winscore.",
+      "footer": "Recibes este correo porque alguien introdujo esta dirección para entrar a tu quiniela de Winscore.",
       "actions": {
         "magiclink": {
           "subject": "Tu enlace de acceso",
@@ -1338,7 +1335,7 @@
     "intro": "Te espera una nueva pregunta de trivia de fútbol. Respóndela antes de que acabe el día para ganar puntos y mantener tu racha.",
     "streakLine": "Llevas una racha de {days} días — no la dejes escapar.",
     "ctaLabel": "Responder la pregunta de hoy",
-    "footer": "Recibes esto porque juegas en Winscore. El quiz se reinicia cada día a medianoche UTC.",
+    "footer": "Recibes esto porque participas en Winscore. El quiz se reinicia cada día a medianoche UTC.",
     "unsubscribeLabel": "Cancelar los recordatorios del quiz diario"
   },
   "welcomeEmail": {
@@ -1369,7 +1366,7 @@
     "listLabel": "Pendientes de pronosticar",
     "vs": "vs",
     "ctaLabel": "Hacer mis pronósticos",
-    "footer": "Recibes esto porque juegas en Winscore. Los pronósticos se cierran al inicio de cada partido.",
+    "footer": "Recibes esto porque participas en Winscore. Los pronósticos se cierran al inicio de cada partido.",
     "unsubscribeLabel": "Cancelar los recordatorios de pronósticos diarios"
   },
   "resultsDigest": {
@@ -1393,7 +1390,7 @@
     "droppedLabel": "Bajó",
     "youLabel": "Tú",
     "ctaLabel": "Ver clasificación completa",
-    "footer": "Recibes este resumen diario de tu pool de Winscore. Puedes desactivarlo en las preferencias de correo de tu cuenta."
+    "footer": "Recibes este resumen diario de Winscore. Puedes desactivarlo en las preferencias de correo de tu cuenta."
   },
   "playoffScoreEmail": {
     "subject": "Resultados de los playoffs del sábado",
@@ -1417,7 +1414,7 @@
     "matchCtaLabel": "Ver partido",
     "shareCtaLabel": "Compartir",
     "shareText": "Mira este cómic de recap del partido · Winscore",
-    "footer": "Recibes este resumen de cómics de tu pool de Winscore. Puedes desactivarlo en las preferencias de correo de tu cuenta."
+    "footer": "Recibes este resumen de cómics de recap de Winscore. Puedes desactivarlo en las preferencias de correo de tu cuenta."
   },
   "comebackEmail": {
     "subject": "Echamos de menos tus pronósticos — la quiniela sigue",
@@ -1433,7 +1430,7 @@
     "matchesLabel": "Próximos por pronosticar",
     "vs": "vs",
     "ctaLabel": "Hacer mis pronósticos",
-    "footer": "Recibes esto porque juegas en Winscore y hace tiempo que no pronosticas.",
+    "footer": "Recibes esto porque participas en Winscore y hace tiempo que no pronosticas.",
     "unsubscribeLabel": "Cancelar los correos de regreso"
   },
   "scoreRulesEmail": {

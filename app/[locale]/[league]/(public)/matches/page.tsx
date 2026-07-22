@@ -11,7 +11,6 @@ import { MatchStatusFilter } from "@/components/match-status-filter";
 import { MatchTeamFilter } from "@/components/match-team-filter";
 import { NeedsPickToggle } from "@/components/needs-pick-toggle";
 import { PendingPicksNudge } from "@/components/pending-picks-nudge";
-import { TeamFlag } from "@/components/team-flag";
 import {
   dayKeyForTimeZone,
   filterableTeams,
@@ -551,14 +550,12 @@ function MatchRowCard({
         </div>
         <div className="font-heading text-foreground mt-1.5 flex min-w-0 flex-col gap-1 text-base font-semibold tracking-tight sm:flex-row sm:items-center sm:gap-2 sm:text-lg">
           <span className="flex min-w-0 items-center gap-2">
-            <TeamFlag team={match.home_team} size="sm" />
             <span className="truncate">{match.home_team}</span>
           </span>
           <span className="text-muted-foreground hidden text-xs font-medium tracking-[0.18em] uppercase sm:inline">
             vs
           </span>
           <span className="flex min-w-0 items-center gap-2">
-            <TeamFlag team={match.away_team} size="sm" />
             <span className="truncate">{match.away_team}</span>
           </span>
         </div>
