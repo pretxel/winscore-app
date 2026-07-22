@@ -141,6 +141,14 @@ export default async function RootLayout({
       className={`${manrope.variable} ${archivo.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
+        <Script
+          id="Cookiebot"
+          src="https://consent.cookiebot.com/uc.js"
+          data-cbid="069c856d-e4c3-40e0-8c41-2a7fbb3bf64b"
+          type="text/javascript"
+          async
+          strategy="beforeInteractive"
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
