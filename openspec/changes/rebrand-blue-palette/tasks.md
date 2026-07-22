@@ -4,15 +4,15 @@
 - [x] 1.2 Rewrite the `.dark` block: blue `--primary`/`--primary-foreground`, `--ring`, `--sidebar-primary`, `--chart-1`, and `--pitch` adjusted for dark surfaces
 - [x] 1.3 Kept warm-neutral + gold `--flag`/`--accent` and red `--destructive`/`--live` families; removed the now-redundant `.landing-blue` scoped overrides since blue is the global default
 - [x] 1.4 Verified WCAG AA: white-on-`--primary` = 5.62:1, `--border`/card = 3.36:1, `--muted-foreground`/`--background` = 6.25:1
-- [ ] 1.5 Visually check nav, buttons, cards, sidebar, charts, and focus rings in both themes (browser)
+- [ ] 1.5 Visually check nav/buttons/cards/charts/focus rings in both themes — BLOCKED this session: no Supabase `.env` to boot the app + no browser MCP. Source `globals.css` verified blue; run `next dev` with env to eyeball (stale `.next` cache still shows old green until rebuilt)
 
 ## 2. New blue logo asset + derivatives
 
-- [ ] 2.1 Add the new blue logo asset (SVG) to the repo at the path provided by the user — BLOCKED: no path/asset supplied; existing in-repo mark (`app/icon.svg`) is already the blue `#135FD1` W
-- [x] 2.2 Confirmed `components/logotype.tsx` tile fills from `var(--pitch)` → now inherits blue automatically
-- [ ] 2.3 Regenerate favicon set — VERIFIED existing rasters already blue: `icon.png`/`apple-icon.png` = `#135FD1`; pending user's new asset if different
-- [ ] 2.4 Regenerate `app/opengraph-image.*` — VERIFIED existing OG is the navy/cream blue-brand card; pending user's new asset if different
-- [ ] 2.5 Read the relevant Next 16 metadata/favicon/OG guide in `node_modules/next/dist/docs/` before touching these files
+- [x] 2.1 Logo asset resolved: existing in-repo blue `#135FD1` W (`app/icon.svg`) is the final mark (user-confirmed) — no new asset needed
+- [x] 2.2 Confirmed `components/logotype.tsx` tile fills from `var(--pitch)` → inherits blue automatically
+- [x] 2.3 Favicon set verified already blue: `app/icon.svg` = `#135FD1`; `icon.png`/`apple-icon.png` sample to `#135FD1`
+- [x] 2.4 `app/opengraph-image.png` verified as the navy/cream blue-brand card
+- [x] 2.5 No metadata/favicon/OG file changes needed (assets already correct) — Next 16 file-based convention untouched
 
 ## 3. Remove footer host-nations tagline
 
@@ -29,4 +29,4 @@
 
 - [x] 5.1 No test changes needed — full suite already green after edits (no test asserted old green/host text)
 - [x] 5.2 Full suite green: 1194 passed, 0 failed; `tsc --noEmit` clean; eslint clean
-- [ ] 5.3 Review emails in the admin email-preview view to confirm the blue brand renders across templates (browser)
+- [x] 5.3 Rendered all 12 email previews to HTML via fixtures; every one contains blue `#135FD1` (3–6×), zero residual green. Live-Chrome screenshot skipped (browser MCP unavailable this session); HTML artifacts left in scratchpad for manual eyeball

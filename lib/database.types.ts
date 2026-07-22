@@ -98,6 +98,7 @@ export type Database = {
         Row: {
           branding: Json
           created_at: string
+          finished_at: string | null
           format_config: Json
           id: string
           is_active: boolean
@@ -118,6 +119,7 @@ export type Database = {
         Insert: {
           branding?: Json
           created_at?: string
+          finished_at?: string | null
           format_config: Json
           id?: string
           is_active?: boolean
@@ -138,6 +140,7 @@ export type Database = {
         Update: {
           branding?: Json
           created_at?: string
+          finished_at?: string | null
           format_config?: Json
           id?: string
           is_active?: boolean
@@ -2199,6 +2202,7 @@ export type Database = {
         Returns: string
       }
       disable_pool_wager: { Args: { p_group_id: string }; Returns: undefined }
+      finish_league: { Args: { p_id: string }; Returns: undefined }
       flag_rounds_for_shortening: { Args: never; Returns: string[] }
       generate_join_code: { Args: { p_prefix?: string }; Returns: string }
       grant_streak_freeze: {
@@ -2289,6 +2293,7 @@ export type Database = {
         Args: { p_competition_id: string; p_stage_key: string }
         Returns: number
       }
+      restart_league: { Args: { p_id: string }; Returns: undefined }
       round_can_accept_wager: { Args: { p_round_id: string }; Returns: boolean }
       round_effective_close: { Args: { p_round_id: string }; Returns: string }
       round_eligible_fixtures: {

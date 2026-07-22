@@ -375,7 +375,8 @@
     "missingPickKickoff": "Die Tipps sind gesperrt – der Anstoß ist vorbei und du hast für dieses Spiel keinen abgegeben.",
     "summaryHeading": "Spielzusammenfassung",
     "summaryDisclaimer": "KI-generierte Zusammenfassung",
-    "recapImageAlt": "Comic-Rückblick: {home} gegen {away}"
+    "recapImageAlt": "Comic-Rückblick: {home} gegen {away}",
+    "leagueFinished": "Diese Liga ist beendet."
   },
   "matchdaySheet": {
     "fixtures": "Spiele",
@@ -401,7 +402,8 @@
     "wagerRail": {
       "title": "Spieltag-Wette",
       "unavailable": "Wetten sind für diesen Spieltag nicht verfügbar. Kostenlose Tipps sind immer aktiv."
-    }
+    },
+    "leagueFinished": "Diese Liga ist beendet. Tipps sind geschlossen."
   },
   "recapReactions": {
     "heading": "Reagiere auf diesen Rückblick",
@@ -443,7 +445,8 @@
     "lockedLive": "Tipps gesperrt — das Spiel läuft.",
     "errorNotSignedIn": "Sie müssen angemeldet sein, um einen Tipp abzugeben.",
     "errorMatchNotFound": "Spiel nicht gefunden.",
-    "errorInvalidScores": "Die Ergebnisse müssen ganze Zahlen zwischen 0 und 20 sein."
+    "errorInvalidScores": "Die Ergebnisse müssen ganze Zahlen zwischen 0 und 20 sein.",
+    "leagueFinished": "Diese Liga ist beendet. Tipps sind geschlossen."
   },
   "shareRecap": {
     "heading": "Teile diesen Rückblick",
@@ -1314,7 +1317,12 @@
         "status": "Status",
         "providerMetadata": "Provider-Metadaten"
       }
-    }
+    },
+    "competitions.badgeFinished": "Beendet",
+    "competitions.finish": "Beenden",
+    "competitions.finishConfirm": "\"{name}\" als beendet markieren? Tipps werden gesperrt.",
+    "competitions.restart": "Wieder öffnen",
+    "competitions.restartConfirm": "\"{name}\" wieder öffnen? Tipps werden wieder erlaubt."
   },
   "error": {
     "eyebrow": "Nachspielzeit",

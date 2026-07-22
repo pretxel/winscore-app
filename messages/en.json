@@ -373,6 +373,7 @@
     "missingPickCancelled": "This match was cancelled — no predictions can be submitted.",
     "missingPickLive": "This match is live — predictions are locked and you didn't submit one.",
     "missingPickKickoff": "Predictions are locked — kickoff has passed and you didn't submit one for this match.",
+    "leagueFinished": "This league has finished.",
     "summaryHeading": "Match recap",
     "summaryDisclaimer": "AI-generated summary",
     "recapImageAlt": "Comic recap of {home} vs {away}"
@@ -398,6 +399,7 @@
     "errorInvalidInput": "Invalid prediction data. Check your scores.",
     "errorNotSignedIn": "Please sign in to submit picks.",
     "errorNotMember": "You must be a pool member to submit picks.",
+    "leagueFinished": "This league has finished. Predictions are closed.",
     "wagerRail": {
       "title": "Matchday Wager",
       "unavailable": "Wagering is not available for this round. Free picks are always on."
@@ -441,6 +443,7 @@
     "lockedFinal": "Predictions are locked — match is final.",
     "lockedCancelled": "Predictions are locked — match was cancelled.",
     "lockedLive": "Predictions are locked — match is live.",
+    "leagueFinished": "This league has finished. Predictions are closed.",
     "errorNotSignedIn": "You need to be signed in to submit a prediction.",
     "errorMatchNotFound": "Match not found.",
     "errorInvalidScores": "Scores must be whole numbers between 0 and 20."
@@ -1047,12 +1050,17 @@
       "new": "New competition",
       "badgeActive": "Active",
       "badgeManaging": "Managing",
+      "badgeFinished": "Finished",
       "fixtures": "{count, plural, =0 {No fixtures} one {# fixture} other {# fixtures}}",
       "season": "Season {season}",
       "manage": "Manage",
       "edit": "Edit",
       "delete": "Delete",
-      "deleteConfirm": "Delete “{name}”? This can't be undone.",
+      "deleteConfirm": "Delete \"{name}\"? This can't be undone.",
+      "finish": "Finish",
+      "finishConfirm": "Mark \"{name}\" as finished? Predictions will be locked.",
+      "restart": "Restart",
+      "restartConfirm": "Restart \"{name}\"? Predictions will be allowed again.",
       "emptyTitle": "No competitions yet",
       "emptyBody": "Create your first competition to start running the pool."
     },

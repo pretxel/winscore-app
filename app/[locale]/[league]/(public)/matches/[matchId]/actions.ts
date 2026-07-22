@@ -48,7 +48,7 @@ export async function submitPrediction(input: unknown): Promise<SubmitResult> {
 
   const { data: match, error: matchError } = await supabase
     .from("matches")
-    .select("status, kickoff_at, home_team, away_team")
+    .select("status, kickoff_at, home_team, away_team, competition_id")
     .eq("id", matchId)
     .maybeSingle();
 
@@ -57,6 +57,17 @@ export async function submitPrediction(input: unknown): Promise<SubmitResult> {
   }
   if (!match) {
     return { ok: false, error: t("errorMatchNotFound") };
+  }
+
+  // Check if the league is finished
+  const { data: comp } = await supabase
+    .from("competitions")
+    .select("finished_at")
+    .eq("id", match.competition_id)
+    .maybeSingle();
+
+  if (comp?.finished_at) {
+    return { ok: false, error: t("leagueFinished") };
   }
 
   // Teams must be confirmed before a pick can be written — defends the hidden

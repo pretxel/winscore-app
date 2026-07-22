@@ -375,7 +375,8 @@
     "missingPickKickoff": "Los pronósticos están cerrados — el inicio ya pasó y no enviaste uno para este partido.",
     "summaryHeading": "Resumen del partido",
     "summaryDisclaimer": "Resumen generado por IA",
-    "recapImageAlt": "Resumen cómic de {home} vs {away}"
+    "recapImageAlt": "Resumen cómic de {home} vs {away}",
+    "leagueFinished": "Esta liga ha terminado."
   },
   "matchdaySheet": {
     "fixtures": "partidos",
@@ -401,7 +402,8 @@
     "wagerRail": {
       "title": "Apuesta de la jornada",
       "unavailable": "Las apuestas no están disponibles para esta ronda. Los pronósticos gratuitos siempre están activos."
-    }
+    },
+    "leagueFinished": "Esta liga ha terminado. Los pronósticos están cerrados."
   },
   "recapReactions": {
     "heading": "Reacciona a este resumen",
@@ -443,7 +445,8 @@
     "lockedLive": "Pronósticos cerrados — el partido está en vivo.",
     "errorNotSignedIn": "Debes iniciar sesión para enviar un pronóstico.",
     "errorMatchNotFound": "Partido no encontrado.",
-    "errorInvalidScores": "Los marcadores deben ser números enteros entre 0 y 20."
+    "errorInvalidScores": "Los marcadores deben ser números enteros entre 0 y 20.",
+    "leagueFinished": "Esta liga ha terminado. Los pronósticos están cerrados."
   },
   "shareRecap": {
     "heading": "Comparte este resumen",
@@ -1314,7 +1317,12 @@
         "status": "Estado",
         "providerMetadata": "Metadatos del proveedor"
       }
-    }
+    },
+    "competitions.badgeFinished": "Terminada",
+    "competitions.finish": "Terminar",
+    "competitions.finishConfirm": "¿Marcar \"{name}\" como terminada? Los pronósticos se bloquearán.",
+    "competitions.restart": "Reabrir",
+    "competitions.restartConfirm": "¿Reabrir \"{name}\"? Se permitirán pronósticos de nuevo."
   },
   "error": {
     "eyebrow": "Tiempo añadido",

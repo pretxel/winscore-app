@@ -180,6 +180,7 @@ export const listLiveLeagues = cache(
       .from("competitions")
       .select("*")
       .eq("is_live", true)
+      .is("finished_at", null)
       .order("name", { ascending: true });
     return (data ?? []).map((row) => {
       const comp = resolveCompetition(row);

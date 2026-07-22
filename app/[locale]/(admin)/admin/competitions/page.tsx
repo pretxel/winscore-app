@@ -10,7 +10,7 @@ import { StatusCard } from "@/components/admin/status-card";
 import { EmptyState } from "@/components/admin/empty-state";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { SetActiveDialog } from "@/components/admin/set-active-dialog";
-import { deleteCompetition, setManagedCompetition } from "./actions";
+import { deleteCompetition, setManagedCompetition, finishLeague, restartLeague } from "./actions";
 import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 const WC_SEED_SLUG = "world-cup-2026";
@@ -30,7 +30,7 @@ export default async function AdminCompetitionsPage({
   const [{ data: competitions }, managedId] = await Promise.all([
     admin
       .from("competitions")
-      .select("id, slug, name, short_name, season, is_active")
+      .select("id, slug, name, short_name, season, is_active, finished_at")
       .order("season", { ascending: false }),
     getManagedCompetitionId(),
   ]);
@@ -85,8 +85,10 @@ export default async function AdminCompetitionsPage({
             {rows.map((c) => {
               const isManaged = c.id === managedId;
               const fixtures = fixtureCounts.get(c.id) ?? 0;
+              const isFinished = Boolean(c.finished_at);
+              const isWcSeed = c.slug === WC_SEED_SLUG;
               const deletable =
-                !c.is_active && c.slug !== WC_SEED_SLUG && fixtures === 0;
+                !c.is_active && !isWcSeed && fixtures === 0;
               return (
                 <li key={c.id}>
                   <StatusCard
@@ -100,6 +102,11 @@ export default async function AdminCompetitionsPage({
                         {isManaged ? (
                           <Badge variant="outline">
                             {t("competitions.badgeManaging")}
+                          </Badge>
+                        ) : null}
+                        {isFinished ? (
+                          <Badge variant="outline" className="border-muted-foreground/30 text-muted-foreground">
+                            {t("competitions.badgeFinished")}
                           </Badge>
                         ) : null}
                       </>
@@ -140,6 +147,35 @@ export default async function AdminCompetitionsPage({
                             {t("competitions.edit")}
                           </Button>
                         </Link>
+
+                        {/* Finish / Restart */}
+                        {!isWcSeed && !c.is_active ? (
+                          isFinished ? (
+                            <form action={restartLeague}>
+                              <input type="hidden" name="id" value={c.id} />
+                              <input type="hidden" name="locale" value={locale} />
+                              <SubmitButton
+                                size="sm"
+                                variant="outline"
+                                confirmText={t("competitions.restartConfirm", { name: c.name })}
+                              >
+                                {t("competitions.restart")}
+                              </SubmitButton>
+                            </form>
+                          ) : (
+                            <form action={finishLeague}>
+                              <input type="hidden" name="id" value={c.id} />
+                              <input type="hidden" name="locale" value={locale} />
+                              <SubmitButton
+                                size="sm"
+                                variant="outline"
+                                confirmText={t("competitions.finishConfirm", { name: c.name })}
+                              >
+                                {t("competitions.finish")}
+                              </SubmitButton>
+                            </form>
+                          )
+                        ) : null}
 
                         {deletable ? (
                           <form action={deleteCompetition} className="ml-auto">

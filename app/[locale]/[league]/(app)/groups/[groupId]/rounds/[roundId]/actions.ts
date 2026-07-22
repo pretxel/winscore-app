@@ -57,6 +57,25 @@ export async function submitBulkPredictions(
     return { ok: false, error: t("errorNotMember") };
   }
 
+  // Check if the league is finished
+  const { data: round } = await supabase
+    .from("competition_rounds")
+    .select("competition_id")
+    .eq("id", roundId)
+    .maybeSingle();
+
+  if (round) {
+    const { data: comp } = await supabase
+      .from("competitions")
+      .select("finished_at")
+      .eq("id", round.competition_id)
+      .maybeSingle();
+
+    if (comp?.finished_at) {
+      return { ok: false, error: t("leagueFinished") };
+    }
+  }
+
   const matchIds = predictions.map((p) => p.matchId);
 
   const { data: matches, error: matchError } = await supabase

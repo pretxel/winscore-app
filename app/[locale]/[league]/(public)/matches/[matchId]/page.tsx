@@ -163,6 +163,14 @@ export default async function MatchDetailPage({
     myPrediction = data;
   }
 
+  // Check if the league is finished
+  const { data: comp } = match.competition_id ? await supabase
+    .from("competitions")
+    .select("finished_at")
+    .eq("id", match.competition_id)
+    .maybeSingle() : { data: null };
+  const isFinished = Boolean(comp?.finished_at);
+
   // Personal, prediction-only group table for this match's group. Built from
   // the viewer's own picks across the group's fixtures (real results are never
   // folded in). Only signed-in, group-stage matches get the section.
@@ -629,6 +637,11 @@ export default async function MatchDetailPage({
                 missingPickExplain()
               )}
             </div>
+          </div>
+        ) : isFinished ? (
+          <div className="flex items-start gap-3 rounded-xl border border-border bg-muted/40 p-5 text-sm">
+            <LockIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+            <p>{t("leagueFinished")}</p>
           </div>
         ) : (
           <PredictionForm

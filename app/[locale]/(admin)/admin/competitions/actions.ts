@@ -195,3 +195,29 @@ export async function setManagedCompetition(formData: FormData): Promise<void> {
 
   revalidatePath("/admin", "layout");
 }
+
+export async function finishLeague(formData: FormData): Promise<void> {
+  await assertAdmin();
+  const id = z.string().uuid().parse(formData.get("id"));
+  const locale = formLocale(formData);
+
+  const admin = createAdminSupabaseClient();
+  const { error } = await admin.rpc("finish_league", { p_id: id });
+  if (error) throw dbError(error);
+
+  revalidatePath("/admin/competitions");
+  redirect(localePath(locale, "/admin/competitions"));
+}
+
+export async function restartLeague(formData: FormData): Promise<void> {
+  await assertAdmin();
+  const id = z.string().uuid().parse(formData.get("id"));
+  const locale = formLocale(formData);
+
+  const admin = createAdminSupabaseClient();
+  const { error } = await admin.rpc("restart_league", { p_id: id });
+  if (error) throw dbError(error);
+
+  revalidatePath("/admin/competitions");
+  redirect(localePath(locale, "/admin/competitions"));
+}

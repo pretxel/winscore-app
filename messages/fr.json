@@ -375,7 +375,8 @@
     "missingPickKickoff": "Pronos verrouillés — le coup d'envoi est passé et vous n'en avez pas envoyé pour ce match.",
     "summaryHeading": "Résumé du match",
     "summaryDisclaimer": "Résumé généré par IA",
-    "recapImageAlt": "Résumé BD de {home} contre {away}"
+    "recapImageAlt": "Résumé BD de {home} contre {away}",
+    "leagueFinished": "Cette ligue est terminée."
   },
   "matchdaySheet": {
     "fixtures": "matchs",
@@ -401,7 +402,8 @@
     "wagerRail": {
       "title": "Pari de la journée",
       "unavailable": "Les paris ne sont pas disponibles pour cette journée. Les pronostics gratuits restent actifs."
-    }
+    },
+    "leagueFinished": "Cette ligue est terminée. Les pronostics sont fermés."
   },
   "recapReactions": {
     "heading": "Réagissez à ce résumé",
@@ -443,7 +445,8 @@
     "lockedLive": "Pronos verrouillés — le match est en direct.",
     "errorNotSignedIn": "Connectez-vous pour envoyer un prono.",
     "errorMatchNotFound": "Match introuvable.",
-    "errorInvalidScores": "Les scores doivent être des entiers entre 0 et 20."
+    "errorInvalidScores": "Les scores doivent être des entiers entre 0 et 20.",
+    "leagueFinished": "Cette ligue est terminée. Les pronostics sont fermés."
   },
   "shareRecap": {
     "heading": "Partagez ce résumé",
@@ -1314,7 +1317,12 @@
         "status": "Statut",
         "providerMetadata": "Métadonnées du fournisseur"
       }
-    }
+    },
+    "competitions.badgeFinished": "Terminée",
+    "competitions.finish": "Terminer",
+    "competitions.finishConfirm": "Marquer \"{name}\" comme terminée ? Les pronostics seront verrouillés.",
+    "competitions.restart": "Rouvrir",
+    "competitions.restartConfirm": "Rouvrir \"{name}\" ? Les pronostics seront à nouveau autorisés."
   },
   "error": {
     "eyebrow": "Temps additionnel",
