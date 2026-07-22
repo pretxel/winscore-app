@@ -1,6 +1,6 @@
 // Pure, dependency-free renderer for the result-standing email. Mirrors the
-// web leaderboard's visual language (pitch-green header, cream body, gold/ink/
-// green rank tones, mono uppercase labels) using email-safe HTML: table layout,
+// web leaderboard's visual language (blue header, cream body, gold/ink/blue
+// rank tones, mono uppercase labels) using email-safe HTML: table layout,
 // inline styles, fixed hex colors (no oklch, CSS variables, or stylesheets).
 //
 // No database or network access — callers assemble `ResultEmailData` and pass
@@ -18,18 +18,20 @@ const C = {
   ink: "#1B2330",
   muted: "#6B7280",
   border: "#E5E2D7",
-  pitch: "#1B7A4D",
+  pitch: "#135FD1",
   pitchFg: "#FAF9F4",
   flag: "#E7B53C",
   flagFg: "#3A2E14",
   live: "#D6402F",
   // Soft tints used for the per-match outcome chips.
-  pitchTint: "#E3EFE8",
+  pitchTint: "#E7EFFC",
   mutedTint: "#F0EEE6",
 } as const;
 
-const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS =
+  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO =
+  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 export type EmailOutcome = HitType;
 
@@ -114,7 +116,7 @@ function escapeHtml(value: string): string {
 }
 
 // Per-match outcome chip colors, echoing the leaderboard accents:
-// exact = gold, winner/GD = pitch green, winner = green tint, miss = muted.
+// exact = gold, winner/GD = blue, winner = blue tint, miss = muted.
 function outcomeChipColors(hit: EmailOutcome): { bg: string; fg: string } {
   switch (hit) {
     case "exact":
@@ -130,7 +132,7 @@ function outcomeChipColors(hit: EmailOutcome): { bg: string; fg: string } {
 }
 
 // RankBadge tones from components/leaderboard-table.tsx:
-// 1st = gold, 2nd = ink, 3rd = green, else neutral.
+// 1st = gold, 2nd = ink, 3rd = blue, else neutral.
 function rankBadgeColors(rank: number | null): { bg: string; fg: string } {
   switch (rank) {
     case 1:
@@ -153,13 +155,13 @@ function monoLabel(text: string, color: string): string {
 // --- HTML sections ---------------------------------------------------------
 
 function renderHeader(): string {
-  // Pitch-green band with the WC·26·POOL wordmark in cream — the brand
+  // Blue band with the WIN·SCORE·POOL wordmark in cream — the brand
   // signature without depending on the SVG logotype (which uses var()).
   return `
     <tr>
       <td style="background-color:${C.pitch};padding:22px 28px;">
-        <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WC</span>
-        <span style="display:inline-block;margin:0 6px;padding:2px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:16px;font-weight:800;letter-spacing:-1px;color:${C.pitch};vertical-align:middle;">26</span>
+        <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WIN</span>
+        <span style="display:inline-block;margin:0 6px;padding:3px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:12px;font-weight:800;letter-spacing:0;color:${C.pitch};vertical-align:middle;">SCORE</span>
         <span style="font-family:${MONO};font-size:12px;font-weight:600;letter-spacing:0.3em;color:${C.pitchFg};vertical-align:middle;">POOL</span>
       </td>
     </tr>`;
@@ -211,7 +213,9 @@ function renderMatchCard(m: EmailFinishedMatch, s: ResultEmailStrings): string {
 }
 
 function renderResults(data: ResultEmailData): string {
-  const cards = data.matches.map((m) => renderMatchCard(m, data.strings)).join("");
+  const cards = data.matches
+    .map((m) => renderMatchCard(m, data.strings))
+    .join("");
   return `
     <tr>
       <td style="padding:18px 28px 4px 28px;">
@@ -344,7 +348,8 @@ function renderText(data: ResultEmailData): string {
   }
   lines.push("");
   lines.push(s.standingLabel.toUpperCase());
-  const rankText = data.standing.rank != null ? String(data.standing.rank) : "—";
+  const rankText =
+    data.standing.rank != null ? String(data.standing.rank) : "—";
   lines.push(
     `  ${s.rankLabel} ${rankText} · ${s.pointsLabel} ${data.standing.totalPoints} · ${s.exactLabel} ${data.standing.exactHits} · ${s.winnerGdLabel} ${data.standing.winnerGdHits}`,
   );

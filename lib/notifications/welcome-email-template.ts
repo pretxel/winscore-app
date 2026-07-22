@@ -1,5 +1,5 @@
 // Pure, dependency-free renderer for the one-time onboarding welcome email.
-// Mirrors the result/quiz emails' visual language (pitch-green header, cream
+// Mirrors the result/quiz emails' visual language (blue header, cream
 // body, gold accents, mono uppercase labels) using email-safe HTML: table
 // layout, inline styles, fixed hex colors (no oklch, CSS variables, or
 // stylesheets).
@@ -13,15 +13,17 @@ const C = {
   ink: "#1B2330",
   muted: "#6B7280",
   border: "#E5E2D7",
-  pitch: "#1B7A4D",
+  pitch: "#135FD1",
   pitchFg: "#FAF9F4",
   flag: "#E7B53C",
   flagFg: "#3A2E14",
-  pitchTint: "#E3EFE8",
+  pitchTint: "#E7EFFC",
 } as const;
 
-const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS =
+  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO =
+  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // All copy is resolved by the caller (next-intl) and passed in — value-bearing
 // strings (subject, heading) arrive already interpolated.
@@ -87,8 +89,8 @@ function renderHeader(): string {
   return `
     <tr>
       <td style="background-color:${C.pitch};padding:22px 28px;">
-        <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WC</span>
-        <span style="display:inline-block;margin:0 6px;padding:2px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:16px;font-weight:800;letter-spacing:-1px;color:${C.pitch};vertical-align:middle;">26</span>
+        <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WIN</span>
+        <span style="display:inline-block;margin:0 6px;padding:3px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:12px;font-weight:800;letter-spacing:0;color:${C.pitch};vertical-align:middle;">SCORE</span>
         <span style="font-family:${MONO};font-size:12px;font-weight:600;letter-spacing:0.3em;color:${C.pitchFg};vertical-align:middle;">POOL</span>
       </td>
     </tr>`;
@@ -111,7 +113,12 @@ function renderIntro(data: WelcomeEmailData): string {
 }
 
 // One oriented "core loop" section: a titled card with a blurb and a deep link.
-function renderLoop(title: string, blurb: string, cta: string, url: string): string {
+function renderLoop(
+  title: string,
+  blurb: string,
+  cta: string,
+  url: string,
+): string {
   return `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${C.border};border-radius:12px;background-color:${C.card};margin-top:10px;">
       <tr>
@@ -157,7 +164,9 @@ function renderFooter(s: WelcomeEmailStrings): string {
 
 // --- public renderer -------------------------------------------------------
 
-export function renderWelcomeEmail(data: WelcomeEmailData): WelcomeEmailRendered {
+export function renderWelcomeEmail(
+  data: WelcomeEmailData,
+): WelcomeEmailRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>

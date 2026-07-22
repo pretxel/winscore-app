@@ -93,7 +93,7 @@ export default async function HomePage({
   }
 
   return (
-    <main>
+    <main className="landing-blue">
       <Hero locale={locale} t={t} />
       <TournamentCountdown />
       <ScoringSection locale={locale} t={t} />
@@ -285,10 +285,34 @@ function ScoringSection({ locale, t }: { locale: Locale; t: T }) {
     Icon: React.ComponentType<{ className?: string }>;
     accent: "pitch" | "flag" | "muted" | "ghost";
   }> = [
-    { pts: 5, titleKey: "scoringTierExactTitle", detailKey: "scoringTierExactDetail", Icon: TargetIcon, accent: "pitch" },
-    { pts: 3, titleKey: "scoringTierWinnerGdTitle", detailKey: "scoringTierWinnerGdDetail", Icon: ZapIcon, accent: "flag" },
-    { pts: 1, titleKey: "scoringTierWinnerTitle", detailKey: "scoringTierWinnerDetail", Icon: TrophyIcon, accent: "muted" },
-    { pts: 0, titleKey: "scoringTierMissTitle", detailKey: "scoringTierMissDetail", Icon: ArrowRightIcon, accent: "ghost" },
+    {
+      pts: 5,
+      titleKey: "scoringTierExactTitle",
+      detailKey: "scoringTierExactDetail",
+      Icon: TargetIcon,
+      accent: "pitch",
+    },
+    {
+      pts: 3,
+      titleKey: "scoringTierWinnerGdTitle",
+      detailKey: "scoringTierWinnerGdDetail",
+      Icon: ZapIcon,
+      accent: "flag",
+    },
+    {
+      pts: 1,
+      titleKey: "scoringTierWinnerTitle",
+      detailKey: "scoringTierWinnerDetail",
+      Icon: TrophyIcon,
+      accent: "muted",
+    },
+    {
+      pts: 0,
+      titleKey: "scoringTierMissTitle",
+      detailKey: "scoringTierMissDetail",
+      Icon: ArrowRightIcon,
+      accent: "ghost",
+    },
   ];
 
   return (
@@ -431,7 +455,9 @@ function Cadence({ t }: { t: T }) {
                   {t(step.labelKey)}
                 </span>
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">{t(step.copyKey)}</p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                {t(step.copyKey)}
+              </p>
             </li>
           ))}
         </ol>
@@ -448,9 +474,27 @@ function FeatureSections({ locale, t }: { locale: Locale; t: T }) {
     href: string;
     Icon: React.ComponentType<{ className?: string }>;
   }> = [
-    { titleKey: "groupsTitle", copyKey: "groupsCopy", ctaKey: "groupsCta", href: "/groups", Icon: UsersIcon },
-    { titleKey: "newsTitle", copyKey: "newsCopy", ctaKey: "newsCta", href: "/news", Icon: NewspaperIcon },
-    { titleKey: "quizTitle", copyKey: "quizCopy", ctaKey: "quizCta", href: "/quiz", Icon: BrainIcon },
+    {
+      titleKey: "groupsTitle",
+      copyKey: "groupsCopy",
+      ctaKey: "groupsCta",
+      href: "/groups",
+      Icon: UsersIcon,
+    },
+    {
+      titleKey: "newsTitle",
+      copyKey: "newsCopy",
+      ctaKey: "newsCta",
+      href: "/news",
+      Icon: NewspaperIcon,
+    },
+    {
+      titleKey: "quizTitle",
+      copyKey: "quizCopy",
+      ctaKey: "quizCta",
+      href: "/quiz",
+      Icon: BrainIcon,
+    },
   ];
 
   return (

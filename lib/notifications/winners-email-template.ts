@@ -1,6 +1,6 @@
 // Pure, dependency-free renderer for the pool winners congratulation email.
 // Mirrors results-digest-template.ts: the web leaderboard's visual language
-// (pitch-green header, cream body, gold/ink/green rank tones, mono uppercase
+// (blue header, cream body, gold/ink/blue rank tones, mono uppercase
 // labels) using email-safe HTML — table layout, inline styles, fixed hex colors
 // (no oklch, CSS variables, or stylesheets).
 //
@@ -19,15 +19,17 @@ const C = {
   ink: "#1B2330",
   muted: "#6B7280",
   border: "#E5E2D7",
-  pitch: "#1B7A4D",
+  pitch: "#135FD1",
   pitchFg: "#FAF9F4",
   flag: "#E7B53C",
   flagFg: "#3A2E14",
   mutedTint: "#F0EEE6",
 } as const;
 
-const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS =
+  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO =
+  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // One podium row. `isYou` marks the recipient's own row with the you-chip.
 export interface WinnersPodiumRow {
@@ -86,7 +88,7 @@ function escapeHtml(value: string): string {
 }
 
 // RankBadge tones from components/leaderboard-table.tsx:
-// 1st = gold, 2nd = ink, 3rd = green, else neutral.
+// 1st = gold, 2nd = ink, 3rd = blue, else neutral.
 function rankBadgeColors(rank: number): { bg: string; fg: string } {
   switch (rank) {
     case 1:
@@ -117,8 +119,8 @@ function renderHeader(): string {
   return `
   <tr>
     <td style="background-color:${C.pitch};padding:22px 28px;">
-      <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WC</span>
-      <span style="display:inline-block;margin:0 6px;padding:2px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:16px;font-weight:800;letter-spacing:-1px;color:${C.pitch};vertical-align:middle;">26</span>
+      <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WIN</span>
+      <span style="display:inline-block;margin:0 6px;padding:3px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:12px;font-weight:800;letter-spacing:0;color:${C.pitch};vertical-align:middle;">SCORE</span>
       <span style="font-family:${MONO};font-size:12px;font-weight:600;letter-spacing:0.3em;color:${C.pitchFg};vertical-align:middle;">POOL</span>
     </td>
   </tr>`;
@@ -207,7 +209,9 @@ function renderFooter(s: WinnersEmailStrings): string {
 
 // --- entry points ----------------------------------------------------------
 
-export function renderWinnersEmail(data: WinnersEmailData): WinnersEmailRendered {
+export function renderWinnersEmail(
+  data: WinnersEmailData,
+): WinnersEmailRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>
@@ -249,7 +253,9 @@ function renderText(data: WinnersEmailData): string {
   lines.push(s.podiumLabel.toUpperCase());
   for (const r of data.podium) {
     const you = r.isYou ? ` (${s.youLabel})` : "";
-    lines.push(` ${r.rank}. ${r.displayName ?? "—"}${you} — ${r.totalPoints} ${s.pointsLabel}`);
+    lines.push(
+      ` ${r.rank}. ${r.displayName ?? "—"}${you} — ${r.totalPoints} ${s.pointsLabel}`,
+    );
   }
   lines.push("");
   lines.push(`${s.ctaLabel}: ${data.leaderboardUrl}`);

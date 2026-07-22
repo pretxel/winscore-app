@@ -1,6 +1,6 @@
 // Pure, dependency-free renderer for the once-daily results-digest email.
 // Mirrors result-email-template.ts: the web leaderboard's visual language
-// (pitch-green header, cream body, gold/ink/green rank tones, mono uppercase
+// (blue header, cream body, gold/ink/blue rank tones, mono uppercase
 // labels) using email-safe HTML — table layout, inline styles, fixed hex colors
 // (no oklch, CSS variables, or stylesheets).
 //
@@ -20,17 +20,19 @@ const C = {
   ink: "#1B2330",
   muted: "#6B7280",
   border: "#E5E2D7",
-  pitch: "#1B7A4D",
+  pitch: "#135FD1",
   pitchFg: "#FAF9F4",
   flag: "#E7B53C",
   flagFg: "#3A2E14",
   live: "#D6402F",
-  pitchTint: "#E3EFE8",
+  pitchTint: "#E7EFFC",
   mutedTint: "#F0EEE6",
 } as const;
 
-const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS =
+  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO =
+  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // One row of the leaderboard top 5.
 export interface DigestTopRow {
@@ -108,7 +110,7 @@ function escapeHtml(value: string): string {
 }
 
 // RankBadge tones from components/leaderboard-table.tsx:
-// 1st = gold, 2nd = ink, 3rd = green, else neutral.
+// 1st = gold, 2nd = ink, 3rd = blue, else neutral.
 function rankBadgeColors(rank: number | null): { bg: string; fg: string } {
   switch (rank) {
     case 1:
@@ -136,7 +138,7 @@ function rankBadge(rank: number | null): string {
   )}</span>`;
 }
 
-// A signed delta chip: a climb (negative) is pitch-green, a drop is the live
+// A signed delta chip: a climb (negative) is blue, a drop is the live
 // red accent, no change is muted. Returns the localized label + magnitude.
 function deltaChip(delta: number, s: ResultsDigestStrings): string {
   let bg: string = C.mutedTint;
@@ -162,8 +164,8 @@ function renderHeader(): string {
   return `
     <tr>
       <td style="background-color:${C.pitch};padding:22px 28px;">
-        <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WC</span>
-        <span style="display:inline-block;margin:0 6px;padding:2px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:16px;font-weight:800;letter-spacing:-1px;color:${C.pitch};vertical-align:middle;">26</span>
+        <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WIN</span>
+        <span style="display:inline-block;margin:0 6px;padding:3px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:12px;font-weight:800;letter-spacing:0;color:${C.pitch};vertical-align:middle;">SCORE</span>
         <span style="font-family:${MONO};font-size:12px;font-weight:600;letter-spacing:0.3em;color:${C.pitchFg};vertical-align:middle;">POOL</span>
       </td>
     </tr>`;
@@ -300,7 +302,9 @@ function renderFooter(s: ResultsDigestStrings): string {
 
 // --- public renderer -------------------------------------------------------
 
-export function renderResultsDigest(data: ResultsDigestData): ResultsDigestRendered {
+export function renderResultsDigest(
+  data: ResultsDigestData,
+): ResultsDigestRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>
@@ -345,15 +349,23 @@ function renderText(data: ResultsDigestData): string {
   lines.push("");
   lines.push(s.top5Label.toUpperCase());
   for (const r of data.top5) {
-    lines.push(`  ${r.rank}. ${r.displayName ?? "—"} — ${r.totalPoints} ${s.pointsLabel}`);
+    lines.push(
+      `  ${r.rank}. ${r.displayName ?? "—"} — ${r.totalPoints} ${s.pointsLabel}`,
+    );
   }
   lines.push("");
   lines.push(s.yourRankLabel.toUpperCase());
-  const rankText = data.personal.rank != null ? String(data.personal.rank) : "—";
+  const rankText =
+    data.personal.rank != null ? String(data.personal.rank) : "—";
   let yourLine = `  ${s.rankLabel} ${rankText} · ${s.pointsLabel} ${data.personal.totalPoints}`;
   if (data.personal.delta != null) {
     const d = data.personal.delta;
-    const label = d < 0 ? `${s.deltaUpLabel} ${Math.abs(d)}` : d > 0 ? `${s.deltaDownLabel} ${d}` : s.deltaFlatLabel;
+    const label =
+      d < 0
+        ? `${s.deltaUpLabel} ${Math.abs(d)}`
+        : d > 0
+          ? `${s.deltaDownLabel} ${d}`
+          : s.deltaFlatLabel;
     yourLine += ` · ${label}`;
   }
   lines.push(yourLine);
@@ -362,8 +374,13 @@ function renderText(data: ResultsDigestData): string {
     lines.push(s.moversLabel.toUpperCase());
     for (const m of data.movers) {
       const label = m.delta < 0 ? s.climbedLabel : s.droppedLabel;
-      const mag = m.delta < 0 ? `${s.deltaUpLabel} ${Math.abs(m.delta)}` : `${s.deltaDownLabel} ${m.delta}`;
-      lines.push(`  ${m.displayName ?? "—"} (${s.rankLabel} ${m.rank}) — ${label}, ${mag}`);
+      const mag =
+        m.delta < 0
+          ? `${s.deltaUpLabel} ${Math.abs(m.delta)}`
+          : `${s.deltaDownLabel} ${m.delta}`;
+      lines.push(
+        `  ${m.displayName ?? "—"} (${s.rankLabel} ${m.rank}) — ${label}, ${mag}`,
+      );
     }
   }
   lines.push("");

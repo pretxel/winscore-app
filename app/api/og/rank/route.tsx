@@ -22,9 +22,9 @@ export const dynamic = "force-dynamic";
 
 const WIDTH = 1200;
 const HEIGHT = 630;
-// Brand pitch green (oklch(0.43 0.13 158) ≈) and its foreground, hex for Satori.
-const PITCH = "#15714b";
-const PITCH_DARK = "#0e5238";
+// Winscore blue and its darker shade, expressed as hex for Satori.
+const PITCH = "#135fd1";
+const PITCH_DARK = "#0d47a8";
 const FG = "#fbfaf6";
 
 function Stat({ value, label }: { value: string; label: string }) {
@@ -81,7 +81,7 @@ export async function GET(request: Request) {
   // fetched by social scrapers with no session. Numbers are read live so the
   // card always reflects the current standing, never the URL.
   const supabase = createClient<Database>(env.supabaseUrl, env.supabaseAnonKey);
-  const [{ data: row }, { count }, { data: comp }] = await Promise.all([
+  const [{ data: row }, { count }] = await Promise.all([
     supabase
       .from("v_leaderboard_overall")
       .select("rank, display_name, total_points, exact_hits")
@@ -90,14 +90,8 @@ export async function GET(request: Request) {
     supabase
       .from("v_leaderboard_overall")
       .select("*", { count: "exact", head: true }),
-    supabase
-      .from("competitions")
-      .select("branding")
-      .eq("is_active", true)
-      .maybeSingle(),
   ]);
-  const brandCode =
-    (comp?.branding as { brandCode?: string } | null)?.brandCode ?? "WC26";
+  const brandCode = "WINSCORE";
   // Validate inputs before any render or ETag work — an unknown user is a 404,
   // never a half-rendered card.
   if (!row) return new Response("Standing not found", { status: 404 });
@@ -122,153 +116,151 @@ export async function GET(request: Request) {
   ]);
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        backgroundImage: `linear-gradient(135deg, ${PITCH} 0%, ${PITCH_DARK} 100%)`,
+        padding: 56,
+      }}
+    >
+      {/* Soft spotlight behind the rank — Satori-supported radial gradient,
+            a texture cue toward the scoreboard look without CSS patterns. */}
       <div
         style={{
-          position: "relative",
-          width: "100%",
-          height: "100%",
+          position: "absolute",
+          inset: 0,
           display: "flex",
-          flexDirection: "column",
-          backgroundImage: `linear-gradient(135deg, ${PITCH} 0%, ${PITCH_DARK} 100%)`,
-          padding: 56,
+          backgroundImage:
+            "radial-gradient(circle at 50% 42%, rgba(251,250,246,0.16) 0%, rgba(251,250,246,0) 55%)",
+        }}
+      />
+      {/* Top hairline accent */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 6,
+          display: "flex",
+          backgroundColor: FG,
+          opacity: 0.5,
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        {/* Soft spotlight behind the rank — Satori-supported radial gradient,
-            a texture cue toward the scoreboard look without CSS patterns. */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            backgroundImage:
-              "radial-gradient(circle at 50% 42%, rgba(251,250,246,0.16) 0%, rgba(251,250,246,0) 55%)",
-          }}
-        />
-        {/* Top hairline accent */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 6,
-            display: "flex",
-            backgroundColor: FG,
-            opacity: 0.5,
-          }}
-        />
-
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            fontFamily: OG_FONT_FAMILY.mono,
+            color: FG,
+            fontSize: 26,
+            fontWeight: 700,
+            letterSpacing: 6,
+            textTransform: "uppercase",
+            opacity: 0.85,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              fontFamily: OG_FONT_FAMILY.mono,
-              color: FG,
-              fontSize: 26,
-              fontWeight: 700,
-              letterSpacing: 6,
-              textTransform: "uppercase",
-              opacity: 0.85,
-            }}
-          >
-            {t("pageEyebrow")}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              fontFamily: OG_FONT_FAMILY.mono,
-              color: FG,
-              fontSize: 26,
-              fontWeight: 700,
-              letterSpacing: 6,
-              textTransform: "uppercase",
-              opacity: 0.85,
-            }}
-          >
-            {brandCode} POOL
-          </div>
+          {t("pageEyebrow")}
         </div>
-
         <div
           style={{
             display: "flex",
-            flex: 1,
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
+            fontFamily: OG_FONT_FAMILY.mono,
+            color: FG,
+            fontSize: 26,
+            fontWeight: 700,
+            letterSpacing: 6,
+            textTransform: "uppercase",
+            opacity: 0.85,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              fontFamily: OG_FONT_FAMILY.heading,
-              color: FG,
-              fontSize: 210,
-              fontWeight: 800,
-              lineHeight: 1,
-            }}
-          >
-            {`#${rank}`}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              fontFamily: OG_FONT_FAMILY.heading,
-              color: FG,
-              fontSize: 60,
-              fontWeight: 700,
-              maxWidth: 1040,
-              textAlign: "center",
-              lineHeight: 1.05,
-            }}
-          >
-            {name}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              fontFamily: OG_FONT_FAMILY.mono,
-              color: FG,
-              fontSize: 24,
-              fontWeight: 700,
-              letterSpacing: 4,
-              textTransform: "uppercase",
-              opacity: 0.7,
-              marginTop: 6,
-            }}
-          >
-            {t("statPlayers", { count: players })}
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "stretch",
-            borderTop: `1px solid rgba(251,250,246,0.18)`,
-            paddingTop: 20,
-          }}
-        >
-          <Stat value={String(points)} label={t("pointsLabel")} />
-          <div
-            style={{
-              display: "flex",
-              width: 1,
-              backgroundColor: "rgba(251,250,246,0.18)",
-            }}
-          />
-          <Stat value={String(exact)} label={t("exactLabel")} />
+          {brandCode} POOL
         </div>
       </div>
-    ),
+
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            fontFamily: OG_FONT_FAMILY.heading,
+            color: FG,
+            fontSize: 210,
+            fontWeight: 800,
+            lineHeight: 1,
+          }}
+        >
+          {`#${rank}`}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            fontFamily: OG_FONT_FAMILY.heading,
+            color: FG,
+            fontSize: 60,
+            fontWeight: 700,
+            maxWidth: 1040,
+            textAlign: "center",
+            lineHeight: 1.05,
+          }}
+        >
+          {name}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            fontFamily: OG_FONT_FAMILY.mono,
+            color: FG,
+            fontSize: 24,
+            fontWeight: 700,
+            letterSpacing: 4,
+            textTransform: "uppercase",
+            opacity: 0.7,
+            marginTop: 6,
+          }}
+        >
+          {t("statPlayers", { count: players })}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "stretch",
+          borderTop: `1px solid rgba(251,250,246,0.18)`,
+          paddingTop: 20,
+        }}
+      >
+        <Stat value={String(points)} label={t("pointsLabel")} />
+        <div
+          style={{
+            display: "flex",
+            width: 1,
+            backgroundColor: "rgba(251,250,246,0.18)",
+          }}
+        />
+        <Stat value={String(exact)} label={t("exactLabel")} />
+      </div>
+    </div>,
     {
       width: WIDTH,
       height: HEIGHT,

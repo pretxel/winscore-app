@@ -29,7 +29,10 @@ export const env = {
   supabaseUrl:
     process.env.SUPABASE_URL ||
     required("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL),
-  supabaseAnonKey: required("NEXT_PUBLIC_SUPABASE_ANON_KEY", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+  supabaseAnonKey: required(
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  ),
   siteUrl: resolveSiteUrl(),
   // Nullable on purpose — the cron route returns 204 with x-skipped: missing-env
   // when these are absent, so the build doesn't crash on cold envs.
@@ -45,17 +48,18 @@ export const env = {
   // crashing. `emailFrom` must be a Resend verified-domain sender in
   // production; the default is dev-only.
   resendApiKey: process.env.RESEND_API_KEY ?? null,
-  emailFrom: process.env.EMAIL_FROM ?? "World Cup Pools <onboarding@resend.dev>",
+  emailFrom: process.env.EMAIL_FROM ?? "Winscore <onboarding@resend.dev>",
   // Reply-To for every transactional send: recipients can reply (and spam
   // filters trust a two-way address). Defaults to the From address so a
   // Reply-To is always present even if EMAIL_REPLY_TO is unset; the `<addr>`
   // is extracted from the `Name <addr>` form when present.
   emailReplyTo:
     process.env.EMAIL_REPLY_TO ??
-    (process.env.EMAIL_FROM ?? "World Cup Pools <onboarding@resend.dev>").match(
+    (process.env.EMAIL_FROM ?? "Winscore <onboarding@resend.dev>").match(
       /<([^>]+)>/,
     )?.[1] ??
-    (process.env.EMAIL_FROM ?? "onboarding@resend.dev"),
+    process.env.EMAIL_FROM ??
+    "onboarding@resend.dev",
   // OpenRouter (server only) for the post-final AI match recap. Nullable on
   // purpose — when the key is unset the generation step short-circuits (no
   // request, no row) instead of throwing, so the feature stays dormant until
@@ -96,5 +100,8 @@ export const env = {
 };
 
 export function requireServiceRoleKey(): string {
-  return required("SUPABASE_SERVICE_ROLE_KEY", process.env.SUPABASE_SERVICE_ROLE_KEY);
+  return required(
+    "SUPABASE_SERVICE_ROLE_KEY",
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
 }

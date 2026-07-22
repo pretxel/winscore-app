@@ -62,7 +62,7 @@
     }
   },
   "footer": {
-    "tournament": "World Cup 2026 · 11. Jun – 19. Jul 2026",
+    "tournament": "Fußballtipps · Live-Ligen",
     "howItWorks": "So funktioniert's",
     "hosts": "USA · Kanada · Mexiko"
   },
@@ -158,10 +158,10 @@
     "groupsCopy": "Erstelle eine private Gruppe, teile einen Code und tritt in einer Mini-Rangliste gegen die Leute an, die du wirklich kennst.",
     "groupsCta": "Gruppe erstellen",
     "newsTitle": "News",
-    "newsCopy": "Die neuesten Schlagzeilen zur Weltmeisterschaft 2026, den ganzen Tag über aktualisiert. Tippe auf einen Beitrag, um ihn an der Quelle zu lesen.",
+    "newsCopy": "Die neuesten Fußball-Schlagzeilen, den ganzen Tag über aktualisiert. Tippe auf einen Beitrag, um ihn an der Quelle zu lesen.",
     "newsCta": "News lesen",
     "quizTitle": "Tägliche Frage",
-    "quizCopy": "Eine WM-Quizfrage pro Tag. Antworte vor Mitternacht UTC, halte deine Serie am Leben und klettere in der Quiz-Rangliste nach oben.",
+    "quizCopy": "Eine Fußball-Quizfrage pro Tag. Antworte vor Mitternacht UTC, halte deine Serie am Leben und klettere in der Quiz-Rangliste nach oben.",
     "quizCta": "Heutige Frage spielen",
     "standingEyebrow": "Dein Stand",
     "lanesEyebrow": "Deine Ligen",
@@ -422,7 +422,7 @@
   },
   "shareRecap": {
     "heading": "Teile diesen Rückblick",
-    "shareText": "Der Comic-Rückblick zu {home} gegen {away} · WM 2026 Pool",
+    "shareText": "Der Comic-Rückblick zu {home} gegen {away} · Winscore",
     "shareOnX": "Auf X teilen",
     "shareOnFacebook": "Auf Facebook teilen",
     "shareNative": "Teilen…",
@@ -431,61 +431,61 @@
   },
   "sharePick": {
     "heading": "Teile deinen Tipp",
-    "shareText": "Mein Tipp: {home} {h}–{a} {away} · WM 2026 Pool",
+    "shareText": "Mein Tipp: {home} {h}–{a} {away} · Winscore",
     "shareOnX": "Auf X teilen",
     "shareOnFacebook": "Auf Facebook teilen",
     "shareNative": "Teilen…",
     "copyLink": "Link kopieren",
     "copied": "Link kopiert",
     "pageTitle": "{home} {h}–{a} {away} — geteilter Tipp",
-    "pageDescription": "Ein WM-2026-Tipp für {home} gegen {away}. Gib vor dem Anpfiff deinen eigenen Tipp ab.",
+    "pageDescription": "Ein Fußballtipp für {home} gegen {away}. Gib vor dem Anpfiff deinen eigenen Tipp ab.",
     "pageEyebrow": "Geteilter Tipp",
-    "pageHeading": "WM-2026-Tipp",
+    "pageHeading": "Fußballtipp",
     "cta": "Gib deinen eigenen Tipp ab",
-    "ogAlt": "Geteilter WM-2026-Tipp: {home} {h}–{a} {away}"
+    "ogAlt": "Geteilter Fußballtipp: {home} {h}–{a} {away}"
   },
   "shareQuiz": {
     "heading": "Teile deine Quiz-Serie",
-    "shareText": "Ich bin auf Platz #{rank} von {count} im täglichen Quiz zur Weltmeisterschaft 2026 — {points} Pkt. und eine Serie von {streak} Tagen. Hol mich ein, wenn du kannst.",
+    "shareText": "Ich bin auf Platz #{rank} von {count} im täglichen Winscore-Quiz — {points} Pkt. und eine Serie von {streak} Tagen. Hol mich ein, wenn du kannst.",
     "shareOnX": "Auf X teilen",
     "shareOnFacebook": "Auf Facebook teilen",
     "shareNative": "Teilen…",
     "copyLink": "Link kopieren",
     "copied": "Link kopiert",
     "pageEyebrow": "Geteilte Quiz-Serie",
-    "pageHeading": "Tägliches Quiz zur Weltmeisterschaft 2026",
+    "pageHeading": "Tägliches Winscore-Quiz",
     "pageTitle": "Quiz-Serie von {streak} Tagen, {points} Pkt. — Winscore",
-    "pageDescription": "{name} hat eine Serie von {streak} Tagen im täglichen Quiz zur Weltmeisterschaft 2026 — {points} Pkt., Platz #{rank} von {count}. Beantworte die heutige Frage und starte deine eigene Serie.",
+    "pageDescription": "{name} hat eine Serie von {streak} Tagen im täglichen Winscore-Quiz — {points} Pkt., Platz #{rank} von {count}. Beantworte die heutige Frage und starte deine eigene Serie.",
     "streakLabel": "Serie",
     "pointsLabel": "Punkte",
     "rankLabel": "Platz",
     "answeredLabel": "Beantwortet",
     "statPlayers": "von {count, plural, one {# Spieler} other {# Spielern}}",
     "cta": "Heutiges Quiz spielen",
-    "ogAlt": "Tägliches Quiz zur Weltmeisterschaft 2026: Serie von {streak} Tagen, {points} Punkte, Platz #{rank}"
+    "ogAlt": "Tägliches Winscore-Quiz: Serie von {streak} Tagen, {points} Punkte, Platz #{rank}"
   },
   "shareRank": {
     "heading": "Teilen Sie Ihre Platzierung",
-    "shareText": "Ich bin auf Platz #{rank} von {count} im WM 2026 Pool — {points} Pkt. Hol mich ein, wenn du kannst.",
+    "shareText": "Ich bin auf Platz #{rank} von {count} bei Winscore — {points} Pkt. Hol mich ein, wenn du kannst.",
     "shareOnX": "Auf X teilen",
     "shareOnFacebook": "Auf Facebook teilen",
     "shareNative": "Teilen…",
     "copyLink": "Link kopieren",
     "copied": "Link kopiert",
     "pageEyebrow": "Geteilte Platzierung",
-    "pageHeading": "WM 2026 Pool",
-    "pageTitle": "Platz #{rank} mit {points} Pkt. — WM 2026 Pool",
-    "pageDescription": "{name} ist derzeit auf Platz #{rank} von {count} im WM 2026 Pool. Geben Sie Ihre Tipps ab und klettern Sie in der Rangliste nach oben.",
+    "pageHeading": "Winscore",
+    "pageTitle": "Platz #{rank} mit {points} Pkt. — Winscore",
+    "pageDescription": "{name} ist derzeit auf Platz #{rank} von {count} bei Winscore. Geben Sie Ihre Tipps ab und klettern Sie in der Rangliste nach oben.",
     "rankLabel": "Platz",
     "pointsLabel": "Punkte",
     "exactLabel": "Exakte Treffer",
     "statPlayers": "von {count, plural, one {# Spieler} other {# Spielern}}",
     "cta": "Rangliste ansehen",
-    "ogAlt": "WM 2026 Pool Platzierung: Platz #{rank}, {points} Punkte"
+    "ogAlt": "Winscore-Platzierung: Platz #{rank}, {points} Punkte"
   },
   "h2h": {
     "pageEyebrow": "Direktduell",
-    "pageHeading": "WM 2026 Pool",
+    "pageHeading": "Winscore",
     "vsLabel": "vs",
     "rankLabel": "Rang",
     "pointsLabel": "Punkte",
@@ -493,7 +493,7 @@
     "formLabel": "Aktuelle Form",
     "formEmpty": "Noch keine gewerteten Spiele",
     "shareHeading": "Teile diese Herausforderung",
-    "shareText": "Direktduell: {a} vs {b} im WM 2026 Pool. Wer liegt vorn?",
+    "shareText": "Direktduell: {a} vs {b} bei Winscore. Wer liegt vorn?",
     "shareOnX": "Auf X teilen",
     "shareOnFacebook": "Auf Facebook teilen",
     "shareNative": "Teilen…",
@@ -502,9 +502,9 @@
     "challengeHeading": "Fordere einen Rivalen heraus",
     "challengeBody": "Wähle oben jemanden aus, um die Platzierungen im Direktduell zu vergleichen.",
     "challengePick": "Gegner auswählen",
-    "pageTitle": "{a} vs {b} — WM 2026 Pool",
-    "pageDescription": "{a} (#{rankA}) vs {b} (#{rankB}) im WM 2026 Pool. Sieh, wer vorn liegt, und die aktuelle Form.",
-    "ogAlt": "Direktduell: {a} #{rankA} vs {b} #{rankB} im WM 2026 Pool",
+    "pageTitle": "{a} vs {b} — Winscore",
+    "pageDescription": "{a} (#{rankA}) vs {b} (#{rankB}) bei Winscore. Sieh, wer vorn liegt, und die aktuelle Form.",
+    "ogAlt": "Direktduell: {a} #{rankA} vs {b} #{rankB} bei Winscore",
     "cta": "Zur Rangliste"
   },
   "myPicks": {
@@ -780,7 +780,7 @@
     "heading": "{group} beitreten",
     "intro": "{inviter} hat dich zu {group} bei Winscore eingeladen. Tritt der Gruppe bei, um auf ihrer Mini-Tabelle mit denselben Tipps mitzuspielen.",
     "joinCta": "Gruppe beitreten",
-    "footer": "Du erhältst diese E-Mail, weil dich jemand zu einer World-Cup-Pool-Gruppe eingeladen hat. Falls du das nicht erwartet hast, kannst du diese E-Mail ignorieren.",
+    "footer": "Du erhältst diese E-Mail, weil dich jemand zu einer Winscore-Gruppe eingeladen hat. Falls du das nicht erwartet hast, kannst du diese E-Mail ignorieren.",
     "inviteLabel": "Per E-Mail einladen",
     "inviteHint": "Schicke einen direkten Beitrittslink direkt in die Postfächer deiner Freunde.",
     "recipientsLabel": "E-Mail-Adressen der Empfänger",
@@ -1261,7 +1261,7 @@
     "browseMatches": "Spiele durchsuchen"
   },
   "email": {
-    "subject": "+{points} Pkt. in deinem World-Cup-Pool",
+    "subject": "+{points} Pkt. in deinem Winscore-Pool",
     "preheader": "Sieh, wo dich die neuesten Ergebnisse in der Rangliste platzieren.",
     "eyebrow": "Spielergebnisse sind da",
     "heading": "{name}, dein Stand hat sich gerade geändert",
@@ -1286,12 +1286,12 @@
     "ctaLabel": "Vollständige Rangliste ansehen",
     "footer": "Du erhältst diese E-Mail, weil ein von dir getipptes Spiel gerade beendet wurde. Die Punkte werden automatisch aktualisiert, sobald neue Ergebnisse eintreffen.",
     "magicLink": {
-      "preheader": "Dein sicherer Anmeldelink für den World-Cup-Pool.",
+      "preheader": "Dein sicherer Anmeldelink für deinen Winscore-Pool.",
       "eyebrow": "Sichere Anmeldung",
       "fallbackLabel": "Button funktioniert nicht? Kopiere diesen Link und füge ihn in deinen Browser ein:",
       "expiryNote": "Dieser Link ist 1 Stunde gültig und kann einmal verwendet werden.",
       "ignoreNote": "Wenn du das nicht angefordert hast, kannst du diese E-Mail ignorieren.",
-      "footer": "Du erhältst diese E-Mail, weil diese Adresse zur Anmeldung beim World-Cup-Pool eingegeben wurde.",
+      "footer": "Du erhältst diese E-Mail, weil diese Adresse zur Anmeldung bei Winscore eingegeben wurde.",
       "actions": {
         "magiclink": {
           "subject": "Dein Anmeldelink",
@@ -1332,7 +1332,7 @@
     "eyebrow": "Tägliches Quiz",
     "heading": "{name}, die heutige Frage ist da",
     "headingNoName": "Die heutige Frage ist da",
-    "intro": "Eine neue Quizfrage rund um die Weltmeisterschaft wartet auf dich. Beantworte sie noch vor Tagesende, um Punkte zu sammeln und deine Serie am Leben zu halten.",
+    "intro": "Eine neue Fußball-Quizfrage wartet auf dich. Beantworte sie noch vor Tagesende, um Punkte zu sammeln und deine Serie am Leben zu halten.",
     "streakLine": "Du bist auf einer Serie von {days} Tagen — lass sie dir nicht entgehen.",
     "ctaLabel": "Heutige Frage beantworten",
     "footer": "Du erhältst diese E-Mail, weil du bei Winscore teilnimmst. Das Quiz wird jeden Tag um Mitternacht UTC zurückgesetzt.",
@@ -1346,7 +1346,7 @@
     "headingNoName": "Willkommen im Pool!",
     "intro": "Alles bereit. Hier sind die ersten drei Dinge, die du tun solltest — jedes dauert weniger als eine Minute.",
     "quizTitle": "Beantworte das tägliche Quiz",
-    "quizBlurb": "Jeden Tag eine Quizfrage rund um die Weltmeisterschaft. Baue eine Serie auf und sammle Punkte.",
+    "quizBlurb": "Jeden Tag eine Fußball-Quizfrage. Baue eine Serie auf und sammle Punkte.",
     "quizCta": "Heutiges Quiz spielen",
     "groupsTitle": "Gründe oder tritt einer Gruppe bei",
     "groupsBlurb": "Tritt in deiner eigenen privaten Mini-Liga direkt gegen Freunde an.",
@@ -1370,7 +1370,7 @@
     "unsubscribeLabel": "Tägliche Tipp-Erinnerungen abbestellen"
   },
   "resultsDigest": {
-    "subject": "Deine tägliche WM-Pool-Zusammenfassung",
+    "subject": "Deine tägliche Winscore-Zusammenfassung",
     "preheader": "Die Top 5 von gestern, dein Rang und die größten Bewegungen.",
     "eyebrow": "Tägliche Ergebnisübersicht",
     "heading": "{name}, so hat sich der Pool bewegt",
@@ -1390,7 +1390,7 @@
     "droppedLabel": "Abgestiegen",
     "youLabel": "Du",
     "ctaLabel": "Gesamte Tabelle ansehen",
-    "footer": "Du erhältst diese tägliche Zusammenfassung deines WM-Pools. Du kannst sie in den E-Mail-Einstellungen deines Kontos deaktivieren."
+    "footer": "Du erhältst diese tägliche Zusammenfassung von Winscore. Du kannst sie in den E-Mail-Einstellungen deines Kontos deaktivieren."
   },
   "playoffScoreEmail": {
     "subject": "Playoff-Ergebnisse vom Samstag",
@@ -1413,8 +1413,8 @@
     "vsLabel": "vs",
     "matchCtaLabel": "Spiel ansehen",
     "shareCtaLabel": "Teilen",
-    "shareText": "Schau dir diesen Spiel-Recap-Comic an · WM-2026-Pool",
-    "footer": "Du erhältst diese Recap-Comic-Übersicht deines WM-Pools. Du kannst sie in den E-Mail-Einstellungen deines Kontos deaktivieren."
+    "shareText": "Schau dir diesen Spiel-Recap-Comic an · Winscore",
+    "footer": "Du erhältst diese Recap-Comic-Übersicht von Winscore. Du kannst sie in den E-Mail-Einstellungen deines Kontos deaktivieren."
   },
   "comebackEmail": {
     "subject": "Deine Tipps fehlen uns — der Pool läuft weiter",
@@ -1461,7 +1461,7 @@
     "pointsLabel": "Pkt.",
     "youLabel": "Du",
     "ctaLabel": "Zur Endtabelle",
-    "footer": "Du erhältst diese E-Mail, weil du beim WM-Pool mitgespielt und das Podium erreicht hast.",
+    "footer": "Du erhältst diese E-Mail, weil du bei Winscore mitgespielt und das Podium erreicht hast.",
     "madeWithLove": "Mit Liebe gemacht :) — pretxel",
     "comingSoon": "Bald verfügbar: La Liga Pool"
   },

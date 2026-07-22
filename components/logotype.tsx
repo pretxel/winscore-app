@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 type Size = "xs" | "md" | "xl";
 
 // Geometry constants tuned for the viewBox 0 0 240 64.
-// Full form: (pitch-green W tile) | INSCORE | · {edition?}
+// Full form: (blue W tile) | INSCORE | · {edition?}
 // Compact form (xs): the W tile alone, viewBox tightened to 0 0 64 64.
 
 const FULL_VIEWBOX = "0 0 240 64";
@@ -27,7 +27,7 @@ export function Logotype({
   className?: string;
   ariaLabel?: string;
   // Optional competition edition rendered as a small subtitle suffix after
-  // the wordmark (e.g. the World Cup "26"). Omitted when unset.
+  // the wordmark. Omitted when unset.
   edition?: string;
 }) {
   const compact = size === "xs";
@@ -46,7 +46,7 @@ export function Logotype({
       preserveAspectRatio="xMidYMid meet"
       className={cn("shrink-0 align-middle text-foreground", className)}
     >
-      {/* W tile: pitch-green rounded square with the brand initial */}
+      {/* W tile: blue rounded square with the brand initial */}
       <g>
         <rect
           x={compact ? 8 : 4}
