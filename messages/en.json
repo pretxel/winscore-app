@@ -769,7 +769,9 @@
     "joinInvalidBody": "This invite code doesn't match a group. Double-check the code and try again.",
     "errorInvalidName": "Group name must be 2–40 characters.",
     "errorInvalidCode": "That invite code isn't valid.",
-    "errorGeneric": "Something went wrong. Please try again."
+    "errorGeneric": "Something went wrong. Please try again.",
+    "leagueEyebrow": "League",
+    "viewFixtures": "View fixtures"
   },
   "groupInvite": {
     "subject": "{inviter} invited you to join {group}",

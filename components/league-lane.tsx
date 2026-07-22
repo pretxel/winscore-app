@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { ArrowRightIcon, PlusIcon, UsersIcon } from "lucide-react";
 import { LeagueRail } from "@/components/league-rail";
-import { Scoreline } from "@/components/scoreline";
-import { LocalTime } from "@/components/local-time";
-import { TeamFlag } from "@/components/team-flag";
+import { FixturesStrip } from "@/components/fixtures-strip";
 import { getTranslations } from "next-intl/server";
 import { localePath, type Locale } from "@/lib/i18n";
 import type { LeaguePools } from "@/lib/groups";
@@ -78,35 +76,9 @@ export function LeagueLane({
           </div>
 
           {fixtures.length > 0 ? (
-            <ul className="mt-4 flex gap-2 overflow-x-auto pb-1">
-              {fixtures.map((f) => (
-                <li
-                  key={f.id}
-                  className="border-border bg-background/50 flex shrink-0 flex-col gap-1.5 rounded-lg border px-3 py-2"
-                >
-                  <div className="flex items-center gap-2">
-                    <TeamFlag team={f.homeTeam} size="sm" className="h-3 w-4" />
-                    {f.status === "live" ? (
-                      <Scoreline home={f.homeScore} away={f.awayScore} />
-                    ) : (
-                      <span className="text-muted-foreground font-mono text-xs">
-                        <LocalTime iso={f.kickoffAt} format="time" />
-                      </span>
-                    )}
-                    <TeamFlag team={f.awayTeam} size="sm" className="h-3 w-4" />
-                  </div>
-                  {f.status === "live" ? (
-                    <span className="text-live inline-flex items-center gap-1 font-mono text-[10px] tracking-widest uppercase">
-                      <span
-                        aria-hidden
-                        className="bg-live size-1.5 animate-pulse rounded-full"
-                      />
-                      Live
-                    </span>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
+            <div className="mt-4">
+              <FixturesStrip fixtures={fixtures} />
+            </div>
           ) : null}
         </div>
       </div>

@@ -3,7 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getGroup, getGroupBoard } from "@/lib/groups";
+import { getLeagueForPool } from "@/lib/competition";
+import { getLeagueLaneFixtures } from "@/lib/home";
 import { LeaderboardTable } from "@/components/leaderboard-table";
+import { FixturesStrip } from "@/components/fixtures-strip";
 import {
   DeleteGroupButton,
   InviteByEmail,
@@ -13,7 +16,7 @@ import {
   RenameGroupForm,
 } from "./group-controls";
 import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
-import { ArrowLeftIcon, CrownIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, CrownIcon } from "lucide-react";
 
 export async function generateMetadata({
   params,
@@ -42,6 +45,12 @@ export default async function GroupDetailPage({
 
   const group = await getGroup(id);
   if (!group) notFound();
+
+  // Single-league focus: resolve the league this pool belongs to (even if it is
+  // no longer live) and its live/next fixtures, so members jump straight to
+  // predicting in the right league.
+  const league = await getLeagueForPool(id);
+  const fixtures = league ? await getLeagueLaneFixtures(league.slug) : [];
 
   const { rows } = await getGroupBoard(id);
   const myRow = group.currentUserId
@@ -73,6 +82,33 @@ export default async function GroupDetailPage({
           {t("memberCount", { count: group.members.length })}
         </p>
       </header>
+
+      {league ? (
+        <section className="border-border bg-card mb-8 rounded-xl border p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-muted-foreground font-mono text-[11px] tracking-[0.24em] uppercase">
+                {t("leagueEyebrow")}
+              </p>
+              <p className="font-heading text-foreground text-lg font-semibold tracking-tight">
+                {league.name}
+              </p>
+            </div>
+            <Link
+              href={localePath(locale, `/${league.slug}/matches`)}
+              className="border-border hover:bg-secondary inline-flex min-h-9 items-center gap-1 rounded-md border px-3 text-sm font-medium transition-colors"
+            >
+              {t("viewFixtures")}
+              <ArrowRightIcon className="size-4" />
+            </Link>
+          </div>
+          {fixtures.length > 0 ? (
+            <div className="mt-3">
+              <FixturesStrip fixtures={fixtures} />
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       <InviteShare
         code={group.joinCode}

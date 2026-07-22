@@ -769,7 +769,9 @@
     "joinInvalidBody": "Este código de invitación no coincide con ningún grupo. Verifica el código e inténtalo de nuevo.",
     "errorInvalidName": "El nombre del grupo debe tener entre 2 y 40 caracteres.",
     "errorInvalidCode": "Ese código de invitación no es válido.",
-    "errorGeneric": "Algo salió mal. Inténtalo de nuevo."
+    "errorGeneric": "Algo salió mal. Inténtalo de nuevo.",
+    "leagueEyebrow": "Liga",
+    "viewFixtures": "Ver partidos"
   },
   "groupInvite": {
     "subject": "{inviter} te invitó a unirte a {group}",

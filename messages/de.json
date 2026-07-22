@@ -769,7 +769,9 @@
     "joinInvalidBody": "Dieser Einladungscode passt zu keiner Gruppe. Überprüfe den Code und versuche es erneut.",
     "errorInvalidName": "Der Gruppenname muss zwischen 2 und 40 Zeichen lang sein.",
     "errorInvalidCode": "Dieser Einladungscode ist nicht gültig.",
-    "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+    "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "leagueEyebrow": "Liga",
+    "viewFixtures": "Spiele ansehen"
   },
   "groupInvite": {
     "subject": "{inviter} hat dich zu {group} eingeladen",
