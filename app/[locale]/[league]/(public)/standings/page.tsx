@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GroupStandingsTable } from "@/components/group-standings-table";
 import { LeagueStandingsTable } from "@/components/league-standings-table";
 import { getGroupTables, getLeagueTable } from "@/lib/group-table";
-import { getActiveCompetition } from "@/lib/competition";
+import { getLeagueFromContext } from "@/lib/competition";
 import { hasGroupStage, leagueStageKey } from "@/lib/competition-schema";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
 import { isLocale, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
@@ -11,20 +11,20 @@ import { isLocale, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; league: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
-  const comp = await getActiveCompetition();
+  const { locale, league } = await params;
+  const comp = await getLeagueFromContext({ slug: league });
   const namespace = comp && leagueStageKey(comp.format) ? "leagueStandings" : "groupStandings";
   const t = await getTranslations({ locale, namespace });
   return {
     title: t("title"),
     description: t("description"),
-    alternates: { canonical: "/standings" },
+    alternates: { canonical: `/${league}/standings` },
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
-      url: "/standings",
+      url: `/${league}/standings`,
       type: "website",
     },
   };
@@ -33,20 +33,20 @@ export async function generateMetadata({
 export default async function StandingsPage({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; league: string }>;
 }) {
-  const { locale: raw } = await params;
+  const { locale: raw, league } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
-  const competition = await getActiveCompetition();
+  const competition = await getLeagueFromContext({ slug: league });
   const hasGroups = competition ? hasGroupStage(competition.format) : false;
   const hasLeague = competition ? leagueStageKey(competition.format) !== null : false;
 
   // Group format: render group standings grid
   if (hasGroups) {
     const t = await getTranslations("groupStandings");
-    const { groups, matches } = await getGroupTables();
+    const { groups, matches } = await getGroupTables(competition);
 
     maybeScheduleOpportunisticSync(matches);
 
@@ -91,7 +91,7 @@ export default async function StandingsPage({
   // League format: render single league table
   if (hasLeague) {
     const t = await getTranslations("leagueStandings");
-    const result = await getLeagueTable();
+    const result = await getLeagueTable(competition);
     const matches = result?.matches ?? [];
 
     maybeScheduleOpportunisticSync(matches);

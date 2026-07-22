@@ -14,6 +14,18 @@ const nextConfig: NextConfig = {
     "/api/og/rank": ["./assets/og/*.ttf"],
     "/api/og/pick": ["./assets/og/*.ttf"],
   },
+  // Legacy single-competition paths (pre-`[league]` routing) 308-redirect to the
+  // league catalog. The locale is constrained to the supported set, and every
+  // source is exactly two path segments — the new `/[locale]/[league]/…` routes
+  // carry an extra segment, so they never collide with these.
+  async redirects() {
+    const legacy = ["matches", "matches/:matchId", "leaderboard", "standings", "bracket", "my-picks"];
+    return legacy.map((path) => ({
+      source: `/:locale(en|es|fr|de)/${path}`,
+      destination: "/:locale/catalog",
+      permanent: true,
+    }));
+  },
 };
 
 export default withNextIntl(nextConfig);

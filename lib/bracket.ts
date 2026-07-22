@@ -1,6 +1,6 @@
 import "server-only";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getActiveCompetition } from "@/lib/competition";
+import { getActiveCompetition, type ResolvedCompetition } from "@/lib/competition";
 import {
   buildBracket,
   type Bracket,
@@ -12,13 +12,16 @@ export type BracketResult = Bracket & {
   matches: BracketMatchInput[];
 };
 
-// Build the projected knockout bracket for the active competition: group +
-// knockout fixtures folded through the pure resolver. Never throws — a missing
-// competition or no knockout fixtures yields an empty, `hasKnockout: false`
-// result.
-export async function getBracket(): Promise<BracketResult> {
-  const competition = await getActiveCompetition();
-  if (!competition) return { rounds: [], hasKnockout: false, matches: [] };
+// Build the projected knockout bracket for a competition: group + knockout
+// fixtures folded through the pure resolver. Pass the league resolved from route
+// context; omit to fall back to the active competition (transition behavior).
+// Never throws — a missing competition or no knockout fixtures yields an empty,
+// `hasKnockout: false` result.
+export async function getBracket(
+  competition?: ResolvedCompetition | null,
+): Promise<BracketResult> {
+  const comp = competition ?? (await getActiveCompetition());
+  if (!comp) return { rounds: [], hasKnockout: false, matches: [] };
 
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
@@ -26,7 +29,7 @@ export async function getBracket(): Promise<BracketResult> {
     .select(
       "id, home_team, away_team, group_code, home_score, away_score, status, kickoff_at, stage, venue",
     )
-    .eq("competition_id", competition.id);
+    .eq("competition_id", comp.id);
 
   const matches = (data ?? []) as BracketMatchInput[];
   return { ...buildBracket(matches), matches };

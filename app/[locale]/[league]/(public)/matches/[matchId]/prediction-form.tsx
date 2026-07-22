@@ -17,6 +17,7 @@ const MAX_GOALS = 20;
 
 export function PredictionForm({
   matchId,
+  league,
   homeTeam,
   awayTeam,
   kickoffAt,
@@ -26,6 +27,7 @@ export function PredictionForm({
   shareBaseUrl,
 }: {
   matchId: string;
+  league: string;
   homeTeam: string;
   awayTeam: string;
   kickoffAt: string;
@@ -74,6 +76,7 @@ export function PredictionForm({
     startTransition(async () => {
       const result = await submitPrediction({
         matchId,
+        league,
         homeGoals: home,
         awayGoals: away,
       });

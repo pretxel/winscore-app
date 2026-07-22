@@ -13,7 +13,7 @@ import { PaginationControls } from "@/components/pagination-controls";
 import { simulateAllGroups } from "@/lib/group-standings";
 import { getStandingSummary } from "@/lib/standing-summary";
 import { getGroupTables } from "@/lib/group-table";
-import { getActiveCompetition } from "@/lib/competition";
+import { getLeagueFromContext } from "@/lib/competition";
 import { groupStageKey } from "@/lib/competition-schema";
 import { paginate, parsePageParam } from "@/lib/pagination";
 import { sortPicksByKickoffDesc } from "@/lib/picks-order";
@@ -41,24 +41,26 @@ export default async function MyPicksPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; league: string }>;
   searchParams: Promise<{ page?: string | string[] }>;
 }) {
-  const { locale: raw } = await params;
+  const { locale: raw, league } = await params;
   const { page: pageParam } = await searchParams;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
   const t = await getTranslations("myPicks");
 
-  const supabase = await createServerSupabaseClient();
+  // League-scoped client: the user's picks/scores below resolve against this
+  // route's league via the x-league header.
+  const supabase = await createServerSupabaseClient(league);
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user)
     redirect(
-      `${localePath(locale, "/sign-in")}?next=${encodeURIComponent(localePath(locale, "/my-picks"))}`,
+      `${localePath(locale, "/sign-in")}?next=${encodeURIComponent(localePath(locale, `/${league}/my-picks`))}`,
     );
 
   const { data: picks, error } = await supabase
@@ -78,7 +80,7 @@ export default async function MyPicksPage({
           <p className="text-foreground text-base font-semibold">{t("loadFailedTitle")}</p>
           <p className="text-muted-foreground mt-2 text-sm">{t("loadFailedBody")}</p>
           <a
-            href={localePath(locale, "/my-picks")}
+            href={localePath(locale, `/${league}/my-picks`)}
             className="bg-primary text-primary-foreground focus-visible:ring-ring focus-visible:ring-offset-background mt-5 inline-flex min-h-11 items-center justify-center rounded-lg px-5 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             {t("loadFailedRetry")}
@@ -126,7 +128,7 @@ export default async function MyPicksPage({
   // (only predicted matches contribute; unpredicted groups show empty). Real
   // results are never mixed in. The group-stage key and scope come from the
   // active competition's format; competitions with no group stage skip this.
-  const activeCompetition = await getActiveCompetition();
+  const activeCompetition = await getLeagueFromContext({ slug: league });
   const groupKey = activeCompetition
     ? groupStageKey(activeCompetition.format)
     : null;
@@ -152,7 +154,7 @@ export default async function MyPicksPage({
   // Real, results-derived group tables for the side-by-side split. Read-only;
   // built from actual `final` results. `hasGroupStage` is false when no group
   // stage is active, in which case the split is hidden below.
-  const realGroups = await getGroupTables();
+  const realGroups = await getGroupTables(activeCompetition);
 
   // One shared, read-only standing summary feeds the cards here and on the
   // signed-in landing. Never recomputes or writes competitive scoring.
@@ -225,7 +227,7 @@ export default async function MyPicksPage({
           </p>
           <p className="mx-auto mt-2 max-w-sm text-sm">{t("emptyBody")}</p>
           <Link
-            href={localePath(locale, "/matches")}
+            href={localePath(locale, `/${league}/matches`)}
             className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-foreground underline-offset-4 hover:text-pitch hover:underline"
           >
             {t("browseMatches")} <ArrowRightIcon className="size-3.5" />
@@ -325,7 +327,7 @@ export default async function MyPicksPage({
                   ) : null}
                   {!locked ? (
                     <Link
-                      href={localePath(locale, `/matches/${m.id}`)}
+                      href={localePath(locale, `/${league}/matches/${m.id}`)}
                       className="inline-flex items-center gap-1 text-xs font-medium text-foreground underline-offset-4 hover:text-pitch hover:underline"
                     >
                       <PencilLineIcon className="size-3.5" />
@@ -340,7 +342,7 @@ export default async function MyPicksPage({
         <PaginationControls
           page={pageInfo.page}
           totalPages={pageInfo.totalPages}
-          basePath={localePath(locale, "/my-picks")}
+          basePath={localePath(locale, `/${league}/my-picks`)}
           navLabel={t("paginationLabel")}
           positionLabel={t("pagePosition", {
             current: pageInfo.page,

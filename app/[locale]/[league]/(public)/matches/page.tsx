@@ -34,7 +34,7 @@ import { persistTimeZoneForCurrentUser, readTimeZoneCookie } from "@/lib/timezon
 import { TimezoneSync } from "@/components/timezone-sync";
 import { MatchRoundFilter } from "@/components/match-round-filter";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
-import { getActiveCompetition } from "@/lib/competition";
+import { getLeagueFromContext } from "@/lib/competition";
 import {
   getStageLabel,
   revealedKnockoutStageKeys,
@@ -51,18 +51,18 @@ const ROW_STAGGER_CAP_MS = 800;
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; league: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale, league } = await params;
   const t = await getTranslations({ locale, namespace: "matches" });
   return {
     title: t("title"),
     description: t("description"),
-    alternates: { canonical: "/matches" },
+    alternates: { canonical: `/${league}/matches` },
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
-      url: "/matches",
+      url: `/${league}/matches`,
       type: "website",
     },
   };
@@ -81,7 +81,7 @@ export default async function MatchesPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; league: string }>;
   searchParams: Promise<{
     team?: string | string[];
     status?: string | string[];
@@ -89,7 +89,7 @@ export default async function MatchesPage({
     round?: string | string[];
   }>;
 }) {
-  const { locale: raw } = await params;
+  const { locale: raw, league } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
@@ -101,10 +101,12 @@ export default async function MatchesPage({
   } = await searchParams;
 
   const t = await getTranslations("matches");
-  const activeCompetition = await getActiveCompetition();
+  const activeCompetition = await getLeagueFromContext({ slug: league });
   const format = activeCompetition?.format ?? null;
 
-  const supabase = await createServerSupabaseClient();
+  // League-scoped client: the x-league header resolves active_competition_id()
+  // so every competition-scoped read below targets this route's league.
+  const supabase = await createServerSupabaseClient(league);
   const { data: matches, error } = await supabase
     .from("matches")
     .select("*")
@@ -123,7 +125,7 @@ export default async function MatchesPage({
           <h1 className="text-foreground text-lg font-semibold">{t("loadFailedTitle")}</h1>
           <p className="text-muted-foreground mt-2 text-sm">{t("loadFailedBody")}</p>
           <a
-            href={localePath(locale, "/matches")}
+            href={localePath(locale, `/${league}/matches`)}
             className="bg-primary text-primary-foreground focus-visible:ring-ring focus-visible:ring-offset-background mt-5 inline-flex min-h-11 items-center justify-center rounded-lg px-5 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             {t("loadFailedRetry")}
@@ -344,7 +346,7 @@ export default async function MatchesPage({
                 {t("firstPick.title")}
               </p>
               <Link
-                href={localePath(locale, `/matches/${firstPickMatch.id}`)}
+                href={localePath(locale, `/${league}/matches/${firstPickMatch.id}`)}
                 className="border-border bg-card font-heading text-foreground hover:bg-muted/50 focus-visible:ring-ring mt-4 inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-medium tracking-tight transition-colors focus-visible:ring-2 focus-visible:outline-none"
               >
                 {t("firstPick.cta", {
@@ -401,6 +403,7 @@ export default async function MatchesPage({
                         match={m}
                         uiStatus={uiStatusFor(m)}
                         locale={locale}
+                        league={league}
                         tStage={format ? getStageLabel(format, m.stage, locale) : m.stage}
                         tKickoff={t("rowKickoff")}
                         tFinal={t("rowFinal")}
@@ -464,6 +467,7 @@ function MatchRowCard({
   match,
   uiStatus,
   locale,
+  league,
   tStage,
   tKickoff,
   tFinal,
@@ -479,6 +483,7 @@ function MatchRowCard({
   match: MatchRow;
   uiStatus: MatchUiStatus;
   locale: Locale;
+  league: string;
   tStage: string;
   tKickoff: string;
   tFinal: string;
@@ -509,7 +514,7 @@ function MatchRowCard({
 
   return (
     <Link
-      href={localePath(locale, `/matches/${match.id}`)}
+      href={localePath(locale, `/${league}/matches/${match.id}`)}
       aria-label={rowAriaLabel}
       className={cn(
         "group/match hover:bg-muted/50 focus-visible:ring-ring focus-visible:ring-inset relative flex items-center gap-3 px-4 py-3.5 transition-colors focus-visible:ring-2 focus-visible:outline-none sm:gap-4 sm:px-5",

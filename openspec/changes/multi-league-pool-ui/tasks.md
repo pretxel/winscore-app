@@ -16,14 +16,14 @@ cutover behind `pnpm typecheck`.
 - [x] 2.1 Migration: redefine `active_competition_id()` to resolve the `x-league` request header (`current_setting('request.headers', true)::json ->> 'x-league'` → league id) with a single-active fallback. Scopes every existing competition-scoped view/RLS/function to the request league unchanged. **Needs live-DB smoke test (RLS).**
 - [x] 2.2 `createServerSupabaseClient(leagueSlug?)`: inject `global.headers['x-league']` when a league is in context.
 - [x] 2.3 Update the 8 cron routes to iterate `listLiveLeagues()` and dispatch per league (create a per-league client so the header scopes each run); add a per-league count to each cron summary log.
-- [ ] 2.4 Retarget page/UI + `lib` helper callers (`bracket.ts`, `group-table.ts`, `news-sync.ts`, pages) to resolve league from route/pool and pass the slug to the client; `pnpm typecheck` enumerates the sites.
+- [x] 2.4 Retarget page/UI + `lib` helper callers (`bracket.ts`, `group-table.ts`, `news-sync.ts`, pages) to resolve league from route/pool and pass the slug to the client; `pnpm typecheck` enumerates the sites. (Admin / auth-email / live-matches API intentionally stay on the active competition — out of the `[league]` page set.)
 
 ## 3. Routing — `[league]` segment
 
-- [ ] 3.1 Add the `[league]` route segment (inside `[locale]`); move `matches`, `matches/[matchId]`, `leaderboard`, `my-picks`, `standings`, `bracket` under `/[locale]/[league]/…`.
-- [ ] 3.2 Resolve the league per route via `getLeagueFromContext({ slug })`; unknown/non-live slug → redirect to the catalog.
-- [ ] 3.3 308-redirect legacy paths (`/matches`, `/leaderboard`, …) to the league catalog.
-- [ ] 3.4 Per-league `generateMetadata`: canonical + edition subtitle from the resolved league.
+- [x] 3.1 Add the `[league]` route segment (inside `[locale]`); move `matches`, `matches/[matchId]`, `leaderboard`, `my-picks`, `standings`, `bracket` under `/[locale]/[league]/…`. (Auth for `my-picks` preserved via `[league]/(app)/layout.tsx`.)
+- [x] 3.2 Resolve the league per route via `getLeagueFromContext({ slug })` (in `[league]/layout.tsx` + each page); unknown/non-live slug → redirect to the catalog.
+- [x] 3.3 308-redirect legacy paths (`/matches`, `/leaderboard`, …) to the league catalog (`next.config.ts` `redirects()`, locale-constrained).
+- [ ] 3.4 Per-league `generateMetadata`: canonical done (`/${league}/…`); **edition subtitle still pending**.
 
 ## 4. Screens
 

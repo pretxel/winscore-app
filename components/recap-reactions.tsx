@@ -15,7 +15,7 @@ import {
   REACTION_TYPES,
   type ReactionType,
 } from "@/lib/recap-reactions";
-import { toggleRecapReaction } from "@/app/[locale]/(public)/matches/[matchId]/actions";
+import { toggleRecapReaction } from "@/app/[locale]/[league]/(public)/matches/[matchId]/actions";
 
 // Collapse a burst of reaction writes (others reacting) into a single counts
 // re-fetch, mirroring components/leaderboard-live.tsx.

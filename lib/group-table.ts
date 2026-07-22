@@ -1,6 +1,6 @@
 import "server-only";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getActiveCompetition } from "@/lib/competition";
+import { getActiveCompetition, type ResolvedCompetition } from "@/lib/competition";
 import { getStageConfig, groupStageKey, leagueStageKey } from "@/lib/competition-schema";
 import {
   buildGroupTables,
@@ -26,10 +26,12 @@ export type GroupTablesResult = {
 // group-stage matches and folds their actual results into the shared standings
 // engine. Never throws — a missing competition or group stage yields an empty,
 // `hasGroupStage: false` result.
-export async function getGroupTables(): Promise<GroupTablesResult> {
-  const competition = await getActiveCompetition();
-  const groupKey = competition ? groupStageKey(competition.format) : null;
-  if (!competition || !groupKey) {
+export async function getGroupTables(
+  competition?: ResolvedCompetition | null,
+): Promise<GroupTablesResult> {
+  const comp = competition ?? (await getActiveCompetition());
+  const groupKey = comp ? groupStageKey(comp.format) : null;
+  if (!comp || !groupKey) {
     return { groups: [], matches: [], hasGroupStage: false };
   }
 
@@ -39,7 +41,7 @@ export async function getGroupTables(): Promise<GroupTablesResult> {
     .select(
       "id, home_team, away_team, group_code, home_score, away_score, status, kickoff_at",
     )
-    .eq("competition_id", competition.id)
+    .eq("competition_id", comp.id)
     .eq("stage", groupKey);
 
   const matches = (data ?? []) as GroupTableMatch[];
@@ -49,10 +51,12 @@ export async function getGroupTables(): Promise<GroupTablesResult> {
 // Build the real league table for the active competition. Reads only the
 // league-stage matches and folds their actual results into the shared standings
 // engine. Never throws — a missing competition or league stage yields null.
-export async function getLeagueTable(): Promise<{ group: SimulatedGroup; matches: GroupTableMatch[] } | null> {
-  const competition = await getActiveCompetition();
-  const leagueKey = competition ? leagueStageKey(competition.format) : null;
-  if (!competition || !leagueKey) return null;
+export async function getLeagueTable(
+  competition?: ResolvedCompetition | null,
+): Promise<{ group: SimulatedGroup; matches: GroupTableMatch[] } | null> {
+  const comp = competition ?? (await getActiveCompetition());
+  const leagueKey = comp ? leagueStageKey(comp.format) : null;
+  if (!comp || !leagueKey) return null;
 
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
@@ -60,10 +64,10 @@ export async function getLeagueTable(): Promise<{ group: SimulatedGroup; matches
     .select(
       "id, home_team, away_team, group_code, home_score, away_score, status, kickoff_at",
     )
-    .eq("competition_id", competition.id)
+    .eq("competition_id", comp.id)
     .eq("stage", leagueKey);
 
-  const stageConfig = getStageConfig(competition.format, leagueKey);
+  const stageConfig = getStageConfig(comp.format, leagueKey);
   const tiebreaker: Tiebreaker = stageConfig?.tiebreaker ?? "gd";
 
   const matches = (data ?? []) as GroupTableMatch[];

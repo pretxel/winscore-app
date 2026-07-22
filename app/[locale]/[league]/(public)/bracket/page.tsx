@@ -4,7 +4,7 @@ import { BracketLiveRefresh } from "@/components/bracket-live-refresh";
 import { BracketView } from "@/components/bracket-view";
 import { getBracket } from "@/lib/bracket";
 import { KNOCKOUT_ORDER } from "@/lib/bracket-core";
-import { getActiveCompetition } from "@/lib/competition";
+import { getLeagueFromContext } from "@/lib/competition";
 import { getStageLabel } from "@/lib/competition-schema";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
 import { isLocale, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
@@ -12,18 +12,18 @@ import { isLocale, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; league: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale, league } = await params;
   const t = await getTranslations({ locale, namespace: "bracket" });
   return {
     title: t("title"),
     description: t("description"),
-    alternates: { canonical: "/bracket" },
+    alternates: { canonical: `/${league}/bracket` },
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
-      url: "/bracket",
+      url: `/${league}/bracket`,
       type: "website",
     },
   };
@@ -32,17 +32,15 @@ export async function generateMetadata({
 export default async function BracketPage({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; league: string }>;
 }) {
-  const { locale: raw } = await params;
+  const { locale: raw, league } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
   const t = await getTranslations("bracket");
-  const [{ rounds, matches, hasKnockout }, competition] = await Promise.all([
-    getBracket(),
-    getActiveCompetition(),
-  ]);
+  const competition = await getLeagueFromContext({ slug: league });
+  const { rounds, matches, hasKnockout } = await getBracket(competition);
 
   // Cron-not-firing safety net: refresh overdue results after the response.
   maybeScheduleOpportunisticSync(matches);

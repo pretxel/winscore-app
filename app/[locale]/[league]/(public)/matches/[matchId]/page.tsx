@@ -12,8 +12,8 @@ import { StageIcon } from "@/components/stage-icon";
 import { VenueImage } from "@/components/venue-image";
 import { isConfirmedMatch, lockReason } from "@/lib/match-utils";
 import { isCurrentUserAdmin } from "@/lib/admin/current-user";
-import { getActiveStageLabel, getActiveCompetition } from "@/lib/competition";
-import { groupStageKey } from "@/lib/competition-schema";
+import { getLeagueFromContext } from "@/lib/competition";
+import { getStageLabel, groupStageKey } from "@/lib/competition-schema";
 import { ArrowLeftIcon, LockIcon, MapPinIcon } from "lucide-react";
 import { PredictionForm } from "./prediction-form";
 import { LiveEventsFeed, type LiveFeedLabels } from "@/components/live-events-feed";
@@ -47,11 +47,11 @@ function recapImagePublicUrl(path: string): string {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ locale: string; matchId: string }>;
+  params: Promise<{ locale: string; league: string; matchId: string }>;
 }): Promise<Metadata> {
-  const { locale, matchId } = await params;
+  const { locale, league, matchId } = await params;
   const t = await getTranslations({ locale, namespace: "matchDetail" });
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient(league);
   const { data: match } = await supabase
     .from("matches")
     .select("home_team, away_team, kickoff_at, venue, stage")
@@ -85,7 +85,7 @@ export async function generateMetadata({
         away: match.away_team,
         kickoff: kickoffLabel,
       });
-  const canonical = `/matches/${matchId}`;
+  const canonical = `/${league}/matches/${matchId}`;
 
   // Preview the active recap's comic when one has been rendered (active-only RLS
   // scopes this row; nothing for matches without a completed render).
@@ -124,9 +124,9 @@ export async function generateMetadata({
 export default async function MatchDetailPage({
   params,
 }: {
-  params: Promise<{ locale: string; matchId: string }>;
+  params: Promise<{ locale: string; league: string; matchId: string }>;
 }) {
-  const { locale: raw, matchId } = await params;
+  const { locale: raw, league, matchId } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
@@ -136,7 +136,7 @@ export default async function MatchDetailPage({
   const tShare = await getTranslations("sharePick");
   const tShareRecap = await getTranslations("shareRecap");
 
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient(league);
 
   const { data: match, error } = await supabase
     .from("matches")
@@ -168,7 +168,7 @@ export default async function MatchDetailPage({
   // the viewer's own picks across the group's fixtures (real results are never
   // folded in). Only signed-in, group-stage matches get the section.
   let groupSim: GroupTeamRow[] | null = null;
-  const activeComp = await getActiveCompetition();
+  const activeComp = await getLeagueFromContext({ slug: league });
   const groupKey = activeComp ? groupStageKey(activeComp.format) : null;
   if (user && groupKey && match.stage === groupKey && match.group_code) {
     const { data: fixtures } = await supabase
@@ -222,7 +222,9 @@ export default async function MatchDetailPage({
     match.home_score != null &&
     match.away_score != null;
 
-  const stageLabelLocalized = await getActiveStageLabel(match.stage, locale);
+  const stageLabelLocalized = activeComp
+    ? getStageLabel(activeComp.format, match.stage, locale)
+    : match.stage;
 
   // Live feed: mounted for non-terminal matches, seeded with the current
   // score/status + any already-ingested events. Final/cancelled matches render
@@ -357,7 +359,7 @@ export default async function MatchDetailPage({
       />
 
       <Link
-        href={localePath(locale, "/matches")}
+        href={localePath(locale, `/${league}/matches`)}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeftIcon className="size-3.5" />
@@ -518,7 +520,7 @@ export default async function MatchDetailPage({
               </p>
               <ShareButtons
                 context="recap"
-                shareUrl={`${env.siteUrl}${localePath(locale, `/matches/${match.id}`)}`}
+                shareUrl={`${env.siteUrl}${localePath(locale, `/${league}/matches/${match.id}`)}`}
                 shareText={tShareRecap("shareText", {
                   home: match.home_team,
                   away: match.away_team,
@@ -580,7 +582,7 @@ export default async function MatchDetailPage({
             </p>
             <div>
               <Link
-                href={`${localePath(locale, "/sign-in")}?next=${encodeURIComponent(localePath(locale, `/matches/${match.id}`))}`}
+                href={`${localePath(locale, "/sign-in")}?next=${encodeURIComponent(localePath(locale, `/${league}/matches/${match.id}`))}`}
                 className={buttonVariants({
                   size: "lg",
                   className:
@@ -634,6 +636,7 @@ export default async function MatchDetailPage({
         ) : (
           <PredictionForm
             matchId={match.id}
+            league={league}
             homeTeam={match.home_team}
             awayTeam={match.away_team}
             kickoffAt={match.kickoff_at}
@@ -677,7 +680,7 @@ export default async function MatchDetailPage({
               {tGroupSim("matchEyebrow")}
             </p>
             <Link
-              href={localePath(locale, "/my-picks")}
+              href={localePath(locale, `/${league}/my-picks`)}
               className="font-mono text-[11px] uppercase tracking-[0.16em] text-foreground underline-offset-4 hover:text-pitch hover:underline"
             >
               {tGroupSim("seeAllGroups")} →

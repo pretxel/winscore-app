@@ -14,6 +14,10 @@ import {
 
 const schema = z.object({
   matchId: z.string().uuid(),
+  // The route league slug — scopes the DB client (x-league header) so the match
+  // lookup + prediction upsert resolve against this league, and drives the
+  // path revalidation below.
+  league: z.string().min(1),
   homeGoals: z.number().int().min(0).max(20),
   awayGoals: z.number().int().min(0).max(20),
 });
@@ -26,9 +30,9 @@ export async function submitPrediction(input: unknown): Promise<SubmitResult> {
   if (!parsed.success) {
     return { ok: false, error: t("errorInvalidScores") };
   }
-  const { matchId, homeGoals, awayGoals } = parsed.data;
+  const { matchId, league, homeGoals, awayGoals } = parsed.data;
 
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient(league);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -92,12 +96,12 @@ export async function submitPrediction(input: unknown): Promise<SubmitResult> {
     return { ok: false, error: error.message };
   }
 
-  revalidatePath(`/en/matches/${matchId}`);
-  revalidatePath(`/es/matches/${matchId}`);
-  revalidatePath(`/fr/matches/${matchId}`);
-  revalidatePath("/en/my-picks");
-  revalidatePath("/es/my-picks");
-  revalidatePath("/fr/my-picks");
+  revalidatePath(`/en/${league}/matches/${matchId}`);
+  revalidatePath(`/es/${league}/matches/${matchId}`);
+  revalidatePath(`/fr/${league}/matches/${matchId}`);
+  revalidatePath(`/en/${league}/my-picks`);
+  revalidatePath(`/es/${league}/my-picks`);
+  revalidatePath(`/fr/${league}/my-picks`);
   return { ok: true };
 }
 

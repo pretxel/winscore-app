@@ -12,7 +12,7 @@ import type { LeaderboardRow } from "@/lib/db";
 import { ArrowRightIcon } from "lucide-react";
 import { buildRankSharePath } from "@/lib/share";
 import { env } from "@/lib/env";
-import { getActiveCompetition } from "@/lib/competition";
+import { getLeagueFromContext } from "@/lib/competition";
 import { getStageLabel, sortedStages } from "@/lib/competition-schema";
 import {
   currentWeekBoundsUtc,
@@ -25,18 +25,18 @@ import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; league: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale, league } = await params;
   const t = await getTranslations({ locale, namespace: "leaderboard" });
   return {
     title: t("title"),
     description: t("description"),
-    alternates: { canonical: "/leaderboard" },
+    alternates: { canonical: `/${league}/leaderboard` },
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
-      url: "/leaderboard",
+      url: `/${league}/leaderboard`,
       type: "website",
     },
   };
@@ -46,10 +46,10 @@ export default async function LeaderboardPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; league: string }>;
   searchParams: Promise<{ segment?: string | string[]; stage?: string | string[] }>;
 }) {
-  const { locale: raw } = await params;
+  const { locale: raw, league } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
@@ -61,7 +61,7 @@ export default async function LeaderboardPage({
 
   // Resolve the active competition's stages so `?stage=` is validated against
   // the real keys (drop unknowns), mirroring how /matches reconciles params.
-  const activeCompetition = await getActiveCompetition();
+  const activeCompetition = await getLeagueFromContext({ slug: league });
   const format = activeCompetition?.format ?? null;
   const stageKeys = format ? sortedStages(format).map((s) => s.key) : [];
   const stageOptions = format
@@ -77,7 +77,7 @@ export default async function LeaderboardPage({
   const activeStage = reconcileStageParam(stageParam, stageKeys);
   const segment = resolveSegment(requestedSegment, activeStage);
 
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient(league);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -169,7 +169,7 @@ export default async function LeaderboardPage({
       </header>
 
       <LeaderboardSegmentSwitcher
-        basePath={localePath(locale, "/leaderboard")}
+        basePath={localePath(locale, `/${league}/leaderboard`)}
         activeSegment={segment}
         activeStage={activeStage}
         stages={stageOptions}
@@ -189,7 +189,7 @@ export default async function LeaderboardPage({
           <p className="text-foreground text-base font-semibold">{t("loadFailedTitle")}</p>
           <p className="text-muted-foreground mt-2 text-sm">{t("loadFailedBody")}</p>
           <a
-            href={localePath(locale, "/leaderboard")}
+            href={localePath(locale, `/${league}/leaderboard`)}
             className="bg-primary text-primary-foreground focus-visible:ring-ring focus-visible:ring-offset-background mt-5 inline-flex min-h-11 items-center justify-center rounded-lg px-5 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             {t("loadFailedRetry")}
@@ -202,7 +202,7 @@ export default async function LeaderboardPage({
           </p>
           <p className="text-muted-foreground mx-auto mt-2 max-w-sm text-sm">{t("emptyBody")}</p>
           <Link
-            href={localePath(locale, "/matches")}
+            href={localePath(locale, `/${league}/matches`)}
             className="text-foreground hover:text-pitch mt-4 inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 hover:underline"
           >
             {t("browseMatches")} <ArrowRightIcon className="size-3.5" />
@@ -272,7 +272,7 @@ export default async function LeaderboardPage({
             <p className="text-muted-foreground mt-1">{t("notYetBody")}</p>
           </div>
           <Link
-            href={localePath(locale, "/matches")}
+            href={localePath(locale, `/${league}/matches`)}
             className="text-foreground hover:text-pitch inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 hover:underline"
           >
             {t("browseMatches")} <ArrowRightIcon className="size-3.5" />
