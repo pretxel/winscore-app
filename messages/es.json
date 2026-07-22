@@ -11,8 +11,8 @@
     "tryAgain": "Reintentar"
   },
   "siteMeta": {
-    "title": "Winscore — Mundial 2026: Pronósticos diarios y clasificación en vivo",
-    "description": "Pronostica cada partido del Mundial 2026. Envía tus marcadores antes del inicio, gana puntos con los resultados y sube en la clasificación diaria y general."
+    "title": "Winscore — Pronósticos diarios y clasificación en vivo",
+    "description": "Pronostica cada partido. Envía tus marcadores antes del inicio, gana puntos con los resultados y sube en la clasificación diaria y general."
   },
   "nav": {
     "leagues": "Ligas",
@@ -97,13 +97,13 @@
     "winner": "Ganador"
   },
   "home": {
-    "title": "Winscore — Mundial 2026: Pronósticos y Clasificación",
-    "description": "Pronostica cada partido del Mundial 2026. Envía marcadores antes del inicio, gana puntos con los resultados y sube en una única clasificación global.",
-    "eyebrow": "FIFA Mundial 2026",
-    "hostsLine": "EE. UU. · Canadá · México",
+    "title": "Winscore — Pronósticos de fútbol y clasificaciones en vivo",
+    "description": "Pronostica partidos de ligas activas. Envía marcadores antes del inicio, compite en pools privados y sube en clasificaciones en vivo.",
+    "eyebrow": "Pronósticos diarios de fútbol",
+    "hostsLine": "Cada liga · Cada jornada",
     "headlineLine1": "Acierta el marcador.",
     "headlineLine2": "Escala la tabla.",
-    "lede": "Un único pool global. Envía un marcador exacto para cada partido antes del inicio y tu posición se mueve al sonar el silbato final. Sin configuración, sin cuotas, sin excusas.",
+    "lede": "Pronostica marcadores exactos en las ligas que sigues. Únete a pools privados, edita hasta el inicio y mira cómo cada resultado transforma la tabla. Sin configuración, sin cuotas, sin excusas.",
     "ctaSignIn": "Inicia sesión para jugar",
     "ctaBrowse": "Ver partidos",
     "ctaScoring": "Cómo se puntúa",
@@ -152,10 +152,6 @@
     "liveVs": "vs",
     "liveViewAll": "Ver todos los partidos",
     "liveKickoffSoon": "Comienza ya",
-    "recapGalleryEyebrow": "04 · Cómics del partido",
-    "recapGalleryHeadline": "Partidos recientes, dibujados.",
-    "recapImageAlt": "Resumen cómic de {home} vs {away}",
-    "recapReactionCount": "{count, plural, one {# reacción} other {# reacciones}}",
     "featuresEyebrow": "03 · Más para jugar",
     "featuresHeadline": "Más allá del cuadro.",
     "groupsTitle": "Grupos de amigos",

@@ -1,4 +1,3 @@
-import { TeamFlag } from "@/components/team-flag";
 import { cn } from "@/lib/utils";
 
 type Match = { home: string; away: string; score?: [number, number] };
@@ -102,7 +101,6 @@ function Row({
         winner ? "font-semibold text-flag" : "text-pitch-foreground/85",
       )}
     >
-      <TeamFlag team={team} size="sm" className="h-2.5 w-3.5 rounded-[1px]" />
       <span className="min-w-0 flex-1 truncate font-mono">{team}</span>
       {typeof score === "number" ? (
         <span className="font-mono tabular-nums">{score}</span>

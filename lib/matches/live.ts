@@ -32,7 +32,7 @@ export function isLiveNow(m: { status: string; kickoff_at: string }): boolean {
 
 // Live fixtures (ordered by kickoff) plus the soonest upcoming scheduled fixture
 // as a fallback, scoped to the active competition. Placeholder knockout rows
-// (no resolvable flag, e.g. "Winner R32-1") are excluded so neither the live
+// (e.g. "Winner R32-1") are excluded so neither the live
 // list nor the next-up card reads like a bracket diagram. Never throws — a
 // failure degrades to an empty payload.
 export async function getLiveAndNextUp(

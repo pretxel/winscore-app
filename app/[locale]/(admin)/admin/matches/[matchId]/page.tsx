@@ -10,7 +10,6 @@ import {
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { env } from "@/lib/env";
 import { LocalTime } from "@/components/local-time";
-import { TeamFlag } from "@/components/team-flag";
 import { VenueImage } from "@/components/venue-image";
 import { MatchStateBadge } from "@/components/match-state-badge";
 import { Badge } from "@/components/ui/badge";
@@ -840,11 +839,9 @@ function FixtureTeam({
       <div
         className={`mt-1 flex items-center gap-2 ${align === "end" ? "justify-end" : ""}`}
       >
-        {align === "end" ? null : <TeamFlag team={team} size="md" />}
         <span className="min-w-0 truncate font-heading text-lg font-semibold">
           {team}
         </span>
-        {align === "end" ? <TeamFlag team={team} size="md" /> : null}
       </div>
     </div>
   );

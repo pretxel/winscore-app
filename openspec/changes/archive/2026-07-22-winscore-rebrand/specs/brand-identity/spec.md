@@ -1,9 +1,5 @@
-# brand-identity
+## MODIFIED Requirements
 
-## Purpose
-
-Rules governing the WC26 brand mark: a single `Logotype` React component and the favicon set that derives from it. Defines where the logotype appears (nav, footer, hero, OG image), how it scales, and how Next.js 16's file-based metadata convention ships the favicon.
-## Requirements
 ### Requirement: Logotype is a single React component with size variants
 
 The system SHALL provide a single `Logotype` React component (server-renderable, no client state) that renders an inline SVG wordmark in three sizes — `xs`, `md`, `xl` — driven by props, not by separate components. The SVG SHALL use a single `viewBox` so all sizes share the exact same geometry. The wordmark SHALL reflect the winscore.me brand identity.
@@ -25,22 +21,6 @@ The system SHALL provide a single `Logotype` React component (server-renderable,
 - **WHEN** the Logotype is rendered at any size
 - **THEN** the SVG glyphs reflect the winscore.me brand mark (no longer a "WC26" wordmark)
 - **AND** the `edition` prop is preserved for per-competition subtitle rendering
-
-### Requirement: Logotype is used everywhere the brand appears
-
-The `Logotype` component SHALL replace the hand-rolled `26` tile + literal "WC26" / "Pool" strings in the global header, the global footer, and the home page hero. No file SHALL render the brand mark with inline `<span>` text after this change.
-
-#### Scenario: Nav uses the component
-- **WHEN** the global header (`SiteNav`) is rendered
-- **THEN** the brand link renders `<Logotype size="xs" />` and contains no hand-rolled `<span>WC26</span>` or `<span>26</span>` markup
-
-#### Scenario: Footer uses the component
-- **WHEN** the global footer (`SiteFooter`) is rendered
-- **THEN** the brand row renders `<Logotype size="xs" />` and contains no hand-rolled `<span>26</span>` tile
-
-#### Scenario: Hero uses the component
-- **WHEN** the home page hero is rendered
-- **THEN** the hero includes a `<Logotype size="xl" />` accent next to the headline
 
 ### Requirement: Favicon set is Next 16 file-based
 
@@ -66,14 +46,6 @@ The Open Graph image (`app/opengraph-image.tsx`) SHALL render the winscore.me wo
 #### Scenario: Wordmark in the OG card
 - **WHEN** the OG image is requested
 - **THEN** the rendered 1200×630 PNG includes a visible winscore.me brand wordmark in the top-left region
-
-### Requirement: Smoke test verifies Logotype renders an SVG
-
-A unit test SHALL render `<Logotype />` at each of the three sizes and assert that an `<svg>` element appears in the output.
-
-#### Scenario: Each size renders an svg
-- **WHEN** the unit test renders `<Logotype size="xs" />`, `<Logotype size="md" />`, and `<Logotype size="xl" />`
-- **THEN** each test case finds exactly one `<svg>` element
 
 ### Requirement: Branding resolves from the active competition
 

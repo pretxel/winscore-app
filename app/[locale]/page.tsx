@@ -14,11 +14,8 @@ import {
 import { cn } from "@/lib/utils";
 import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 import { MiniBracket } from "@/components/mini-bracket";
-import { TeamFlagWall } from "@/components/team-flag-wall";
-import { TeamFlag } from "@/components/team-flag";
 import { Logotype } from "@/components/logotype";
 import { TournamentCountdown } from "@/components/tournament-countdown";
-import { RecentRecapImages } from "@/components/recent-recap-images";
 import { ScoringExplainer } from "@/components/scoring-explainer";
 import { LeagueLane } from "@/components/league-lane";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -101,10 +98,8 @@ export default async function HomePage({
       <TournamentCountdown />
       <ScoringSection locale={locale} t={t} />
       <ScoringExplainer locale={locale} />
-      <FlagWallDivider />
       <Cadence t={t} />
       <FeatureSections locale={locale} t={t} />
-      <RecentRecapImages locale={locale} />
     </main>
   );
 }
@@ -164,11 +159,6 @@ function Hero({ locale, t }: { locale: Locale; t: T }) {
             <span aria-hidden className="size-1.5 rounded-full bg-flag" />
             {t("eyebrow")}
             <span className="text-muted-foreground/40">·</span>
-            <span className="inline-flex items-center gap-1">
-              <TeamFlag team="United States" size="sm" className="h-3 w-4" />
-              <TeamFlag team="Canada" size="sm" className="h-3 w-4" />
-              <TeamFlag team="Mexico" size="sm" className="h-3 w-4" />
-            </span>
             {t("hostsLine")}
           </div>
 
@@ -501,27 +491,6 @@ function FeatureSections({ locale, t }: { locale: Locale; t: T }) {
           </li>
         ))}
       </ul>
-    </section>
-  );
-}
-
-function FlagWallDivider() {
-  return (
-    <section
-      aria-hidden="true"
-      className="relative overflow-hidden border-y border-border/70 bg-muted/30"
-    >
-      <div className="bg-grain pointer-events-none absolute inset-0" />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to right, var(--background) 0%, transparent 12%, transparent 88%, var(--background) 100%)",
-        }}
-      />
-      <div className="relative mx-auto max-w-6xl px-4 py-10 sm:py-12">
-        <TeamFlagWall className="opacity-60 dark:opacity-40" />
-      </div>
     </section>
   );
 }

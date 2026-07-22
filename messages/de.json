@@ -11,8 +11,8 @@
     "tryAgain": "Erneut versuchen"
   },
   "siteMeta": {
-    "title": "Winscore — World Cup 2026: Tägliche Tipps & Live-Rangliste",
-    "description": "Tippen Sie jedes Spiel der Weltmeisterschaft 2026. Geben Sie Ihre Ergebnisse vor dem Anpfiff ab, sammeln Sie Punkte für richtige Tipps und steigen Sie in der täglichen und der Gesamtrangliste auf."
+    "title": "Winscore — Tägliche Tipps & Live-Rangliste",
+    "description": "Tippen Sie jedes Spiel. Geben Sie Ihre Ergebnisse vor dem Anpfiff ab, sammeln Sie Punkte für richtige Tipps und steigen Sie in der täglichen und der Gesamtrangliste auf."
   },
   "nav": {
     "leagues": "Ligen",
@@ -97,13 +97,13 @@
     "winner": "Sieger"
   },
   "home": {
-    "title": "Winscore — World Cup 2026: Tipps & Rangliste",
-    "description": "Tippe jedes Spiel der Weltmeisterschaft 2026. Gib deine Ergebnisse vor dem Anpfiff ab, sammle Punkte für richtige Ergebnisse und klettere in einer einzigen globalen Rangliste nach oben.",
-    "eyebrow": "FIFA Weltmeisterschaft 2026",
-    "hostsLine": "USA · Kanada · Mexiko",
+    "title": "Winscore — Fußballtipps & Live-Ranglisten",
+    "description": "Tippe Spiele aus aktiven Ligen. Gib Ergebnisse vor dem Anpfiff ab, tritt in privaten Pools an und klettere in Live-Ranglisten.",
+    "eyebrow": "Tägliche Fußballtipps",
+    "hostsLine": "Jede Liga · Jeder Spieltag",
     "headlineLine1": "Sag das Ergebnis voraus.",
     "headlineLine2": "Klettere in der Tabelle.",
-    "lede": "Ein globaler Pool. Gib für jede Begegnung vor dem Anpfiff einen exakten Ergebnistipp ab — und deine Platzierung verschiebt sich in dem Moment, in dem der Schlusspfiff ertönt. Keine Einrichtung, keine Gebühren, keine Ausreden.",
+    "lede": "Tippe exakte Ergebnisse in den Ligen, die du verfolgst. Tritt privaten Pools bei, ändere Tipps bis zum Anpfiff und sieh zu, wie jedes Ergebnis die Tabelle neu ordnet. Keine Einrichtung, keine Gebühren, keine Ausreden.",
     "ctaSignIn": "Anmelden und mitspielen",
     "ctaBrowse": "Spiele durchstöbern",
     "ctaScoring": "So funktioniert die Punktevergabe",
@@ -152,10 +152,6 @@
     "liveVs": "gegen",
     "liveViewAll": "Alle Spiele ansehen",
     "liveKickoffSoon": "Anpfiff steht bevor",
-    "recapGalleryEyebrow": "04 · Match-Comics",
-    "recapGalleryHeadline": "Aktuelle Spiele, gezeichnet.",
-    "recapImageAlt": "Comic-Rückblick: {home} gegen {away}",
-    "recapReactionCount": "{count, plural, one {# Reaktion} other {# Reaktionen}}",
     "featuresEyebrow": "03 · Mehr zum Mitspielen",
     "featuresHeadline": "Mehr als nur der Turnierbaum.",
     "groupsTitle": "Freundesgruppen",

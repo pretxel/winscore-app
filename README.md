@@ -122,7 +122,7 @@ update public.profiles
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only — keep it secret)
-   - `NEXT_PUBLIC_SITE_URL` (your production domain, e.g. `https://winscore.example.com`)
+   - `NEXT_PUBLIC_SITE_URL` (your production domain, e.g. `https://winscore.me`)
 4. **Update Supabase Auth → URL Configuration:**
    - Site URL: your production URL.
    - Additional Redirect URLs: `https://YOUR-DOMAIN/auth/callback` and (for previews)
