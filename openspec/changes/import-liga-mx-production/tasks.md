@@ -1,13 +1,13 @@
 ## 1. Verify Migration Status
 
-- [ ] 1.1 Check if Liga MX migration (`20260716000000_liga_mx_tie_key_leg.sql`) is already applied in production Supabase
-- [ ] 1.2 If not applied, run `supabase db push` or apply migration manually
+- [x] 1.1 Check if Liga MX migration (`20260716000000_liga_mx_tie_key_leg.sql`) is already applied in production Supabase
+- [x] 1.2 If not applied, run `supabase db push` or apply migration manually
 
 ## 2. Verify Data in Admin
 
-- [ ] 2.1 Open `/admin/competitions` — confirm Liga MX appears with correct name, slug (`la-liga-mx`), and season
-- [ ] 2.2 Open `/admin/matches` — confirm Liga MX fixtures appear with correct teams and kickoff dates
-- [ ] 2.3 Verify `format_config` shows league format with two-legged knockout ties
+- [x] 2.1 Open `/admin/competitions` — confirm Liga MX appears with correct name, slug (`la-liga-mx`), and season
+- [x] 2.2 Open `/admin/matches` — confirm Liga MX fixtures appear with correct teams and kickoff dates
+- [x] 2.3 Verify `format_config` shows league format with two-legged knockout ties
 
 ## 3. Activate League
 

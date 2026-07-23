@@ -217,7 +217,7 @@ export default async function AdminMatchesPage({
                     <li key={s.key} className="flex items-center justify-between gap-3 py-2">
                       <span className="flex items-center gap-2 text-sm">
                         <span className="font-medium">
-                          {getStageLabel(managed?.format, s.key, locale)}
+                           {managed ? getStageLabel(managed.format, s.key, locale) : s.key}
                         </span>
                         <span
                           className={cn(
