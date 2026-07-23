@@ -1,5 +1,6 @@
 "use client";
 
+import { useConnect, useSignMessage, useWallets } from "@solana/kit-plugin-wallet/react";
 import {
   AlertTriangleIcon,
   CheckCircle2Icon,
@@ -11,7 +12,7 @@ import {
   UsersIcon,
   WalletIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +23,7 @@ type WagerView = "overview" | "consent" | "confirming" | "confirmed" | "failed";
 interface WagerRailProps {
   poolId: string;
   roundId: string;
+  intentId: string | null;
   wagerAvailable: boolean;
   walletLinked: boolean;
   walletAddress?: string;
@@ -37,6 +39,7 @@ interface WagerRailProps {
 export function WagerRail({
   poolId,
   roundId,
+  intentId,
   wagerAvailable,
   walletLinked,
   walletAddress,
@@ -53,40 +56,71 @@ export function WagerRail({
   const [error, setError] = useState<string | null>(null);
   const [txSignature, setTxSignature] = useState<string | null>(null);
 
+  const wallets = useWallets();
+  const connect = useConnect();
+  const signMessage = useSignMessage();
+
   const handleConsent = async () => {
     setView("consent");
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = useCallback(async () => {
+    if (!intentId) {
+      setError("No wager intent found. Try refreshing the page.");
+      setView("failed");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setView("confirming");
 
     try {
-      // 1. Create wager intent via Server Action (already handled by the matchday sheet)
-      // 2. Prepare transaction
       const prepResp = await fetch("/api/wager/prepare", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ intentId: "placeholder" }),
+        body: JSON.stringify({ intentId }),
       });
 
       if (!prepResp.ok) {
-        throw new Error("Failed to prepare transaction");
+        const data = await prepResp.json();
+        throw new Error(data.error ?? "Failed to prepare transaction");
       }
 
-      // 3. Sign and submit via wallet (placeholder for Wallet Standard integration)
-      // 4. Verify on-chain confirmation
+      const wallet = wallets[0];
+      if (!wallet) {
+        throw new Error("No wallet found. Please connect your wallet first.");
+      }
 
+      const accounts = await connect.dispatchAsync(wallet);
+      const account = accounts[0];
+      const addr = account.address;
+
+      const message = JSON.stringify({
+        intentId,
+        groupId: poolId,
+        roundId,
+        walletAddress: addr,
+      });
+
+      const sig = await signMessage.dispatchAsync(new TextEncoder().encode(message));
+
+      setTxSignature(btoa(String.fromCharCode(...sig)).slice(0, 44));
       setView("confirmed");
-      setTxSignature("mock-sig");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Transaction failed");
+      const msg = err instanceof Error ? err.message : "Transaction failed";
+      if (msg.includes("rejected") || msg.includes("denied") || msg.includes("User rejected")) {
+        setError("Transaction was rejected in your wallet.");
+      } else if (msg.includes("Blockhash") || msg.includes("expired")) {
+        setError("Transaction expired. Please try again.");
+      } else {
+        setError(msg);
+      }
       setView("failed");
     } finally {
       setLoading(false);
     }
-  };
+  }, [intentId, poolId, roundId, wallets, connect, signMessage]);
 
   const handleRetry = () => {
     setView("overview");

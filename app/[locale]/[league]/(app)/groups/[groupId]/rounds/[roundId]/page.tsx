@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { WalletLinkButton } from "@/components/wallet/wallet-link-button";
+import { WagerRail } from "@/components/wager/wager-rail";
 import { isCurrentUserAdmin } from "@/lib/admin/current-user";
 import { isLocale, type Locale, localePath } from "@/lib/i18n";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -105,6 +105,54 @@ export default async function RoundSheetPage({
 
   const completePicks = predictionsMap.size === (fixtures?.length ?? 0);
 
+  // Wallet and wager data
+  let walletLinked = false;
+  let walletAddress: string | undefined;
+  let walletLinkId: string | undefined;
+  let intentId: string | null = null;
+  let intentState: string | null = null;
+
+  if (user && isMember && !isAdmin) {
+    const { data: link } = await supabase
+      .from("wallet_links")
+      .select("id, wallet_address")
+      .eq("user_id", user.id)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (link) {
+      walletLinked = true;
+      walletLinkId = link.id;
+      const hex =
+        typeof link.wallet_address === "string"
+          ? (link.wallet_address as string).replace(/^\\x/, "")
+          : "";
+      if (hex) {
+        const bytes = Buffer.from(hex, "hex");
+        const { base58 } = await import("@scure/base");
+        walletAddress = base58.encode(bytes);
+      }
+
+      if (completePicks && fixtures?.length) {
+        const { createWagerIntent } = await import("./create-wager-intent");
+        const picks = Array.from(predictionsMap.entries()).map(([matchId, goals]) => ({
+          matchId,
+          homeGoals: goals.home,
+          awayGoals: goals.away,
+        }));
+        const result = await createWagerIntent({
+          groupId,
+          roundId,
+          userId: user.id,
+          walletLinkId,
+          picks,
+        });
+        intentId = result.intentId;
+        intentState = result.state;
+      }
+    }
+  }
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 space-y-6">
       {/* Header */}
@@ -196,15 +244,16 @@ export default async function RoundSheetPage({
       {user && isMember && !isAdmin && (
         <>
           <Separator />
-          <Card className="border-muted bg-muted/20">
-            <CardHeader>
-              <CardTitle className="text-base">{t("wagerRail.title")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">{t("wagerRail.unavailable")}</p>
-              <WalletLinkButton />
-            </CardContent>
-          </Card>
+          <WagerRail
+            poolId={groupId}
+            roundId={roundId}
+            intentId={intentId}
+            wagerAvailable={true}
+            walletLinked={walletLinked}
+            walletAddress={walletAddress}
+            hasCompletePicks={completePicks}
+            eligibilityOk
+          />
         </>
       )}
     </main>
