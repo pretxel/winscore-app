@@ -152,7 +152,11 @@ export async function POST(request: Request) {
     .single();
 
   if (linkError) {
-    return NextResponse.json({ error: "Failed to create wallet link" }, { status: 500 });
+    console.error("wallet link insert error", linkError);
+    return NextResponse.json(
+      { error: `Failed to create wallet link: ${linkError.message}` },
+      { status: 500 },
+    );
   }
 
   return NextResponse.json(
