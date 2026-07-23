@@ -6,6 +6,7 @@
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import type { MerkleLeaf } from "./merkle-tree";
 import { buildMerkleTree } from "./merkle-tree";
+import { deriveWagerRoundPda } from "./pda";
 import { allocatePot } from "./pot-allocation";
 
 export interface SettlementManifest {
@@ -192,7 +193,7 @@ export async function buildSettlementManifest(
     awardBaseUnits: a.awardBaseUnits,
   }));
 
-  const wagerRoundPubkey = new Uint8Array(32); // Placeholder — actual PDA
+  const { pda: wagerRoundPubkey } = deriveWagerRoundPda(wagerRound.group_id, wagerRound.round_id);
   const tree = buildMerkleTree(wagerRoundPubkey, merkleLeaves);
 
   const manifest: SettlementManifest = {

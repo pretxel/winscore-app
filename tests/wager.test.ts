@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { MerkleLeaf } from "@/lib/wager/merkle-tree";
 import { buildMerkleTree, verifyMerkleProof } from "@/lib/wager/merkle-tree";
+import { deriveWagerRoundPda } from "@/lib/wager/pda";
 import { canonicalizePicks, computePickCommitmentSync } from "@/lib/wager/pick-commitment";
 
 describe("pickCommitment", () => {
@@ -136,6 +137,27 @@ describe("merkleTree", () => {
   it("empty leaves produces zero root", () => {
     const { root } = buildMerkleTree(wagerRoundPubkey, []);
     expect(Buffer.compare(Buffer.from(root), Buffer.alloc(32))).toBe(0);
+  });
+
+  // Regression: the settlement manifest must seed the tree with the real
+  // wager-round PDA, not a zero placeholder. On-chain claim verification
+  // derives the real PDA, so a zero seed makes every winner claim fail.
+  it("binds root to the wager-round pubkey seed", () => {
+    const leaves: MerkleLeaf[] = [{ winnerWalletBytes: makeWallet(1), awardBaseUnits: 100 }];
+    const { pda } = deriveWagerRoundPda(
+      "11111111-1111-1111-1111-111111111111",
+      "22222222-2222-2222-2222-222222222222",
+    );
+
+    // Derived PDA is a non-zero 32-byte key.
+    expect(pda.length).toBe(32);
+    expect(Buffer.compare(Buffer.from(pda), Buffer.alloc(32))).not.toBe(0);
+
+    // Root under the real PDA differs from the zero-seed root — proving the
+    // seed is part of the leaf hash and the placeholder would mismatch.
+    const zeroSeedRoot = buildMerkleTree(new Uint8Array(32), leaves).root;
+    const realSeedRoot = buildMerkleTree(pda, leaves).root;
+    expect(Buffer.compare(Buffer.from(realSeedRoot), Buffer.from(zeroSeedRoot))).not.toBe(0);
   });
 });
 
