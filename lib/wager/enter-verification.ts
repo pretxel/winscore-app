@@ -47,7 +47,7 @@ function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
 
 /** Decode a little-endian u64 from `bytes` starting at `offset`. */
 function readU64LE(bytes: Uint8Array, offset: number): bigint {
-  let value = 0n;
+  let value = BigInt(0);
   for (let i = 0; i < 8; i++) {
     value += BigInt(bytes[offset + i]) << BigInt(8 * i);
   }
@@ -151,6 +151,6 @@ function vaultBalanceDelta(meta: Json, vaultOwner: string): bigint | null {
 
   const post = amountFor(meta.postTokenBalances);
   if (post === null) return null;
-  const pre = amountFor(meta.preTokenBalances) ?? 0n;
+  const pre = amountFor(meta.preTokenBalances) ?? BigInt(0);
   return post - pre;
 }

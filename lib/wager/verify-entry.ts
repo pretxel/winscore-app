@@ -53,8 +53,7 @@ export async function verifyEntryTransaction(
   const { data: intent } = await admin
     .from("wager_intents")
     .select(
-      "id, group_id, round_id, wager_round_id, wallet_link_id, pick_commitment, " +
-        "wager_rounds!inner(stake_base_units, approved_mint, approved_token_program)",
+      "id, group_id, round_id, wager_round_id, wallet_link_id, pick_commitment, wager_rounds!inner(stake_base_units, approved_mint, approved_token_program)",
     )
     .eq("id", intentId)
     .in("state", ["submitted", "reconciliation_required"])
