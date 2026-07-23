@@ -25,7 +25,8 @@
     "myPicks": "Mes pronos",
     "groups": "Groupes",
     "admin": "Admin",
-    "brandTag": "Pool"
+    "brandTag": "Pool",
+    "sections": "Sections de la compétition"
   },
   "profileMenu": {
     "openMenu": "Ouvrir le menu du compte",
