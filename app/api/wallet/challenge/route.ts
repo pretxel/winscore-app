@@ -54,10 +54,10 @@ export async function POST(request: Request) {
     .from("wallet_link_challenges")
     .insert({
       user_id: user.id,
-      wallet_address: Buffer.from(walletBytes) as unknown as string,
+      wallet_address: `\\x${Buffer.from(walletBytes).toString("hex")}`,
       domain: params.domain,
       cluster: params.cluster,
-      nonce: Buffer.from(params.nonce) as unknown as string,
+      nonce: `\\x${Buffer.from(params.nonce).toString("hex")}`,
       message_text: messageText,
       issued_at: params.issuedAt.toISOString(),
       expires_at: params.expiresAt.toISOString(),

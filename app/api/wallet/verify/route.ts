@@ -139,9 +139,9 @@ export async function POST(request: Request) {
     .from("wallet_links")
     .insert({
       user_id: user.id,
-      wallet_address: Buffer.from(walletBytes) as unknown as string,
+      wallet_address: `\\x${Buffer.from(walletBytes).toString("hex")}`,
       challenge_id: challengeId,
-      signature_bytes: Buffer.from(sigBytes) as unknown as string,
+      signature_bytes: `\\x${Buffer.from(sigBytes).toString("hex")}`,
       cluster: challenge.cluster,
       is_active: true,
       linked_at: new Date().toISOString(),
