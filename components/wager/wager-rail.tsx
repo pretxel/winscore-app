@@ -14,11 +14,13 @@ import {
   UsersIcon,
   WalletIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { WalletLinkButton } from "@/components/wallet/wallet-link-button";
 
 type WagerView = "overview" | "consent" | "confirming" | "confirmed" | "failed";
 
@@ -128,6 +130,7 @@ export function WagerRail({
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const [account, setAccount] = useState<WalletAccount | null>(null);
 
+  const router = useRouter();
   const wallets = useWallets();
   const connect = useConnect();
 
@@ -219,10 +222,7 @@ export function WagerRail({
           <p className="text-sm text-muted-foreground">
             Link a Solana wallet to enable wagering for this round.
           </p>
-          <Button variant="outline" size="sm" className="gap-2">
-            <WalletIcon className="size-4" />
-            Link Wallet
-          </Button>
+          <WalletLinkButton onLinked={() => router.refresh()} />
         </CardContent>
       </Card>
     );

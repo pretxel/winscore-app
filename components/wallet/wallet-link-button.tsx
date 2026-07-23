@@ -19,12 +19,15 @@ interface WalletLinkButtonProps {
   initialWalletAddress?: string;
   initialLinkId?: string;
   initialCluster?: string;
+  /** Invoked after a wallet is successfully linked. */
+  onLinked?: () => void;
 }
 
 export function WalletLinkButton({
   initialWalletAddress,
   initialLinkId,
   initialCluster,
+  onLinked,
 }: WalletLinkButtonProps = {}) {
   const [state, setState] = useState<LinkState>(initialWalletAddress ? "linked" : "idle");
   const [walletAddress, setWalletAddress] = useState<string | null>(initialWalletAddress ?? null);
@@ -91,11 +94,12 @@ export function WalletLinkButton({
       setLinkId(newLinkId);
       setCluster("devnet");
       setState("linked");
+      onLinked?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
       setState("error");
     }
-  }, [wallets, connect, signMessage]);
+  }, [wallets, connect, signMessage, onLinked]);
 
   const handleUnlink = useCallback(async () => {
     if (!linkId) return;
