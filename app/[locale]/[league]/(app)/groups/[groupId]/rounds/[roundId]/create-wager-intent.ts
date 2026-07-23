@@ -20,6 +20,7 @@ export async function createWagerIntent({
   const supabase = await createServerSupabaseClient();
 
   const pickCommitmentBytes = computePickCommitmentSync({
+    version: 1,
     groupId,
     roundId,
     userId,
