@@ -141,7 +141,10 @@ grant select on public.v_quiz_questions_public to anon, authenticated;
 -- ranks remain contiguous; rank() is partitioned by competition_id so each
 -- league is ranked independently.
 -- ---------------------------------------------------------------------------
-create or replace view public.v_quiz_leaderboard as
+drop view if exists public.v_quiz_standing;
+drop view if exists public.v_quiz_leaderboard;
+
+create view public.v_quiz_leaderboard as
 with agg as (
   select
     a.user_id,
@@ -174,7 +177,7 @@ grant select on public.v_quiz_leaderboard to anon, authenticated;
 -- 7. Quiz standing — per competition streak + reused leaderboard row.
 -- Gaps-and-islands, now partitioned by (user_id, competition_id).
 -- ---------------------------------------------------------------------------
-create or replace view public.v_quiz_standing
+create view public.v_quiz_standing
   with (security_invoker = off) as
 with days as (
   select distinct
