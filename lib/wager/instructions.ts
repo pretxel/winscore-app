@@ -18,7 +18,8 @@ import {
   getStructEncoder,
   getU16Encoder,
   getU64Encoder,
-  type IInstruction,
+  type Instruction,
+  type ReadonlyUint8Array,
 } from "@solana/kit";
 
 export const SYSTEM_PROGRAM_ADDRESS = "11111111111111111111111111111111" as Address;
@@ -40,9 +41,6 @@ function prependDiscriminator(discriminator: Uint8Array, body: ReadonlyUint8Arra
   out.set(body, discriminator.length);
   return out;
 }
-
-// `ReadonlyUint8Array` is what kit encoders return; alias it locally.
-type ReadonlyUint8Array = Uint8Array | Readonly<Uint8Array>;
 
 // ---------------------------------------------------------------------------
 // enter
@@ -76,7 +74,7 @@ export function buildEnterInstruction(
   programId: Address,
   accounts: EnterAccounts,
   args: EnterArgs,
-): IInstruction {
+): Instruction {
   const data = prependDiscriminator(ENTER_DISCRIMINATOR, enterArgsEncoder.encode(args));
   return {
     programAddress: programId,
@@ -134,7 +132,7 @@ export function buildInitializeWagerRoundInstruction(
   programId: Address,
   accounts: InitializeWagerRoundAccounts,
   args: InitializeWagerRoundArgs,
-): IInstruction {
+): Instruction {
   const data = prependDiscriminator(
     INITIALIZE_WAGER_ROUND_DISCRIMINATOR,
     initializeArgsEncoder.encode(args),

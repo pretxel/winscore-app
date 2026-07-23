@@ -5,7 +5,7 @@ import {
   createSolanaRpc,
   createTransactionMessage,
   getBase64EncodedWireTransaction,
-  type IInstruction,
+  type Instruction,
   pipe,
   setTransactionMessageFeePayer,
   setTransactionMessageLifetimeUsingBlockhash,
@@ -131,7 +131,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const instructions: IInstruction[] = [];
+  const instructions: Instruction[] = [];
 
   // Self-heal the entrant's token account if absent.
   const entrantAtaInfo = await rpc.getAccountInfo(entrantAta, { encoding: "base64" }).send();
