@@ -33,7 +33,7 @@ export const getManagedCompetition = cache(async (): Promise<ResolvedCompetition
   const { data: active } = await admin
     .from("competitions")
     .select("*")
-    .eq("is_active", true)
+    .eq("status", "active")
     .maybeSingle();
   return active ? resolveCompetition(active) : null;
 });

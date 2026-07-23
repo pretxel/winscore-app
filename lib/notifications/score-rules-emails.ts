@@ -144,7 +144,7 @@ async function loadActiveFormat(admin: AdminClient): Promise<CompetitionFormat |
   const { data, error } = await admin
     .from("competitions")
     .select("format_config")
-    .eq("is_active", true)
+    .eq("status", "active")
     .maybeSingle();
   if (error) throw new Error(`[score-rules] load competition: ${error.message}`);
   if (!data) return null;

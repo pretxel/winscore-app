@@ -13,7 +13,7 @@ const generateMatchSummaryMock = vi.fn(
     },
 );
 const assertMatchInManagedMock = vi.fn(async () => {});
-const getManagedCompetitionMock = vi.fn(async () => ({ id: "comp1", is_active: true }));
+const getManagedCompetitionMock = vi.fn(async () => ({ id: "comp1", status: "active" }));
 const getUserMock = vi.fn();
 const profileSingleMock = vi.fn();
 
@@ -79,7 +79,7 @@ function form(values: Record<string, string>): FormData {
 beforeEach(() => {
   generateMatchSummaryMock.mockReset().mockResolvedValue({ generated: true });
   assertMatchInManagedMock.mockReset().mockResolvedValue(undefined);
-  getManagedCompetitionMock.mockReset().mockResolvedValue({ id: "comp1", is_active: true });
+  getManagedCompetitionMock.mockReset().mockResolvedValue({ id: "comp1", status: "active" });
   getUserMock.mockReset().mockResolvedValue({ data: { user: { id: "admin1" } } });
   profileSingleMock.mockReset().mockResolvedValue({ data: { is_admin: true } });
 });

@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const forceDispatchMock = vi.fn(async () => ({ emailed: 7, failed: 0, skipped: 1 }));
 const assertMatchInManagedMock = vi.fn(async () => {});
-const getManagedCompetitionMock = vi.fn(async () => ({ id: "comp1", is_active: true }));
+const getManagedCompetitionMock = vi.fn(async () => ({ id: "comp1", status: "active" }));
 const getUserMock = vi.fn();
 const profileSingleMock = vi.fn();
 const matchSingleMock = vi.fn();
@@ -78,7 +78,7 @@ function form(values: Record<string, string>): FormData {
 beforeEach(() => {
   forceDispatchMock.mockClear();
   assertMatchInManagedMock.mockReset().mockResolvedValue(undefined);
-  getManagedCompetitionMock.mockReset().mockResolvedValue({ id: "comp1", is_active: true });
+  getManagedCompetitionMock.mockReset().mockResolvedValue({ id: "comp1", status: "active" });
   getUserMock.mockReset().mockResolvedValue({ data: { user: { id: "admin1" } } });
   profileSingleMock.mockReset().mockResolvedValue({ data: { is_admin: true } });
   matchSingleMock.mockReset().mockResolvedValue({ data: { status: "final" }, error: null });

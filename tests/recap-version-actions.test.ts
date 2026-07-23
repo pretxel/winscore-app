@@ -36,7 +36,7 @@ const pollRenderMock = vi.fn(
     },
 );
 const assertMatchInManagedMock = vi.fn(async () => {});
-const getManagedCompetitionMock = vi.fn(async () => ({ id: "comp1", is_active: true }));
+const getManagedCompetitionMock = vi.fn(async () => ({ id: "comp1", status: "active" }));
 const getUserMock = vi.fn();
 const profileSingleMock = vi.fn();
 
@@ -140,7 +140,7 @@ beforeEach(() => {
   requestRenderMock.mockReset().mockResolvedValue({ requested: true });
   pollRenderMock.mockReset().mockResolvedValue({ polled: true });
   assertMatchInManagedMock.mockReset().mockResolvedValue(undefined);
-  getManagedCompetitionMock.mockReset().mockResolvedValue({ id: "comp1", is_active: true });
+  getManagedCompetitionMock.mockReset().mockResolvedValue({ id: "comp1", status: "active" });
   getUserMock.mockReset().mockResolvedValue({ data: { user: { id: "admin1" } } });
   profileSingleMock.mockReset().mockResolvedValue({ data: { is_admin: true } });
   holder.admin = makeAdmin();

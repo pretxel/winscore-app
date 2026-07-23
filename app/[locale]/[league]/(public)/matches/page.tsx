@@ -9,7 +9,7 @@ import { MatchLockCountdown } from "@/components/match-lock-countdown";
 import { MatchRoundFilter } from "@/components/match-round-filter";
 import { MatchStateBadge } from "@/components/match-state-badge";
 import { MatchStatusFilter } from "@/components/match-status-filter";
-import { MatchTeamFilter } from "@/components/match-team-filter";
+
 import { NeedsPickToggle } from "@/components/needs-pick-toggle";
 import { PendingPicksNudge } from "@/components/pending-picks-nudge";
 import { TimezoneSync } from "@/components/timezone-sync";
@@ -19,18 +19,14 @@ import type { MatchRow } from "@/lib/db";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import {
   dayKeyForTimeZone,
-  filterableTeams,
   formatDayKeyLabel,
   isClosingSoon,
   isConfirmedMatch,
   isLocked,
-  matchInvolvesTeam,
   needsPick,
   parsePicksParam,
   parseRoundParam,
   parseStatusParam,
-  parseTeamParam,
-  reconcileSelectedTeams,
   soonestPickableMatch,
   stagesPresent,
   statusBucket,
@@ -79,7 +75,6 @@ export default async function MatchesPage({
 }: {
   params: Promise<{ locale: string; league: string }>;
   searchParams: Promise<{
-    team?: string | string[];
     status?: string | string[];
     picks?: string | string[];
     round?: string | string[];
@@ -89,12 +84,7 @@ export default async function MatchesPage({
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
-  const {
-    team: teamParam,
-    status: statusParam,
-    picks: picksParam,
-    round: roundParam,
-  } = await searchParams;
+  const { status: statusParam, picks: picksParam, round: roundParam } = await searchParams;
 
   const t = await getTranslations("matches");
   const activeCompetition = await getLeagueFromContext({ slug: league });
@@ -106,6 +96,7 @@ export default async function MatchesPage({
   const { data: matches, error } = await supabase
     .from("matches")
     .select("*")
+    .eq("competition_id", activeCompetition?.id ?? "")
     .order("kickoff_at", { ascending: true });
 
   if (error) {
@@ -162,13 +153,9 @@ export default async function MatchesPage({
     pickedIds = new Set((picks ?? []).map((p) => p.match_id));
   }
 
-  // Ephemeral URL-driven filters, applied confirmed → team → status → picks.
+  // Ephemeral URL-driven filters, applied confirmed → round → status → picks.
   // Unknown param values are dropped so a bad URL falls back to "show
   // everything" rather than erroring.
-  const availableTeams = filterableTeams(list);
-  const selectedTeams = reconcileSelectedTeams(parseTeamParam(teamParam), availableTeams);
-  const selectedKeys = new Set(selectedTeams.map((team) => team.toLowerCase()));
-  const teamFiltered = list.filter((m) => matchInvolvesTeam(m, selectedKeys));
 
   // Round (stage) filter options: the rounds present in the visible list, in the
   // competition format's stage order, labeled with localized stage names. A
@@ -182,13 +169,10 @@ export default async function MatchesPage({
   const parsedRound = parseRoundParam(roundParam);
   const selectedRound = parsedRound && present.has(parsedRound) ? parsedRound : null;
 
-  // The round filter joins the team filter in the "scoped" set that feeds the
-  // header stats and the needs-pick count, so those reflect the selected round.
-  const scoped = selectedRound
-    ? teamFiltered.filter((m) => m.stage === selectedRound)
-    : teamFiltered;
+  // The round filter feeds the "scoped" set for header stats and needs-pick count.
+  const scoped = selectedRound ? list.filter((m) => m.stage === selectedRound) : list;
 
-  // Stats and the needs-pick count come from the scoped (team + round) set
+  // Stats and the needs-pick count come from the scoped (round-filtered) set
   // BEFORE the status/picks filters, so each control shows what activating it
   // would yield (clicking "Live · 3" can never produce an empty list).
   const stats = {
@@ -215,8 +199,7 @@ export default async function MatchesPage({
     ? statusFiltered.filter((m) => needsPick(m, pickedIds))
     : statusFiltered;
 
-  const isFiltered =
-    selectedTeams.length > 0 || statusFilter !== null || picksNeeded || selectedRound !== null;
+  const isFiltered = statusFilter !== null || picksNeeded || selectedRound !== null;
 
   // Default view is empty only because every in-scope fixture is finished:
   // guide to the Final filter instead of the generic "no matches" state.
@@ -313,17 +296,6 @@ export default async function MatchesPage({
             selected={selectedRound}
             allLabel={t("filterAllRounds")}
             label={t("filterRoundLabel")}
-          />
-        </Suspense>
-      ) : null}
-
-      {availableTeams.length > 0 ? (
-        <Suspense fallback={null}>
-          <MatchTeamFilter
-            teams={availableTeams}
-            selected={selectedTeams}
-            allLabel={t("filterAll")}
-            label={t("filterLabel")}
           />
         </Suspense>
       ) : null}

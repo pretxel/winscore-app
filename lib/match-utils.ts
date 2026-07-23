@@ -202,28 +202,6 @@ export function isConfirmedParticipantName(name: string): boolean {
 }
 
 // Normalize a `?team=` value into a set of case-folded team keys. Accepts a
-// single comma-separated string ("Brazil,Argentina") and/or a repeated param
-// (["Brazil", "Mexico"]). Blank segments are dropped.
-export function parseTeamParam(raw: string | string[] | undefined): Set<string> {
-  if (!raw) return new Set();
-  const parts = (Array.isArray(raw) ? raw : [raw])
-    .flatMap((value) => value.split(","))
-    .map((value) => value.trim().toLowerCase())
-    .filter((value) => value.length > 0);
-  return new Set(parts);
-}
-
-// Distinct confirmed teams present in a match list, sorted alphabetically for
-// a stable chip order. Seeded knockout placeholders are excluded.
-export function filterableTeams(matches: TeamPair[]): string[] {
-  const teams = new Set<string>();
-  for (const match of matches) {
-    if (isConfirmedParticipantName(match.home_team)) teams.add(match.home_team);
-    if (isConfirmedParticipantName(match.away_team)) teams.add(match.away_team);
-  }
-  return [...teams].sort((a, b) => a.localeCompare(b));
-}
-
 // Distinct stage (round) keys present in a match list. Used to build the round
 // filter's option set so only rounds with fixtures appear.
 export function stagesPresent(matches: { stage: string }[]): Set<string> {
@@ -240,21 +218,6 @@ export function parseRoundParam(raw: string | string[] | undefined): string | nu
     if (key.length > 0) return key;
   }
   return null;
-}
-
-// Drop unknown/placeholder values from a parsed selection by intersecting it
-// with the known filterable teams. Returns canonical team names in
-// `available` order, so an all-unknown `?team=` collapses to an empty (= "All")
-// selection.
-export function reconcileSelectedTeams(selected: Set<string>, available: string[]): string[] {
-  return available.filter((team) => selected.has(team.toLowerCase()));
-}
-
-// True when a match involves any selected team (case-insensitive on either
-// side). An empty selection matches every fixture.
-export function matchInvolvesTeam(match: TeamPair, selected: Set<string>): boolean {
-  if (selected.size === 0) return true;
-  return selected.has(match.home_team.toLowerCase()) || selected.has(match.away_team.toLowerCase());
 }
 
 // --- Status + needs-pick filters (ephemeral, URL-driven) ------------------

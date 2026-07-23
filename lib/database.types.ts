@@ -1,6 +1,31 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json;
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
   public: {
     Tables: {
       comeback_email_log: {
@@ -95,8 +120,6 @@ export type Database = {
           finished_at: string | null;
           format_config: Json;
           id: string;
-          is_active: boolean;
-          is_live: boolean;
           kind: string;
           name: string;
           opening_away: string | null;
@@ -106,6 +129,7 @@ export type Database = {
           season: string | null;
           short_name: string;
           slug: string;
+          status: string;
           tournament_end_at: string | null;
           tournament_start_at: string;
           updated_at: string;
@@ -116,8 +140,6 @@ export type Database = {
           finished_at?: string | null;
           format_config: Json;
           id?: string;
-          is_active?: boolean;
-          is_live?: boolean;
           kind?: string;
           name: string;
           opening_away?: string | null;
@@ -127,6 +149,7 @@ export type Database = {
           season?: string | null;
           short_name: string;
           slug: string;
+          status?: string;
           tournament_end_at?: string | null;
           tournament_start_at: string;
           updated_at?: string;
@@ -137,8 +160,6 @@ export type Database = {
           finished_at?: string | null;
           format_config?: Json;
           id?: string;
-          is_active?: boolean;
-          is_live?: boolean;
           kind?: string;
           name?: string;
           opening_away?: string | null;
@@ -148,6 +169,7 @@ export type Database = {
           season?: string | null;
           short_name?: string;
           slug?: string;
+          status?: string;
           tournament_end_at?: string | null;
           tournament_start_at?: string;
           updated_at?: string;
@@ -1026,6 +1048,13 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "quiz_answers_competition_fk";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "competitions";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "quiz_answers_question_id_fkey";
             columns: ["question_id"];
@@ -2066,6 +2095,13 @@ export type Database = {
         };
         Relationships: [
           {
+            foreignKeyName: "quiz_answers_competition_fk";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "competitions";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "quiz_answers_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
@@ -2099,7 +2135,15 @@ export type Database = {
           prompt?: string | null;
           translations?: Json | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_competition_fk";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "competitions";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       v_quiz_standing: {
         Row: {
@@ -2112,6 +2156,13 @@ export type Database = {
           user_id: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "quiz_answers_competition_fk";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "competitions";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "quiz_answers_user_id_fkey";
             columns: ["user_id"];
@@ -2334,7 +2385,6 @@ export type Database = {
           points: number;
         }[];
       };
-      set_active_competition: { Args: { p_id: string }; Returns: undefined };
       set_league_live: {
         Args: { p_id: string; p_live: boolean };
         Returns: undefined;
@@ -2492,6 +2542,9 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

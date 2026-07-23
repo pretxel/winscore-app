@@ -224,8 +224,6 @@
     "rowClosesIn": "ferme dans {time}",
     "emptyTitle": "Tableau vide",
     "emptyBody": "Aucun match chargé pour l'instant. Un admin doit publier le calendrier avant l'ouverture des pronos.",
-    "filterLabel": "Filtrer par équipe",
-    "filterAll": "Toutes",
     "filterEmptyTitle": "Aucun match",
     "filterEmptyBody": "Aucun match ne correspond à vos filtres. Retirez-les pour voir tout le calendrier.",
     "filterClear": "Retirer les filtres",
@@ -1577,6 +1575,7 @@
     "lede": "Toutes les ligues actives — créez un groupe dans l'une d'elles.",
     "empty": "Aucune ligue active pour l'instant.",
     "start": "Créer un groupe",
-    "fixtures": "Voir les matchs"
+    "fixtures": "Voir les matchs",
+    "finished": "Terminé"
   }
 }

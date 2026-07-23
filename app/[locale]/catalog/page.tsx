@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LeagueRail } from "@/components/league-rail";
+import { Badge } from "@/components/ui/badge";
 import { listLiveLeagues } from "@/lib/competition";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 
@@ -53,8 +54,16 @@ export default async function CatalogPage({ params }: { params: Promise<{ locale
                 <LeagueRail label={league.shortName || league.name} />
                 <div className="flex flex-1 flex-wrap items-center justify-between gap-4 p-4 sm:p-5">
                   <div>
-                    <h2 className="font-heading text-foreground text-xl font-semibold tracking-tight">
+                    <h2 className="font-heading text-foreground inline-flex items-center gap-2 text-xl font-semibold tracking-tight">
                       {league.name}
+                      {league.status === "finished" ? (
+                        <Badge
+                          variant="outline"
+                          className="border-muted-foreground/30 text-muted-foreground align-middle"
+                        >
+                          {t("finished")}
+                        </Badge>
+                      ) : null}
                     </h2>
                     <p className="text-muted-foreground font-mono text-[11px] tracking-[0.22em] uppercase">
                       {league.brandCode}

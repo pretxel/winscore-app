@@ -152,7 +152,7 @@ export async function resendQuizReminder(formData: FormData): Promise<void> {
   const { data: activeComp } = await admin
     .from("competitions")
     .select("id")
-    .eq("is_active", true)
+    .eq("status", "active")
     .maybeSingle();
   const { data: question, error } = activeComp
     ? await admin

@@ -224,8 +224,6 @@
     "rowClosesIn": "schließt in {time}",
     "emptyTitle": "Leerer Spielplan",
     "emptyBody": "Noch keine Spiele geladen. Ein Admin muss den Spielplan einrichten, bevor Tipps abgegeben werden können.",
-    "filterLabel": "Nach Team filtern",
-    "filterAll": "Alle",
     "filterEmptyTitle": "Keine Spiele",
     "filterEmptyBody": "Keine Spiele entsprechen deinen Filtern. Setze sie zurück, um den gesamten Spielplan zu sehen.",
     "filterClear": "Filter zurücksetzen",
@@ -1577,6 +1575,7 @@
     "lede": "Alle aktiven Ligen — starte in jeder eine Gruppe.",
     "empty": "Noch keine aktiven Ligen.",
     "start": "Gruppe erstellen",
-    "fixtures": "Spiele ansehen"
+    "fixtures": "Spiele ansehen",
+    "finished": "Beendet"
   }
 }

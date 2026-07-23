@@ -38,7 +38,7 @@ vi.mock("@/lib/supabase/admin", () => ({
           if ("id" in filter) {
             return { data: byId.get(filter.id as string) ?? null, error: null };
           }
-          if ("is_active" in filter) return { data: activeRow, error: null };
+          if ("status" in filter) return { data: activeRow, error: null };
           return { data: null, error: null };
         },
       };
@@ -61,6 +61,7 @@ function competition(id: string, overrides: Record<string, unknown> = {}) {
     opening_away: null,
     opening_venue: null,
     is_active: false,
+    status: "manage",
     format_config: {
       stages: [{ key: "final", kind: "knockout", order: 1, labels: { en: "Final" } }],
       groups: { enabled: false },
@@ -85,7 +86,7 @@ beforeEach(() => {
 describe("getManagedCompetition", () => {
   it("defaults to the active competition when no cookie is set", async () => {
     cookieStore.get.mockReturnValue(undefined);
-    activeRow = competition("active-id", { is_active: true });
+    activeRow = competition("active-id", { status: "active" });
 
     const { getManagedCompetition } = await import("@/lib/admin/managed-competition");
     const managed = await getManagedCompetition();
@@ -94,8 +95,8 @@ describe("getManagedCompetition", () => {
 
   it("returns the cookie's competition when it exists (may be non-active)", async () => {
     cookieStore.get.mockReturnValue({ value: "draft-id" });
-    byId.set("draft-id", competition("draft-id", { is_active: false }));
-    activeRow = competition("active-id", { is_active: true });
+    byId.set("draft-id", competition("draft-id", { status: "manage" }));
+    activeRow = competition("active-id", { status: "active" });
 
     const { getManagedCompetition } = await import("@/lib/admin/managed-competition");
     const managed = await getManagedCompetition();
@@ -105,7 +106,7 @@ describe("getManagedCompetition", () => {
   it("falls back to active and clears a stale cookie pointing at a deleted competition", async () => {
     cookieStore.get.mockReturnValue({ value: "gone-id" });
     // byId has no "gone-id"
-    activeRow = competition("active-id", { is_active: true });
+    activeRow = competition("active-id", { status: "active" });
 
     const { getManagedCompetition } = await import("@/lib/admin/managed-competition");
     const managed = await getManagedCompetition();

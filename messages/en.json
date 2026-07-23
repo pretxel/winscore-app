@@ -224,8 +224,6 @@
     "rowClosesIn": "closes in {time}",
     "emptyTitle": "Empty bracket",
     "emptyBody": "No matches loaded yet. An admin needs to seed the fixture list before picks can open.",
-    "filterLabel": "Filter by team",
-    "filterAll": "All",
     "filterEmptyTitle": "No matches",
     "filterEmptyBody": "No fixtures match your filters. Clear them to see the full schedule.",
     "filterClear": "Clear filters",
@@ -1577,6 +1575,7 @@
     "lede": "Every live league — start a group in any of them.",
     "empty": "No live leagues yet.",
     "start": "Start a group",
-    "fixtures": "View fixtures"
+    "fixtures": "View fixtures",
+    "finished": "Finished"
   }
 }

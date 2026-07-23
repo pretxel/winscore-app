@@ -224,8 +224,6 @@
     "rowClosesIn": "cierra en {time}",
     "emptyTitle": "Cuadro vacío",
     "emptyBody": "Aún no hay partidos cargados. Un admin necesita publicar el calendario antes de abrir los pronósticos.",
-    "filterLabel": "Filtrar por equipo",
-    "filterAll": "Todos",
     "filterEmptyTitle": "Sin partidos",
     "filterEmptyBody": "Ningún partido coincide con tus filtros. Quítalos para ver todo el calendario.",
     "filterClear": "Quitar filtros",
@@ -1577,6 +1575,7 @@
     "lede": "Todas las ligas activas: crea un grupo en cualquiera.",
     "empty": "Aún no hay ligas activas.",
     "start": "Crear un grupo",
-    "fixtures": "Ver partidos"
+    "fixtures": "Ver partidos",
+    "finished": "Finalizado"
   }
 }

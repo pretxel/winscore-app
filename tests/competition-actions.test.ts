@@ -116,11 +116,10 @@ beforeEach(() => {
 });
 
 describe("createCompetition", () => {
-  it("forces is_active=false on insert and redirects to the edit page", async () => {
+  it("inserts a new competition and redirects to the edit page", async () => {
     const { createCompetition } = await import("@/app/[locale]/(admin)/admin/competitions/actions");
     await createCompetition(validCreateForm());
     expect(state.insertPayload).not.toBeNull();
-    expect(state.insertPayload?.is_active).toBe(false);
     expect(redirectMock).toHaveBeenCalledOnce();
   });
 });
@@ -132,15 +131,8 @@ describe("deleteCompetition guardrails", () => {
     return fd;
   }
 
-  it("refuses to delete the active competition", async () => {
-    state.competitionRow = { slug: "euro-2028", is_active: true };
-    const { deleteCompetition } = await import("@/app/[locale]/(admin)/admin/competitions/actions");
-    await expect(deleteCompetition(form())).rejects.toThrow(/switch the active/i);
-    expect(state.deleted).toBe(false);
-  });
-
   it("refuses to delete the World Cup 2026 seed", async () => {
-    state.competitionRow = { slug: "world-cup-2026", is_active: false };
+    state.competitionRow = { slug: "world-cup-2026", status: "active" };
     const { deleteCompetition } = await import("@/app/[locale]/(admin)/admin/competitions/actions");
     await expect(deleteCompetition(form())).rejects.toThrow(/seed/i);
     expect(state.deleted).toBe(false);

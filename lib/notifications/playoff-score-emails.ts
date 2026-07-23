@@ -170,7 +170,7 @@ async function loadActiveCompetitionId(admin: AdminClient): Promise<string | nul
   const { data, error } = await admin
     .from("competitions")
     .select("id")
-    .eq("is_active", true)
+    .eq("status", "active")
     .maybeSingle();
   if (error) throw new Error(`[playoff-score] load competition: ${error.message}`);
   return data?.id ?? null;

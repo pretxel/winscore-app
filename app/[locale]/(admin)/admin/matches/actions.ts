@@ -146,7 +146,7 @@ export async function saveFixture(formData: FormData) {
     if (error) throw new Error(error.message);
   }
 
-  revalidateAfterMutation(managed.is_active);
+  revalidateAfterMutation(managed.status === "active");
 }
 
 // Detail-page wrapper around `saveFixture`. `saveFixture` is the shared save
@@ -201,7 +201,7 @@ export async function setMatchResult(formData: FormData): Promise<void> {
   });
   if (rpcError) throw new Error(rpcError.message);
 
-  revalidateAfterMutation(managed.is_active, `/matches/${parsed.match_id}`);
+  revalidateAfterMutation(managed.status === "active", `/matches/${parsed.match_id}`);
 }
 
 // Detail-page wrapper around `setMatchResult`. Runs the same validated update +
@@ -230,7 +230,7 @@ export async function forceRecompute(formData: FormData) {
   const { error } = await admin.rpc("compute_match_scores", { p_match_id: match_id });
   if (error) throw new Error(error.message);
 
-  revalidateAfterMutation(managed.is_active);
+  revalidateAfterMutation(managed.status === "active");
 }
 
 // Detail-page wrapper around `forceRecompute`. Reruns the score RPC, then
@@ -261,7 +261,7 @@ export async function syncNow(formData: FormData): Promise<void> {
 
   const summary = await runSync({ competitionId: managed.id });
 
-  revalidateAfterMutation(managed.is_active);
+  revalidateAfterMutation(managed.status === "active");
 
   const params = new URLSearchParams({
     tab: "sync",
@@ -291,7 +291,7 @@ export async function confirmKnockoutTeams(formData: FormData): Promise<void> {
 
   const result = await applyKnockoutTeamConfirmation(managed.id);
 
-  revalidateAfterMutation(managed.is_active);
+  revalidateAfterMutation(managed.status === "active");
 
   const params = new URLSearchParams({
     tab: "sync",
@@ -335,7 +335,7 @@ export async function toggleKnockoutRoundReveal(formData: FormData): Promise<voi
     .eq("id", managed.id);
   if (error) throw new Error(`Failed to update competition format: ${error.message}`);
 
-  revalidateAfterMutation(managed.is_active);
+  revalidateAfterMutation(managed.status === "active");
   redirect(localePath(locale, "/admin/matches"));
 }
 
@@ -372,7 +372,7 @@ export async function resendResultEmails(formData: FormData): Promise<void> {
 
   const summary = await forceDispatchResultEmails(match_id);
 
-  revalidateAfterMutation(managed.is_active);
+  revalidateAfterMutation(managed.status === "active");
 
   params.set("resendEmailed", String(summary.emailed));
   params.set("resendFailed", String(summary.failed));
@@ -411,7 +411,7 @@ export async function summarizeMatch(formData: FormData): Promise<void> {
   }
 
   // A fresh recap surfaces on the public match page when the managed comp is active.
-  revalidateAfterMutation(managed.is_active, `/matches/${match_id}`);
+  revalidateAfterMutation(managed.status === "active", `/matches/${match_id}`);
   redirect(localePath(locale, `/admin/matches/${match_id}?${params.toString()}`));
 }
 
@@ -489,7 +489,7 @@ export async function regenerateMatchSummary(formData: FormData): Promise<void> 
   }
 
   // A draft does not change the public view; revalidate the admin surfaces.
-  revalidateAfterMutation(managed.is_active);
+  revalidateAfterMutation(managed.status === "active");
   redirect(localePath(locale, `/admin/matches/${parsed.match_id}?${params.toString()}`));
 }
 
@@ -539,7 +539,7 @@ export async function setActiveSummaryVersion(formData: FormData): Promise<void>
   }
 
   // The newly active version surfaces publicly when the managed comp is active.
-  revalidateAfterMutation(managed.is_active, `/matches/${parsed.match_id}`);
+  revalidateAfterMutation(managed.status === "active", `/matches/${parsed.match_id}`);
   redirect(localePath(locale, `/admin/matches/${parsed.match_id}?${params.toString()}`));
 }
 
@@ -580,7 +580,7 @@ export async function deleteSummaryVersion(formData: FormData): Promise<void> {
     params.set("deleteResult", "error");
   }
 
-  revalidateAfterMutation(managed.is_active);
+  revalidateAfterMutation(managed.status === "active");
   redirect(localePath(locale, `/admin/matches/${parsed.match_id}?${params.toString()}`));
 }
 
@@ -622,7 +622,7 @@ export async function generateMatchImagePromptAction(formData: FormData): Promis
     params.set("imagePromptResult", "error");
   }
 
-  revalidateAfterMutation(managed.is_active, `/matches/${parsed.match_id}`);
+  revalidateAfterMutation(managed.status === "active", `/matches/${parsed.match_id}`);
   redirect(localePath(locale, `/admin/matches/${parsed.match_id}?${params.toString()}`));
 }
 
@@ -663,7 +663,7 @@ export async function renderMatchImageAction(formData: FormData): Promise<void> 
     params.set("renderResult", "error");
   }
 
-  revalidateAfterMutation(managed.is_active, `/matches/${parsed.match_id}`);
+  revalidateAfterMutation(managed.status === "active", `/matches/${parsed.match_id}`);
   redirect(localePath(locale, `/admin/matches/${parsed.match_id}?${params.toString()}`));
 }
 
@@ -703,7 +703,7 @@ export async function syncMatchImageRenderAction(formData: FormData): Promise<vo
     params.set("syncRenderResult", "error");
   }
 
-  revalidateAfterMutation(managed.is_active, `/matches/${parsed.match_id}`);
+  revalidateAfterMutation(managed.status === "active", `/matches/${parsed.match_id}`);
   redirect(localePath(locale, `/admin/matches/${parsed.match_id}?${params.toString()}`));
 }
 
@@ -759,7 +759,7 @@ export async function generateAndRenderImageAction(formData: FormData): Promise<
     params.set("comboResult", "error");
   }
 
-  revalidateAfterMutation(managed.is_active, `/matches/${parsed.match_id}`);
+  revalidateAfterMutation(managed.status === "active", `/matches/${parsed.match_id}`);
   redirect(localePath(locale, `/admin/matches/${parsed.match_id}?${params.toString()}`));
 }
 
@@ -774,7 +774,7 @@ export async function deleteMatch(formData: FormData) {
   const { error } = await admin.from("matches").delete().eq("id", id);
   if (error) throw new Error(error.message);
 
-  revalidateAfterMutation(managed.is_active);
+  revalidateAfterMutation(managed.status === "active");
 }
 
 // Detail-page wrapper around `deleteMatch`. After the row is gone the detail

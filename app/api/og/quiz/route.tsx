@@ -81,7 +81,7 @@ export async function GET(request: Request) {
     .from("competitions")
     .select("id")
     .eq("slug", league)
-    .eq("is_live", true)
+    .neq("status", "manage")
     .maybeSingle();
   if (!competition) return new Response("League not found", { status: 404 });
   const standing = await loadQuizStanding(supabase, userId, competition.id);

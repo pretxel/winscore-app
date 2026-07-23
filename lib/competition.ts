@@ -38,7 +38,7 @@ export const getActiveCompetition = cache(async (): Promise<ResolvedCompetition 
   const { data } = await supabase
     .from("competitions")
     .select("*")
-    .eq("is_active", true)
+    .eq("status", "active")
     .maybeSingle();
   return data ? resolveCompetition(data) : null;
 });
@@ -107,15 +107,16 @@ export function getBrandingForLeague(comp: ResolvedCompetition | null): Resolved
 // `getActiveCompetition()` above stays until routes are migrated.
 // ---------------------------------------------------------------------------
 
-// Resolve a live league by slug. Returns null ("league unavailable") when the
-// slug does not exist or the league is not live.
+// Resolve a league by slug. Returns null when the slug does not exist or the
+// league is in `manage` status (hidden from public). Active and finished leagues
+// are both accessible — finished leagues show results but predictions are closed.
 export const getLeagueBySlug = cache(async (slug: string): Promise<ResolvedCompetition | null> => {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
     .from("competitions")
     .select("*")
     .eq("slug", slug)
-    .eq("is_live", true)
+    .neq("status", "manage")
     .maybeSingle();
   return data ? resolveCompetition(data) : null;
 });
@@ -159,16 +160,17 @@ export type LeagueCatalogEntry = {
   shortName: string;
   brandCode: string;
   joinCodePrefix: string;
+  status: string;
 };
 
-// Catalog of every live league, for the "start a pool" picker. Ordered by name.
+// Catalog of active and finished leagues, for the "start a pool" picker and
+// the public catalog page. Ordered by name.
 export const listLiveLeagues = cache(async (): Promise<LeagueCatalogEntry[]> => {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
     .from("competitions")
     .select("*")
-    .eq("is_live", true)
-    .is("finished_at", null)
+    .in("status", ["active", "finished"])
     .order("name", { ascending: true });
   return (data ?? []).map((row) => {
     const comp = resolveCompetition(row);
@@ -179,6 +181,7 @@ export const listLiveLeagues = cache(async (): Promise<LeagueCatalogEntry[]> => 
       shortName: comp.short_name,
       brandCode: comp.brandingConfig.brandCode ?? FALLBACK_BRAND_CODE,
       joinCodePrefix: comp.brandingConfig.joinCodePrefix ?? "WC",
+      status: comp.status,
     } satisfies LeagueCatalogEntry;
   });
 });

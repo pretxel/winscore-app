@@ -47,7 +47,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 
 // Managed-competition context reads cookies; stub it (active scope).
 vi.mock("@/lib/admin/managed-competition", () => ({
-  getManagedCompetition: vi.fn(async () => ({ id: "comp-1", is_active: true })),
+  getManagedCompetition: vi.fn(async () => ({ id: "comp-1", status: "active" })),
   assertMatchInManaged: vi.fn(async () => {}),
 }));
 

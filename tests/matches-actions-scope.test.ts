@@ -46,7 +46,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 
 const MANAGED = {
   id: "comp-1",
-  is_active: true,
+  status: "active",
   format: {
     stages: [
       { key: "group", kind: "group", order: 1, hasGroupCode: true, labels: { en: "G" } },

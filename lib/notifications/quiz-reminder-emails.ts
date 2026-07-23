@@ -255,7 +255,7 @@ export async function dispatchQuizReminders(
   const compQuery = admin.from("competitions").select("id, slug");
   const { data: competition, error: cErr } = await (leagueSlug
     ? compQuery.eq("slug", leagueSlug)
-    : compQuery.eq("is_active", true)
+    : compQuery.eq("status", "active")
   ).maybeSingle();
   if (cErr) {
     throw new Error(`[quiz-reminders] resolve competition: ${cErr.message}`);

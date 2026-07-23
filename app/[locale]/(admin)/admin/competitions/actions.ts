@@ -85,13 +85,9 @@ export async function createCompetition(formData: FormData): Promise<void> {
   const input = parseCompetitionForm(formData);
 
   const admin = createAdminSupabaseClient();
-  // is_active is forced false (the guard trigger also enforces this); going
-  // live is a separate, confirmed step via setActiveCompetition.
-  const { data, error } = await admin
-    .from("competitions")
-    .insert({ ...input, is_active: false })
-    .select("id")
-    .single();
+  // New competitions start in `manage` status (hidden) and are promoted to
+  // `active` or `finished` later via setStatus.
+  const { data, error } = await admin.from("competitions").insert(input).select("id").single();
   if (error) throw dbError(error);
 
   revalidatePath("/admin/competitions");
@@ -113,16 +109,16 @@ export async function updateCompetition(formData: FormData): Promise<void> {
   revalidatePath("/admin/competitions");
 }
 
-export async function setActiveCompetition(formData: FormData): Promise<void> {
+export async function setStatus(formData: FormData): Promise<void> {
   await assertAdmin();
   const id = z.string().uuid().parse(formData.get("id"));
+  const status = z.enum(["active", "manage", "finished"]).parse(formData.get("status"));
 
   const admin = createAdminSupabaseClient();
-  const { error } = await admin.rpc("set_active_competition", { p_id: id });
+  const { error } = await admin.from("competitions").update({ status }).eq("id", id);
   if (error) throw new Error(error.message);
 
-  // The active competition drives every public surface + branding, so blow away
-  // the public caches and the leaderboard tag.
+  // Blow away public caches and leaderboard tag.
   revalidateTag("leaderboard", "max");
   revalidatePath("/", "layout");
   revalidatePath("/matches");
@@ -136,13 +132,10 @@ export async function deleteCompetition(formData: FormData): Promise<void> {
   const admin = createAdminSupabaseClient();
   const { data: comp } = await admin
     .from("competitions")
-    .select("slug, is_active")
+    .select("slug, status")
     .eq("id", id)
     .maybeSingle();
   if (!comp) throw new Error("Competition not found");
-  if (comp.is_active) {
-    throw new Error("Switch the active competition away before deleting this one");
-  }
   if (comp.slug === WC_SEED_SLUG) {
     throw new Error("The World Cup 2026 seed competition cannot be deleted");
   }

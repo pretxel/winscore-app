@@ -28,7 +28,7 @@ export default async function RoundsPage({ params }: { params: Promise<{ locale:
 
   const { data: competitions } = await admin
     .from("competitions")
-    .select("id, name, short_name, is_live")
+    .select("id, name, short_name, status")
     .order("name");
 
   const { data: rounds } = await admin

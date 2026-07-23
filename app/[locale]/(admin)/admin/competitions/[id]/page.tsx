@@ -33,10 +33,11 @@ export default async function EditCompetitionPage({
     .eq("competition_id", id);
   const hasFixtures = (fixtureCount ?? 0) > 0;
 
-  const activeName = row.is_active
-    ? row.name
-    : ((await admin.from("competitions").select("name").eq("is_active", true).maybeSingle()).data
-        ?.name ?? null);
+  const activeName =
+    row.status === "active"
+      ? row.name
+      : ((await admin.from("competitions").select("name").eq("status", "active").maybeSingle()).data
+          ?.name ?? null);
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
@@ -52,7 +53,7 @@ export default async function EditCompetitionPage({
           <AdminPageHeader
             title={row.name}
             actions={
-              row.is_active ? (
+              row.status === "active" ? (
                 <Badge>{t("competitions.badgeActive")}</Badge>
               ) : (
                 <SetActiveDialog

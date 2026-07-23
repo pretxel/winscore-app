@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { setActiveCompetition } from "@/app/[locale]/(admin)/admin/competitions/actions";
+import { setStatus } from "@/app/[locale]/(admin)/admin/competitions/actions";
 import { ActionStatus } from "@/components/admin/action-status";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { Button } from "@/components/ui/button";
@@ -56,8 +56,9 @@ export function SetActiveDialog({
           <DialogClose render={<Button variant="ghost" autoFocus />}>
             {t("setActive.cancel")}
           </DialogClose>
-          <form action={setActiveCompetition}>
+          <form action={setStatus}>
             <input type="hidden" name="id" value={id} />
+            <input type="hidden" name="status" value="active" />
             <SubmitButton variant="destructive">{t("setActive.confirm")}</SubmitButton>
           </form>
         </DialogFooter>

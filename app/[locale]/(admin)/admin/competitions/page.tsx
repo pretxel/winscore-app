@@ -30,13 +30,13 @@ export default async function AdminCompetitionsPage({
   const [{ data: competitions }, managedId] = await Promise.all([
     admin
       .from("competitions")
-      .select("id, slug, name, short_name, season, is_active, finished_at")
+      .select("id, slug, name, short_name, season, status, finished_at")
       .order("season", { ascending: false }),
     getManagedCompetitionId(),
   ]);
 
   const rows = competitions ?? [];
-  const activeName = rows.find((c) => c.is_active)?.name ?? null;
+  const activeName = rows.find((c) => c.status === "active")?.name ?? null;
 
   // Fixture counts (few competitions → a small fan-out of head counts).
   const fixtureCounts = new Map<string, number>();
@@ -85,9 +85,10 @@ export default async function AdminCompetitionsPage({
             {rows.map((c) => {
               const isManaged = c.id === managedId;
               const fixtures = fixtureCounts.get(c.id) ?? 0;
-              const isFinished = Boolean(c.finished_at);
+              const isActive = c.status === "active";
+              const isFinished = c.status === "finished";
               const isWcSeed = c.slug === WC_SEED_SLUG;
-              const deletable = !c.is_active && !isWcSeed && fixtures === 0;
+              const deletable = !isActive && !isWcSeed && fixtures === 0;
               return (
                 <li key={c.id}>
                   <StatusCard
@@ -95,7 +96,10 @@ export default async function AdminCompetitionsPage({
                     value={c.name}
                     badges={
                       <>
-                        {c.is_active ? <Badge>{t("competitions.badgeActive")}</Badge> : null}
+                        {isActive ? <Badge>{t("competitions.badgeActive")}</Badge> : null}
+                        {c.status === "manage" ? (
+                          <Badge variant="outline">{t("competitions.badgeDraft") ?? "Draft"}</Badge>
+                        ) : null}
                         {isManaged ? (
                           <Badge variant="outline">{t("competitions.badgeManaging")}</Badge>
                         ) : null}
@@ -129,7 +133,7 @@ export default async function AdminCompetitionsPage({
                           </form>
                         ) : null}
 
-                        {!c.is_active ? (
+                        {!isActive ? (
                           <SetActiveDialog
                             id={c.id}
                             name={c.name}
@@ -145,7 +149,7 @@ export default async function AdminCompetitionsPage({
                         </Link>
 
                         {/* Finish / Restart */}
-                        {!isWcSeed && !c.is_active ? (
+                        {!isWcSeed && !isActive ? (
                           isFinished ? (
                             <form action={restartLeague}>
                               <input type="hidden" name="id" value={c.id} />

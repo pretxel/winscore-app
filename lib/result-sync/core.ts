@@ -223,7 +223,7 @@ export async function runSync(opts: RunSyncOptions = {}): Promise<RunSummary> {
   const compQuery = admin.from("competitions").select("id, providers");
   const { data: comp } = opts.competitionId
     ? await compQuery.eq("id", opts.competitionId).maybeSingle()
-    : await compQuery.eq("is_active", true).maybeSingle();
+    : await compQuery.eq("status", "active").maybeSingle();
   const competitionId = comp?.id ?? opts.competitionId;
   const providerConfig = (comp?.providers ?? undefined) as ProviderConfig | undefined;
 
