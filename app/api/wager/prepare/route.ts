@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   appendTransactionMessageInstructions,
   compileTransaction,
@@ -13,14 +14,18 @@ import {
   findAssociatedTokenPda,
   getCreateAssociatedTokenIdempotentInstruction,
 } from "@solana-program/token";
-import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { transitionIntentState } from "@/lib/wager/entry-saga";
 import { getWagerEnv } from "@/lib/wager/env";
 import { buildEnterInstruction } from "@/lib/wager/instructions";
-import { addressFromBytes, deriveEntryPda, deriveVaultAta, deriveWagerRoundPda } from "@/lib/wager/pda";
+import {
+  addressFromBytes,
+  deriveEntryPda,
+  deriveVaultAta,
+  deriveWagerRoundPda,
+} from "@/lib/wager/pda";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +79,10 @@ export async function POST(request: Request) {
     );
   }
   if (!intent.wager_round_id) {
-    return NextResponse.json({ error: "Wager round not configured for this round" }, { status: 409 });
+    return NextResponse.json(
+      { error: "Wager round not configured for this round" },
+      { status: 409 },
+    );
   }
 
   const admin = createAdminSupabaseClient();

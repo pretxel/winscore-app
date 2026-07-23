@@ -58,24 +58,26 @@ export async function deriveWagerRoundPda(groupId: string, roundId: string): Pro
   return { address: addr, bytes: toBytes(addr), bump };
 }
 
-export async function deriveEntryPda(
-  wagerRound: Address,
-  entrant: Address,
-): Promise<DerivedPda> {
+export async function deriveEntryPda(wagerRound: Address, entrant: Address): Promise<DerivedPda> {
   const [addr, bump] = await getProgramDerivedAddress({
     programAddress: programAddress(),
-    seeds: [utf8Encoder.encode(ENTRY_SEED), addressEncoder.encode(wagerRound), addressEncoder.encode(entrant)],
+    seeds: [
+      utf8Encoder.encode(ENTRY_SEED),
+      addressEncoder.encode(wagerRound),
+      addressEncoder.encode(entrant),
+    ],
   });
   return { address: addr, bytes: toBytes(addr), bump };
 }
 
-export async function deriveClaimPda(
-  wagerRound: Address,
-  winner: Address,
-): Promise<DerivedPda> {
+export async function deriveClaimPda(wagerRound: Address, winner: Address): Promise<DerivedPda> {
   const [addr, bump] = await getProgramDerivedAddress({
     programAddress: programAddress(),
-    seeds: [utf8Encoder.encode(CLAIM_SEED), addressEncoder.encode(wagerRound), addressEncoder.encode(winner)],
+    seeds: [
+      utf8Encoder.encode(CLAIM_SEED),
+      addressEncoder.encode(wagerRound),
+      addressEncoder.encode(winner),
+    ],
   });
   return { address: addr, bytes: toBytes(addr), bump };
 }

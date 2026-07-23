@@ -110,5 +110,8 @@ export async function POST(request: Request) {
 
   // Not confirmed within the window — hand off to the reconciler.
   await transitionIntentState(intentId, "reconciliation_required");
-  return NextResponse.json({ ok: true, state: "reconciliation_required", signature }, { status: 202 });
+  return NextResponse.json(
+    { ok: true, state: "reconciliation_required", signature },
+    { status: 202 },
+  );
 }

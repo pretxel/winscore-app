@@ -11,7 +11,6 @@
 import {
   AccountRole,
   type Address,
-  type IInstruction,
   fixEncoderSize,
   getAddressEncoder,
   getBytesEncoder,
@@ -19,6 +18,7 @@ import {
   getStructEncoder,
   getU16Encoder,
   getU64Encoder,
+  type IInstruction,
 } from "@solana/kit";
 
 export const SYSTEM_PROGRAM_ADDRESS = "11111111111111111111111111111111" as Address;
