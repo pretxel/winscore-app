@@ -1,6 +1,6 @@
 // Pure, dependency-free renderer for the magic-link (and related auth) email.
 // Mirrors the web app's visual language and the result-standing email
-// (blue header, cream body, WIN·SCORE·POOL wordmark, mono uppercase labels)
+// (blue header, cream body, Winscore wordmark, mono uppercase labels)
 // using email-safe HTML: table layout, inline styles, fixed hex colors (no
 // oklch, CSS variables, or stylesheets).
 //
@@ -98,14 +98,15 @@ function monoLabel(text: string, color: string): string {
 // --- HTML sections ---------------------------------------------------------
 
 function renderHeader(): string {
-  // Blue band with the WIN·SCORE·POOL wordmark in cream — identical to the
-  // result email's signature, without depending on the SVG logotype (var()).
+  // Blue band with the Winscore wordmark in cream — mirrors the app logotype
+  // (a "W" tile + INSCORE) without depending on the SVG logotype (var()). The
+  // tile is inverted vs. on-screen (cream tile, blue W) to stay legible on the
+  // blue band.
   return `
     <tr>
       <td style="background-color:${C.pitch};padding:22px 28px;">
-        <span style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.5px;color:${C.pitchFg};">WIN</span>
-        <span style="display:inline-block;margin:0 6px;padding:3px 8px;border-radius:7px;background-color:${C.pitchFg};font-family:${MONO};font-size:12px;font-weight:800;letter-spacing:0;color:${C.pitch};vertical-align:middle;">SCORE</span>
-        <span style="font-family:${MONO};font-size:12px;font-weight:600;letter-spacing:0.3em;color:${C.pitchFg};vertical-align:middle;">POOL</span>
+        <span style="display:inline-block;width:30px;height:30px;line-height:30px;text-align:center;border-radius:8px;background-color:${C.pitchFg};font-family:${SANS};font-size:20px;font-weight:800;color:${C.pitch};vertical-align:middle;">W</span>
+        <span style="margin-left:8px;font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:1px;color:${C.pitchFg};vertical-align:middle;">INSCORE</span>
       </td>
     </tr>`;
 }
