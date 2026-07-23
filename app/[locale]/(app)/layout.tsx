@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 export default async function AppLayout({
   children,

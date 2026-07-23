@@ -10,10 +10,7 @@ import { describe, expect, it } from "vitest";
 
 const raw = readFileSync(
   fileURLToPath(
-    new URL(
-      "../supabase/migrations/20260619170000_group_referral_reward.sql",
-      import.meta.url,
-    ),
+    new URL("../supabase/migrations/20260619170000_group_referral_reward.sql", import.meta.url),
   ),
   "utf8",
 );
@@ -92,9 +89,7 @@ describe("group-referral-reward migration — RPC guards", () => {
 
 describe("group-referral-reward migration — RLS", () => {
   it("enables RLS and a co-member select policy, with no client write policy", () => {
-    expect(sql).toMatch(
-      /alter table public\.group_referrals enable row level security/i,
-    );
+    expect(sql).toMatch(/alter table public\.group_referrals enable row level security/i);
     expect(sql).toMatch(
       /create policy[\s\S]*on public\.group_referrals for select[\s\S]*is_group_member\(group_id\)/i,
     );

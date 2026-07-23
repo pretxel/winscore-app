@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { env } from "@/lib/env";
+import { type Locale, SUPPORTED_LOCALES } from "@/lib/i18n";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { SUPPORTED_LOCALES, type Locale } from "@/lib/i18n";
 
 type StaticRoute = {
   path: string;
@@ -22,13 +22,8 @@ function urlFor(base: string, locale: Locale, path: string): string {
   return `${base}/${locale}${trimmed}`;
 }
 
-function languageAlternates(
-  base: string,
-  path: string,
-): Record<string, string> {
-  return Object.fromEntries(
-    SUPPORTED_LOCALES.map((loc) => [loc, urlFor(base, loc, path)]),
-  );
+function languageAlternates(base: string, path: string): Record<string, string> {
+  return Object.fromEntries(SUPPORTED_LOCALES.map((loc) => [loc, urlFor(base, loc, path)]));
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

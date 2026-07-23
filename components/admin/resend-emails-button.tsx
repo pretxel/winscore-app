@@ -1,7 +1,7 @@
 "use client";
 
-import { SubmitButton } from "@/components/admin/submit-button";
 import { resendResultEmails } from "@/app/[locale]/(admin)/admin/matches/actions";
+import { SubmitButton } from "@/components/admin/submit-button";
 
 // Force-resend of result emails for one final match. Re-sends to players who
 // were already emailed, so it is confirm-gated and disabled while submitting via

@@ -1,11 +1,7 @@
 import "server-only";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { isOptedIn } from "@/lib/email-prefs";
-import {
-  sendWebPush,
-  type PushPayload,
-  type PushSubscriptionRecord,
-} from "./web-push";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { type PushPayload, type PushSubscriptionRecord, sendWebPush } from "./web-push";
 
 type AdminClient = ReturnType<typeof createAdminSupabaseClient>;
 
@@ -55,10 +51,7 @@ export async function loadPushPrefs(
   userIds: string[],
 ): Promise<{ user_id: string; email_prefs: unknown }[]> {
   if (userIds.length === 0) return [];
-  const { data, error } = await admin
-    .from("profiles")
-    .select("id, email_prefs")
-    .in("id", userIds);
+  const { data, error } = await admin.from("profiles").select("id, email_prefs").in("id", userIds);
   if (error) throw new Error(`[push] load prefs: ${error.message}`);
   return (data ?? []).map((r) => ({
     user_id: r.id as string,
@@ -122,10 +115,7 @@ async function pushToUser(
     // "skipped" (VAPID unset) leaves delivered=false; the caller no-ops.
   }
   if (deadIds.length > 0) {
-    const { error } = await admin
-      .from("push_subscriptions")
-      .delete()
-      .in("id", deadIds);
+    const { error } = await admin.from("push_subscriptions").delete().in("id", deadIds);
     if (error) {
       console.error("[push] prune dead subscriptions failed:", error.message);
     } else {

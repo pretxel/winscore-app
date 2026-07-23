@@ -78,7 +78,7 @@ export function normalizeSourceUrl(raw: string): string {
 
 /** Build the idempotent dedup key for an article. */
 export function dedupKeyFor(externalId: string | null, sourceUrl: string): string {
-  if (externalId && externalId.trim()) return `id:${externalId.trim()}`;
+  if (externalId?.trim()) return `id:${externalId.trim()}`;
   return `url:${normalizeSourceUrl(sourceUrl)}`;
 }
 
@@ -131,10 +131,7 @@ export function mapNewsApiResponse(json: NewsApiResponse): NewsArticle[] {
  * is sent via the X-Api-Key header (see fetchNewsFeed), NOT in the query
  * string — secrets in URLs leak into proxy/access logs.
  */
-export function buildNewsRequestUrl(
-  baseUrl: string,
-  query: string = NEWS_QUERY,
-): string {
+export function buildNewsRequestUrl(baseUrl: string, query: string = NEWS_QUERY): string {
   const u = new URL(baseUrl);
   if (!u.searchParams.has("q")) u.searchParams.set("q", query);
   u.searchParams.set("sortBy", "publishedAt");

@@ -86,7 +86,7 @@ function makePromptAdmin(opts: PromptAdminOpts) {
       return {
         select: () => ({
           // batch selection: .eq("is_active",true).in("match_id",[...])
-          eq: (col: string, _val: unknown) => ({
+          eq: (_col: string, _val: unknown) => ({
             in: async () => ({
               data: opts.summariesError ? null : summaries,
               error: opts.summariesError ?? null,
@@ -168,15 +168,13 @@ describe("generatePendingImagePrompts", () => {
   it("isolates a single-item failure: increments errors and continues the batch", async () => {
     // First generation throws (OpenRouter), the second succeeds.
     chatMock.mockReset();
-    chatMock
-      .mockRejectedValueOnce(new Error("openrouter boom"))
-      .mockResolvedValueOnce({
-        content:
-          "### **Panel 1**\n* a\n### **Panel 2**\n* b\n### **Panel 3**\n* c\n### **Panel 4**\n* d",
-        model: "test/model",
-        promptTokens: 1,
-        completionTokens: 2,
-      });
+    chatMock.mockRejectedValueOnce(new Error("openrouter boom")).mockResolvedValueOnce({
+      content:
+        "### **Panel 1**\n* a\n### **Panel 2**\n* b\n### **Panel 3**\n* c\n### **Panel 4**\n* d",
+      model: "test/model",
+      promptTokens: 1,
+      completionTokens: 2,
+    });
     const admin = makePromptAdmin({
       finals: [{ id: "m1" }, { id: "m2" }],
       summaries: [

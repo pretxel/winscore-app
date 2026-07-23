@@ -18,9 +18,7 @@ function utcDayKey(d: Date): string {
  * convention.
  */
 function currentUtcWeekBounds(now: Date): { start: Date; end: Date } {
-  const start = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   // getUTCDay(): 0 = Sunday … 6 = Saturday. Days since Monday: Sun → 6, else d-1.
   const daysSinceMonday = (start.getUTCDay() + 6) % 7;
   start.setUTCDate(start.getUTCDate() - daysSinceMonday);
@@ -71,9 +69,7 @@ export function computePredictionStreak(
   // Anchor at today (UTC midnight). If today has no pick, the streak can still
   // be alive from yesterday backwards; otherwise it's zero. The anchor uses
   // real in-week activity only — a freeze is never spent on it.
-  const cursor = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
+  const cursor = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   if (!days.has(utcDayKey(cursor))) {
     cursor.setUTCDate(cursor.getUTCDate() - 1);
     if (!days.has(utcDayKey(cursor))) return 0;

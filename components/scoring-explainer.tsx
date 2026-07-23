@@ -1,9 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { getActiveCompetition } from "@/lib/competition";
 import { getStageLabel, sortedStages } from "@/lib/competition-schema";
+import type { Locale } from "@/lib/i18n";
 import { BASE_POINTS, resolveStageMultiplier } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
-import type { Locale } from "@/lib/i18n";
 
 // Base-point tiers, in the order they appear as columns.
 const TIERS = [
@@ -30,10 +30,7 @@ export async function ScoringExplainer({ locale }: { locale: Locale }) {
   }));
 
   return (
-    <section
-      id="stage-scoring"
-      className="border-t border-border/70 bg-muted/30"
-    >
+    <section id="stage-scoring" className="border-t border-border/70 bg-muted/30">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
         <div className="max-w-2xl">
           <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">

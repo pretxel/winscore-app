@@ -1,6 +1,6 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { type NextRequest, NextResponse } from "next/server";
 import { normalizeEmailPrefs } from "@/lib/email-prefs";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 // One-click unsubscribe for the comeback (re-engagement) email. Reached from the
 // email's footer link (GET) and from RFC 8058 one-click clients (POST). No auth:

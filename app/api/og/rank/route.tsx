@@ -1,20 +1,11 @@
-import { ImageResponse } from "next/og";
 import { createClient } from "@supabase/supabase-js";
+import { ImageResponse } from "next/og";
 import { getTranslations } from "next-intl/server";
-import { env } from "@/lib/env";
-import { isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import type { Database } from "@/lib/database.types";
-import {
-  loadOgFonts,
-  loadDisplayNameFallback,
-  OG_FONT_FAMILY,
-} from "@/lib/og-fonts";
-import {
-  cardETag,
-  ifNoneMatchSatisfied,
-  notModified,
-  OG_CACHE_CONTROL,
-} from "@/lib/og-cache";
+import { env } from "@/lib/env";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n";
+import { cardETag, ifNoneMatchSatisfied, notModified, OG_CACHE_CONTROL } from "@/lib/og-cache";
+import { loadDisplayNameFallback, loadOgFonts, OG_FONT_FAMILY } from "@/lib/og-fonts";
 
 // Node runtime (no `runtime = "edge"`): lib/og-fonts.ts reads font binaries via
 // node:fs/promises, and the @vercel/og Edge bundle cap does not apply.
@@ -87,9 +78,7 @@ export async function GET(request: Request) {
       .select("rank, display_name, total_points, exact_hits")
       .eq("user_id", userId)
       .maybeSingle(),
-    supabase
-      .from("v_leaderboard_overall")
-      .select("*", { count: "exact", head: true }),
+    supabase.from("v_leaderboard_overall").select("*", { count: "exact", head: true }),
   ]);
   const brandCode = "WINSCORE";
   // Validate inputs before any render or ETag work — an unknown user is a 404,

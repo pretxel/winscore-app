@@ -27,16 +27,16 @@ vi.mock("@/lib/matches/match-image-render", () => ({
 }));
 
 import { createChatCompletion } from "@/lib/ai/openrouter";
+import { generateMatchImagePrompt } from "@/lib/matches/match-image-prompt";
+import { requestMatchImageRender } from "@/lib/matches/match-image-render";
 import {
   buildSummaryPrompt,
   generateMatchSummary,
   generatePendingSummaries,
   STYLE_PRESETS,
-  type SummaryMatch,
   type SummaryEvent,
+  type SummaryMatch,
 } from "@/lib/matches/match-summary";
-import { generateMatchImagePrompt } from "@/lib/matches/match-image-prompt";
-import { requestMatchImageRender } from "@/lib/matches/match-image-render";
 
 const chatMock = vi.mocked(createChatCompletion);
 const imagePromptMock = vi.mocked(generateMatchImagePrompt);
@@ -330,22 +330,25 @@ describe("generateMatchSummary (regenerate mode)", () => {
     // no-key
     envMock.openrouterApiKey = null;
     let admin = makeAdmin({ match: FINAL_MATCH, events: [GOAL] });
-    expect(
-      await generateMatchSummary(admin as never, "m1", { mode: "regenerate" }),
-    ).toEqual({ generated: false, reason: "no-key" });
+    expect(await generateMatchSummary(admin as never, "m1", { mode: "regenerate" })).toEqual({
+      generated: false,
+      reason: "no-key",
+    });
 
     // not-final
     envMock.openrouterApiKey = "test-key";
     admin = makeAdmin({ match: { ...FINAL_MATCH, status: "live" }, events: [GOAL] });
-    expect(
-      await generateMatchSummary(admin as never, "m1", { mode: "regenerate" }),
-    ).toEqual({ generated: false, reason: "not-final" });
+    expect(await generateMatchSummary(admin as never, "m1", { mode: "regenerate" })).toEqual({
+      generated: false,
+      reason: "not-final",
+    });
 
     // no-events
     admin = makeAdmin({ match: FINAL_MATCH, events: [] });
-    expect(
-      await generateMatchSummary(admin as never, "m1", { mode: "regenerate" }),
-    ).toEqual({ generated: false, reason: "no-events" });
+    expect(await generateMatchSummary(admin as never, "m1", { mode: "regenerate" })).toEqual({
+      generated: false,
+      reason: "no-events",
+    });
   });
 });
 
@@ -368,9 +371,7 @@ describe("buildSummaryPrompt", () => {
     const prompt = buildSummaryPrompt(FINAL_MATCH, [GOAL], instruction);
     expect(prompt.system).toContain(instruction);
     // The style guidance is appended AFTER the "never invent" grounding rule.
-    expect(prompt.system.indexOf("never invent")).toBeLessThan(
-      prompt.system.indexOf(instruction),
-    );
+    expect(prompt.system.indexOf("never invent")).toBeLessThan(prompt.system.indexOf(instruction));
   });
 
   it("ignores an empty/whitespace style instruction", () => {

@@ -1,11 +1,11 @@
-import { getTranslations } from "next-intl/server";
 import { TriangleAlertIcon } from "lucide-react";
-import { getActiveCompetition } from "@/lib/competition";
-import { getManagedCompetition } from "@/lib/admin/managed-competition";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { getTranslations } from "next-intl/server";
 import { setManagedCompetition } from "@/app/[locale]/(admin)/admin/competitions/actions";
-import { NativeSelect } from "@/components/ui/native-select";
 import { SubmitButton } from "@/components/admin/submit-button";
+import { NativeSelect } from "@/components/ui/native-select";
+import { getManagedCompetition } from "@/lib/admin/managed-competition";
+import { getActiveCompetition } from "@/lib/competition";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 // Persistent indicator of the active (public) vs managed (editing) competition.
 // Calm when they coincide; a prominent gold caution bar when they diverge so an
@@ -13,10 +13,7 @@ import { SubmitButton } from "@/components/admin/submit-button";
 // managed-context switcher lives here too, so it is reachable from every screen.
 export async function ManagedContextBar() {
   const t = await getTranslations("admin");
-  const [active, managed] = await Promise.all([
-    getActiveCompetition(),
-    getManagedCompetition(),
-  ]);
+  const [active, managed] = await Promise.all([getActiveCompetition(), getManagedCompetition()]);
   const diverged = !!(managed && active && managed.id !== active.id);
 
   const admin = createAdminSupabaseClient();
@@ -35,18 +32,16 @@ export async function ManagedContextBar() {
               {t("context.divergedTitle")}
             </span>
             <span>
-              {t("context.managing")}:{" "}
-              <strong className="font-semibold">{managed!.name}</strong>
+              {t("context.managing")}: <strong className="font-semibold">{managed?.name}</strong>
             </span>
             <span aria-hidden className="opacity-50">
               ·
             </span>
             <span>
-              {t("context.live")}:{" "}
-              <strong className="font-semibold">{active!.name}</strong>
+              {t("context.live")}: <strong className="font-semibold">{active?.name}</strong>
             </span>
             <form action={setManagedCompetition} className="ml-auto">
-              <input type="hidden" name="id" value={active!.id} />
+              <input type="hidden" name="id" value={active?.id} />
               <SubmitButton size="sm" variant="outline">
                 {t("context.switchToLive")}
               </SubmitButton>

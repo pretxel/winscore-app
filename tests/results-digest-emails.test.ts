@@ -5,11 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // ---------------------------------------------------------------------------
 
 import {
+  type BoardRow,
+  buildResultsDigestStrings,
   computeDeltas,
   computeMovers,
   computePendingRecipients,
-  buildResultsDigestStrings,
-  type BoardRow,
 } from "@/lib/notifications/results-digest-emails";
 
 function board(rows: Partial<BoardRow>[]): BoardRow[] {
@@ -71,12 +71,7 @@ describe("computeMovers", () => {
 
 describe("computePendingRecipients", () => {
   it("drops already-sent and opted-out users; keeps absent/opted-in", () => {
-    const b = board([
-      { user_id: "u1" },
-      { user_id: "u2" },
-      { user_id: "u3" },
-      { user_id: "u4" },
-    ]);
+    const b = board([{ user_id: "u1" }, { user_id: "u2" }, { user_id: "u3" }, { user_id: "u4" }]);
     const pending = computePendingRecipients(
       b,
       [{ user_id: "u1" }], // already sent today

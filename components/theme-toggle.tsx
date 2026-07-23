@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { useTheme } from "next-themes";
 import { MoonIcon, SunIcon } from "lucide-react";
+import { useTheme } from "next-themes";
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
@@ -28,11 +28,7 @@ export function ThemeToggle() {
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="text-muted-foreground hover:text-foreground"
     >
-      {mounted ? (
-        isDark ? <SunIcon /> : <MoonIcon />
-      ) : (
-        <SunIcon className="opacity-0" />
-      )}
+      {mounted ? isDark ? <SunIcon /> : <MoonIcon /> : <SunIcon className="opacity-0" />}
     </Button>
   );
 }

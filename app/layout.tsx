@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Archivo_Black, JetBrains_Mono, Manrope } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
+import { getLocale } from "next-intl/server";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { getLocale } from "next-intl/server";
 import { env } from "@/lib/env";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n";
 
@@ -149,11 +149,7 @@ export default async function RootLayout({
           async
           strategy="beforeInteractive"
         />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          disableTransitionOnChange
-        >
+        <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
           {children}
           <Toaster richColors closeButton />
         </ThemeProvider>

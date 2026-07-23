@@ -26,10 +26,7 @@ export function AdminNav({
 }) {
   const pathname = usePathname();
   return (
-    <nav
-      aria-label={label}
-      className="flex min-w-0 items-center gap-0.5 overflow-x-auto"
-    >
+    <nav aria-label={label} className="flex min-w-0 items-center gap-0.5 overflow-x-auto">
       {items.map((item) => {
         const active = isActive(pathname, item.href, item.href === dashboardHref);
         return (

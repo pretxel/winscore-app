@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 // Auth gate for the signed-in pages under `[league]` (my-picks). Mirrors the
 // original `(app)` layout: require a session and a completed profile, else

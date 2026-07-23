@@ -1,16 +1,12 @@
 "use server";
 
-import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { isConfirmedMatch } from "@/lib/match-utils";
+import { z } from "zod";
 import { isCurrentUserAdmin } from "@/lib/admin/current-user";
-import {
-  foldCounts,
-  REACTION_TYPES,
-  type ReactionType,
-} from "@/lib/recap-reactions";
+import { isConfirmedMatch } from "@/lib/match-utils";
+import { foldCounts, REACTION_TYPES, type ReactionType } from "@/lib/recap-reactions";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const schema = z.object({
   matchId: z.string().uuid(),
@@ -135,9 +131,7 @@ export type ToggleReactionResult =
   | { ok: true; counts: Record<ReactionType, number> }
   | { ok: false; error: string };
 
-export async function toggleRecapReaction(
-  input: unknown,
-): Promise<ToggleReactionResult> {
+export async function toggleRecapReaction(input: unknown): Promise<ToggleReactionResult> {
   const t = await getTranslations("recapReactions");
   const parsed = reactionSchema.safeParse(input);
   if (!parsed.success) {

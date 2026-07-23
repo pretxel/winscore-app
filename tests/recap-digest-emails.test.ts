@@ -5,9 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // ---------------------------------------------------------------------------
 
 import {
+  buildRecapDigestStrings,
   computePendingByUser,
   filterRecapOptIns,
-  buildRecapDigestStrings,
   type RecapImageRow,
   type RecapRecipient,
 } from "@/lib/notifications/recap-digest-emails";
@@ -22,7 +22,10 @@ function img(id: string, matchId = `match-${id}`): RecapImageRow {
   };
 }
 
-function recipient(user_id: string, display_name: string | null = `Player ${user_id}`): RecapRecipient {
+function recipient(
+  user_id: string,
+  display_name: string | null = `Player ${user_id}`,
+): RecapRecipient {
   return { user_id, display_name };
 }
 

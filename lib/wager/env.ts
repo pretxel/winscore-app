@@ -32,26 +32,17 @@ export interface WagerEnv {
 function parseWagerEnv(): WagerEnv {
   const cluster = env.wagerCluster ?? "devnet";
   if (cluster !== "devnet") {
-    throw new Error(
-      `WAGER_CLUSTER must be "devnet" for MVP. Got: ${cluster}`
-    );
+    throw new Error(`WAGER_CLUSTER must be "devnet" for MVP. Got: ${cluster}`);
   }
 
   return {
     cluster: cluster as "devnet",
-    rpcUrl:
-      env.wagerRpcUrl ?? "https://api.devnet.solana.com",
-    wsUrl:
-      env.wagerWsUrl ?? "wss://api.devnet.solana.com",
+    rpcUrl: env.wagerRpcUrl ?? "https://api.devnet.solana.com",
+    wsUrl: env.wagerWsUrl ?? "wss://api.devnet.solana.com",
     rpcApiKey: env.wagerRpcApiKey ?? null,
-    programId:
-      env.wagerProgramId ??
-      "9q5fBczvg3XYipRmxY5tt3axGgNQfYtGeaDpbMHMLkmi",
-    approvedMint:
-      env.wagerApprovedMint ?? "",
-    tokenProgram:
-      env.wagerTokenProgram ??
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    programId: env.wagerProgramId ?? "9q5fBczvg3XYipRmxY5tt3axGgNQfYtGeaDpbMHMLkmi",
+    approvedMint: env.wagerApprovedMint ?? "",
+    tokenProgram: env.wagerTokenProgram ?? "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
     commitment: "confirmed",
     uiEnabled: env.wagerUiEnabled === "true",
     depositsEnabled: env.wagerDepositsEnabled === "true",

@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { MatchStateBadge } from "@/components/match-state-badge";
 import { KickoffCountdown } from "@/components/kickoff-countdown";
+import { MatchStateBadge } from "@/components/match-state-badge";
 import { useLivePolling } from "@/hooks/use-live-polling";
-import { localePath, type Locale } from "@/lib/i18n";
-import { cn } from "@/lib/utils";
+import { type Locale, localePath } from "@/lib/i18n";
 import type { LiveFixture, LiveMatchesPayload } from "@/lib/matches/live";
+import { cn } from "@/lib/utils";
 
 const POLL_MS = 30_000;
 // Cap how many live rows render inline; the rest live on /matches.
@@ -38,9 +38,7 @@ export function LiveMatchList({
     intervalMs: POLL_MS,
     stopWhen: (p) => {
       if (p.live.length > 0) return false;
-      const nextMs = p.nextUp
-        ? new Date(p.nextUp.kickoff_at).getTime() - Date.now()
-        : Infinity;
+      const nextMs = p.nextUp ? new Date(p.nextUp.kickoff_at).getTime() - Date.now() : Infinity;
       return nextMs > POLL_MS;
     },
   });
@@ -76,25 +74,13 @@ export function LiveMatchList({
           ) : null}
         </>
       ) : data.nextUp ? (
-        <NextUpCard
-          fixture={data.nextUp}
-          locale={locale}
-          labels={labels}
-        />
+        <NextUpCard fixture={data.nextUp} locale={locale} labels={labels} />
       ) : null}
     </div>
   );
 }
 
-function LiveRow({
-  fixture,
-  locale,
-  vs,
-}: {
-  fixture: LiveFixture;
-  locale: Locale;
-  vs: string;
-}) {
+function LiveRow({ fixture, locale, vs }: { fixture: LiveFixture; locale: Locale; vs: string }) {
   const home = fixture.home_score ?? 0;
   const away = fixture.away_score ?? 0;
 
@@ -119,7 +105,9 @@ function LiveRow({
         aria-live="polite"
         className="shrink-0 font-mono text-lg font-semibold tabular-nums text-foreground"
       >
-        {home}<span className="text-muted-foreground">–</span>{away}
+        {home}
+        <span className="text-muted-foreground">–</span>
+        {away}
       </span>
     </Link>
   );

@@ -38,10 +38,7 @@ export function TrophyMark({ className }: { className?: string }) {
       />
 
       {/* Cup body */}
-      <path
-        d="M16 12 H48 V32 C 48 44, 40 50, 32 50 C 24 50, 16 44, 16 32 Z"
-        fill="url(#tm-gold)"
-      />
+      <path d="M16 12 H48 V32 C 48 44, 40 50, 32 50 C 24 50, 16 44, 16 32 Z" fill="url(#tm-gold)" />
       {/* Rim shine */}
       <rect x="16" y="12" width="32" height="4" fill="url(#tm-rim)" />
       {/* Highlight stripe */}

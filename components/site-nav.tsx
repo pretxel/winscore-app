@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { buttonVariants } from "@/components/ui/button";
-import { NavLinks, MobileNav } from "@/components/site-nav-client";
-import { UserMenu } from "@/components/user-menu";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Logotype } from "@/components/logotype";
+import { MobileNav, NavLinks } from "@/components/site-nav-client";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { buttonVariants } from "@/components/ui/button";
+import { UserMenu } from "@/components/user-menu";
 import { getActiveBranding } from "@/lib/competition";
+import { DEFAULT_EMAIL_PREFS, type EmailPrefs, normalizeEmailPrefs } from "@/lib/email-prefs";
 import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n";
-import { DEFAULT_EMAIL_PREFS, normalizeEmailPrefs, type EmailPrefs } from "@/lib/email-prefs";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 export async function SiteNav() {
@@ -76,10 +76,7 @@ export async function SiteNav() {
           ) : (
             <Link
               href={lp("/sign-in")}
-              className={cn(
-                buttonVariants({ size: "sm" }),
-                "hidden sm:inline-flex",
-              )}
+              className={cn(buttonVariants({ size: "sm" }), "hidden sm:inline-flex")}
             >
               {tCommon("signIn")}
             </Link>
@@ -100,9 +97,7 @@ export async function SiteFooter() {
       <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <Logotype size="xs" className="text-foreground" />
-          <span className="font-mono uppercase tracking-[0.2em]">
-            {t("tournament")}
-          </span>
+          <span className="font-mono uppercase tracking-[0.2em]">{t("tournament")}</span>
         </div>
         <div className="flex items-center gap-4">
           <Link

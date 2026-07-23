@@ -1,8 +1,8 @@
 import "server-only";
-import { env } from "@/lib/env";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { fetchNewsFeed, type NewsArticle } from "@/lib/news";
 import { getActiveBranding } from "@/lib/competition";
+import { env } from "@/lib/env";
+import { fetchNewsFeed, type NewsArticle } from "@/lib/news";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 // One news-sync run's outcome. fetched = raw upstream count; skipped = items
 // dropped for invalid fields / non-http scheme / in-batch dedup; inserted +

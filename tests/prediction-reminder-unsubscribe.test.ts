@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const updateMock = vi.fn();
 const updateEqMock = vi.fn();
@@ -86,8 +86,12 @@ describe("GET /api/prediction-reminders/unsubscribe", () => {
 
   it("is idempotent across repeated calls", async () => {
     const { GET } = await import("@/app/api/prediction-reminders/unsubscribe/route");
-    const a = await GET(req(`http://localhost/api/prediction-reminders/unsubscribe?token=${TOKEN}`));
-    const b = await GET(req(`http://localhost/api/prediction-reminders/unsubscribe?token=${TOKEN}`));
+    const a = await GET(
+      req(`http://localhost/api/prediction-reminders/unsubscribe?token=${TOKEN}`),
+    );
+    const b = await GET(
+      req(`http://localhost/api/prediction-reminders/unsubscribe?token=${TOKEN}`),
+    );
     expect(a.status).toBe(200);
     expect(b.status).toBe(200);
     expect(updateMock).toHaveBeenCalledTimes(2);

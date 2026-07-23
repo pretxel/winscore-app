@@ -1,12 +1,14 @@
+import { ArrowLeftIcon, ArrowRightIcon, CrownIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { getGroup, getGroupBoard } from "@/lib/groups";
-import { getLeagueForPool } from "@/lib/competition";
-import { getLeagueLaneFixtures } from "@/lib/home";
-import { LeaderboardTable } from "@/components/leaderboard-table";
 import { FixturesStrip } from "@/components/fixtures-strip";
+import { LeaderboardTable } from "@/components/leaderboard-table";
+import { getLeagueForPool } from "@/lib/competition";
+import { getGroup, getGroupBoard } from "@/lib/groups";
+import { getLeagueLaneFixtures } from "@/lib/home";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import {
   DeleteGroupButton,
   InviteByEmail,
@@ -15,8 +17,6 @@ import {
   RemoveMemberButton,
   RenameGroupForm,
 } from "./group-controls";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
-import { ArrowLeftIcon, ArrowRightIcon, CrownIcon } from "lucide-react";
 
 export async function generateMetadata({
   params,
@@ -110,22 +110,14 @@ export default async function GroupDetailPage({
         </section>
       ) : null}
 
-      <InviteShare
-        code={group.joinCode}
-        locale={locale}
-        currentUserId={group.currentUserId}
-      />
-      {group.currentUserId ? (
-        <InviteByEmail groupId={group.id} locale={locale} />
-      ) : null}
+      <InviteShare code={group.joinCode} locale={locale} currentUserId={group.currentUserId} />
+      {group.currentUserId ? <InviteByEmail groupId={group.id} locale={locale} /> : null}
 
       <section className="mt-8">
         <h2 className="mb-3 font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
           {t("boardTitle")}
         </h2>
-        <p className="mb-3 text-sm text-muted-foreground">
-          {t("joinDateScoringNote")}
-        </p>
+        <p className="mb-3 text-sm text-muted-foreground">{t("joinDateScoringNote")}</p>
         {rows.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-muted/30 p-10 text-center">
             <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
@@ -167,16 +159,11 @@ export default async function GroupDetailPage({
           {group.members.map((m) => {
             const isGroupOwner = m.userId === group.ownerId;
             return (
-              <li
-                key={m.userId}
-                className="flex items-center justify-between gap-3 px-4 py-3"
-              >
+              <li key={m.userId} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <span className="truncate font-medium">
                     {m.displayName ?? (
-                      <span className="italic text-muted-foreground">
-                        {t("noName")}
-                      </span>
+                      <span className="italic text-muted-foreground">{t("noName")}</span>
                     )}
                   </span>
                   {isGroupOwner ? (

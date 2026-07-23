@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { isLiveNow } from "@/lib/matches/live";
-import { maybeScheduleMatchSync } from "@/lib/result-sync/opportunistic";
 import type {
   LiveFeedPayload,
   MatchEvent,
@@ -9,16 +7,15 @@ import type {
   MatchEventType,
   MatchSummary,
 } from "@/lib/matches/match-events";
+import { maybeScheduleMatchSync } from "@/lib/result-sync/opportunistic";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 // Per-match live feed. Polled ~15s by <LiveEventsFeed/> while a match is in
 // progress. Returns current score/status plus the chronological event timeline.
 // `no-store` keeps every poll fresh; an unknown id is a 404. When the match is
 // live, schedules a debounced ESPN event+score refresh AFTER the response is
 // sent so the feed stays fresh without a paid sub-minute cron.
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ matchId: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ matchId: string }> }) {
   const { matchId } = await params;
   const supabase = await createServerSupabaseClient();
 

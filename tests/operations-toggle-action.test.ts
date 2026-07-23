@@ -95,9 +95,7 @@ describe("toggleOperationEnabled", () => {
   it("rejects a non-admin and writes nothing", async () => {
     h.isAdmin = false;
     await expect(
-      toggleOperationEnabled(
-        makeFormData({ locale: "en", kind: "sync_news", enabled: "false" }),
-      ),
+      toggleOperationEnabled(makeFormData({ locale: "en", kind: "sync_news", enabled: "false" })),
     ).rejects.toThrow("Admin only");
     expect(h.setOperationEnabledMock).not.toHaveBeenCalled();
     expect(h.redirectMock).not.toHaveBeenCalled();
@@ -106,18 +104,14 @@ describe("toggleOperationEnabled", () => {
   it("rejects a signed-out caller and writes nothing", async () => {
     h.user = null;
     await expect(
-      toggleOperationEnabled(
-        makeFormData({ locale: "en", kind: "sync_news", enabled: "false" }),
-      ),
+      toggleOperationEnabled(makeFormData({ locale: "en", kind: "sync_news", enabled: "false" })),
     ).rejects.toThrow("Not signed in");
     expect(h.setOperationEnabledMock).not.toHaveBeenCalled();
   });
 
   it("rejects an unknown kind and writes nothing", async () => {
     await expect(
-      toggleOperationEnabled(
-        makeFormData({ locale: "en", kind: "drop_tables", enabled: "false" }),
-      ),
+      toggleOperationEnabled(makeFormData({ locale: "en", kind: "drop_tables", enabled: "false" })),
     ).rejects.toThrow("Unknown operation kind");
     expect(h.setOperationEnabledMock).not.toHaveBeenCalled();
   });

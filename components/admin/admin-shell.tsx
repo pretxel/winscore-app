@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { localePath, type Locale } from "@/lib/i18n";
 import { AdminNav, type AdminNavItem } from "@/components/admin/admin-nav";
 import { ManagedContextBar } from "@/components/admin/managed-context-bar";
+import { type Locale, localePath } from "@/lib/i18n";
 
 const NAV = [
   { href: "/admin", key: "dashboard" },
@@ -43,11 +43,7 @@ export async function AdminShell({
               {t("nav.sectionLabel")}
             </span>
           </Link>
-          <AdminNav
-            items={items}
-            dashboardHref={dashboardHref}
-            label={t("nav.sectionLabel")}
-          />
+          <AdminNav items={items} dashboardHref={dashboardHref} label={t("nav.sectionLabel")} />
         </div>
       </header>
       <ManagedContextBar />

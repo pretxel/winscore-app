@@ -2,26 +2,22 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { runSync } from "@/lib/result-sync/core";
-import { dispatchResultEmails } from "@/lib/notifications/result-emails";
-import { dispatchPredictionReminders } from "@/lib/notifications/prediction-reminder-emails";
-import { dispatchQuizReminders } from "@/lib/notifications/quiz-reminder-emails";
-import { dispatchResultsDigest } from "@/lib/notifications/results-digest-emails";
-import { dispatchRecapDigest } from "@/lib/notifications/recap-digest-emails";
+import { getActiveBranding } from "@/lib/competition";
+import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n";
+import { runNewsSync } from "@/lib/news-sync";
 import { dispatchComebackEmails } from "@/lib/notifications/comeback-emails";
 import { dispatchPlayoffScoreEmail } from "@/lib/notifications/playoff-score-emails";
+import { dispatchPredictionReminders } from "@/lib/notifications/prediction-reminder-emails";
+import { dispatchQuizReminders } from "@/lib/notifications/quiz-reminder-emails";
+import { dispatchRecapDigest } from "@/lib/notifications/recap-digest-emails";
+import { dispatchResultEmails } from "@/lib/notifications/result-emails";
+import { dispatchResultsDigest } from "@/lib/notifications/results-digest-emails";
 import { dispatchScoreRulesEmail } from "@/lib/notifications/score-rules-emails";
 import { dispatchWinnersEmail } from "@/lib/notifications/winners-emails";
-import { runNewsSync } from "@/lib/news-sync";
-import { getActiveBranding } from "@/lib/competition";
-import {
-  OPERATION_KINDS,
-  recordRun,
-  type OperationKind,
-} from "@/lib/operations/record-run";
+import { OPERATION_KINDS, type OperationKind, recordRun } from "@/lib/operations/record-run";
 import { setOperationEnabled } from "@/lib/operations/settings";
-import { isLocale, localePath, DEFAULT_LOCALE } from "@/lib/i18n";
+import { runSync } from "@/lib/result-sync/core";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 async function assertAdmin() {
   const supabase = await createServerSupabaseClient();

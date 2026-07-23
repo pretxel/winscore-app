@@ -9,10 +9,8 @@
 
 import { C } from "./email-theme";
 
-const SANS =
-  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO =
-  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // All copy is resolved by the caller (next-intl) and passed in — value-bearing
 // strings (subject, heading) arrive already interpolated.
@@ -102,12 +100,7 @@ function renderIntro(data: WelcomeEmailData): string {
 }
 
 // One oriented "core loop" section: a titled card with a blurb and a deep link.
-function renderLoop(
-  title: string,
-  blurb: string,
-  cta: string,
-  url: string,
-): string {
+function renderLoop(title: string, blurb: string, cta: string, url: string): string {
   return `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${C.border};border-radius:12px;background-color:${C.card};margin-top:10px;">
       <tr>
@@ -153,9 +146,7 @@ function renderFooter(s: WelcomeEmailStrings): string {
 
 // --- public renderer -------------------------------------------------------
 
-export function renderWelcomeEmail(
-  data: WelcomeEmailData,
-): WelcomeEmailRendered {
+export function renderWelcomeEmail(data: WelcomeEmailData): WelcomeEmailRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>

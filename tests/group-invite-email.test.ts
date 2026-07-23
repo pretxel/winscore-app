@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  renderGroupInviteEmail,
   type GroupInviteEmailData,
   type GroupInviteEmailStrings,
+  renderGroupInviteEmail,
 } from "@/lib/notifications/group-invite-template";
 
 // ---------------------------------------------------------------------------
@@ -150,9 +150,7 @@ const baseOpts = {
 describe("sendGroupInviteEmails", () => {
   it("no-ops without sending when RESEND_API_KEY is unset", async () => {
     resendApiKey = null;
-    const { sendGroupInviteEmails } = await import(
-      "@/lib/notifications/group-invite-email"
-    );
+    const { sendGroupInviteEmails } = await import("@/lib/notifications/group-invite-email");
     const res = await sendGroupInviteEmails({
       ...baseOpts,
       recipients: ["friend@gmail.com"],
@@ -163,9 +161,7 @@ describe("sendGroupInviteEmails", () => {
   });
 
   it("sends one message per recipient and logs each accepted send", async () => {
-    const { sendGroupInviteEmails } = await import(
-      "@/lib/notifications/group-invite-email"
-    );
+    const { sendGroupInviteEmails } = await import("@/lib/notifications/group-invite-email");
     const res = await sendGroupInviteEmails({
       ...baseOpts,
       recipients: ["a@gmail.com", "b@gmail.com"],
@@ -186,9 +182,7 @@ describe("sendGroupInviteEmails", () => {
     sendMock
       .mockResolvedValueOnce({ data: null, error: { message: "rejected" } })
       .mockResolvedValueOnce({ data: { id: "ok" }, error: null });
-    const { sendGroupInviteEmails } = await import(
-      "@/lib/notifications/group-invite-email"
-    );
+    const { sendGroupInviteEmails } = await import("@/lib/notifications/group-invite-email");
     const res = await sendGroupInviteEmails({
       ...baseOpts,
       recipients: ["bad@gmail.com", "good@gmail.com"],
@@ -199,9 +193,7 @@ describe("sendGroupInviteEmails", () => {
   });
 
   it("builds the join URL at the given locale", async () => {
-    const { sendGroupInviteEmails } = await import(
-      "@/lib/notifications/group-invite-email"
-    );
+    const { sendGroupInviteEmails } = await import("@/lib/notifications/group-invite-email");
     await sendGroupInviteEmails({
       ...baseOpts,
       locale: "es",

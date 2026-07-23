@@ -1,8 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
+import { type NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
-import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@/lib/env";
-import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/lib/i18n";
 
 const intlMiddleware = createIntlMiddleware({
   locales: SUPPORTED_LOCALES as unknown as string[],
@@ -51,7 +51,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api|auth|flags|venues|messages|.*\\.).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api|auth|flags|venues|messages|.*\\.).*)"],
 };

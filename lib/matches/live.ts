@@ -1,6 +1,6 @@
 import "server-only";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { isConfirmedMatch } from "@/lib/match-utils";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 // A fixture as the landing "Tournament live" section needs it. A trimmed slice
 // of `matches` — just what the live list + next-up card render.
@@ -35,9 +35,7 @@ export function isLiveNow(m: { status: string; kickoff_at: string }): boolean {
 // (e.g. "Winner R32-1") are excluded so neither the live
 // list nor the next-up card reads like a bracket diagram. Never throws — a
 // failure degrades to an empty payload.
-export async function getLiveAndNextUp(
-  competitionId?: string,
-): Promise<LiveMatchesPayload> {
+export async function getLiveAndNextUp(competitionId?: string): Promise<LiveMatchesPayload> {
   try {
     const supabase = await createServerSupabaseClient();
     let query = supabase
@@ -52,10 +50,8 @@ export async function getLiveAndNextUp(
     const live = confirmed.filter(isLiveNow);
     const now = Date.now();
     const nextUp =
-      confirmed.find(
-        (m) =>
-          m.status === "scheduled" && new Date(m.kickoff_at).getTime() > now,
-      ) ?? null;
+      confirmed.find((m) => m.status === "scheduled" && new Date(m.kickoff_at).getTime() > now) ??
+      null;
 
     return { live, nextUp };
   } catch {

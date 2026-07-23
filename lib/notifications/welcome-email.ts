@@ -1,9 +1,9 @@
 import "server-only";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { Resend } from "resend";
 import { env } from "@/lib/env";
 import { DEFAULT_LOCALE, localePath } from "@/lib/i18n";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { isSendableEmail } from "./result-emails";
 import { renderWelcomeEmail, type WelcomeEmailStrings } from "./welcome-email-template";
 

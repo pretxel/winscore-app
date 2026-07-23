@@ -1,9 +1,9 @@
 import "server-only";
-import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
+import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { finalizeRender } from "@/lib/matches/match-image-render";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 // Leonardo.ai image-generation webhook. When a requested render completes,
 // Leonardo POSTs `image_generation.complete` here with the generation id and the
@@ -20,7 +20,7 @@ export const maxDuration = 30;
 // configured callback key. Length-guarded so timingSafeEqual never throws.
 function bearerMatches(header: string | null, secret: string): boolean {
   const prefix = "Bearer ";
-  if (!header || !header.startsWith(prefix)) return false;
+  if (!header?.startsWith(prefix)) return false;
   const token = Buffer.from(header.slice(prefix.length));
   const expected = Buffer.from(secret);
   if (token.length !== expected.length) return false;
@@ -46,8 +46,10 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   // Leonardo payload: { type, data: { object: { id, status, generated_images: [{ url }] } } }.
   const root = (body ?? {}) as Record<string, unknown>;
-  const dataObject = ((root.data as Record<string, unknown> | undefined)?.object ?? {}) as
-    Record<string, unknown>;
+  const dataObject = ((root.data as Record<string, unknown> | undefined)?.object ?? {}) as Record<
+    string,
+    unknown
+  >;
   const generationId =
     typeof dataObject.id === "string" && dataObject.id.length > 0 ? dataObject.id : null;
   // Images live under `generated_images` (fall back to `images` defensively).

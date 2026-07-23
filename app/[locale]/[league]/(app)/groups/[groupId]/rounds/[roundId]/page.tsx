@@ -1,12 +1,12 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getTranslations } from "next-intl/server";
-import { isLocale, localePath, type Locale } from "@/lib/i18n";
-import { isCurrentUserAdmin } from "@/lib/admin/current-user";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { MatchdayPredictionBoard } from "./prediction-board";
+import { getTranslations } from "next-intl/server";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { WalletLinkButton } from "@/components/wallet/wallet-link-button";
+import { isCurrentUserAdmin } from "@/lib/admin/current-user";
+import { isLocale, type Locale, localePath } from "@/lib/i18n";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { MatchdayPredictionBoard } from "./prediction-board";
 
 export default async function RoundSheetPage({
   params,
@@ -33,11 +33,7 @@ export default async function RoundSheetPage({
 
   // Pool membership
   const [{ data: group }, { data: membership }] = await Promise.all([
-    supabase
-      .from("groups")
-      .select("id, name, competition_id")
-      .eq("id", groupId)
-      .maybeSingle(),
+    supabase.from("groups").select("id, name, competition_id").eq("id", groupId).maybeSingle(),
     user
       ? supabase
           .from("group_members")
@@ -91,7 +87,7 @@ export default async function RoundSheetPage({
       .eq("user_id", user.id)
       .in(
         "match_id",
-        fixtures.map((f) => f.id)
+        fixtures.map((f) => f.id),
       );
 
     for (const p of preds ?? []) {
@@ -104,7 +100,7 @@ export default async function RoundSheetPage({
 
   const roundLabel =
     round.labels && typeof round.labels === "object"
-      ? (round.labels as Record<string, string>)[locale] ?? round.round_key
+      ? ((round.labels as Record<string, string>)[locale] ?? round.round_key)
       : round.round_key;
 
   const completePicks = predictionsMap.size === (fixtures?.length ?? 0);
@@ -135,7 +131,10 @@ export default async function RoundSheetPage({
           <CardContent className="py-4 text-center">
             <p className="text-sm">{t("signInToPick")}</p>
             <Link
-              href={localePath(locale, `/sign-in?next=/${league}/groups/${groupId}/rounds/${roundId}`)}
+              href={localePath(
+                locale,
+                `/sign-in?next=/${league}/groups/${groupId}/rounds/${roundId}`,
+              )}
               className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground mt-2"
             >
               {common("signIn")}
@@ -184,13 +183,12 @@ export default async function RoundSheetPage({
           />
 
           <p className="text-center text-xs text-muted-foreground">
-              {completePicks
-                ? t("allPicksComplete")
-                : t("picksRemaining", {
-                    remaining:
-                      (fixtures?.length ?? 0) - predictionsMap.size,
-                  })}
-            </p>
+            {completePicks
+              ? t("allPicksComplete")
+              : t("picksRemaining", {
+                  remaining: (fixtures?.length ?? 0) - predictionsMap.size,
+                })}
+          </p>
         </>
       )}
 
@@ -203,9 +201,7 @@ export default async function RoundSheetPage({
               <CardTitle className="text-base">{t("wagerRail.title")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {t("wagerRail.unavailable")}
-              </p>
+              <p className="text-sm text-muted-foreground">{t("wagerRail.unavailable")}</p>
               <WalletLinkButton />
             </CardContent>
           </Card>

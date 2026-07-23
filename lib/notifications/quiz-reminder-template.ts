@@ -8,10 +8,8 @@
 
 import { C } from "./email-theme";
 
-const SANS =
-  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO =
-  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // All copy is resolved by the caller (next-intl) and passed in — value-bearing
 // strings (subject, heading, streakLine) arrive already interpolated. A null
@@ -121,9 +119,7 @@ function renderFooter(data: QuizReminderEmailData): string {
 
 // --- public renderer -------------------------------------------------------
 
-export function renderQuizReminderEmail(
-  data: QuizReminderEmailData,
-): QuizReminderEmailRendered {
+export function renderQuizReminderEmail(data: QuizReminderEmailData): QuizReminderEmailRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>

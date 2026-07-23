@@ -1,12 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { Loader2Icon, TicketIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, TicketIcon } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
-import { joinGroupAction, type GroupActionState } from "../../actions";
+import { type GroupActionState, joinGroupAction } from "../../actions";
 
 const INITIAL: GroupActionState = {};
 
@@ -43,9 +43,7 @@ export function JoinConfirmForm({
     <form action={formAction}>
       <input type="hidden" name="code" value={code} />
       <input type="hidden" name="locale" value={locale} />
-      {invitedBy ? (
-        <input type="hidden" name="invited_by" value={invitedBy} />
-      ) : null}
+      {invitedBy ? <input type="hidden" name="invited_by" value={invitedBy} /> : null}
       <Button type="submit" disabled={pending} className="h-11 w-full gap-2">
         {pending ? (
           <Loader2Icon className="size-4 animate-spin" />

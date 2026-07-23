@@ -87,44 +87,36 @@ beforeEach(() => {
 describe("resendResultEmails action", () => {
   it("rejects a non-admin and sends nothing", async () => {
     profileSingleMock.mockResolvedValue({ data: { is_admin: false } });
-    const { resendResultEmails } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
+    const { resendResultEmails } = await import("@/app/[locale]/(admin)/admin/matches/actions");
+    await expect(resendResultEmails(form({ match_id: MATCH_ID, locale: "en" }))).rejects.toThrow(
+      "Admin only",
     );
-    await expect(
-      resendResultEmails(form({ match_id: MATCH_ID, locale: "en" })),
-    ).rejects.toThrow("Admin only");
     expect(forceDispatchMock).not.toHaveBeenCalled();
   });
 
   it("rejects a match outside the managed competition and sends nothing", async () => {
     assertMatchInManagedMock.mockRejectedValue(new Error("Match not in managed competition"));
-    const { resendResultEmails } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
+    const { resendResultEmails } = await import("@/app/[locale]/(admin)/admin/matches/actions");
+    await expect(resendResultEmails(form({ match_id: MATCH_ID, locale: "en" }))).rejects.toThrow(
+      "managed",
     );
-    await expect(
-      resendResultEmails(form({ match_id: MATCH_ID, locale: "en" })),
-    ).rejects.toThrow("managed");
     expect(forceDispatchMock).not.toHaveBeenCalled();
   });
 
   it("rejects a non-final match server-side and sends nothing", async () => {
     matchSingleMock.mockResolvedValue({ data: { status: "scheduled" }, error: null });
-    const { resendResultEmails } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
+    const { resendResultEmails } = await import("@/app/[locale]/(admin)/admin/matches/actions");
+    await expect(resendResultEmails(form({ match_id: MATCH_ID, locale: "en" }))).rejects.toThrow(
+      /resendError=notFinal/,
     );
-    await expect(
-      resendResultEmails(form({ match_id: MATCH_ID, locale: "en" })),
-    ).rejects.toThrow(/resendError=notFinal/);
     expect(forceDispatchMock).not.toHaveBeenCalled();
   });
 
   it("force-dispatches for a final match and redirects with the summary", async () => {
-    const { resendResultEmails } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
+    const { resendResultEmails } = await import("@/app/[locale]/(admin)/admin/matches/actions");
+    await expect(resendResultEmails(form({ match_id: MATCH_ID, locale: "en" }))).rejects.toThrow(
+      /resendEmailed=7.*resendSkipped=1/,
     );
-    await expect(
-      resendResultEmails(form({ match_id: MATCH_ID, locale: "en" })),
-    ).rejects.toThrow(/resendEmailed=7.*resendSkipped=1/);
     expect(forceDispatchMock).toHaveBeenCalledWith(MATCH_ID);
   });
 });

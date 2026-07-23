@@ -1,18 +1,18 @@
 import "server-only";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { Resend } from "resend";
+import { isOptedIn } from "@/lib/email-prefs";
 import { env } from "@/lib/env";
 import { DEFAULT_LOCALE, localePath } from "@/lib/i18n";
 import { isConfirmedMatch, isLocked } from "@/lib/match-utils";
-import { isOptedIn } from "@/lib/email-prefs";
-import { checkEmailSenderConfig } from "./email-sender-config";
-import { isSendableEmail } from "./result-emails";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import {
-  renderComebackEmail,
   type ComebackEmailMatch,
   type ComebackEmailStrings,
+  renderComebackEmail,
 } from "./comeback-email-template";
+import { checkEmailSenderConfig } from "./email-sender-config";
+import { isSendableEmail } from "./result-emails";
 
 // Resend caps a single batch.send call at 100 messages.
 const RESEND_BATCH_LIMIT = 100;
@@ -355,7 +355,10 @@ interface PreparedMessage {
 // RESEND_API_KEY is unset, or when no pickable matches exist. Per-recipient
 // failures are logged and counted, never aborting the rest; ledger rows are
 // written only for batches Resend accepted, so failures retry on a later run.
-export async function dispatchComebackEmails(fromName?: string, leagueSlug?: string): Promise<DispatchSummary> {
+export async function dispatchComebackEmails(
+  fromName?: string,
+  leagueSlug?: string,
+): Promise<DispatchSummary> {
   const senderMisconfigured = warnIfSenderMisconfigured();
   const flag = senderMisconfigured ? { senderMisconfigured } : {};
   if (!env.resendApiKey) {

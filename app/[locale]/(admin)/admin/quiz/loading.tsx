@@ -4,12 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 // then the scheduled-questions cards.
 export default function AdminQuizLoading() {
   return (
-    <main
-      role="status"
-      aria-busy="true"
-      aria-live="off"
-      className="mx-auto max-w-4xl px-4 py-10"
-    >
+    <main role="status" aria-busy="true" aria-live="off" className="mx-auto max-w-4xl px-4 py-10">
       <span className="sr-only">Loading</span>
       <div className="space-y-8">
         <div className="space-y-2">
@@ -47,10 +42,7 @@ export default function AdminQuizLoading() {
 
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className="rounded-xl bg-card p-4 ring-1 ring-foreground/10"
-            >
+            <div key={i} className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 space-y-2">
                   <Skeleton className="h-3 w-24" />

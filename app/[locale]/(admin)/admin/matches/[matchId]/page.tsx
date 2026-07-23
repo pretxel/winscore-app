@@ -1,54 +1,45 @@
-import { notFound } from "next/navigation";
+import { ArrowLeftIcon, CalendarClockIcon, MapPinIcon, SparklesIcon } from "lucide-react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ActionStatus } from "@/components/admin/action-status";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { EmptyState } from "@/components/admin/empty-state";
+import { FormSection } from "@/components/admin/form-section";
+import { LiveRegion } from "@/components/admin/live-region";
 import {
-  ArrowLeftIcon,
-  CalendarClockIcon,
-  MapPinIcon,
-  SparklesIcon,
-} from "lucide-react";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { env } from "@/lib/env";
+  type RegenerateLabels,
+  RegenerateSummaryForm,
+} from "@/components/admin/regenerate-summary-form";
+import { ResendResultEmailsButton } from "@/components/admin/resend-emails-button";
+import { SubmitButton } from "@/components/admin/submit-button";
+import { SummarizeMatchButton } from "@/components/admin/summarize-match-button";
 import { LocalTime } from "@/components/local-time";
-import { VenueImage } from "@/components/venue-image";
 import { MatchStateBadge } from "@/components/match-state-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { FormSection } from "@/components/admin/form-section";
-import { EmptyState } from "@/components/admin/empty-state";
-import { ActionStatus } from "@/components/admin/action-status";
-import { LiveRegion } from "@/components/admin/live-region";
-import { SubmitButton } from "@/components/admin/submit-button";
-import { ResendResultEmailsButton } from "@/components/admin/resend-emails-button";
-import { SummarizeMatchButton } from "@/components/admin/summarize-match-button";
-import {
-  RegenerateSummaryForm,
-  type RegenerateLabels,
-} from "@/components/admin/regenerate-summary-form";
-import {
-  regenerateMatchSummary,
-  setActiveSummaryVersion,
-  deleteSummaryVersion,
-  generateMatchImagePromptAction,
-  renderMatchImageAction,
-  syncMatchImageRenderAction,
-  generateAndRenderImageAction,
-  saveFixtureDetail,
-  setMatchResultDetail,
-  forceRecomputeDetail,
-  deleteMatchDetail,
-} from "../actions";
+import { VenueImage } from "@/components/venue-image";
 import { getManagedCompetition } from "@/lib/admin/managed-competition";
+import { getStageLabel, hasGroupStage, sortedStages } from "@/lib/competition-schema";
+import { env } from "@/lib/env";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import {
-  getStageLabel,
-  hasGroupStage,
-  sortedStages,
-} from "@/lib/competition-schema";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+  deleteMatchDetail,
+  deleteSummaryVersion,
+  forceRecomputeDetail,
+  generateAndRenderImageAction,
+  generateMatchImagePromptAction,
+  regenerateMatchSummary,
+  renderMatchImageAction,
+  saveFixtureDetail,
+  setActiveSummaryVersion,
+  setMatchResultDetail,
+  syncMatchImageRenderAction,
+} from "../actions";
 
 type BadgeStatus = "scheduled" | "live" | "final" | "cancelled";
 
@@ -115,8 +106,7 @@ function resolveOutcome(
   if (typeof render === "string" && render.length > 0) {
     if (render === "requested")
       return { message: t("detail.outcomeRenderRequested"), variant: "success" };
-    if (render === "no-key")
-      return { message: t("detail.outcomeRenderNoKey"), variant: "info" };
+    if (render === "no-key") return { message: t("detail.outcomeRenderNoKey"), variant: "info" };
     if (render === "no-prompt")
       return { message: t("detail.outcomeRenderNoPrompt"), variant: "info" };
     return { message: t("detail.outcomeRenderError"), variant: "error" };
@@ -242,25 +232,24 @@ export default async function AdminMatchDetailPage({
     .maybeSingle();
   if (!match) notFound();
 
-  const [{ data: eventRows }, { data: versionRows }, { data: renderRows }] =
-    await Promise.all([
-      admin
-        .from("match_events")
-        .select("id, type, team, minute, extra_minute, player, detail, sequence")
-        .eq("match_id", matchId)
-        .order("sequence", { ascending: true }),
-      admin
-        .from("match_summaries")
-        .select(
-          "id, content, style_key, style_instruction, model, generated_at, is_active, image_prompt",
-        )
-        .eq("match_id", matchId)
-        .order("generated_at", { ascending: false }),
-      admin
-        .from("match_summary_images")
-        .select("summary_id, status, storage_path, error")
-        .eq("match_id", matchId),
-    ]);
+  const [{ data: eventRows }, { data: versionRows }, { data: renderRows }] = await Promise.all([
+    admin
+      .from("match_events")
+      .select("id, type, team, minute, extra_minute, player, detail, sequence")
+      .eq("match_id", matchId)
+      .order("sequence", { ascending: true }),
+    admin
+      .from("match_summaries")
+      .select(
+        "id, content, style_key, style_instruction, model, generated_at, is_active, image_prompt",
+      )
+      .eq("match_id", matchId)
+      .order("generated_at", { ascending: false }),
+    admin
+      .from("match_summary_images")
+      .select("summary_id, status, storage_path, error")
+      .eq("match_id", matchId),
+  ]);
   const events = eventRows ?? [];
   const versions = versionRows ?? [];
   // Render state keyed by recap-version id (one render row per version).
@@ -268,8 +257,7 @@ export default async function AdminMatchDetailPage({
 
   const sp = await searchParams;
   const outcome = resolveOutcome(sp, t);
-  const outcomeAnnounce =
-    outcome && outcome.variant !== "error" ? outcome.message : undefined;
+  const outcomeAnnounce = outcome && outcome.variant !== "error" ? outcome.message : undefined;
   const outcomeAlert = outcome?.variant === "error" ? outcome.message : undefined;
 
   const status = match.status as BadgeStatus;
@@ -279,8 +267,7 @@ export default async function AdminMatchDetailPage({
     label: getStageLabel(managed.format, s.key, locale),
   }));
   const showGroupCode = hasGroupStage(managed.format);
-  const isFinal =
-    match.status === "final" && match.home_score != null && match.away_score != null;
+  const isFinal = match.status === "final" && match.home_score != null && match.away_score != null;
 
   // Regenerate preconditions: a recap is only ever generated for a final match
   // that has event data, and only when the generator key is configured. Disable
@@ -411,10 +398,7 @@ export default async function AdminMatchDetailPage({
         {/* Edit fixture */}
         <Card className="p-5">
           <FormSection title={t("editFixture")}>
-            <form
-              action={saveFixtureDetail}
-              className="grid grid-cols-1 gap-3 sm:grid-cols-2"
-            >
+            <form action={saveFixtureDetail} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <input type="hidden" name="id" value={match.id} />
               <input type="hidden" name="locale" value={locale} />
               <div className="space-y-1.5">
@@ -440,21 +424,11 @@ export default async function AdminMatchDetailPage({
               ) : null}
               <div className="space-y-1.5">
                 <Label htmlFor="home_team">{t("homeTeam")}</Label>
-                <Input
-                  id="home_team"
-                  name="home_team"
-                  defaultValue={match.home_team}
-                  required
-                />
+                <Input id="home_team" name="home_team" defaultValue={match.home_team} required />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="away_team">{t("awayTeam")}</Label>
-                <Input
-                  id="away_team"
-                  name="away_team"
-                  defaultValue={match.away_team}
-                  required
-                />
+                <Input id="away_team" name="away_team" defaultValue={match.away_team} required />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="kickoff_at">{t("kickoff")}</Label>
@@ -550,10 +524,7 @@ export default async function AdminMatchDetailPage({
                   confirmText={t("resendConfirm")}
                 />
               ) : null}
-              <form
-                action={deleteMatchDetail}
-                className="ml-auto border-l border-border pl-1.5"
-              >
+              <form action={deleteMatchDetail} className="ml-auto border-l border-border pl-1.5">
                 <input type="hidden" name="id" value={match.id} />
                 <input type="hidden" name="locale" value={locale} />
                 <SubmitButton
@@ -574,10 +545,7 @@ export default async function AdminMatchDetailPage({
             {t("detail.eventsSection")}
           </h2>
           {events.length === 0 ? (
-            <EmptyState
-              icon={<CalendarClockIcon />}
-              title={t("detail.eventsEmpty")}
-            />
+            <EmptyState icon={<CalendarClockIcon />} title={t("detail.eventsEmpty")} />
           ) : (
             <ul className="overflow-hidden rounded-xl border border-border">
               {events.map((e) => (
@@ -588,9 +556,7 @@ export default async function AdminMatchDetailPage({
                   <span className="w-10 shrink-0 font-mono tabular-nums text-muted-foreground">
                     {formatMinute(e.minute, e.extra_minute)}
                   </span>
-                  <span className="font-medium">
-                    {tFeed(`eventTypes.${e.type}`)}
-                  </span>
+                  <span className="font-medium">{tFeed(`eventTypes.${e.type}`)}</span>
                   {e.team ? (
                     <span className="text-muted-foreground">{teamLabel(e.team)}</span>
                   ) : null}
@@ -624,177 +590,171 @@ export default async function AdminMatchDetailPage({
               {versions.map((v) => {
                 const render = renders.get(v.id) ?? null;
                 return (
-                <li
-                  key={v.id}
-                  className="space-y-3 rounded-xl border border-border bg-card p-4"
-                >
-                  <div className="flex flex-wrap items-center gap-2">
-                    {v.is_active ? (
-                      <Badge className="gap-1">
-                        <SparklesIcon className="size-3" aria-hidden />
-                        {t("detail.versionActive")}
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">{t("detail.versionDraft")}</Badge>
-                    )}
-                    <Badge variant="outline">
-                      {t("detail.versionStyle")}: {styleLabel(v.style_key)}
-                    </Badge>
-                  </div>
-
-                  <p className="text-sm leading-relaxed text-foreground/90">
-                    {v.content}
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                    <span>
-                      {t("detail.versionModel")}: {v.model}
-                    </span>
-                    <span>
-                      {t("detail.versionGenerated")}:{" "}
-                      <LocalTime iso={v.generated_at} />
-                    </span>
-                  </div>
-
-                  {v.image_prompt ? (
-                    <details className="rounded-lg border border-border bg-muted/20 p-3">
-                      <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                        {t("detail.imagePromptLabel")}
-                      </summary>
-                      <pre className="mt-2 whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-foreground/80">
-                        {v.image_prompt}
-                      </pre>
-                    </details>
-                  ) : null}
-
-                  <div className="flex flex-wrap items-center gap-1.5 border-t border-border pt-3">
-                    <form action={generateMatchImagePromptAction}>
-                      <input type="hidden" name="summary_id" value={v.id} />
-                      <input type="hidden" name="match_id" value={match.id} />
-                      <input type="hidden" name="locale" value={locale} />
-                      <SubmitButton
-                        size="sm"
-                        variant="secondary"
-                        disabled={!hasKey}
-                        pendingLabel={t("detail.generateImagePromptPending")}
-                      >
-                        {v.image_prompt
-                          ? t("detail.regenerateImagePrompt")
-                          : t("detail.generateImagePrompt")}
-                      </SubmitButton>
-                    </form>
-                  </div>
-
-                  <div className="space-y-2 border-t border-border pt-3">
+                  <li key={v.id} className="space-y-3 rounded-xl border border-border bg-card p-4">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                        {t("detail.renderLabel")}
-                      </span>
-                      {render ? (
-                        <Badge
-                          variant={
-                            render.status === "complete"
-                              ? "default"
-                              : render.status === "failed"
-                                ? "destructive"
-                                : "secondary"
-                          }
-                        >
-                          {t(`detail.renderStatus_${render.status}`)}
+                      {v.is_active ? (
+                        <Badge className="gap-1">
+                          <SparklesIcon className="size-3" aria-hidden />
+                          {t("detail.versionActive")}
                         </Badge>
                       ) : (
-                        <Badge variant="outline">{t("detail.renderStatusNone")}</Badge>
+                        <Badge variant="secondary">{t("detail.versionDraft")}</Badge>
                       )}
+                      <Badge variant="outline">
+                        {t("detail.versionStyle")}: {styleLabel(v.style_key)}
+                      </Badge>
                     </div>
 
-                    {render?.status === "complete" && render.storage_path ? (
-                      <a
-                        href={renderImageUrl(render.storage_path)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block w-fit"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={renderImageUrl(render.storage_path)}
-                          alt={t("detail.renderLabel")}
-                          className="max-h-80 w-auto rounded-lg border border-border"
-                        />
-                      </a>
+                    <p className="text-sm leading-relaxed text-foreground/90">{v.content}</p>
+
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                      <span>
+                        {t("detail.versionModel")}: {v.model}
+                      </span>
+                      <span>
+                        {t("detail.versionGenerated")}: <LocalTime iso={v.generated_at} />
+                      </span>
+                    </div>
+
+                    {v.image_prompt ? (
+                      <details className="rounded-lg border border-border bg-muted/20 p-3">
+                        <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                          {t("detail.imagePromptLabel")}
+                        </summary>
+                        <pre className="mt-2 whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-foreground/80">
+                          {v.image_prompt}
+                        </pre>
+                      </details>
                     ) : null}
 
-                    {render?.status === "failed" && render.error ? (
-                      <p className="text-xs text-destructive">{render.error}</p>
-                    ) : null}
-
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <form action={generateAndRenderImageAction}>
-                        <input type="hidden" name="summary_id" value={v.id} />
-                        <input type="hidden" name="match_id" value={match.id} />
-                        <input type="hidden" name="locale" value={locale} />
-                        <SubmitButton
-                          size="sm"
-                          disabled={!hasKey}
-                          pendingLabel={t("detail.generateAndRenderPending")}
-                        >
-                          {t("detail.generateAndRender")}
-                        </SubmitButton>
-                      </form>
-                      <form action={renderMatchImageAction}>
+                    <div className="flex flex-wrap items-center gap-1.5 border-t border-border pt-3">
+                      <form action={generateMatchImagePromptAction}>
                         <input type="hidden" name="summary_id" value={v.id} />
                         <input type="hidden" name="match_id" value={match.id} />
                         <input type="hidden" name="locale" value={locale} />
                         <SubmitButton
                           size="sm"
                           variant="secondary"
-                          disabled={!hasLeonardoKey || !v.image_prompt}
-                          pendingLabel={t("detail.renderImagePending")}
+                          disabled={!hasKey}
+                          pendingLabel={t("detail.generateImagePromptPending")}
                         >
-                          {render ? t("detail.rerenderImage") : t("detail.renderImage")}
+                          {v.image_prompt
+                            ? t("detail.regenerateImagePrompt")
+                            : t("detail.generateImagePrompt")}
                         </SubmitButton>
                       </form>
-                      {render?.status === "pending" ? (
-                        <form action={syncMatchImageRenderAction}>
+                    </div>
+
+                    <div className="space-y-2 border-t border-border pt-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                          {t("detail.renderLabel")}
+                        </span>
+                        {render ? (
+                          <Badge
+                            variant={
+                              render.status === "complete"
+                                ? "default"
+                                : render.status === "failed"
+                                  ? "destructive"
+                                  : "secondary"
+                            }
+                          >
+                            {t(`detail.renderStatus_${render.status}`)}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">{t("detail.renderStatusNone")}</Badge>
+                        )}
+                      </div>
+
+                      {render?.status === "complete" && render.storage_path ? (
+                        <a
+                          href={renderImageUrl(render.storage_path)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block w-fit"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={renderImageUrl(render.storage_path)}
+                            alt={t("detail.renderLabel")}
+                            className="max-h-80 w-auto rounded-lg border border-border"
+                          />
+                        </a>
+                      ) : null}
+
+                      {render?.status === "failed" && render.error ? (
+                        <p className="text-xs text-destructive">{render.error}</p>
+                      ) : null}
+
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <form action={generateAndRenderImageAction}>
                           <input type="hidden" name="summary_id" value={v.id} />
                           <input type="hidden" name="match_id" value={match.id} />
                           <input type="hidden" name="locale" value={locale} />
                           <SubmitButton
                             size="sm"
-                            variant="ghost"
-                            pendingLabel={t("detail.syncRenderPending")}
+                            disabled={!hasKey}
+                            pendingLabel={t("detail.generateAndRenderPending")}
                           >
-                            {t("detail.syncRender")}
+                            {t("detail.generateAndRender")}
                           </SubmitButton>
                         </form>
-                      ) : null}
+                        <form action={renderMatchImageAction}>
+                          <input type="hidden" name="summary_id" value={v.id} />
+                          <input type="hidden" name="match_id" value={match.id} />
+                          <input type="hidden" name="locale" value={locale} />
+                          <SubmitButton
+                            size="sm"
+                            variant="secondary"
+                            disabled={!hasLeonardoKey || !v.image_prompt}
+                            pendingLabel={t("detail.renderImagePending")}
+                          >
+                            {render ? t("detail.rerenderImage") : t("detail.renderImage")}
+                          </SubmitButton>
+                        </form>
+                        {render?.status === "pending" ? (
+                          <form action={syncMatchImageRenderAction}>
+                            <input type="hidden" name="summary_id" value={v.id} />
+                            <input type="hidden" name="match_id" value={match.id} />
+                            <input type="hidden" name="locale" value={locale} />
+                            <SubmitButton
+                              size="sm"
+                              variant="ghost"
+                              pendingLabel={t("detail.syncRenderPending")}
+                            >
+                              {t("detail.syncRender")}
+                            </SubmitButton>
+                          </form>
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
 
-                  {!v.is_active ? (
-                    <div className="flex flex-wrap items-center gap-1.5 border-t border-border pt-3">
-                      <form action={setActiveSummaryVersion}>
-                        <input type="hidden" name="summary_id" value={v.id} />
-                        <input type="hidden" name="match_id" value={match.id} />
-                        <input type="hidden" name="locale" value={locale} />
-                        <SubmitButton size="sm" pendingLabel={t("detail.setActivePending")}>
-                          {t("detail.setActive")}
-                        </SubmitButton>
-                      </form>
-                      <form action={deleteSummaryVersion} className="ml-auto">
-                        <input type="hidden" name="summary_id" value={v.id} />
-                        <input type="hidden" name="match_id" value={match.id} />
-                        <input type="hidden" name="locale" value={locale} />
-                        <SubmitButton
-                          size="sm"
-                          variant="destructive"
-                          confirmText={t("detail.deleteVersionConfirm")}
-                        >
-                          {t("detail.deleteVersion")}
-                        </SubmitButton>
-                      </form>
-                    </div>
-                  ) : null}
-                </li>
+                    {!v.is_active ? (
+                      <div className="flex flex-wrap items-center gap-1.5 border-t border-border pt-3">
+                        <form action={setActiveSummaryVersion}>
+                          <input type="hidden" name="summary_id" value={v.id} />
+                          <input type="hidden" name="match_id" value={match.id} />
+                          <input type="hidden" name="locale" value={locale} />
+                          <SubmitButton size="sm" pendingLabel={t("detail.setActivePending")}>
+                            {t("detail.setActive")}
+                          </SubmitButton>
+                        </form>
+                        <form action={deleteSummaryVersion} className="ml-auto">
+                          <input type="hidden" name="summary_id" value={v.id} />
+                          <input type="hidden" name="match_id" value={match.id} />
+                          <input type="hidden" name="locale" value={locale} />
+                          <SubmitButton
+                            size="sm"
+                            variant="destructive"
+                            confirmText={t("detail.deleteVersionConfirm")}
+                          >
+                            {t("detail.deleteVersion")}
+                          </SubmitButton>
+                        </form>
+                      </div>
+                    ) : null}
+                  </li>
                 );
               })}
             </ul>
@@ -836,12 +796,8 @@ function FixtureTeam({
       <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
         {label}
       </div>
-      <div
-        className={`mt-1 flex items-center gap-2 ${align === "end" ? "justify-end" : ""}`}
-      >
-        <span className="min-w-0 truncate font-heading text-lg font-semibold">
-          {team}
-        </span>
+      <div className={`mt-1 flex items-center gap-2 ${align === "end" ? "justify-end" : ""}`}>
+        <span className="min-w-0 truncate font-heading text-lg font-semibold">{team}</span>
       </div>
     </div>
   );

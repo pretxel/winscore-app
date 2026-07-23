@@ -51,9 +51,7 @@ export async function PicksVsResults({
         >
           {t("heading")}
         </h2>
-        <p className="mt-1 max-w-md text-sm text-muted-foreground">
-          {t("lede")}
-        </p>
+        <p className="mt-1 max-w-md text-sm text-muted-foreground">{t("lede")}</p>
       </div>
 
       <div className="grid gap-6">
@@ -63,18 +61,10 @@ export async function PicksVsResults({
           return (
             <div key={code} className="grid gap-3 lg:grid-cols-2">
               <ColumnLabelled label={t("picksLabel")}>
-                <GroupStandingsTable
-                  groupCode={code}
-                  rows={picks}
-                  source="picks"
-                />
+                <GroupStandingsTable groupCode={code} rows={picks} source="picks" />
               </ColumnLabelled>
               <ColumnLabelled label={t("resultsLabel")}>
-                <GroupStandingsTable
-                  groupCode={code}
-                  rows={results}
-                  source="results"
-                />
+                <GroupStandingsTable groupCode={code} rows={results} source="results" />
               </ColumnLabelled>
             </div>
           );

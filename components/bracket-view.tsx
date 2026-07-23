@@ -1,5 +1,5 @@
+import { type Labels, MatchCard } from "@/components/bracket-match-card";
 import { BracketRoundsMobile } from "@/components/bracket-rounds-mobile";
-import { MatchCard, type Labels } from "@/components/bracket-match-card";
 import type { BracketRound } from "@/lib/bracket-core";
 
 // Data-driven knockout bracket. On large screens the main rounds (R32→final)
@@ -29,10 +29,7 @@ export function BracketView({
         <div className="overflow-x-auto pb-2">
           <div className="flex min-w-max gap-3 sm:gap-4">
             {main.map((round) => (
-              <div
-                key={round.stage}
-                className="flex w-52 flex-col gap-3 sm:w-56"
-              >
+              <div key={round.stage} className="flex w-52 flex-col gap-3 sm:w-56">
                 <h2 className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   {labels.stage[round.stage] ?? round.stage}
                 </h2>

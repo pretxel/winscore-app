@@ -8,10 +8,7 @@ export default function GroupsLoading() {
     <PageSkeletonShell className="max-w-3xl">
       <div className="grid gap-4 sm:grid-cols-2">
         {Array.from({ length: 2 }).map((_, i) => (
-          <section
-            key={i}
-            className="rounded-xl border border-border bg-card p-4"
-          >
+          <section key={i} className="rounded-xl border border-border bg-card p-4">
             <Skeleton className="mb-3 h-5 w-28" />
             <Skeleton className="h-10 w-full" />
             <Skeleton className="mt-2 h-9 w-full" />

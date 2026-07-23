@@ -50,13 +50,13 @@ function ColHint({ label, hint }: { label: string; hint?: string }) {
 
 export function RankBadge({ rank }: { rank: number | null }) {
   const r = rank ?? 0;
-  let tone =
-    "bg-secondary text-muted-foreground ring-1 ring-inset ring-border";
+  let tone = "bg-secondary text-muted-foreground ring-1 ring-inset ring-border";
   let label = "—";
   if (r > 0) {
     label = String(r);
     if (r === 1) tone = "bg-flag text-flag-foreground ring-1 ring-inset ring-flag/40";
-    else if (r === 2) tone = "bg-foreground/85 text-background ring-1 ring-inset ring-foreground/30";
+    else if (r === 2)
+      tone = "bg-foreground/85 text-background ring-1 ring-inset ring-foreground/30";
     else if (r === 3) tone = "bg-pitch/90 text-pitch-foreground ring-1 ring-inset ring-pitch/30";
   }
   return (
@@ -116,8 +116,7 @@ export function LeaderboardTable({
                 key={r.user_id}
                 className={cn(
                   "transition-colors",
-                  isMe &&
-                    "relative bg-flag/15 hover:bg-flag/20 dark:bg-flag/10",
+                  isMe && "relative bg-flag/15 hover:bg-flag/20 dark:bg-flag/10",
                 )}
               >
                 <TableCell className="pl-4">
@@ -125,16 +124,9 @@ export function LeaderboardTable({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <span
-                      className={cn(
-                        "truncate font-medium",
-                        isMe && "text-foreground",
-                      )}
-                    >
+                    <span className={cn("truncate font-medium", isMe && "text-foreground")}>
                       {r.display_name ?? (
-                        <span className="text-muted-foreground italic">
-                          {labels.noName}
-                        </span>
+                        <span className="text-muted-foreground italic">{labels.noName}</span>
                       )}
                     </span>
                     {isMe ? (

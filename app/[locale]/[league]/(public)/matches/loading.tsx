@@ -45,10 +45,7 @@ export default function MatchesLoading() {
                   )}
                 >
                   <Skeleton className="h-5 w-10 shrink-0" />
-                  <div
-                    aria-hidden
-                    className="hidden h-10 w-px bg-border sm:block"
-                  />
+                  <div aria-hidden className="hidden h-10 w-px bg-border sm:block" />
                   <div className="min-w-0 flex-1 space-y-1.5">
                     <Skeleton className="h-3.5 w-32" />
                     <div className="flex items-center gap-2">

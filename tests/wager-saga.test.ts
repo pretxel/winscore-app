@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildMerkleTree } from "@/lib/wager/merkle-tree";
-import { allocatePot } from "@/lib/wager/pot-allocation";
-import { canonicalizePicks } from "@/lib/wager/pick-commitment";
 import { checkEligibility } from "@/lib/wager/flags";
 import type { MerkleLeaf } from "@/lib/wager/merkle-tree";
+import { buildMerkleTree } from "@/lib/wager/merkle-tree";
+import { canonicalizePicks } from "@/lib/wager/pick-commitment";
+import { allocatePot } from "@/lib/wager/pot-allocation";
 
 describe("wager saga integration", () => {
   const wagerRoundPubkey = new Uint8Array(32);
@@ -15,14 +15,20 @@ describe("wager saga integration", () => {
 
   it("pick canonicalization is deterministic across ordering", () => {
     const payload1 = {
-      version: 1, groupId: "g1", roundId: "r1", userId: "u1",
+      version: 1,
+      groupId: "g1",
+      roundId: "r1",
+      userId: "u1",
       picks: [
         { matchId: "a", homeGoals: 1, awayGoals: 0 },
         { matchId: "b", homeGoals: 0, awayGoals: 0 },
       ],
     };
     const payload2 = {
-      version: 1, groupId: "g1", roundId: "r1", userId: "u1",
+      version: 1,
+      groupId: "g1",
+      roundId: "r1",
+      userId: "u1",
       picks: [
         { matchId: "b", homeGoals: 0, awayGoals: 0 },
         { matchId: "a", homeGoals: 1, awayGoals: 0 },
@@ -34,8 +40,20 @@ describe("wager saga integration", () => {
   });
 
   it("pick canonicalization differs by user", () => {
-    const bytes1 = canonicalizePicks({ version: 1, groupId: "g", roundId: "r", userId: "u1", picks: [] });
-    const bytes2 = canonicalizePicks({ version: 1, groupId: "g", roundId: "r", userId: "u2", picks: [] });
+    const bytes1 = canonicalizePicks({
+      version: 1,
+      groupId: "g",
+      roundId: "r",
+      userId: "u1",
+      picks: [],
+    });
+    const bytes2 = canonicalizePicks({
+      version: 1,
+      groupId: "g",
+      roundId: "r",
+      userId: "u2",
+      picks: [],
+    });
     expect(Buffer.compare(Buffer.from(bytes1), Buffer.from(bytes2))).not.toBe(0);
   });
 
@@ -61,8 +79,8 @@ describe("wager saga integration", () => {
     const b = { userId: "b", walletPubkey: new Uint8Array(32).fill(1) };
     const result = allocatePot(101, [a, b]);
     // b has lower pubkey (1 < 2), gets the extra unit
-    expect(result.find((r) => r.userId === "b")!.awardBaseUnits).toBe(51);
-    expect(result.find((r) => r.userId === "a")!.awardBaseUnits).toBe(50);
+    expect(result.find((r) => r.userId === "b")?.awardBaseUnits).toBe(51);
+    expect(result.find((r) => r.userId === "a")?.awardBaseUnits).toBe(50);
   });
 
   it("merkle tree proof verification: full round trip", () => {
@@ -121,10 +139,10 @@ describe("wager saga integration", () => {
 
   it("wager round PDA changes with group_id", () => {
     // PDA derivation is deterministic per group+round
-    const programId = Buffer.alloc(32).fill(1);
+    const _programId = Buffer.alloc(32).fill(1);
     const group1 = Buffer.from("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "hex");
     const group2 = Buffer.from("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "hex");
-    const round = Buffer.from("cccccccccccccccccccccccccccccccc", "hex");
+    const _round = Buffer.from("cccccccccccccccccccccccccccccccc", "hex");
 
     // Same group + round → same PDA
     // Different group → different PDA

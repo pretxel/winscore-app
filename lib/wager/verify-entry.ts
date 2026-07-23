@@ -1,9 +1,9 @@
 "use server";
 
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { getWagerEnv } from "@/lib/wager/env";
-import { transitionIntentState } from "@/lib/wager/entry-saga";
 import { base58 } from "@scure/base";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { transitionIntentState } from "@/lib/wager/entry-saga";
+import { getWagerEnv } from "@/lib/wager/env";
 
 /**
  * Independently verify an on-chain entry transaction.
@@ -91,7 +91,7 @@ export async function verifyEntryTransaction(
 
     // Extract entry account data from transaction logs/accounts
     const accountKeys = txResult.transaction?.message?.accountKeys ?? [];
-    const postTokenBalances = txResult.meta?.postTokenBalances ?? [];
+    const _postTokenBalances = txResult.meta?.postTokenBalances ?? [];
 
     // For full verification, decode instruction data and validate PDAs
     // This requires the program IDL for proper deserialization
@@ -155,9 +155,9 @@ export async function persistVerifiedEntry(
     .single();
 
   const walletBytes = walletLink?.wallet_address
-    ? (typeof walletLink.wallet_address === "string"
-        ? base58.decode(walletLink.wallet_address)
-        : new Uint8Array(walletLink.wallet_address as unknown as ArrayBuffer))
+    ? typeof walletLink.wallet_address === "string"
+      ? base58.decode(walletLink.wallet_address)
+      : new Uint8Array(walletLink.wallet_address as unknown as ArrayBuffer)
     : new Uint8Array(32);
 
   // Create entry under transaction
@@ -182,10 +182,7 @@ export async function persistVerifiedEntry(
   if (entryError) throw new Error(`Failed to persist entry: ${entryError.message}`);
 
   // Update intent state to confirmed
-  await admin
-    .from("wager_intents")
-    .update({ state: "confirmed" })
-    .eq("id", intentId);
+  await admin.from("wager_intents").update({ state: "confirmed" }).eq("id", intentId);
 
   // Update wager_entry_predictions to reference the new entry
   await admin

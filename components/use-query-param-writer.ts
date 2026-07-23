@@ -1,7 +1,7 @@
 "use client";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 // Shared URL-rewrite primitive for the /matches filter controls (team chips,
 // status stats, needs-pick toggle). Applies a batch of query-param updates

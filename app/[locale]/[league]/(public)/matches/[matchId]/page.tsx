@@ -1,21 +1,25 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
+import { ArrowLeftIcon, LockIcon, MapPinIcon } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { GroupStandingsTable } from "@/components/group-standings-table";
+import { KickoffCountdown } from "@/components/kickoff-countdown";
+import { LiveEventsFeed, type LiveFeedLabels } from "@/components/live-events-feed";
 import { LocalTime } from "@/components/local-time";
 import { MatchStateBadge } from "@/components/match-state-badge";
-import { KickoffCountdown } from "@/components/kickoff-countdown";
-import { buttonVariants } from "@/components/ui/button";
+import { RecapReactions } from "@/components/recap-reactions";
+import { ShareButtons } from "@/components/share-buttons";
 import { StageIcon } from "@/components/stage-icon";
+import { buttonVariants } from "@/components/ui/button";
 import { VenueImage } from "@/components/venue-image";
-import { isConfirmedMatch, lockReason } from "@/lib/match-utils";
 import { isCurrentUserAdmin } from "@/lib/admin/current-user";
 import { getLeagueFromContext } from "@/lib/competition";
 import { getStageLabel, groupStageKey } from "@/lib/competition-schema";
-import { ArrowLeftIcon, LockIcon, MapPinIcon } from "lucide-react";
-import { PredictionForm } from "./prediction-form";
-import { LiveEventsFeed, type LiveFeedLabels } from "@/components/live-events-feed";
+import { env } from "@/lib/env";
+import { type GroupTeamRow, simulateGroup } from "@/lib/group-standings";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { isConfirmedMatch, lockReason } from "@/lib/match-utils";
 import { isLiveNow } from "@/lib/matches/live";
 import type {
   LiveFeedPayload,
@@ -23,16 +27,12 @@ import type {
   MatchEventTeam,
   MatchEventType,
 } from "@/lib/matches/match-events";
-import { ShareButtons } from "@/components/share-buttons";
-import { buildPickSharePath } from "@/lib/share";
-import { env } from "@/lib/env";
-import { GroupStandingsTable } from "@/components/group-standings-table";
-import { simulateGroup, type GroupTeamRow } from "@/lib/group-standings";
-import { RecapReactions } from "@/components/recap-reactions";
-import { getRecapReactionSummary } from "@/lib/recap-reactions-server";
 import { emptyCounts, type ReactionType } from "@/lib/recap-reactions";
+import { getRecapReactionSummary } from "@/lib/recap-reactions-server";
+import { buildPickSharePath } from "@/lib/share";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { PredictionForm } from "./prediction-form";
 
 const RECAP_BUCKET = "match-recap-images";
 
@@ -94,9 +94,7 @@ export async function generateMetadata({
     .eq("match_id", matchId)
     .eq("status", "complete")
     .maybeSingle();
-  const recapImage = renderRow?.storage_path
-    ? recapImagePublicUrl(renderRow.storage_path)
-    : null;
+  const recapImage = renderRow?.storage_path ? recapImagePublicUrl(renderRow.storage_path) : null;
 
   return {
     title,
@@ -164,11 +162,13 @@ export default async function MatchDetailPage({
   }
 
   // Check if the league is finished
-  const { data: comp } = match.competition_id ? await supabase
-    .from("competitions")
-    .select("finished_at")
-    .eq("id", match.competition_id)
-    .maybeSingle() : { data: null };
+  const { data: comp } = match.competition_id
+    ? await supabase
+        .from("competitions")
+        .select("finished_at")
+        .eq("id", match.competition_id)
+        .maybeSingle()
+    : { data: null };
   const isFinished = Boolean(comp?.finished_at);
 
   // Personal, prediction-only group table for this match's group. Built from
@@ -185,10 +185,7 @@ export default async function MatchDetailPage({
       .eq("stage", groupKey)
       .eq("group_code", match.group_code);
     const groupFixtures = fixtures ?? [];
-    const predictionsByMatchId = new Map<
-      string,
-      { home_goals: number; away_goals: number }
-    >();
+    const predictionsByMatchId = new Map<string, { home_goals: number; away_goals: number }>();
     if (groupFixtures.length > 0) {
       const { data: groupPicks } = await supabase
         .from("predictions")
@@ -224,10 +221,7 @@ export default async function MatchDetailPage({
             ? "locked"
             : "scheduled";
 
-  const isFinal =
-    match.status === "final" &&
-    match.home_score != null &&
-    match.away_score != null;
+  const isFinal = match.status === "final" && match.home_score != null && match.away_score != null;
 
   const stageLabelLocalized = activeComp
     ? getStageLabel(activeComp.format, match.stage, locale)
@@ -236,8 +230,7 @@ export default async function MatchDetailPage({
   // Live feed: mounted for non-terminal matches, seeded with the current
   // score/status + any already-ingested events. Final/cancelled matches render
   // the result statically with no feed/poll.
-  const isTerminalMatch =
-    match.status === "final" || match.status === "cancelled";
+  const isTerminalMatch = match.status === "final" || match.status === "cancelled";
   let liveFeedData: LiveFeedPayload | null = null;
   if (!isTerminalMatch) {
     const { data: eventRows } = await supabase
@@ -283,10 +276,7 @@ export default async function MatchDetailPage({
       .maybeSingle();
     if (summaryRow) {
       matchSummary = { content: summaryRow.content, id: summaryRow.id };
-      const summary = await getRecapReactionSummary(
-        summaryRow.id,
-        user?.id ?? null,
-      );
+      const summary = await getRecapReactionSummary(summaryRow.id, user?.id ?? null);
       reactionCounts = summary.counts;
       reactionMine = summary.mine;
     }
@@ -352,7 +342,6 @@ export default async function MatchDetailPage({
         return t("missingPickCancelled");
       case "live":
         return t("missingPickLive");
-      case "kickoff":
       default:
         return t("missingPickKickoff");
     }
@@ -377,10 +366,7 @@ export default async function MatchDetailPage({
         aria-label={t("scoreboardLabel")}
         className="bg-scoreboard relative mt-5 overflow-hidden rounded-2xl text-pitch-foreground ring-1 ring-pitch/30 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.45)] motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-500 motion-safe:ease-out"
       >
-        <VenueImage
-          venue={match.venue}
-          className="opacity-25 mix-blend-luminosity"
-        />
+        <VenueImage venue={match.venue} className="opacity-25 mix-blend-luminosity" />
         <div
           aria-hidden
           className="bg-pitch-stripes pointer-events-none absolute inset-0 opacity-[0.12]"
@@ -394,9 +380,7 @@ export default async function MatchDetailPage({
               {stageLabelLocalized}
               {match.group_code ? ` · ${match.group_code}` : ""}
             </span>
-            <span
-              className={cn(match.status === "live" && "motion-safe:animate-pulse")}
-            >
+            <span className={cn(match.status === "live" && "motion-safe:animate-pulse")}>
               <MatchStateBadge status={uiStatus} size="sm" />
             </span>
           </div>
@@ -503,9 +487,7 @@ export default async function MatchDetailPage({
                 className="mx-auto mb-4 block w-full max-w-sm rounded-lg border border-border"
               />
             ) : null}
-            <p className="text-sm leading-relaxed text-foreground/90">
-              {matchSummary.content}
-            </p>
+            <p className="text-sm leading-relaxed text-foreground/90">{matchSummary.content}</p>
             <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
               {t("summaryDisclaimer")}
             </p>
@@ -590,8 +572,7 @@ export default async function MatchDetailPage({
                 href={`${localePath(locale, "/sign-in")}?next=${encodeURIComponent(localePath(locale, `/${league}/matches/${match.id}`))}`}
                 className={buttonVariants({
                   size: "lg",
-                  className:
-                    "h-10 gap-2 px-4 text-sm font-semibold uppercase tracking-[0.16em]",
+                  className: "h-10 gap-2 px-4 text-sm font-semibold uppercase tracking-[0.16em]",
                 })}
               >
                 {t("signInCta")}
@@ -628,9 +609,7 @@ export default async function MatchDetailPage({
                     )}
                   </p>
                   {isFinal ? (
-                    <p className="mt-1 text-muted-foreground">
-                      {t("finalFootnote")}
-                    </p>
+                    <p className="mt-1 text-muted-foreground">{t("finalFootnote")}</p>
                   ) : null}
                 </>
               ) : (

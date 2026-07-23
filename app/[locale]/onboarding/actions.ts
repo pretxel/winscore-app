@@ -1,10 +1,10 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { displayNameSchema } from "@/lib/display-name";
 import { sendWelcomeEmail } from "@/lib/notifications/welcome-email";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export async function setDisplayName(formData: FormData) {
   const parsed = displayNameSchema.safeParse({

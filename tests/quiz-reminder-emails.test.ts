@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  renderQuizReminderEmail,
   type QuizReminderEmailData,
   type QuizReminderEmailStrings,
+  renderQuizReminderEmail,
 } from "@/lib/notifications/quiz-reminder-template";
 
 // ---------------------------------------------------------------------------
@@ -170,6 +170,8 @@ function pagedSelect(getData: () => unknown[]) {
         range: (from: number, to: number) =>
           Promise.resolve({ data: getData().slice(from, to + 1), error: null }),
       }),
+      // Competition-scoped streak query terminal: .eq(competition_id).in(user_id)
+      in: () => Promise.resolve({ data: streakData, error: null }),
     }),
     order: () => ({
       range: (from: number, to: number) =>
@@ -182,11 +184,27 @@ function pagedSelect(getData: () => unknown[]) {
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminSupabaseClient: vi.fn(() => ({
     from: (table: string) => {
-      if (table === "quiz_questions") {
+      if (table === "competitions") {
         return {
           select: () => ({
             eq: () => ({
-              maybeSingle: () => Promise.resolve({ data: questionData, error: null }),
+              maybeSingle: () =>
+                Promise.resolve({
+                  data: { id: "c1", slug: "world-cup-2026" },
+                  error: null,
+                }),
+            }),
+          }),
+        };
+      }
+      if (table === "quiz_questions") {
+        // Now scoped: .eq(competition_id).eq(active_on).maybeSingle()
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                maybeSingle: () => Promise.resolve({ data: questionData, error: null }),
+              }),
             }),
           }),
         };
@@ -277,9 +295,7 @@ describe("dispatchQuizReminders", () => {
   });
 
   it("still emails a user with no explicit quiz_reminder preference", async () => {
-    profileData = [
-      { id: "u1", display_name: "Alex", unsubscribe_token: "tok1", email_prefs: {} },
-    ];
+    profileData = [{ id: "u1", display_name: "Alex", unsubscribe_token: "tok1", email_prefs: {} }];
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
     const { dispatchQuizReminders } = await import("@/lib/notifications/quiz-reminder-emails");
     const summary = await dispatchQuizReminders();

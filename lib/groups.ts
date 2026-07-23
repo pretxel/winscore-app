@@ -1,6 +1,6 @@
 import "server-only";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { GroupBoardRow, GroupMemberRole } from "@/lib/db";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type GroupSummary = {
   id: string;
@@ -113,11 +113,7 @@ export async function listMyPoolsByLeague(): Promise<LeaguePools[]> {
   }
 
   const competitionIds = Array.from(
-    new Set(
-      rows
-        .map((m) => m.groups?.competition_id)
-        .filter((id): id is string => Boolean(id)),
-    ),
+    new Set(rows.map((m) => m.groups?.competition_id).filter((id): id is string => Boolean(id))),
   );
   const { data: comps } = await supabase
     .from("competitions")
@@ -214,9 +210,7 @@ export async function getGroupBoard(
 }
 
 // Name-only lookup by invite code, for the join-confirm screen.
-export async function getGroupPreview(
-  code: string,
-): Promise<{ id: string; name: string } | null> {
+export async function getGroupPreview(code: string): Promise<{ id: string; name: string } | null> {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase.rpc("group_preview", { p_code: code });
   const row = data?.[0];

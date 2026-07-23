@@ -1,8 +1,8 @@
-import { getFormatter, getTranslations } from "next-intl/server";
 import { ActivityIcon } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { getFormatter, getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/admin/empty-state";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { getUserActivity } from "@/lib/operations/queries";
 
 export async function ActivityView() {
@@ -35,12 +35,8 @@ export async function ActivityView() {
             <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
               {t(`activity.stat.${tile.key}`)}
             </div>
-            <div className="font-heading text-2xl font-semibold tabular-nums">
-              {tile.value}
-            </div>
-            {tile.sub ? (
-              <div className="text-xs text-muted-foreground">{tile.sub}</div>
-            ) : null}
+            <div className="font-heading text-2xl font-semibold tabular-nums">{tile.value}</div>
+            {tile.sub ? <div className="text-xs text-muted-foreground">{tile.sub}</div> : null}
           </Card>
         ))}
       </div>
@@ -70,10 +66,7 @@ export async function ActivityView() {
                       {event.displayName ?? t("activity.unknownUser")}
                     </span>
                   </div>
-                  <span
-                    title={event.at}
-                    className="shrink-0 text-xs text-muted-foreground"
-                  >
+                  <span title={event.at} className="shrink-0 text-xs text-muted-foreground">
                     {format.relativeTime(new Date(event.at), now)}
                   </span>
                 </li>

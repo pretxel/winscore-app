@@ -6,11 +6,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // ---------------------------------------------------------------------------
 
 import {
-  isSaturdayUtc,
-  utcDayWindow,
-  selectFinishedPlayoffMatches,
   computePendingRecipients,
+  isSaturdayUtc,
   type RawMatchRow,
+  selectFinishedPlayoffMatches,
+  utcDayWindow,
 } from "@/lib/notifications/playoff-score-emails";
 
 describe("isSaturdayUtc", () => {
@@ -131,7 +131,9 @@ vi.mock("@/lib/supabase/admin", () => ({
       if (table === "competitions") {
         return {
           select: () => ({
-            eq: () => ({ maybeSingle: () => Promise.resolve({ data: competitionData, error: null }) }),
+            eq: () => ({
+              maybeSingle: () => Promise.resolve({ data: competitionData, error: null }),
+            }),
           }),
         };
       }

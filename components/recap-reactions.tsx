@@ -1,21 +1,21 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
-import { trackEvent } from "@/lib/analytics";
-import { cn } from "@/lib/utils";
+import { toggleRecapReaction } from "@/app/[locale]/[league]/(public)/matches/[matchId]/actions";
 import { buttonVariants } from "@/components/ui/button";
-import { localePath, type Locale } from "@/lib/i18n";
+import { trackEvent } from "@/lib/analytics";
+import { type Locale, localePath } from "@/lib/i18n";
 import {
   foldCounts,
   REACTION_EMOJI,
   REACTION_TYPES,
   type ReactionType,
 } from "@/lib/recap-reactions";
-import { toggleRecapReaction } from "@/app/[locale]/[league]/(public)/matches/[matchId]/actions";
+import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+import { cn } from "@/lib/utils";
 
 // Collapse a burst of reaction writes (others reacting) into a single counts
 // re-fetch, mirroring components/leaderboard-live.tsx.
@@ -46,9 +46,7 @@ export function RecapReactions({
   initialMine: ReactionType[];
 }) {
   const t = useTranslations("recapReactions");
-  const [counts, setCounts] = useState<Record<ReactionType, number>>(
-    initialCounts,
-  );
+  const [counts, setCounts] = useState<Record<ReactionType, number>>(initialCounts);
   const [mine, setMine] = useState<Set<ReactionType>>(new Set(initialMine));
   const [pendingType, setPendingType] = useState<ReactionType | null>(null);
   const [, startTransition] = useTransition();
@@ -159,8 +157,7 @@ export function RecapReactions({
                 selected
                   ? "border-pitch bg-pitch/10 text-foreground"
                   : "border-border bg-card text-foreground/90 hover:bg-muted/50",
-                (!isSignedIn || pendingType !== null) &&
-                  "cursor-default opacity-90",
+                (!isSignedIn || pendingType !== null) && "cursor-default opacity-90",
                 isSignedIn && pendingType === null && "cursor-pointer",
               )}
             >

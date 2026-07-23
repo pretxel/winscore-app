@@ -1,8 +1,4 @@
-import type {
-  ProviderConfig,
-  RemoteMatch,
-  ResultProvider,
-} from "@/lib/result-sync/types";
+import type { ProviderConfig, RemoteMatch, ResultProvider } from "@/lib/result-sync/types";
 
 // Keyless fallback source. ESPN's unofficial scoreboard returns one UTC day
 // per request, so callers must pass the dates they care about; core.ts derives
@@ -62,10 +58,7 @@ export function normalizeEspnEvents(events: EspnEvent[]): RemoteMatch[] {
     if (!home?.team?.displayName || !away?.team?.displayName || !event.date) {
       continue;
     }
-    const status = toRemoteStatus(
-      event.status?.type?.state,
-      event.status?.type?.completed,
-    );
+    const status = toRemoteStatus(event.status?.type?.state, event.status?.type?.completed);
     out.push({
       id: Number(event.id ?? 0),
       // ESPN dates omit seconds ("2026-06-11T19:00Z"); the pipeline only
@@ -91,10 +84,7 @@ export const espnProvider: ResultProvider = {
     return true;
   },
 
-  async fetchMatches(
-    dates: string[] = [],
-    config?: ProviderConfig,
-  ): Promise<RemoteMatch[]> {
+  async fetchMatches(dates: string[] = [], config?: ProviderConfig): Promise<RemoteMatch[]> {
     if (dates.length === 0) return [];
     // ESPN buckets days by US Eastern time, not UTC: a UTC date D's
     // late-night kickoffs (00:00–04:00Z) live under Eastern day D-1
@@ -110,9 +100,7 @@ export const espnProvider: ResultProvider = {
       cache: "no-store",
     });
     if (!resp.ok) {
-      throw new Error(
-        `ESPN fetch failed for ${range}: ${resp.status} ${resp.statusText}`,
-      );
+      throw new Error(`ESPN fetch failed for ${range}: ${resp.status} ${resp.statusText}`);
     }
     const body = (await resp.json()) as { events?: EspnEvent[] };
     return normalizeEspnEvents(body.events ?? []);

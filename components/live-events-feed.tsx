@@ -38,9 +38,7 @@ const EVENT_GLYPH: Record<MatchEventType, string> = {
 
 function minuteLabel(event: MatchEvent): string {
   if (event.minute == null) return "";
-  return event.extraMinute
-    ? `${event.minute}+${event.extraMinute}'`
-    : `${event.minute}'`;
+  return event.extraMinute ? `${event.minute}+${event.extraMinute}'` : `${event.minute}'`;
 }
 
 function latestMinute(events: MatchEvent[]): string {
@@ -70,9 +68,7 @@ export function LiveEventsFeed({
     // Stop at full time / cancellation, or when there is simply nothing live to
     // watch yet (a not-yet-kicked-off match with no events).
     stopWhen: (p) =>
-      p.status === "final" ||
-      p.status === "cancelled" ||
-      (!p.isLive && p.events.length === 0),
+      p.status === "final" || p.status === "cancelled" || (!p.isLive && p.events.length === 0),
   });
 
   // Nothing to surface until the match is live or has events.
@@ -128,15 +124,9 @@ export function LiveEventsFeed({
         </div>
 
         {/* Single polite region: AT announces the timeline as one unit. */}
-        <ul
-          aria-live="polite"
-          aria-label={labels.updatesLabel}
-          className="divide-y divide-border"
-        >
+        <ul aria-live="polite" aria-label={labels.updatesLabel} className="divide-y divide-border">
           {ordered.length === 0 ? (
-            <li className="px-4 py-6 text-center text-sm text-muted-foreground">
-              {labels.empty}
-            </li>
+            <li className="px-4 py-6 text-center text-sm text-muted-foreground">{labels.empty}</li>
           ) : (
             ordered.map((event) => {
               const min = minuteLabel(event);
@@ -155,9 +145,7 @@ export function LiveEventsFeed({
                     {EVENT_GLYPH[event.type]}
                   </span>
                   <span className="min-w-0 flex-1 text-sm">
-                    <span className="font-medium">
-                      {labels.eventTypes[event.type]}
-                    </span>
+                    <span className="font-medium">{labels.eventTypes[event.type]}</span>
                     {event.player ? (
                       <span className="text-muted-foreground">
                         {" — "}

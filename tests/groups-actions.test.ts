@@ -67,10 +67,7 @@ describe("createGroupAction", () => {
   it("creates with a trimmed name then redirects to the new group", async () => {
     const { createGroupAction } = await importActions();
     await expect(
-      createGroupAction(
-        {},
-        fd({ name: "  Office Pool  ", competitionId: COMPETITION_ID }),
-      ),
+      createGroupAction({}, fd({ name: "  Office Pool  ", competitionId: COMPETITION_ID })),
     ).rejects.toThrow(`REDIRECT:/en/groups/${GROUP_ID}`);
     expect(rpcMock).toHaveBeenCalledWith("create_group", {
       p_name: "Office Pool",
@@ -110,9 +107,9 @@ describe("joinGroupAction", () => {
 
   it("redirects to the group on a successful join", async () => {
     const { joinGroupAction } = await importActions();
-    await expect(
-      joinGroupAction({}, fd({ code: "WC-ABCDE" })),
-    ).rejects.toThrow(`REDIRECT:/en/groups/${GROUP_ID}`);
+    await expect(joinGroupAction({}, fd({ code: "WC-ABCDE" }))).rejects.toThrow(
+      `REDIRECT:/en/groups/${GROUP_ID}`,
+    );
     expect(rpcMock).toHaveBeenCalledWith("join_group", { p_code: "WC-ABCDE" });
   });
 
@@ -137,9 +134,9 @@ describe("joinGroupAction", () => {
 
   it("omits p_invited_by entirely for a manual (no-inviter) join", async () => {
     const { joinGroupAction } = await importActions();
-    await expect(
-      joinGroupAction({}, fd({ code: "WC-ABCDE" })),
-    ).rejects.toThrow(`REDIRECT:/en/groups/${GROUP_ID}`);
+    await expect(joinGroupAction({}, fd({ code: "WC-ABCDE" }))).rejects.toThrow(
+      `REDIRECT:/en/groups/${GROUP_ID}`,
+    );
     const call = rpcMock.mock.calls.find((c) => c[0] === "join_group");
     expect(call?.[1]).not.toHaveProperty("p_invited_by");
   });
@@ -149,9 +146,9 @@ describe("leaveGroupAction", () => {
   it("calls leave_group and redirects back to the groups list", async () => {
     rpcMock.mockResolvedValue({ data: null, error: null });
     const { leaveGroupAction } = await importActions();
-    await expect(
-      leaveGroupAction(fd({ group_id: GROUP_ID })),
-    ).rejects.toThrow("REDIRECT:/en/groups");
+    await expect(leaveGroupAction(fd({ group_id: GROUP_ID }))).rejects.toThrow(
+      "REDIRECT:/en/groups",
+    );
     expect(rpcMock).toHaveBeenCalledWith("leave_group", {
       p_group_id: GROUP_ID,
     });

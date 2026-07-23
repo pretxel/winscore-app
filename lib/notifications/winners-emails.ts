@@ -1,12 +1,12 @@
 import "server-only";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { Resend } from "resend";
+import { isOptedIn } from "@/lib/email-prefs";
 import { env } from "@/lib/env";
 import { DEFAULT_LOCALE, localePath } from "@/lib/i18n";
-import { isOptedIn } from "@/lib/email-prefs";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { checkEmailSenderConfig } from "./email-sender-config";
-import { isSendableEmail, type DispatchSummary } from "./result-emails";
+import { type DispatchSummary, isSendableEmail } from "./result-emails";
 import {
   renderWinnersEmail,
   type WinnersEmailStrings,
@@ -145,10 +145,7 @@ async function loadPodium(admin: AdminClient): Promise<WinnerRow[]> {
 // Email prefs for the podium ids, keyed by user id.
 async function loadPrefs(admin: AdminClient, ids: string[]): Promise<Map<string, unknown>> {
   if (ids.length === 0) return new Map();
-  const { data, error } = await admin
-    .from("profiles")
-    .select("id, email_prefs")
-    .in("id", ids);
+  const { data, error } = await admin.from("profiles").select("id, email_prefs").in("id", ids);
   if (error) throw new Error(`[winners-email] load prefs: ${error.message}`);
   return new Map((data ?? []).map((p) => [p.id, p.email_prefs as unknown]));
 }
@@ -178,7 +175,10 @@ export async function dispatchWinnersEmail(fromName?: string): Promise<WinnersDi
     return withFlag({ ...ZERO });
   }
 
-  const prefsById = await loadPrefs(admin, podium.map((w) => w.user_id));
+  const prefsById = await loadPrefs(
+    admin,
+    podium.map((w) => w.user_id),
+  );
   const { data: sentRows, error: sentErr } = await admin
     .from("winners_email_log")
     .select("user_id");

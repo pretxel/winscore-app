@@ -1,43 +1,30 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import Link from "next/link";
 import { ArrowRightIcon, CalendarClockIcon, RefreshCwIcon } from "lucide-react";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ActionStatus } from "@/components/admin/action-status";
+import { AdminMatchesTabs } from "@/components/admin/admin-matches-tabs";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { EmptyState } from "@/components/admin/empty-state";
+import { FormSection } from "@/components/admin/form-section";
+import { LiveRegion } from "@/components/admin/live-region";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { LocalTime } from "@/components/local-time";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import { NativeSelect } from "@/components/ui/native-select";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { FormSection } from "@/components/admin/form-section";
-import { EmptyState } from "@/components/admin/empty-state";
-import { ActionStatus } from "@/components/admin/action-status";
-import { LiveRegion } from "@/components/admin/live-region";
-import { SubmitButton } from "@/components/admin/submit-button";
-import {
-  confirmKnockoutTeams,
-  saveFixture,
-  syncNow,
-  toggleKnockoutRoundReveal,
-} from "./actions";
-import { AdminMatchesTabs } from "@/components/admin/admin-matches-tabs";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
-import { isConfirmedMatch, parseMatchesTab } from "@/lib/match-utils";
-import { cn } from "@/lib/utils";
-import { isStaleMatch } from "@/lib/result-sync/staleness";
 import { getManagedCompetition } from "@/lib/admin/managed-competition";
-import {
-  getStageLabel,
-  hasGroupStage,
-  sortedStages,
-} from "@/lib/competition-schema";
+import { getStageLabel, hasGroupStage, sortedStages } from "@/lib/competition-schema";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { isConfirmedMatch, parseMatchesTab } from "@/lib/match-utils";
+import { isStaleMatch } from "@/lib/result-sync/staleness";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
+import { confirmKnockoutTeams, saveFixture, syncNow, toggleKnockoutRoundReveal } from "./actions";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "admin" });
   return { title: t("title") };
@@ -116,10 +103,7 @@ export default async function AdminMatchesPage({
     managed ? getStageLabel(managed.format, stage, locale) : stage;
 
   const supabase = await createServerSupabaseClient();
-  let matchesQuery = supabase
-    .from("matches")
-    .select("*")
-    .order("kickoff_at", { ascending: true });
+  let matchesQuery = supabase.from("matches").select("*").order("kickoff_at", { ascending: true });
   if (managed) matchesQuery = matchesQuery.eq("competition_id", managed.id);
   const { data: matches } = await matchesQuery;
   const list = matches ?? [];
@@ -149,11 +133,7 @@ export default async function AdminMatchesPage({
     <main className="mx-auto max-w-5xl px-4 py-10">
       <LiveRegion status={syncAnnounce ?? deletedAnnounce} alert={syncAlert} />
       <div className="admin-reveal space-y-8">
-        <AdminPageHeader
-          eyebrow={managed?.name}
-          title={t("headline")}
-          description={t("lede")}
-        />
+        <AdminPageHeader eyebrow={managed?.name} title={t("headline")} description={t("lede")} />
 
         {fixtureDeleted ? (
           <ActionStatus variant="success" live={false}>
@@ -174,18 +154,13 @@ export default async function AdminMatchesPage({
             <Card className="gap-3 p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="space-y-0.5">
-                  <h2 className="font-heading text-base font-semibold">
-                    {t("syncTitle")}
-                  </h2>
+                  <h2 className="font-heading text-base font-semibold">{t("syncTitle")}</h2>
                   <p className="text-sm text-muted-foreground">{t("syncLede")}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <form action={confirmKnockoutTeams}>
                     <input type="hidden" name="locale" value={locale} />
-                    <SubmitButton
-                      variant="outline"
-                      pendingLabel={t("confirmKnockoutRunning")}
-                    >
+                    <SubmitButton variant="outline" pendingLabel={t("confirmKnockoutRunning")}>
                       {t("confirmKnockout")}
                     </SubmitButton>
                   </form>
@@ -232,22 +207,17 @@ export default async function AdminMatchesPage({
             /* Knockout round reveal */
             <Card className="gap-3 p-5">
               <div className="space-y-0.5">
-                <h2 className="font-heading text-base font-semibold">
-                  {t("revealTitle")}
-                </h2>
+                <h2 className="font-heading text-base font-semibold">{t("revealTitle")}</h2>
                 <p className="text-sm text-muted-foreground">{t("revealLede")}</p>
               </div>
               <ul className="divide-border divide-y">
                 {knockoutStages.map((s) => {
                   const revealed = s.revealed === true;
                   return (
-                    <li
-                      key={s.key}
-                      className="flex items-center justify-between gap-3 py-2"
-                    >
+                    <li key={s.key} className="flex items-center justify-between gap-3 py-2">
                       <span className="flex items-center gap-2 text-sm">
                         <span className="font-medium">
-                          {getStageLabel(managed!.format, s.key, locale)}
+                          {getStageLabel(managed?.format, s.key, locale)}
                         </span>
                         <span
                           className={cn(
@@ -263,11 +233,7 @@ export default async function AdminMatchesPage({
                       <form action={toggleKnockoutRoundReveal}>
                         <input type="hidden" name="locale" value={locale} />
                         <input type="hidden" name="stage" value={s.key} />
-                        <input
-                          type="hidden"
-                          name="reveal"
-                          value={revealed ? "false" : "true"}
-                        />
+                        <input type="hidden" name="reveal" value={revealed ? "false" : "true"} />
                         <SubmitButton size="sm" variant="outline">
                           {revealed ? t("revealHide") : t("revealShow")}
                         </SubmitButton>
@@ -283,10 +249,7 @@ export default async function AdminMatchesPage({
               {/* New fixture */}
               <Card className="p-5">
                 <FormSection title={t("newFixture")}>
-                  <form
-                    action={saveFixture}
-                    className="grid grid-cols-1 gap-3 sm:grid-cols-2"
-                  >
+                  <form action={saveFixture} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div className="space-y-1.5">
                       <Label htmlFor="stage">{t("stage")}</Label>
                       <NativeSelect id="stage" name="stage">
@@ -313,7 +276,13 @@ export default async function AdminMatchesPage({
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="kickoff_at">{t("kickoff")}</Label>
-                      <Input id="kickoff_at" name="kickoff_at" type="datetime-local" required step="60" />
+                      <Input
+                        id="kickoff_at"
+                        name="kickoff_at"
+                        type="datetime-local"
+                        required
+                        step="60"
+                      />
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="venue">{t("venue")}</Label>
@@ -355,9 +324,7 @@ export default async function AdminMatchesPage({
                         const confirmed = isConfirmedMatch(m);
                         const stale = isStaleMatch(m, now);
                         const hasScore =
-                          m.status === "final" &&
-                          m.home_score != null &&
-                          m.away_score != null;
+                          m.status === "final" && m.home_score != null && m.away_score != null;
                         return (
                           <li
                             key={m.id}
@@ -365,10 +332,7 @@ export default async function AdminMatchesPage({
                           >
                             {/* Kickoff */}
                             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                              <CalendarClockIcon
-                                className="size-3.5 lg:hidden"
-                                aria-hidden
-                              />
+                              <CalendarClockIcon className="size-3.5 lg:hidden" aria-hidden />
                               <LocalTime iso={m.kickoff_at} />
                             </div>
 
@@ -391,9 +355,7 @@ export default async function AdminMatchesPage({
                                 ) : null}
                               </div>
                               {m.venue ? (
-                                <div className="text-xs text-muted-foreground">
-                                  {m.venue}
-                                </div>
+                                <div className="text-xs text-muted-foreground">{m.venue}</div>
                               ) : null}
                             </div>
 

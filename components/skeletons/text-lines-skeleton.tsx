@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 // N stacked shimmer lines for ledes, summaries and descriptions. The last line
 // is shortened by default to read like a paragraph rather than a block.
@@ -19,11 +19,7 @@ export function TextLinesSkeleton({
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
           key={i}
-          className={cn(
-            "h-4 w-full",
-            shrinkLast && i === lines - 1 && "w-2/3",
-            lineClassName,
-          )}
+          className={cn("h-4 w-full", shrinkLast && i === lines - 1 && "w-2/3", lineClassName)}
         />
       ))}
     </div>

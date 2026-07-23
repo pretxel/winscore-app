@@ -55,9 +55,7 @@ export const env = {
   // is extracted from the `Name <addr>` form when present.
   emailReplyTo:
     process.env.EMAIL_REPLY_TO ??
-    (process.env.EMAIL_FROM ?? "Winscore <onboarding@resend.dev>").match(
-      /<([^>]+)>/,
-    )?.[1] ??
+    (process.env.EMAIL_FROM ?? "Winscore <onboarding@resend.dev>").match(/<([^>]+)>/)?.[1] ??
     process.env.EMAIL_FROM ??
     "onboarding@resend.dev",
   // OpenRouter (server only) for the post-final AI match recap. Nullable on
@@ -115,8 +113,5 @@ export const env = {
 };
 
 export function requireServiceRoleKey(): string {
-  return required(
-    "SUPABASE_SERVICE_ROLE_KEY",
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-  );
+  return required("SUPABASE_SERVICE_ROLE_KEY", process.env.SUPABASE_SERVICE_ROLE_KEY);
 }

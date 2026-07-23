@@ -11,11 +11,11 @@ interface RateLimitConfig {
 }
 
 const RATE_LIMITS: Record<string, RateLimitConfig> = {
-  wallet_challenge: { windowMs: 3600_000, maxRequests: 5 },   // 5/hour
-  wallet_verify: { windowMs: 3600_000, maxRequests: 10 },     // 10/hour
-  wager_intent: { windowMs: 3600_000, maxRequests: 10 },      // 10/hour
-  wager_init: { windowMs: 3600_000, maxRequests: 5 },         // 5/hour per owner
-  wager_settle: { windowMs: 3600_000, maxRequests: 20 },      // 20/hour per operator
+  wallet_challenge: { windowMs: 3600_000, maxRequests: 5 }, // 5/hour
+  wallet_verify: { windowMs: 3600_000, maxRequests: 10 }, // 10/hour
+  wager_intent: { windowMs: 3600_000, maxRequests: 10 }, // 10/hour
+  wager_init: { windowMs: 3600_000, maxRequests: 5 }, // 5/hour per owner
+  wager_settle: { windowMs: 3600_000, maxRequests: 20 }, // 20/hour per operator
 };
 
 /**

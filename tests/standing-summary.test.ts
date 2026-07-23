@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { deriveStandingSummary } from "@/lib/standing-summary";
 import type { HitType } from "@/lib/db";
+import { deriveStandingSummary } from "@/lib/standing-summary";
 
 const score = (match_id: string, points: number, hit_type: HitType) => ({
   match_id,
@@ -11,11 +11,7 @@ const score = (match_id: string, points: number, hit_type: HitType) => ({
 describe("deriveStandingSummary", () => {
   it("sums points and counts exact picks", () => {
     const summary = deriveStandingSummary({
-      scores: [
-        score("m1", 5, "exact"),
-        score("m2", 3, "winner_gd"),
-        score("m3", 0, "miss"),
-      ],
+      scores: [score("m1", 5, "exact"), score("m2", 3, "winner_gd"), score("m3", 0, "miss")],
       totalPicks: 4,
       matchStatusById: new Map(),
       currentRank: null,

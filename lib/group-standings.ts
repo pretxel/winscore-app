@@ -178,9 +178,7 @@ export interface GroupTableMatch {
 // reflect completed games only. Every team named in a fixture is still seeded,
 // so all four appear even before any result. Pure — same 3/1/0 engine as the
 // predictions path, just fed real scorelines.
-export function buildGroupTables(
-  matches: GroupTableMatch[],
-): SimulatedGroup[] {
+export function buildGroupTables(matches: GroupTableMatch[]): SimulatedGroup[] {
   const fixtures: GroupStageFixture[] = matches.map((m) => ({
     id: m.id,
     home_team: m.home_team,
@@ -210,10 +208,7 @@ export type Tiebreaker = "gd" | "h2h";
 // new array of the same length — the final ordering uses H2H points → H2H GD
 // → H2H GF → overall GD → overall GF → team name, so the fallback chain
 // eventually produces a stable result even when H2H is fully symmetric.
-function resolveH2HTie(
-  tied: GroupTeamRow[],
-  matches: GroupTableMatch[],
-): GroupTeamRow[] {
+function resolveH2HTie(tied: GroupTeamRow[], matches: GroupTableMatch[]): GroupTeamRow[] {
   const teamSet = new Set(tied.map((r) => r.team));
   const h2hPoints = new Map<string, number>();
   const h2hGd = new Map<string, number>();

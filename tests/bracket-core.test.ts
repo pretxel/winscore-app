@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   assignMatchNumbers,
+  type BracketMatchInput,
   buildBracket,
   parseKnockoutSlot,
-  type BracketMatchInput,
 } from "@/lib/bracket-core";
 
 let seq = 0;
@@ -43,7 +43,7 @@ function mk(
 }
 
 function find(bracket: ReturnType<typeof buildBracket>, stage: string, idx = 0) {
-  return bracket.rounds.find((r) => r.stage === stage)!.matches[idx];
+  return bracket.rounds.find((r) => r.stage === stage)?.matches[idx];
 }
 
 describe("parseKnockoutSlot", () => {
@@ -65,7 +65,9 @@ describe("assignMatchNumbers", () => {
     const g1 = mk("group", "Mexico", "South Africa", { kickoff: "2026-06-28T19:00:00Z" }); // late group
     const g2 = mk("group", "Brazil", "Serbia", { kickoff: "2026-06-11T19:00:00Z" });
     const k1 = mk("r32", "Winner Group A", "2nd Group B", { kickoff: "2026-06-28T15:00:00Z" }); // early r32
-    const fin = mk("final", "Winner Match 101", "Winner Match 102", { kickoff: "2026-07-19T19:00:00Z" });
+    const fin = mk("final", "Winner Match 101", "Winner Match 102", {
+      kickoff: "2026-07-19T19:00:00Z",
+    });
     const { numberById } = assignMatchNumbers([g1, g2, k1, fin]);
     // group sorted by kickoff: g2(early)=1, g1(late)=2 — both < 73 despite g1's date
     expect(numberById.get(g2.id)).toBe(1);

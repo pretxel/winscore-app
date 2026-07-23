@@ -1,13 +1,10 @@
-import { getTranslations } from "next-intl/server";
 import { MailIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/admin/empty-state";
 import { LocalTime } from "@/components/local-time";
-import {
-  getEmailLogs,
-  type EmailEventType,
-} from "@/lib/operations/queries";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { type EmailEventType, getEmailLogs } from "@/lib/operations/queries";
 
 const TYPES: EmailEventType[] = ["result", "prediction_reminder", "quiz_reminder"];
 
@@ -24,12 +21,8 @@ export async function EmailsView() {
             <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
               {t(`emails.type.${type}`)}
             </div>
-            <div className="font-heading text-2xl font-semibold tabular-nums">
-              {totals[type]}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {t("emails.totals")}
-            </div>
+            <div className="font-heading text-2xl font-semibold tabular-nums">{totals[type]}</div>
+            <div className="text-xs text-muted-foreground">{t("emails.totals")}</div>
           </Card>
         ))}
       </div>

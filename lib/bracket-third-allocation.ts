@@ -36,9 +36,7 @@ export function comboKey(groups: string[]): string {
 // table has no entry (so the caller keeps the candidate placeholder). The
 // generated table stores each row as an 8-letter string in THIRD_SLOT_WINNERS
 // order; decode it positionally.
-export function allocateBestThirds(
-  qualifyingGroups: string[],
-): ThirdAllocation | null {
+export function allocateBestThirds(qualifyingGroups: string[]): ThirdAllocation | null {
   if (qualifyingGroups.length !== 8) return null;
   const encoded = THIRD_PLACE_ALLOCATION[comboKey(qualifyingGroups)];
   if (!encoded || encoded.length !== THIRD_SLOT_WINNERS.length) return null;

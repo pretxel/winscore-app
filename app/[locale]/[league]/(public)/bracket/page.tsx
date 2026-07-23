@@ -6,8 +6,8 @@ import { getBracket } from "@/lib/bracket";
 import { KNOCKOUT_ORDER } from "@/lib/bracket-core";
 import { getLeagueFromContext } from "@/lib/competition";
 import { getStageLabel } from "@/lib/competition-schema";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
-import { isLocale, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 export async function generateMetadata({
   params,
@@ -50,9 +50,7 @@ export default async function BracketPage({
   // the raw stage key when no competition resolves.
   const stage: Record<string, string> = {};
   for (const key of KNOCKOUT_ORDER) {
-    stage[key] = competition
-      ? getStageLabel(competition.format, key, locale)
-      : key;
+    stage[key] = competition ? getStageLabel(competition.format, key, locale) : key;
   }
 
   return (

@@ -1,9 +1,9 @@
 "use server";
 
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { localePath } from "@/lib/i18n";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { localePath } from "@/lib/i18n";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 function formLocale(formData: FormData): string {
   return (formData.get("locale") as string) ?? "en";
@@ -17,16 +17,14 @@ export async function createRound(formData: FormData): Promise<void> {
     p_competition_id: formData.get("competition_id") as string,
     p_round_key: formData.get("round_key") as string,
     p_round_number: formData.get("round_number")
-      ? parseInt(formData.get("round_number") as string)
+      ? parseInt(formData.get("round_number") as string, 10)
       : undefined,
     p_labels: JSON.parse((formData.get("labels") as string) ?? "{}"),
-    p_display_order: parseInt((formData.get("display_order") as string) ?? "0"),
+    p_display_order: parseInt((formData.get("display_order") as string) ?? "0", 10),
     p_opens_at: formData.get("opens_at") as string,
     p_admin_closes_at: (formData.get("admin_closes_at") as string) || undefined,
     p_status: (formData.get("status") as string) ?? "pending",
-    p_provider_metadata: JSON.parse(
-      (formData.get("provider_metadata") as string) ?? "{}"
-    ),
+    p_provider_metadata: JSON.parse((formData.get("provider_metadata") as string) ?? "{}"),
   });
 
   revalidatePath("/admin/rounds");
@@ -44,13 +42,11 @@ export async function updateRound(formData: FormData): Promise<void> {
     p_round_id: roundId,
     p_round_key: (formData.get("round_key") as string) || undefined,
     p_round_number: formData.get("round_number")
-      ? parseInt(formData.get("round_number") as string)
+      ? parseInt(formData.get("round_number") as string, 10)
       : undefined,
-    p_labels: formData.get("labels")
-      ? JSON.parse(formData.get("labels") as string)
-      : undefined,
+    p_labels: formData.get("labels") ? JSON.parse(formData.get("labels") as string) : undefined,
     p_display_order: formData.get("display_order")
-      ? parseInt(formData.get("display_order") as string)
+      ? parseInt(formData.get("display_order") as string, 10)
       : undefined,
     p_opens_at: (formData.get("opens_at") as string) || undefined,
     p_admin_closes_at: (formData.get("admin_closes_at") as string) || undefined,
@@ -58,8 +54,7 @@ export async function updateRound(formData: FormData): Promise<void> {
     p_provider_metadata: formData.get("provider_metadata")
       ? JSON.parse(formData.get("provider_metadata") as string)
       : undefined,
-    p_provider_review_status:
-      (formData.get("provider_review_status") as string) || undefined,
+    p_provider_review_status: (formData.get("provider_review_status") as string) || undefined,
   });
 
   revalidatePath("/admin/rounds");
@@ -79,9 +74,7 @@ export async function assignFixtureToRound(formData: FormData): Promise<void> {
   });
 
   revalidatePath("/admin/rounds");
-  redirect(
-    localePath(locale as never, `/admin/rounds/${roundId}?assigned=1`)
-  );
+  redirect(localePath(locale as never, `/admin/rounds/${roundId}?assigned=1`));
 }
 
 export async function unassignFixture(formData: FormData): Promise<void> {
@@ -108,9 +101,7 @@ export async function markRoundReviewed(formData: FormData): Promise<void> {
     p_round_id: roundId,
     p_provider_review_status: "reviewed",
   });
-  redirect(
-    localePath(locale as never, `/admin/rounds/${roundId}?reviewed=1`)
-  );
+  redirect(localePath(locale as never, `/admin/rounds/${roundId}?reviewed=1`));
 }
 
 export async function closeRound(formData: FormData): Promise<void> {

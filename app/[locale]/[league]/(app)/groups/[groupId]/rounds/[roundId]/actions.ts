@@ -1,12 +1,10 @@
 "use server";
 
-import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { isConfirmedMatch } from "@/lib/match-utils";
+import { z } from "zod";
 import { isCurrentUserAdmin } from "@/lib/admin/current-user";
-import type { Locale } from "@/lib/i18n";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const predictionSchema = z.object({
   matchId: z.string().uuid(),
@@ -25,9 +23,7 @@ export type BulkPredictionResult =
   | { ok: true; saved: number; locked: string[] }
   | { ok: false; error: string };
 
-export async function submitBulkPredictions(
-  input: unknown
-): Promise<BulkPredictionResult> {
+export async function submitBulkPredictions(input: unknown): Promise<BulkPredictionResult> {
   const t = await getTranslations("matchdaySheet");
 
   const parsed = bulkSchema.safeParse(input);
@@ -129,7 +125,7 @@ export async function submitBulkPredictions(
         away_goals: goals.away,
         submitted_at: new Date().toISOString(),
       },
-      { onConflict: "user_id,match_id" }
+      { onConflict: "user_id,match_id" },
     );
 
     if (error) {

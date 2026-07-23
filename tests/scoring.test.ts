@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
-import {
-  scorePrediction,
-  resolveStageMultiplier,
-  STAGE_POINT_MULTIPLIER,
-} from "@/lib/scoring";
-import { allocatePot, verifyPotConservation } from "@/lib/wager/pot-allocation";
 import type { CompetitionFormat } from "@/lib/competition-schema";
+import { resolveStageMultiplier, STAGE_POINT_MULTIPLIER, scorePrediction } from "@/lib/scoring";
+import { allocatePot, verifyPotConservation } from "@/lib/wager/pot-allocation";
 
 const stageDefaults = {
   hasGroupCode: false,
@@ -30,49 +26,63 @@ function stubFormat(
 
 describe("scorePrediction", () => {
   it("awards 5 points and 'exact' for matching scores", () => {
-    expect(scorePrediction({ home_goals: 2, away_goals: 1 }, { home_score: 2, away_score: 1 })).toEqual({
+    expect(
+      scorePrediction({ home_goals: 2, away_goals: 1 }, { home_score: 2, away_score: 1 }),
+    ).toEqual({
       points: 5,
       hit_type: "exact",
     });
   });
 
   it("awards 3 points and 'winner_gd' for correct winner + same goal diff", () => {
-    expect(scorePrediction({ home_goals: 2, away_goals: 1 }, { home_score: 3, away_score: 2 })).toEqual({
+    expect(
+      scorePrediction({ home_goals: 2, away_goals: 1 }, { home_score: 3, away_score: 2 }),
+    ).toEqual({
       points: 3,
       hit_type: "winner_gd",
     });
   });
 
   it("awards 3 points and 'winner_gd' for matching draws", () => {
-    expect(scorePrediction({ home_goals: 1, away_goals: 1 }, { home_score: 2, away_score: 2 })).toEqual({
+    expect(
+      scorePrediction({ home_goals: 1, away_goals: 1 }, { home_score: 2, away_score: 2 }),
+    ).toEqual({
       points: 3,
       hit_type: "winner_gd",
     });
   });
 
   it("awards 1 point and 'winner' for correct winner but wrong goal diff", () => {
-    expect(scorePrediction({ home_goals: 3, away_goals: 0 }, { home_score: 3, away_score: 1 })).toEqual({
+    expect(
+      scorePrediction({ home_goals: 3, away_goals: 0 }, { home_score: 3, away_score: 1 }),
+    ).toEqual({
       points: 1,
       hit_type: "winner",
     });
   });
 
   it("awards 0 points and 'miss' when the winner is wrong", () => {
-    expect(scorePrediction({ home_goals: 2, away_goals: 1 }, { home_score: 1, away_score: 2 })).toEqual({
+    expect(
+      scorePrediction({ home_goals: 2, away_goals: 1 }, { home_score: 1, away_score: 2 }),
+    ).toEqual({
       points: 0,
       hit_type: "miss",
     });
   });
 
   it("awards 0 points and 'miss' when predicting a draw but a team wins", () => {
-    expect(scorePrediction({ home_goals: 1, away_goals: 1 }, { home_score: 2, away_score: 1 })).toEqual({
+    expect(
+      scorePrediction({ home_goals: 1, away_goals: 1 }, { home_score: 2, away_score: 1 }),
+    ).toEqual({
       points: 0,
       hit_type: "miss",
     });
   });
 
   it("awards 0 points and 'miss' when predicting a winner but the match draws", () => {
-    expect(scorePrediction({ home_goals: 2, away_goals: 1 }, { home_score: 1, away_score: 1 })).toEqual({
+    expect(
+      scorePrediction({ home_goals: 2, away_goals: 1 }, { home_score: 1, away_score: 1 }),
+    ).toEqual({
       points: 0,
       hit_type: "miss",
     });
@@ -109,7 +119,11 @@ describe("scorePrediction", () => {
 
   it("defaults to ×1 for an unknown/unmapped stage", () => {
     expect(
-      scorePrediction({ home_goals: 2, away_goals: 1 }, { home_score: 2, away_score: 1 }, "totally-unknown"),
+      scorePrediction(
+        { home_goals: 2, away_goals: 1 },
+        { home_score: 2, away_score: 1 },
+        "totally-unknown",
+      ),
     ).toEqual({ points: 5, hit_type: "exact" });
   });
 });
@@ -142,17 +156,13 @@ describe("resolveStageMultiplier", () => {
   });
 
   it("prefers configured pointMultiplier over hardcoded", () => {
-    const format = stubFormat([
-      { key: "group", kind: "group", order: 1, pointMultiplier: 2 },
-    ]);
+    const format = stubFormat([{ key: "group", kind: "group", order: 1, pointMultiplier: 2 }]);
     expect(resolveStageMultiplier("group", format)).toBe(2);
     expect(resolveStageMultiplier("group")).toBe(1);
   });
 
   it("returns hardcoded fallback when format has no matching stage", () => {
-    const format = stubFormat([
-      { key: "group", kind: "group", order: 1 },
-    ]);
+    const format = stubFormat([{ key: "group", kind: "group", order: 1 }]);
     expect(resolveStageMultiplier("qf", format)).toBe(6);
   });
 });
@@ -171,9 +181,7 @@ describe("scorePrediction — boundary cases", () => {
   });
 
   it("*12 multiplier produces correct scaled values", () => {
-    const format = stubFormat([
-      { key: "final", kind: "knockout", order: 1, pointMultiplier: 12 },
-    ]);
+    const format = stubFormat([{ key: "final", kind: "knockout", order: 1, pointMultiplier: 12 }]);
     expect(
       scorePrediction(
         { home_goals: 2, away_goals: 1 },

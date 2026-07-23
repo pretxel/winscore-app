@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
-  renderPlayoffScoreEmail,
   type PlayoffScoreData,
   type PlayoffScoreStrings,
+  renderPlayoffScoreEmail,
 } from "@/lib/notifications/playoff-score-template";
 
 // ---------------------------------------------------------------------------
@@ -54,7 +54,13 @@ describe("renderPlayoffScoreEmail", () => {
     const { html, text } = renderPlayoffScoreEmail(
       makeData({
         matches: [
-          { home: "Brazil", away: "Spain", homeScore: 1, awayScore: 1, resultNote: "Brazil won on penalties" },
+          {
+            home: "Brazil",
+            away: "Spain",
+            homeScore: 1,
+            awayScore: 1,
+            resultNote: "Brazil won on penalties",
+          },
         ],
       }),
     );
@@ -82,7 +88,7 @@ describe("renderPlayoffScoreEmail", () => {
   it("HTML-escapes interpolated team names and copy", () => {
     const { html } = renderPlayoffScoreEmail(
       makeData({
-        matches: [{ home: "A & B <x>", away: "C \"D\"", homeScore: 3, awayScore: 2 }],
+        matches: [{ home: "A & B <x>", away: 'C "D"', homeScore: 3, awayScore: 2 }],
       }),
     );
     expect(html).toContain("A &amp; B &lt;x&gt;");

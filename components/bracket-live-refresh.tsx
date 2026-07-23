@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
 // Collapse a burst of match-row changes (e.g. a sync run finalizing several
@@ -30,19 +30,14 @@ export function BracketLiveRefresh() {
       }, REFRESH_DEBOUNCE_MS);
     }
 
-    let channel: ReturnType<
-      ReturnType<typeof createBrowserSupabaseClient>["channel"]
-    > | null = null;
+    let channel: ReturnType<ReturnType<typeof createBrowserSupabaseClient>["channel"]> | null =
+      null;
     const supabase = createBrowserSupabaseClient();
 
     try {
       channel = supabase
         .channel("bracket-matches")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "matches" },
-          scheduleRefresh,
-        )
+        .on("postgres_changes", { event: "*", schema: "public", table: "matches" }, scheduleRefresh)
         .subscribe();
     } catch {
       // Silent fallback: keep the SSR bracket; it still updates on reload.

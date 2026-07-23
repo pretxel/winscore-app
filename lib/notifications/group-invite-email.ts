@@ -1,13 +1,10 @@
 import "server-only";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { Resend } from "resend";
 import { env } from "@/lib/env";
-import { localePath, type Locale } from "@/lib/i18n";
-import {
-  renderGroupInviteEmail,
-  type GroupInviteEmailStrings,
-} from "./group-invite-template";
+import { type Locale, localePath } from "@/lib/i18n";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { type GroupInviteEmailStrings, renderGroupInviteEmail } from "./group-invite-template";
 
 // Minimal translator shape so this stays decoupled from next-intl internals.
 type Translator = (key: string, values?: Record<string, unknown>) => string;
@@ -56,8 +53,7 @@ export async function sendGroupInviteEmails(opts: {
   locale: Locale;
   recipients: string[];
 }): Promise<GroupInviteSendResult> {
-  const { groupId, groupName, inviterId, inviterName, joinCode, locale, recipients } =
-    opts;
+  const { groupId, groupName, inviterId, inviterName, joinCode, locale, recipients } = opts;
 
   if (!env.resendApiKey) {
     console.log("[group-invite-email] RESEND_API_KEY unset — skipping send");
@@ -100,10 +96,7 @@ export async function sendGroupInviteEmails(opts: {
       });
       if (error) {
         failed++;
-        console.error(
-          `[group-invite-email] send to ${recipient} failed:`,
-          error.message,
-        );
+        console.error(`[group-invite-email] send to ${recipient} failed:`, error.message);
         continue;
       }
 

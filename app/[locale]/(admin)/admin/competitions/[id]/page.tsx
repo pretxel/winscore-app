@@ -1,15 +1,15 @@
+import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeftIcon } from "lucide-react";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { resolveCompetition } from "@/lib/competition";
-import { CompetitionForm } from "@/components/admin/competition-form";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { CompetitionForm } from "@/components/admin/competition-form";
 import { SetActiveDialog } from "@/components/admin/set-active-dialog";
-import { updateCompetition } from "../actions";
 import { Badge } from "@/components/ui/badge";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { resolveCompetition } from "@/lib/competition";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { updateCompetition } from "../actions";
 
 export default async function EditCompetitionPage({
   params,
@@ -23,11 +23,7 @@ export default async function EditCompetitionPage({
   const t = await getTranslations("admin");
 
   const admin = createAdminSupabaseClient();
-  const { data: row } = await admin
-    .from("competitions")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  const { data: row } = await admin.from("competitions").select("*").eq("id", id).maybeSingle();
   if (!row) notFound();
 
   const resolved = resolveCompetition(row);
@@ -39,13 +35,8 @@ export default async function EditCompetitionPage({
 
   const activeName = row.is_active
     ? row.name
-    : ((
-        await admin
-          .from("competitions")
-          .select("name")
-          .eq("is_active", true)
-          .maybeSingle()
-      ).data?.name ?? null);
+    : ((await admin.from("competitions").select("name").eq("is_active", true).maybeSingle()).data
+        ?.name ?? null);
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">

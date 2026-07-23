@@ -7,8 +7,8 @@
  */
 
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { getWagerEnv } from "./env";
 import type { IntentState } from "./entry-saga";
+import { getWagerEnv } from "./env";
 
 interface ReconcilerOptions {
   maxRetries?: number;
@@ -36,7 +36,7 @@ export async function reconcileWagerEntries(
 ): Promise<{ reconciled: number; errors: number }> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const admin = createAdminSupabaseClient();
-  const env = getWagerEnv();
+  const _env = getWagerEnv();
 
   let reconciled = 0;
   let errors = 0;
@@ -44,7 +44,9 @@ export async function reconcileWagerEntries(
   // Find intents that need reconciliation
   const { data: pending } = await admin
     .from("wager_intents")
-    .select("id, state, pick_commitment, user_id, group_id, round_id, wager_round_id, wallet_link_id")
+    .select(
+      "id, state, pick_commitment, user_id, group_id, round_id, wager_round_id, wallet_link_id",
+    )
     .in("state", ["submitted", "reconciliation_required"] as IntentState[])
     .order("created_at", { ascending: true })
     .limit(50);
@@ -53,7 +55,7 @@ export async function reconcileWagerEntries(
     return { reconciled, errors };
   }
 
-  for (const intent of pending) {
+  for (const _intent of pending) {
     try {
       // Query the Solana RPC for the Entry PDA account
       // If account exists → reconcile to 'confirmed'

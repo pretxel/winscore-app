@@ -13,16 +13,9 @@ export async function LeagueStandingsTable({
   const hasResults = rows.some((r) => r.played > 0);
 
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-xl border border-border bg-card",
-        className,
-      )}
-    >
+    <div className={cn("overflow-hidden rounded-xl border border-border bg-card", className)}>
       <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-        <h3 className="font-heading text-sm font-semibold tracking-tight">
-          {t("heading")}
-        </h3>
+        <h3 className="font-heading text-sm font-semibold tracking-tight">{t("heading")}</h3>
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
           {t("caption")}
         </span>
@@ -63,19 +56,12 @@ export async function LeagueStandingsTable({
                   className="hidden md:table-cell"
                 />
                 <NumHead abbr={t("colGoalDiff")} full={t("colGoalDiffFull")} />
-                <NumHead
-                  abbr={t("colPoints")}
-                  full={t("colPointsFull")}
-                  className="pr-3"
-                />
+                <NumHead abbr={t("colPoints")} full={t("colPointsFull")} className="pr-3" />
               </tr>
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr
-                  key={row.team}
-                  className="border-b border-border/60 last:border-0"
-                >
+                <tr key={row.team} className="border-b border-border/60 last:border-0">
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
                       <span className="w-3.5 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">
@@ -88,14 +74,8 @@ export async function LeagueStandingsTable({
                   <NumCell value={row.won} className="hidden sm:table-cell" />
                   <NumCell value={row.drawn} className="hidden sm:table-cell" />
                   <NumCell value={row.lost} className="hidden sm:table-cell" />
-                  <NumCell
-                    value={row.goalsFor}
-                    className="hidden md:table-cell"
-                  />
-                  <NumCell
-                    value={row.goalsAgainst}
-                    className="hidden md:table-cell"
-                  />
+                  <NumCell value={row.goalsFor} className="hidden md:table-cell" />
+                  <NumCell value={row.goalsAgainst} className="hidden md:table-cell" />
                   <NumCell value={signed(row.goalDiff)} />
                   <td className="px-3 py-2 text-right font-mono font-semibold tabular-nums">
                     {row.points}
@@ -121,21 +101,9 @@ function signed(n: number): string {
   return n > 0 ? `+${n}` : String(n);
 }
 
-function NumHead({
-  abbr,
-  full,
-  className,
-}: {
-  abbr: string;
-  full: string;
-  className?: string;
-}) {
+function NumHead({ abbr, full, className }: { abbr: string; full: string; className?: string }) {
   return (
-    <th
-      scope="col"
-      title={full}
-      className={cn("px-1.5 py-2 text-right font-medium", className)}
-    >
+    <th scope="col" title={full} className={cn("px-1.5 py-2 text-right font-medium", className)}>
       <abbr title={full} className="no-underline">
         {abbr}
       </abbr>
@@ -143,13 +111,7 @@ function NumHead({
   );
 }
 
-function NumCell({
-  value,
-  className,
-}: {
-  value: number | string;
-  className?: string;
-}) {
+function NumCell({ value, className }: { value: number | string; className?: string }) {
   return (
     <td
       className={cn(

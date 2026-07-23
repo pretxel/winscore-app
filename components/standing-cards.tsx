@@ -1,5 +1,5 @@
-import { getTranslations } from "next-intl/server";
 import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import type { StandingSummary } from "@/lib/standing-summary";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +18,7 @@ export async function StandingCards({
   const hasFinals = summary.finals.scored > 0;
 
   return (
-    <section
-      className={className}
-      aria-label={t("ariaLabel")}
-    >
+    <section className={className} aria-label={t("ariaLabel")}>
       <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         <Card label={t("points")} value={summary.totalPoints} accent="pitch" />
         <Card label={t("exact")} value={summary.exactCount} accent="flag" />
@@ -35,9 +32,7 @@ export async function StandingCards({
                 <RankDeltaBadge delta={summary.rankDelta} t={t} />
               </span>
             ) : (
-              <span className="text-base text-muted-foreground">
-                {t("unranked")}
-              </span>
+              <span className="text-base text-muted-foreground">{t("unranked")}</span>
             )
           }
         />
@@ -157,9 +152,7 @@ function AccuracyStat({
   return (
     <span className="inline-flex items-baseline gap-1.5">
       <span className={cn("font-semibold", className)}>{value}</span>
-      <span className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-        {label}
-      </span>
+      <span className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{label}</span>
     </span>
   );
 }

@@ -7,53 +7,50 @@ import "server-only";
 import { getTranslations } from "next-intl/server";
 import { env } from "@/lib/env";
 import type { Locale } from "@/lib/i18n";
-import { renderWelcomeEmail } from "./welcome-email-template";
-import { buildWelcomeEmailStrings } from "./welcome-email";
-import { renderResultEmail } from "./result-email-template";
-import { buildResultEmailStrings } from "./result-emails";
-import { renderResultsDigest } from "./results-digest-template";
-import { buildResultsDigestStrings } from "./results-digest-emails";
-import { renderRecapDigest } from "./recap-digest-template";
-import { buildRecapDigestStrings } from "./recap-digest-emails";
-import { renderPredictionReminderEmail } from "./prediction-reminder-template";
-import { buildPredictionReminderStrings } from "./prediction-reminder-emails";
-import { renderQuizReminderEmail } from "./quiz-reminder-template";
-import { buildQuizReminderStrings } from "./quiz-reminder-emails";
-import { renderPlayoffScoreEmail } from "./playoff-score-template";
-import { buildPlayoffScoreStrings } from "./playoff-score-emails";
 import { renderComebackEmail } from "./comeback-email-template";
 import { buildComebackEmailStrings } from "./comeback-emails";
-import { renderScoreRulesEmail } from "./score-rules-template";
-import { buildScoreRulesStrings } from "./score-rules-emails";
-import { renderGroupInviteEmail } from "./group-invite-template";
 import { buildGroupInviteEmailStrings } from "./group-invite-email";
+import { renderGroupInviteEmail } from "./group-invite-template";
+import { buildMagicLinkEmailStrings, renderMagicLinkEmail } from "./magic-link-email-template";
+import { buildPlayoffScoreStrings } from "./playoff-score-emails";
+import { renderPlayoffScoreEmail } from "./playoff-score-template";
+import { buildPredictionReminderStrings } from "./prediction-reminder-emails";
+import { renderPredictionReminderEmail } from "./prediction-reminder-template";
 import {
-  renderMagicLinkEmail,
-  buildMagicLinkEmailStrings,
-} from "./magic-link-email-template";
-import { renderWinnersEmail } from "./winners-email-template";
-import { buildWinnersEmailStrings } from "./winners-emails";
-import {
-  SAMPLE_NAME,
-  SAMPLE_EARNED_POINTS,
-  SAMPLE_RANK_DELTA,
-  SAMPLE_QUIZ_STREAK,
-  SAMPLE_DAYS_INACTIVE,
-  SAMPLE_INVITER,
-  SAMPLE_GROUP_NAME,
-  welcomeFixture,
-  resultFixture,
-  resultsDigestFixture,
-  recapDigestFixture,
-  predictionReminderFixture,
-  quizReminderFixture,
-  playoffScoreFixture,
   comebackFixture,
-  scoreRulesFixture,
   groupInviteFixture,
   magicLinkFixture,
+  playoffScoreFixture,
+  predictionReminderFixture,
+  quizReminderFixture,
+  recapDigestFixture,
+  resultFixture,
+  resultsDigestFixture,
+  SAMPLE_DAYS_INACTIVE,
+  SAMPLE_EARNED_POINTS,
+  SAMPLE_GROUP_NAME,
+  SAMPLE_INVITER,
+  SAMPLE_NAME,
+  SAMPLE_QUIZ_STREAK,
+  SAMPLE_RANK_DELTA,
+  scoreRulesFixture,
+  welcomeFixture,
   winnersFixture,
 } from "./preview-fixtures";
+import { buildQuizReminderStrings } from "./quiz-reminder-emails";
+import { renderQuizReminderEmail } from "./quiz-reminder-template";
+import { buildRecapDigestStrings } from "./recap-digest-emails";
+import { renderRecapDigest } from "./recap-digest-template";
+import { renderResultEmail } from "./result-email-template";
+import { buildResultEmailStrings } from "./result-emails";
+import { buildResultsDigestStrings } from "./results-digest-emails";
+import { renderResultsDigest } from "./results-digest-template";
+import { buildScoreRulesStrings } from "./score-rules-emails";
+import { renderScoreRulesEmail } from "./score-rules-template";
+import { buildWelcomeEmailStrings } from "./welcome-email";
+import { renderWelcomeEmail } from "./welcome-email-template";
+import { renderWinnersEmail } from "./winners-email-template";
+import { buildWinnersEmailStrings } from "./winners-emails";
 
 // Minimal translator shape so this stays decoupled from next-intl internals.
 type Translator = (key: string, values?: Record<string, unknown>) => string;

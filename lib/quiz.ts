@@ -17,10 +17,7 @@ type LocalizableQuestion = {
   translations?: unknown;
 };
 
-function isUsableTranslation(
-  value: unknown,
-  englishOptionCount: number,
-): value is QuizTranslation {
+function isUsableTranslation(value: unknown, englishOptionCount: number): value is QuizTranslation {
   if (typeof value !== "object" || value === null) return false;
   const t = value as Record<string, unknown>;
   if (typeof t.prompt !== "string" || t.prompt.trim().length === 0) {
@@ -29,9 +26,7 @@ function isUsableTranslation(
   if (!Array.isArray(t.options) || t.options.length !== englishOptionCount) {
     return false;
   }
-  return t.options.every(
-    (o) => typeof o === "string" && o.trim().length > 0,
-  );
+  return t.options.every((o) => typeof o === "string" && o.trim().length > 0);
 }
 
 /**
@@ -89,9 +84,7 @@ export function computeStreak(
   // still be alive from yesterday backwards; otherwise it's zero. A freeze is
   // never spent on the anchor itself (the day is still open / there is nothing
   // before it to bridge), so anchoring uses real activity only.
-  const cursor = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
+  const cursor = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   if (!days.has(utcDayKey(cursor))) {
     cursor.setUTCDate(cursor.getUTCDate() - 1);
     if (!days.has(utcDayKey(cursor))) return 0;

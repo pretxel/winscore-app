@@ -5,12 +5,7 @@ import { cn } from "@/lib/utils";
 // new-fixture form, then the fixture rows.
 export default function AdminMatchesLoading() {
   return (
-    <main
-      role="status"
-      aria-busy="true"
-      aria-live="off"
-      className="mx-auto max-w-4xl px-4 py-10"
-    >
+    <main role="status" aria-busy="true" aria-live="off" className="mx-auto max-w-4xl px-4 py-10">
       <span className="sr-only">Loading</span>
       <div className="space-y-8">
         <div className="space-y-2">

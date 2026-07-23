@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import type { LeaderboardSegment } from "@/lib/leaderboard-segment";
+import { cn } from "@/lib/utils";
 
 export type StageOption = { key: string; label: string };
 

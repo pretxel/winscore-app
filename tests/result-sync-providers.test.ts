@@ -27,24 +27,16 @@ afterEach(() => {
 
 describe("footballDataProvider URL construction", () => {
   it("defaults to the World Cup competition + season", async () => {
-    const { footballDataProvider } = await import(
-      "@/lib/result-sync/providers/football-data"
-    );
+    const { footballDataProvider } = await import("@/lib/result-sync/providers/football-data");
     await footballDataProvider.fetchMatches();
-    expect(lastUrl).toBe(
-      "https://api.football-data.org/v4/competitions/WC/matches?season=2026",
-    );
+    expect(lastUrl).toBe("https://api.football-data.org/v4/competitions/WC/matches?season=2026");
   });
 
   it("builds the URL from the competition's provider config", async () => {
-    const { footballDataProvider } = await import(
-      "@/lib/result-sync/providers/football-data"
-    );
+    const { footballDataProvider } = await import("@/lib/result-sync/providers/football-data");
     const config: ProviderConfig = { footballData: { code: "CL", season: "2027" } };
     await footballDataProvider.fetchMatches(undefined, config);
-    expect(lastUrl).toBe(
-      "https://api.football-data.org/v4/competitions/CL/matches?season=2027",
-    );
+    expect(lastUrl).toBe("https://api.football-data.org/v4/competitions/CL/matches?season=2027");
   });
 });
 

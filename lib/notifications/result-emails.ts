@@ -1,26 +1,26 @@
 import "server-only";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { Resend } from "resend";
+import type { HitType } from "@/lib/db";
+import { isOptedIn } from "@/lib/email-prefs";
 import { env } from "@/lib/env";
 import { DEFAULT_LOCALE, localePath } from "@/lib/i18n";
-import { isOptedIn } from "@/lib/email-prefs";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { checkEmailSenderConfig } from "./email-sender-config";
 import {
   dispatchPushTargets,
-  ZERO_PUSH,
   type PushDispatchSummary,
   type PushTarget,
+  ZERO_PUSH,
 } from "./push-dispatch";
-import { isWebPushConfigured } from "./web-push";
-import type { HitType } from "@/lib/db";
 import {
-  renderResultEmail,
   type EmailFinishedMatch,
   type RankDelta,
   type ResultEmailData,
   type ResultEmailStrings,
+  renderResultEmail,
 } from "./result-email-template";
+import { isWebPushConfigured } from "./web-push";
 
 // Resend caps a single batch.send call at 100 messages.
 const RESEND_BATCH_LIMIT = 100;
@@ -220,11 +220,7 @@ function withFromName(emailFrom: string, name?: string): string {
 // like example.com") and a single bad address fails the whole all-or-nothing
 // batch — so drop them before send. There's nothing to retry, so callers count
 // these as skipped, exactly like a missing address.
-const UNDELIVERABLE_DOMAINS = new Set([
-  "example.com",
-  "example.org",
-  "example.net",
-]);
+const UNDELIVERABLE_DOMAINS = new Set(["example.com", "example.org", "example.net"]);
 const UNDELIVERABLE_TLDS = new Set(["test", "example", "invalid", "localhost"]);
 
 export function isSendableEmail(email: string): boolean {
@@ -243,10 +239,7 @@ export function isSendableEmail(email: string): boolean {
 // Loads scored rows on matches that are currently final, flattened with the
 // match details. When `matchId` is given the query is filtered to that one
 // match at the data layer, so the force path can never widen beyond it.
-async function loadScoredFinals(
-  admin: AdminClient,
-  matchId?: string,
-): Promise<ScoredFinalRow[]> {
+async function loadScoredFinals(admin: AdminClient, matchId?: string): Promise<ScoredFinalRow[]> {
   let query = admin
     .from("scores")
     .select(
@@ -278,15 +271,9 @@ async function loadScoredFinals(
 // Reads the result-email preference for the given affected user ids so opted-out
 // players can be dropped before send. Returns one row per user that has a
 // profile; absent users (treated as opted-in) simply don't appear.
-async function loadResultPrefs(
-  admin: AdminClient,
-  userIds: string[],
-): Promise<ResultPrefRow[]> {
+async function loadResultPrefs(admin: AdminClient, userIds: string[]): Promise<ResultPrefRow[]> {
   if (userIds.length === 0) return [];
-  const { data, error } = await admin
-    .from("profiles")
-    .select("id, email_prefs")
-    .in("id", userIds);
+  const { data, error } = await admin.from("profiles").select("id, email_prefs").in("id", userIds);
   if (error) {
     throw new Error(`[result-emails] load prefs: ${error.message}`);
   }
@@ -509,7 +496,9 @@ export async function forceDispatchResultEmails(
 // ledger), so re-running sync-matches never re-pushes. No-ops when VAPID is
 // unset. Isolated by the caller: a failure never aborts the sync or the
 // result-email send.
-export async function dispatchStandingChangedPush(leagueSlug?: string): Promise<PushDispatchSummary> {
+export async function dispatchStandingChangedPush(
+  leagueSlug?: string,
+): Promise<PushDispatchSummary> {
   if (!isWebPushConfigured()) {
     console.log("[result-emails] VAPID unset — skipping push");
     return { ...ZERO_PUSH };

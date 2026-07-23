@@ -4,12 +4,9 @@
  */
 
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import type { MerkleLeaf } from "./merkle-tree";
 import { buildMerkleTree } from "./merkle-tree";
 import { allocatePot } from "./pot-allocation";
-import { canonicalizePicks } from "./pick-commitment";
-import type { MerkleLeaf } from "./merkle-tree";
-import type { WinnerAllocation } from "./pot-allocation";
-import type { PickCommitmentPayload } from "./pick-commitment";
 
 export interface SettlementManifest {
   version: number;
@@ -125,9 +122,10 @@ export async function buildSettlementManifest(
       }
     }
 
-    const walletBytes = typeof entry.wallet_address === "string"
-      ? Buffer.from(entry.wallet_address, "hex")
-      : Buffer.from(entry.wallet_address as unknown as ArrayBuffer);
+    const walletBytes =
+      typeof entry.wallet_address === "string"
+        ? Buffer.from(entry.wallet_address, "hex")
+        : Buffer.from(entry.wallet_address as unknown as ArrayBuffer);
 
     entryResults.push({
       entryId: entry.id,

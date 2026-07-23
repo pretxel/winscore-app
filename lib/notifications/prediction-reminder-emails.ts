@@ -1,24 +1,24 @@
 import "server-only";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { Resend } from "resend";
+import { isOptedIn } from "@/lib/email-prefs";
 import { env } from "@/lib/env";
 import { DEFAULT_LOCALE, localePath } from "@/lib/i18n";
 import { filterRecipientsAtLocalHour, isConfirmedMatch, isLocked } from "@/lib/match-utils";
-import { isOptedIn } from "@/lib/email-prefs";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { checkEmailSenderConfig } from "./email-sender-config";
 import {
-  dispatchPushTargets,
-  ZERO_PUSH,
-  type PushDispatchSummary,
-  type PushTarget,
-} from "./push-dispatch";
-import { isWebPushConfigured } from "./web-push";
-import {
-  renderPredictionReminderEmail,
   type PredictionReminderEmailStrings,
   type PredictionReminderMatch,
+  renderPredictionReminderEmail,
 } from "./prediction-reminder-template";
+import {
+  dispatchPushTargets,
+  type PushDispatchSummary,
+  type PushTarget,
+  ZERO_PUSH,
+} from "./push-dispatch";
+import { isWebPushConfigured } from "./web-push";
 
 // Resend caps a single batch.send call at 100 messages.
 const RESEND_BATCH_LIMIT = 100;
@@ -97,9 +97,7 @@ export function computePendingPredictionReminders(
   for (const recipient of recipients) {
     if (reminded.has(recipient.userId)) continue;
     const predicted = predictedByUser.get(recipient.userId);
-    const matches = predicted
-      ? todayMatches.filter((m) => !predicted.has(m.id))
-      : todayMatches;
+    const matches = predicted ? todayMatches.filter((m) => !predicted.has(m.id)) : todayMatches;
     if (matches.length > 0) out.push({ recipient, matches });
   }
   return out;
@@ -309,7 +307,10 @@ interface PreparedMessage {
 // is unset, or when no matches are scheduled for today. Per-recipient failures
 // are logged and counted, never aborting the rest; ledger rows are written only
 // for messages Resend accepted, so failures retry on a later run the same day.
-export async function dispatchPredictionReminders(fromName?: string, leagueSlug?: string): Promise<DispatchSummary> {
+export async function dispatchPredictionReminders(
+  fromName?: string,
+  leagueSlug?: string,
+): Promise<DispatchSummary> {
   const senderMisconfigured = warnIfSenderMisconfigured();
   const flag = senderMisconfigured ? { senderMisconfigured } : {};
   if (!env.resendApiKey) {

@@ -56,8 +56,7 @@ function setupLocalMatches(
       const compChain: Record<string, unknown> = {
         select: () => compChain,
         eq: () => compChain,
-        maybeSingle: () =>
-          Promise.resolve({ data: competition, error: null }),
+        maybeSingle: () => Promise.resolve({ data: competition, error: null }),
       };
       return compChain;
     }
@@ -236,9 +235,7 @@ describe("runSync provider escalation", () => {
   });
 
   it("keeps the primary as source when the targeted escalation resolves nothing", async () => {
-    setupLocalMatches([
-      localMatch({ status: "live" }),
-    ]);
+    setupLocalMatches([localMatch({ status: "live" })]);
     // Primary returns the match still in play; fallback has nothing new.
     const primary = provider("football-data", async () => [
       finishedRemote({ status: "IN_PLAY", score: null }),
@@ -275,9 +272,7 @@ describe("runSync provider escalation", () => {
 
 describe("runSync cross-source final protection", () => {
   it("never lets the fallback overwrite an existing final", async () => {
-    setupLocalMatches([
-      localMatch({ status: "final", home_score: 2, away_score: 1 }),
-    ]);
+    setupLocalMatches([localMatch({ status: "final", home_score: 2, away_score: 1 })]);
     const primary = provider("football-data", async () => {
       throw new Error("down");
     });
@@ -293,9 +288,7 @@ describe("runSync cross-source final protection", () => {
   });
 
   it("never lets the primary overwrite a differing final either — finals are immutable to feeds", async () => {
-    setupLocalMatches([
-      localMatch({ status: "final", home_score: 2, away_score: 1 }),
-    ]);
+    setupLocalMatches([localMatch({ status: "final", home_score: 2, away_score: 1 })]);
     const primary = provider("football-data", async () => [
       finishedRemote({ score: { fullTime: { home: 3, away: 1 } } }),
     ]);
@@ -309,9 +302,7 @@ describe("runSync cross-source final protection", () => {
   });
 
   it("issues no UPDATE for an identical final but still recomputes (heals a failed RPC)", async () => {
-    setupLocalMatches([
-      localMatch({ status: "final", home_score: 2, away_score: 1 }),
-    ]);
+    setupLocalMatches([localMatch({ status: "final", home_score: 2, away_score: 1 })]);
     const primary = provider("football-data", async () => [finishedRemote()]);
     const fallback = provider("espn", async () => []);
 
@@ -429,10 +420,7 @@ describe("findStaleMatches", () => {
   it("flags overdue scheduled and live matches", async () => {
     const { findStaleMatches } = await import("@/lib/result-sync/staleness");
     const stale = findStaleMatches(
-      [
-        localMatch(),
-        localMatch({ id: MATCH_B, status: "live" }),
-      ],
+      [localMatch(), localMatch({ id: MATCH_B, status: "live" })],
       NOW,
     );
     expect(stale).toHaveLength(2);
@@ -457,14 +445,9 @@ describe("findStaleMatches", () => {
 
 describe("espn provider", () => {
   it("normalizes the captured scoreboard fixture", async () => {
-    const { normalizeEspnEvents } = await import(
-      "@/lib/result-sync/providers/espn"
-    );
+    const { normalizeEspnEvents } = await import("@/lib/result-sync/providers/espn");
     const fixture = JSON.parse(
-      readFileSync(
-        join(__dirname, "fixtures", "espn-scoreboard-20260611.json"),
-        "utf-8",
-      ),
+      readFileSync(join(__dirname, "fixtures", "espn-scoreboard-20260611.json"), "utf-8"),
     ) as { events: unknown[] };
 
     const remote = normalizeEspnEvents(fixture.events as never);
@@ -483,8 +466,7 @@ describe("espn provider", () => {
 
   it("fetches one range widened a day back for ESPN's US-Eastern day bucketing", async () => {
     const fetchMock = vi.fn<(input: RequestInfo | URL) => Promise<Response>>(
-      async () =>
-        new Response(JSON.stringify({ events: [] }), { status: 200 }),
+      async () => new Response(JSON.stringify({ events: [] }), { status: 200 }),
     );
     vi.stubGlobal("fetch", fetchMock);
     const { espnProvider } = await import("@/lib/result-sync/providers/espn");
@@ -493,9 +475,7 @@ describe("espn provider", () => {
     // so the range must start one day before the earliest UTC date.
     await espnProvider.fetchMatches(["2026-06-12", "2026-06-11"]);
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(String(fetchMock.mock.calls[0][0])).toContain(
-      "dates=20260610-20260612",
-    );
+    expect(String(fetchMock.mock.calls[0][0])).toContain("dates=20260610-20260612");
 
     // No dates → nothing to ask for, no request.
     fetchMock.mockClear();
@@ -506,16 +486,12 @@ describe("espn provider", () => {
       "fetch",
       vi.fn(async () => new Response("nope", { status: 503 })),
     );
-    await expect(espnProvider.fetchMatches(["2026-06-11"])).rejects.toThrow(
-      /ESPN fetch failed/,
-    );
+    await expect(espnProvider.fetchMatches(["2026-06-11"])).rejects.toThrow(/ESPN fetch failed/);
     vi.unstubAllGlobals();
   });
 
   it("skips degenerate events and keeps scores null until completed", async () => {
-    const { normalizeEspnEvents } = await import(
-      "@/lib/result-sync/providers/espn"
-    );
+    const { normalizeEspnEvents } = await import("@/lib/result-sync/providers/espn");
     const remote = normalizeEspnEvents([
       {}, // no competitions at all
       { date: "2026-06-11T19:00Z", competitions: [{ competitors: [] }] },

@@ -6,21 +6,27 @@ import { filterPushOptIns } from "@/lib/notifications/push-dispatch";
 // ---------------------------------------------------------------------------
 describe("filterPushOptIns", () => {
   it("drops only users whose push pref is explicitly false", () => {
-    const result = filterPushOptIns(["a", "b", "c"], [
-      { user_id: "a", email_prefs: { push: false } },
-      { user_id: "b", email_prefs: { push: true } },
-      // c has no pref row at all → treated as opted-in
-    ]);
+    const result = filterPushOptIns(
+      ["a", "b", "c"],
+      [
+        { user_id: "a", email_prefs: { push: false } },
+        { user_id: "b", email_prefs: { push: true } },
+        // c has no pref row at all → treated as opted-in
+      ],
+    );
     expect(result).toEqual(["b", "c"]);
   });
 
   it("treats missing/null/non-boolean push as opted-in", () => {
-    const result = filterPushOptIns(["a", "b", "c", "d"], [
-      { user_id: "a", email_prefs: {} },
-      { user_id: "b", email_prefs: null },
-      { user_id: "c", email_prefs: { push: "yes" } },
-      { user_id: "d", email_prefs: { push: 1 } },
-    ]);
+    const result = filterPushOptIns(
+      ["a", "b", "c", "d"],
+      [
+        { user_id: "a", email_prefs: {} },
+        { user_id: "b", email_prefs: null },
+        { user_id: "c", email_prefs: { push: "yes" } },
+        { user_id: "d", email_prefs: { push: 1 } },
+      ],
+    );
     expect(result).toEqual(["a", "b", "c", "d"]);
   });
 });
@@ -57,9 +63,7 @@ function makeAdmin(opts: {
             in: () => ({
               order: () => ({
                 range: async (start: number) =>
-                  start === 0
-                    ? { data: opts.subs, error: null }
-                    : { data: [], error: null },
+                  start === 0 ? { data: opts.subs, error: null } : { data: [], error: null },
               }),
             }),
           }),
@@ -84,7 +88,10 @@ describe("dispatchPushTargets", () => {
     sendWebPush.mockResolvedValue({ status: "sent" });
     const ledger: string[] = [];
     const admin = makeAdmin({
-      prefs: [{ id: "out", email_prefs: { push: false } }, { id: "in", email_prefs: {} }],
+      prefs: [
+        { id: "out", email_prefs: { push: false } },
+        { id: "in", email_prefs: {} },
+      ],
       subs: [{ id: "s1", user_id: "in", endpoint: "e", p256dh: "p", auth: "a" }],
     });
 

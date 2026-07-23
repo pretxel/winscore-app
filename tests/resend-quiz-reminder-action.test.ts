@@ -46,7 +46,14 @@ vi.mock("@/lib/supabase/server", () => ({
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminSupabaseClient: () => ({
     from: () => ({
-      select: () => ({ eq: () => ({ maybeSingle: questionMaybeSingleMock }) }),
+      select: () => ({
+        eq: () => ({
+          // competitions lookup: .select().eq(is_active).maybeSingle()
+          maybeSingle: questionMaybeSingleMock,
+          // quiz_questions lookup: .select().eq(competition_id).eq(active_on).maybeSingle()
+          eq: () => ({ maybeSingle: questionMaybeSingleMock }),
+        }),
+      }),
     }),
   }),
 }));

@@ -18,8 +18,14 @@ const SRC =
 // winner each faces, with the candidate groups whose 3rd can fill them.
 const SLOT_WINNERS = ["A", "B", "D", "E", "G", "I", "K", "L"];
 const CANDIDATES = {
-  A: "CEFHI", B: "EFGIJ", D: "BEFIJ", E: "ABCDF",
-  G: "AEHIJ", I: "CDFGH", K: "DEIJL", L: "EHIJK",
+  A: "CEFHI",
+  B: "EFGIJ",
+  D: "BEFIJ",
+  E: "ABCDF",
+  G: "AEHIJ",
+  I: "CDFGH",
+  K: "DEIJL",
+  L: "EHIJK",
 };
 
 const res = await fetch(SRC);
@@ -71,8 +77,5 @@ ${body}
 };
 `;
 
-writeFileSync(
-  new URL("../lib/bracket-third-allocation.generated.ts", import.meta.url),
-  out,
-);
+writeFileSync(new URL("../lib/bracket-third-allocation.generated.ts", import.meta.url), out);
 console.log(`wrote lib/bracket-third-allocation.generated.ts (${rows.length} rows)`);

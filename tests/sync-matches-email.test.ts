@@ -7,7 +7,6 @@ vi.mock("@/lib/operations/settings", () => ({
   isOperationEnabled: vi.fn(async () => true),
 }));
 
-
 // Verifies the cron route isolates result-email dispatch: a dispatch failure
 // never fails the sync, and a successful dispatch's count is surfaced.
 

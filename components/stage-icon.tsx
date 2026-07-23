@@ -1,24 +1,13 @@
 import type { MatchStage } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
-export function StageIcon({
-  stage,
-  className,
-}: {
-  stage: string;
-  className?: string;
-}) {
+export function StageIcon({ stage, className }: { stage: string; className?: string }) {
   const cls = cn("size-4 shrink-0", className);
   switch (stage as MatchStage) {
     case "group":
       // Three group dots.
       return (
-        <svg
-          viewBox="0 0 16 16"
-          aria-hidden="true"
-          className={cls}
-          fill="currentColor"
-        >
+        <svg viewBox="0 0 16 16" aria-hidden="true" className={cls} fill="currentColor">
           <circle cx="3" cy="8" r="1.8" />
           <circle cx="8" cy="8" r="1.8" />
           <circle cx="13" cy="8" r="1.8" />
@@ -87,12 +76,7 @@ export function StageIcon({
     case "third":
       // Bronze medal.
       return (
-        <svg
-          viewBox="0 0 16 16"
-          aria-hidden="true"
-          className={cls}
-          fill="currentColor"
-        >
+        <svg viewBox="0 0 16 16" aria-hidden="true" className={cls} fill="currentColor">
           <path d="M5 1.5l-2 4 5 .7L5 1.5zM11 1.5l-3 4.7 5-.7-2-4z" opacity="0.55" />
           <circle cx="8" cy="11" r="4" />
           <text
@@ -111,23 +95,13 @@ export function StageIcon({
     case "final":
       // Trophy.
       return (
-        <svg
-          viewBox="0 0 16 16"
-          aria-hidden="true"
-          className={cls}
-          fill="currentColor"
-        >
+        <svg viewBox="0 0 16 16" aria-hidden="true" className={cls} fill="currentColor">
           <path d="M4 2h8v1.5c0 .8.2 1.5 1.4 1.5h.6V3h-1.5V2H4v1H2.5v2H3c1.2 0 1.4-.7 1.4-1.5V2zM5 2v3a3 3 0 0 0 6 0V2H5zM7 9h2v2.5h1.5V13h-5v-1.5H7V9z" />
         </svg>
       );
     default:
       return (
-        <svg
-          viewBox="0 0 16 16"
-          aria-hidden="true"
-          className={cls}
-          fill="currentColor"
-        >
+        <svg viewBox="0 0 16 16" aria-hidden="true" className={cls} fill="currentColor">
           <circle cx="8" cy="8" r="2" />
         </svg>
       );

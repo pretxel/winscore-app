@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import {
-  LeaderboardTable,
   type BoardRow,
   type LeaderboardLabels,
+  LeaderboardTable,
 } from "@/components/leaderboard-table";
+import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
 // How many rows the board renders (matches the SSR slice in the page).
 const TOP_N = 10;
@@ -57,11 +57,7 @@ export function LeaderboardLive({
 
     const channel = supabase
       .channel("leaderboard-scores")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "scores" },
-        scheduleRefetch,
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "scores" }, scheduleRefetch)
       .subscribe();
 
     return () => {
@@ -71,11 +67,5 @@ export function LeaderboardLive({
     };
   }, []);
 
-  return (
-    <LeaderboardTable
-      rows={rows}
-      currentUserId={currentUserId}
-      labels={labels}
-    />
-  );
+  return <LeaderboardTable rows={rows} currentUserId={currentUserId} labels={labels} />;
 }

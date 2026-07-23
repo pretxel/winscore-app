@@ -46,9 +46,7 @@ export function AdminMatchesTabs({
       >
         <TabsTrigger value="fixtures">{labels.fixtures}</TabsTrigger>
         <TabsTrigger value="sync">{labels.sync}</TabsTrigger>
-        {showReveal ? (
-          <TabsTrigger value="reveal">{labels.reveal}</TabsTrigger>
-        ) : null}
+        {showReveal ? <TabsTrigger value="reveal">{labels.reveal}</TabsTrigger> : null}
       </TabsList>
 
       <TabsContent value="fixtures" className="space-y-8">

@@ -5,16 +5,16 @@
 // unit-testable — the server loader in lib/bracket.ts just feeds it rows.
 
 import {
+  allocateBestThirds,
+  THIRD_SLOT_CANDIDATES,
+  type ThirdSlotWinner,
+} from "@/lib/bracket-third-allocation";
+import {
   buildGroupTables,
   compareTeamRows,
   type GroupTableMatch,
   type GroupTeamRow,
 } from "@/lib/group-standings";
-import {
-  allocateBestThirds,
-  THIRD_SLOT_CANDIDATES,
-  type ThirdSlotWinner,
-} from "@/lib/bracket-third-allocation";
 
 export type KnockoutStage = "r32" | "r16" | "qf" | "sf" | "third" | "final";
 
@@ -98,10 +98,7 @@ export function assignMatchNumbers(matches: BracketMatchInput[]): {
   for (const [stage, arr] of byStage) {
     const base = STAGE_BASE[stage];
     if (base == null) continue; // unknown stage — not numbered
-    arr.sort(
-      (a, b) =>
-        a.kickoff_at.localeCompare(b.kickoff_at) || a.id.localeCompare(b.id),
-    );
+    arr.sort((a, b) => a.kickoff_at.localeCompare(b.kickoff_at) || a.id.localeCompare(b.id));
     arr.forEach((m, i) => {
       const n = base + i + 1;
       numberById.set(m.id, n);
@@ -146,8 +143,7 @@ function buildGroupContext(groupMatches: BracketMatchInput[]): GroupContext {
     if (f > 0) hasResults.add(code);
     if (f === n) complete.add(code);
   }
-  const allGroupsComplete =
-    rowsByCode.size > 0 && [...total.keys()].every((c) => complete.has(c));
+  const allGroupsComplete = rowsByCode.size > 0 && [...total.keys()].every((c) => complete.has(c));
 
   return { rowsByCode, hasResults, complete, allGroupsComplete };
 }
@@ -248,10 +244,7 @@ export function buildBracket(matches: BracketMatchInput[]): Bracket {
   // Winner/loser of a numbered, decisively-final fixture (resolving the
   // referenced fixture's own slots first, so a chain of results carries
   // through). Returns null when undecided or unresolved.
-  const outcome = (
-    n: number,
-    want: "winner" | "loser",
-  ): ResolvedParticipant | null => {
+  const outcome = (n: number, want: "winner" | "loser"): ResolvedParticipant | null => {
     const fx = matchByNumber.get(n);
     if (!fx) return null;
     if (
@@ -265,16 +258,11 @@ export function buildBracket(matches: BracketMatchInput[]): Bracket {
     const homeWon = fx.home_score > fx.away_score;
     const side = (want === "winner") === homeWon ? "home" : "away";
     const part = side === "home" ? resolveSide(fx, "home") : resolveSide(fx, "away");
-    return part.team
-      ? { team: part.team, label: part.team, status: "confirmed" }
-      : null;
+    return part.team ? { team: part.team, label: part.team, status: "confirmed" } : null;
   };
 
   // Resolve one side of a fixture into a participant.
-  function resolveSide(
-    fx: BracketMatchInput,
-    side: "home" | "away",
-  ): ResolvedParticipant {
+  function resolveSide(fx: BracketMatchInput, side: "home" | "away"): ResolvedParticipant {
     const original = side === "home" ? fx.home_team : fx.away_team;
     const sibling = side === "home" ? fx.away_team : fx.home_team;
     const slot = parseKnockoutSlot(original);
@@ -301,24 +289,26 @@ export function buildBracket(matches: BracketMatchInput[]): Bracket {
           // change, so the status follows the set-level flag (provisional until
           // all groups complete, then confirmed) — broader than one group's
           // own completeness.
-          return p.team
-            ? { ...p, status: thirdsProvisional ? "provisional" : "confirmed" }
-            : p;
+          return p.team ? { ...p, status: thirdsProvisional ? "provisional" : "confirmed" } : p;
         }
         return { team: null, label: original, status: "placeholder" };
       }
       case "winner-match":
-        return outcome(slot.matchNumber, "winner") ?? {
-          team: null,
-          label: original,
-          status: "placeholder",
-        };
+        return (
+          outcome(slot.matchNumber, "winner") ?? {
+            team: null,
+            label: original,
+            status: "placeholder",
+          }
+        );
       case "loser-match":
-        return outcome(slot.matchNumber, "loser") ?? {
-          team: null,
-          label: original,
-          status: "placeholder",
-        };
+        return (
+          outcome(slot.matchNumber, "loser") ?? {
+            team: null,
+            label: original,
+            status: "placeholder",
+          }
+        );
     }
   }
 
@@ -352,4 +342,4 @@ export function buildBracket(matches: BracketMatchInput[]): Bracket {
   return { rounds, hasKnockout: true };
 }
 
-export { STAGE_ORDER, STAGE_BASE, KNOCKOUT_ORDER };
+export { KNOCKOUT_ORDER, STAGE_BASE, STAGE_ORDER };

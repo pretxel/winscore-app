@@ -347,11 +347,13 @@ const QUESTIONS = [
     options: ["Cameroon", "Senegal", "Ghana", "Nigeria"],
     correctIndex: 0,
     es: {
-      prompt: "¿Qué selección africana llegó por primera vez a unos cuartos de final de la Copa Mundial?",
+      prompt:
+        "¿Qué selección africana llegó por primera vez a unos cuartos de final de la Copa Mundial?",
       options: ["Camerún", "Senegal", "Ghana", "Nigeria"],
     },
     fr: {
-      prompt: "Quelle nation africaine a été la première à atteindre un quart de finale de Coupe du monde ?",
+      prompt:
+        "Quelle nation africaine a été la première à atteindre un quart de finale de Coupe du monde ?",
       options: ["Cameroun", "Sénégal", "Ghana", "Nigeria"],
     },
     de: {
@@ -405,7 +407,8 @@ const QUESTIONS = [
       options: ["1974", "1970", "1982", "1966"],
     },
     fr: {
-      prompt: "En quelle année le trophée actuel de la Coupe du monde a-t-il été décerné pour la première fois ?",
+      prompt:
+        "En quelle année le trophée actuel de la Coupe du monde a-t-il été décerné pour la première fois ?",
       options: ["1974", "1970", "1982", "1966"],
     },
     de: {
@@ -641,8 +644,7 @@ const seedSql = `${seedHeader}${seedRows}\non conflict (active_on) do nothing;\n
 // German by rewriting each seeded question's full {es, fr, de} translations
 // object keyed on its stable active_on. es/fr values are byte-identical to what
 // is already stored, so only `de` is effectively added.
-const migrationFilename =
-  "20260617000000_quiz_question_translations_de_backfill.sql";
+const migrationFilename = "20260617000000_quiz_question_translations_de_backfill.sql";
 
 const migrationHeader = `-- ===========================================================================
 -- Daily Quiz — backfill GERMAN (de) translations onto already-seeded questions.
@@ -703,10 +705,7 @@ export function quizTranslationsSqlLiteral(q: QuizSeedQuestion): string {
 // --- write -----------------------------------------------------------------
 
 writeFileSync(join(ROOT, "supabase/seed/quiz.sql"), seedSql);
-writeFileSync(
-  join(ROOT, `supabase/migrations/${migrationFilename}`),
-  migrationSql,
-);
+writeFileSync(join(ROOT, `supabase/migrations/${migrationFilename}`), migrationSql);
 writeFileSync(join(ROOT, "tests/fixtures/quiz-translations.ts"), fixtureTs);
 
 console.log(`Generated ${QUESTIONS.length} questions →`);

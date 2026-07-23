@@ -23,9 +23,7 @@ export function FormSection({
           <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             {title}
           </h2>
-          {description ? (
-            <p className="text-xs text-muted-foreground">{description}</p>
-          ) : null}
+          {description ? <p className="text-xs text-muted-foreground">{description}</p> : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>

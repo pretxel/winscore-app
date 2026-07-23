@@ -1,7 +1,7 @@
 "use client";
 
-import { SubmitButton } from "@/components/admin/submit-button";
 import { summarizeMatch } from "@/app/[locale]/(admin)/admin/matches/actions";
+import { SubmitButton } from "@/components/admin/submit-button";
 
 // On-demand AI recap trigger for one final match. Generation is idempotent and
 // non-destructive (the generator skips when a recap already exists), so unlike

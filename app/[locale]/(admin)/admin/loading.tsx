@@ -5,12 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 // 3-up quick-link cards. Renders after the (admin) is_admin gate resolves.
 export default function AdminDashboardLoading() {
   return (
-    <main
-      role="status"
-      aria-busy="true"
-      aria-live="off"
-      className="mx-auto max-w-4xl px-4 py-10"
-    >
+    <main role="status" aria-busy="true" aria-live="off" className="mx-auto max-w-4xl px-4 py-10">
       <span className="sr-only">Loading</span>
       <div className="space-y-8">
         <div className="space-y-2">
@@ -21,10 +16,7 @@ export default function AdminDashboardLoading() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           {Array.from({ length: 2 }).map((_, i) => (
-            <div
-              key={i}
-              className="rounded-xl bg-card p-4 ring-1 ring-foreground/10"
-            >
+            <div key={i} className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
               <Skeleton className="h-3 w-20" />
               <Skeleton className="mt-2 h-6 w-40" />
               <Skeleton className="mt-3 h-3 w-32" />

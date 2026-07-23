@@ -1,10 +1,10 @@
+import { ArrowLeftIcon, UsersIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getGroupPreview } from "@/lib/groups";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { JoinConfirmForm } from "./join-confirm";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
-import { ArrowLeftIcon, UsersIcon } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Join group",

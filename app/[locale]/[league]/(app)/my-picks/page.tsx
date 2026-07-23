@@ -1,36 +1,29 @@
+import { ArrowRightIcon, FlameIcon, PencilLineIcon, SnowflakeIcon } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { LocalTime } from "@/components/local-time";
 import { MatchStateBadge } from "@/components/match-state-badge";
+import { PaginationControls } from "@/components/pagination-controls";
 import { PicksVsResults } from "@/components/picks-vs-results";
+import { PicksVsResultsTracker } from "@/components/picks-vs-results-tracker";
 import { StandingCards } from "@/components/standing-cards";
 import { StandingCardsTracker } from "@/components/standing-cards-tracker";
-import { PicksVsResultsTracker } from "@/components/picks-vs-results-tracker";
-import { PaginationControls } from "@/components/pagination-controls";
-import { simulateAllGroups } from "@/lib/group-standings";
-import { getStandingSummary } from "@/lib/standing-summary";
-import { getGroupTables } from "@/lib/group-table";
 import { getLeagueFromContext } from "@/lib/competition";
 import { groupStageKey } from "@/lib/competition-schema";
+import { simulateAllGroups } from "@/lib/group-standings";
+import { getGroupTables } from "@/lib/group-table";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { isLocked } from "@/lib/match-utils";
 import { paginate, parsePageParam } from "@/lib/pagination";
 import { sortPicksByKickoffDesc } from "@/lib/picks-order";
-import { isLocked } from "@/lib/match-utils";
 import { computePredictionStreak } from "@/lib/prediction-streak";
-import {
-  resolveStreakFreeze,
-  currentFreezeWeekBounds,
-} from "@/lib/streak-freeze";
-import { ArrowRightIcon, FlameIcon, PencilLineIcon, SnowflakeIcon } from "lucide-react";
+import { getStandingSummary } from "@/lib/standing-summary";
+import { currentFreezeWeekBounds, resolveStreakFreeze } from "@/lib/streak-freeze";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "myPicks" });
   return { title: t("title") };
@@ -128,9 +121,7 @@ export default async function MyPicksPage({
   // results are never mixed in. The group-stage key and scope come from the
   // active competition's format; competitions with no group stage skip this.
   const activeCompetition = await getLeagueFromContext({ slug: league });
-  const groupKey = activeCompetition
-    ? groupStageKey(activeCompetition.format)
-    : null;
+  const groupKey = activeCompetition ? groupStageKey(activeCompetition.format) : null;
   const { data: groupFixtures } =
     activeCompetition && groupKey
       ? await supabase
@@ -140,15 +131,9 @@ export default async function MyPicksPage({
           .eq("stage", groupKey)
       : { data: [] };
   const predictionsByMatchId = new Map(
-    (picks ?? []).map((p) => [
-      p.match_id,
-      { home_goals: p.home_goals, away_goals: p.away_goals },
-    ]),
+    (picks ?? []).map((p) => [p.match_id, { home_goals: p.home_goals, away_goals: p.away_goals }]),
   );
-  const simulatedGroups = simulateAllGroups(
-    groupFixtures ?? [],
-    predictionsByMatchId,
-  );
+  const simulatedGroups = simulateAllGroups(groupFixtures ?? [], predictionsByMatchId);
 
   // Real, results-derived group tables for the side-by-side split. Read-only;
   // built from actual `final` results. `hasGroupStage` is false when no group
@@ -182,9 +167,7 @@ export default async function MyPicksPage({
           >
             {t("headline")}
           </h1>
-          <p className="mt-2 max-w-md text-sm text-muted-foreground">
-            {t("lede")}
-          </p>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">{t("lede")}</p>
         </div>
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
           <Stat label={t("statPicks")} value={picks?.length ?? 0} />
@@ -234,120 +217,118 @@ export default async function MyPicksPage({
         </div>
       ) : (
         <>
-        <ul className="overflow-hidden rounded-xl border border-border bg-card">
-          {pagePicks.map((p, i) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const m = (p as any).matches as {
-              id: string;
-              home_team: string;
-              away_team: string;
-              kickoff_at: string;
-              status: "scheduled" | "live" | "final" | "cancelled";
-              home_score: number | null;
-              away_score: number | null;
-            };
-            const locked = isLocked(m);
-            const score = scoreByMatch.get(p.match_id);
-            const uiStatus =
-              m.status === "live"
-                ? "live"
-                : m.status === "final"
-                  ? "final"
-                  : m.status === "cancelled"
-                    ? "cancelled"
-                    : locked
-                      ? "locked"
-                      : "scheduled";
-            const exact = score?.hit_type === "exact";
-            return (
-              <li
-                key={p.match_id}
-                className={cn(
-                  "grid items-center gap-3 px-4 py-3.5 sm:grid-cols-[1fr_auto] sm:gap-4",
-                  i !== 0 && "border-t border-border",
-                )}
-              >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                      <LocalTime iso={m.kickoff_at} />
-                    </span>
-                    <MatchStateBadge status={uiStatus} size="sm" />
-                  </div>
-                  <div className="mt-1 flex items-center gap-1.5 truncate font-heading text-base font-semibold tracking-tight">
-                    <span className="truncate">{m.home_team}</span>
-                    <span className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                      vs
-                    </span>
-                    <span className="truncate">{m.away_team}</span>
-                  </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-xs">
-                    <span className="text-muted-foreground">{t("rowPick")}</span>
-                    <span className="font-semibold tabular-nums text-foreground">
-                      {p.home_goals}–{p.away_goals}
-                    </span>
-                    {m.status === "final" && m.home_score != null && m.away_score != null ? (
-                      <>
-                        <span className="text-muted-foreground/60">·</span>
-                        <span className="text-muted-foreground">{t("rowFinal")}</span>
-                        <span className="font-semibold tabular-nums text-foreground">
-                          {m.home_score}–{m.away_score}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-muted-foreground/60">·</span>
-                        <span className="text-muted-foreground">{t("rowFinal")}</span>
-                        <span className="italic text-muted-foreground/70">
-                          {t("rowPending")}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 justify-self-end">
-                  {score ? (
-                    <span
-                      className={cn(
-                        "rounded-md px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em]",
-                        score.points > 0
-                          ? exact
-                            ? "bg-flag text-flag-foreground"
-                            : "bg-pitch text-pitch-foreground"
-                          : "border border-border bg-secondary text-muted-foreground",
+          <ul className="overflow-hidden rounded-xl border border-border bg-card">
+            {pagePicks.map((p, i) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const m = (p as any).matches as {
+                id: string;
+                home_team: string;
+                away_team: string;
+                kickoff_at: string;
+                status: "scheduled" | "live" | "final" | "cancelled";
+                home_score: number | null;
+                away_score: number | null;
+              };
+              const locked = isLocked(m);
+              const score = scoreByMatch.get(p.match_id);
+              const uiStatus =
+                m.status === "live"
+                  ? "live"
+                  : m.status === "final"
+                    ? "final"
+                    : m.status === "cancelled"
+                      ? "cancelled"
+                      : locked
+                        ? "locked"
+                        : "scheduled";
+              const exact = score?.hit_type === "exact";
+              return (
+                <li
+                  key={p.match_id}
+                  className={cn(
+                    "grid items-center gap-3 px-4 py-3.5 sm:grid-cols-[1fr_auto] sm:gap-4",
+                    i !== 0 && "border-t border-border",
+                  )}
+                >
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                        <LocalTime iso={m.kickoff_at} />
+                      </span>
+                      <MatchStateBadge status={uiStatus} size="sm" />
+                    </div>
+                    <div className="mt-1 flex items-center gap-1.5 truncate font-heading text-base font-semibold tracking-tight">
+                      <span className="truncate">{m.home_team}</span>
+                      <span className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                        vs
+                      </span>
+                      <span className="truncate">{m.away_team}</span>
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-xs">
+                      <span className="text-muted-foreground">{t("rowPick")}</span>
+                      <span className="font-semibold tabular-nums text-foreground">
+                        {p.home_goals}–{p.away_goals}
+                      </span>
+                      {m.status === "final" && m.home_score != null && m.away_score != null ? (
+                        <>
+                          <span className="text-muted-foreground/60">·</span>
+                          <span className="text-muted-foreground">{t("rowFinal")}</span>
+                          <span className="font-semibold tabular-nums text-foreground">
+                            {m.home_score}–{m.away_score}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-muted-foreground/60">·</span>
+                          <span className="text-muted-foreground">{t("rowFinal")}</span>
+                          <span className="italic text-muted-foreground/70">{t("rowPending")}</span>
+                        </>
                       )}
-                    >
-                      +{score.points} {score.points === 1 ? t("ptsSingular") : t("ptsPlural")} ·{" "}
-                      {score.hit_type}
-                    </span>
-                  ) : null}
-                  {!locked ? (
-                    <Link
-                      href={localePath(locale, `/${league}/matches/${m.id}`)}
-                      className="inline-flex items-center gap-1 text-xs font-medium text-foreground underline-offset-4 hover:text-pitch hover:underline"
-                    >
-                      <PencilLineIcon className="size-3.5" />
-                      {t("rowEdit")}
-                    </Link>
-                  ) : null}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-        <PaginationControls
-          page={pageInfo.page}
-          totalPages={pageInfo.totalPages}
-          basePath={localePath(locale, `/${league}/my-picks`)}
-          navLabel={t("paginationLabel")}
-          positionLabel={t("pagePosition", {
-            current: pageInfo.page,
-            total: pageInfo.totalPages,
-          })}
-          prevLabel={t("prevPage")}
-          nextLabel={t("nextPage")}
-        />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 justify-self-end">
+                    {score ? (
+                      <span
+                        className={cn(
+                          "rounded-md px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em]",
+                          score.points > 0
+                            ? exact
+                              ? "bg-flag text-flag-foreground"
+                              : "bg-pitch text-pitch-foreground"
+                            : "border border-border bg-secondary text-muted-foreground",
+                        )}
+                      >
+                        +{score.points} {score.points === 1 ? t("ptsSingular") : t("ptsPlural")} ·{" "}
+                        {score.hit_type}
+                      </span>
+                    ) : null}
+                    {!locked ? (
+                      <Link
+                        href={localePath(locale, `/${league}/matches/${m.id}`)}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-foreground underline-offset-4 hover:text-pitch hover:underline"
+                      >
+                        <PencilLineIcon className="size-3.5" />
+                        {t("rowEdit")}
+                      </Link>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          <PaginationControls
+            page={pageInfo.page}
+            totalPages={pageInfo.totalPages}
+            basePath={localePath(locale, `/${league}/my-picks`)}
+            navLabel={t("paginationLabel")}
+            positionLabel={t("pagePosition", {
+              current: pageInfo.page,
+              total: pageInfo.totalPages,
+            })}
+            prevLabel={t("prevPage")}
+            nextLabel={t("nextPage")}
+          />
         </>
       )}
 
@@ -391,9 +372,7 @@ function Stat({
         {value}
       </dd>
       {hint ? (
-        <p className="mt-0.5 text-[10px] leading-tight text-muted-foreground">
-          {hint}
-        </p>
+        <p className="mt-0.5 text-[10px] leading-tight text-muted-foreground">{hint}</p>
       ) : null}
     </div>
   );

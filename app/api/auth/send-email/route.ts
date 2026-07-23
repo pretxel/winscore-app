@@ -1,11 +1,11 @@
 import "server-only";
 import { NextResponse } from "next/server";
-import { Webhook } from "standardwebhooks";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
+import { Resend } from "resend";
+import { Webhook } from "standardwebhooks";
+import { getActiveBranding } from "@/lib/competition";
 import { env } from "@/lib/env";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
-import { getActiveBranding } from "@/lib/competition";
 import {
   buildMagicLinkEmailStrings,
   isLinkAction,

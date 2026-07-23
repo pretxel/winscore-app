@@ -1,10 +1,10 @@
 "use client";
 
+import { CheckIcon, LinkIcon, Share2Icon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
-import { CheckIcon, LinkIcon, Share2Icon } from "lucide-react";
-import { buildFacebookShareUrl, buildTweetIntentUrl } from "@/lib/share";
 import { trackEvent } from "@/lib/analytics";
+import { buildFacebookShareUrl, buildTweetIntentUrl } from "@/lib/share";
 import { cn } from "@/lib/utils";
 
 // Generic social share actions for any pre-built share URL + text. All data

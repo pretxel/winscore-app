@@ -95,9 +95,7 @@ export const formatConfigSchema = z
   });
 
 export const providersSchema = z.object({
-  footballData: z
-    .object({ code: z.string().min(1), season: z.string().optional() })
-    .optional(),
+  footballData: z.object({ code: z.string().min(1), season: z.string().optional() }).optional(),
   espn: z.object({ leaguePath: z.string().min(1) }).optional(),
 });
 
@@ -111,9 +109,7 @@ export const brandingSchema = z.object({
 });
 
 export const competitionSchema = z.object({
-  slug: z
-    .string()
-    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "slug must be lowercase kebab-case"),
+  slug: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "slug must be lowercase kebab-case"),
   kind: z.string().min(1),
   name: z.string().min(1),
   short_name: z.string().min(1).max(60),
@@ -158,19 +154,12 @@ export function getStageConfig(
   return format.stages.find((s) => s.key === stageKey);
 }
 
-export function getStageLabel(
-  format: CompetitionFormat,
-  stageKey: string,
-  locale: Locale,
-): string {
+export function getStageLabel(format: CompetitionFormat, stageKey: string, locale: Locale): string {
   const stage = getStageConfig(format, stageKey);
   return stage?.labels[locale] ?? stage?.labels[DEFAULT_LOCALE] ?? stageKey;
 }
 
-export function getStageOrder(
-  format: CompetitionFormat,
-  stageKey: string,
-): number {
+export function getStageOrder(format: CompetitionFormat, stageKey: string): number {
   return getStageConfig(format, stageKey)?.order ?? Number.MAX_SAFE_INTEGER;
 }
 
@@ -183,9 +172,7 @@ export function hasGroupStage(format: CompetitionFormat): boolean {
 // confirmed. Non-knockout and unrevealed stages are excluded.
 export function revealedKnockoutStageKeys(format: CompetitionFormat): Set<string> {
   return new Set(
-    format.stages
-      .filter((s) => s.kind === "knockout" && s.revealed)
-      .map((s) => s.key),
+    format.stages.filter((s) => s.kind === "knockout" && s.revealed).map((s) => s.key),
   );
 }
 

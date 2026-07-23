@@ -1,19 +1,13 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { cn } from "@/lib/utils";
-import {
-  SUPPORTED_LOCALES,
-  isLocale,
-  localePath,
-  DEFAULT_LOCALE,
-  type Locale,
-} from "@/lib/i18n";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath, SUPPORTED_LOCALES } from "@/lib/i18n";
 import {
   EMAIL_PREVIEW_IDS,
+  type EmailPreviewId,
   isEmailPreviewId,
   renderEmailPreview,
-  type EmailPreviewId,
 } from "@/lib/notifications/email-previews";
+import { cn } from "@/lib/utils";
 
 const BODY_MODES = ["html", "text"] as const;
 type BodyMode = (typeof BODY_MODES)[number];
@@ -38,9 +32,7 @@ export async function EmailPreviewsView({
   const emailLocale: Locale =
     rawEmailLocale && isLocale(rawEmailLocale) ? rawEmailLocale : DEFAULT_LOCALE;
   const rawBody = str(sp.body);
-  const body: BodyMode = BODY_MODES.includes(rawBody as BodyMode)
-    ? (rawBody as BodyMode)
-    : "html";
+  const body: BodyMode = BODY_MODES.includes(rawBody as BodyMode) ? (rawBody as BodyMode) : "html";
 
   const preview = await renderEmailPreview(template, emailLocale);
 

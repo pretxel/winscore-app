@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  REMOTE_TO_LOCAL_TEAM,
-  normalizeTeamName,
-} from "@/lib/team-name-aliases";
+import { normalizeTeamName, REMOTE_TO_LOCAL_TEAM } from "@/lib/team-name-aliases";
 
 describe("normalizeTeamName", () => {
   it("maps every alias to its local name", () => {

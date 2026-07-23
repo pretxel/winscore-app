@@ -1,8 +1,8 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { env } from "@/lib/env";
 import { createChatCompletion } from "@/lib/ai/openrouter";
 import type { Database } from "@/lib/database.types";
+import { env } from "@/lib/env";
 import type { SummaryMatch } from "@/lib/matches/match-summary";
 
 // Turns a stored recap (`match_summaries.content`) into a ready-to-render image

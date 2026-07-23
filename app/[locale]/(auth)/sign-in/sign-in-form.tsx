@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { CheckCircle2Icon, Loader2Icon, MailIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { Loader2Icon, MailIcon, CheckCircle2Icon } from "lucide-react";
+import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
 export function SignInForm({ next }: { next?: string }) {
   const t = useTranslations("signIn");
@@ -47,9 +47,7 @@ export function SignInForm({ next }: { next?: string }) {
           <p className="font-medium">{t("checkInbox")}</p>
           <p className="mt-1 text-muted-foreground">
             {t.rich("checkInboxBody", {
-              email: () => (
-                <span className="font-mono text-foreground">{email}</span>
-              ),
+              email: () => <span className="font-mono text-foreground">{email}</span>,
             })}
           </p>
         </div>
@@ -61,7 +59,10 @@ export function SignInForm({ next }: { next?: string }) {
     <div className="space-y-4">
       <form onSubmit={handleMagicLink} className="space-y-3">
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          <Label
+            htmlFor="email"
+            className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
+          >
             {t("emailLabel")}
           </Label>
           <Input

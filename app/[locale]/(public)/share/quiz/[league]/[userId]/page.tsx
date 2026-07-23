@@ -1,25 +1,23 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FlameIcon } from "lucide-react";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { loadQuizStanding } from "@/lib/quiz-standing";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
+import { getLeagueFromContext } from "@/lib/competition";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { loadQuizStanding } from "@/lib/quiz-standing";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
-type QuizParams = Promise<{ locale: string; userId: string }>;
+type QuizParams = Promise<{ locale: string; league: string; userId: string }>;
 
-export async function generateMetadata({
-  params,
-}: {
-  params: QuizParams;
-}): Promise<Metadata> {
-  const { locale: raw, userId } = await params;
+export async function generateMetadata({ params }: { params: QuizParams }): Promise<Metadata> {
+  const { locale: raw, league, userId } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const supabase = await createServerSupabaseClient();
-  const standing = await loadQuizStanding(supabase, userId);
+  const competition = await getLeagueFromContext({ slug: league });
+  const standing = competition ? await loadQuizStanding(supabase, userId, competition.id) : null;
 
   if (!standing) {
     return { robots: { index: false, follow: false } };
@@ -36,7 +34,7 @@ export async function generateMetadata({
     name: row.display_name ?? tQuiz("noName"),
   };
 
-  const og = new URLSearchParams({ userId, locale });
+  const og = new URLSearchParams({ userId, league, locale });
   const imageUrl = `/api/og/quiz?${og.toString()}`;
   const title = t("pageTitle", values);
   const description = t("pageDescription", values);
@@ -61,12 +59,13 @@ export async function generateMetadata({
 }
 
 export default async function ShareQuizPage({ params }: { params: QuizParams }) {
-  const { locale: raw, userId } = await params;
+  const { locale: raw, league, userId } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
-  setRequestLocale(locale);
 
   const supabase = await createServerSupabaseClient();
-  const standing = await loadQuizStanding(supabase, userId);
+  const competition = await getLeagueFromContext({ slug: league });
+  if (!competition) notFound();
+  const standing = await loadQuizStanding(supabase, userId, competition.id);
   if (!standing) notFound();
 
   const t = await getTranslations("shareQuiz");
@@ -140,7 +139,7 @@ export default async function ShareQuizPage({ params }: { params: QuizParams }) 
 
       <div className="mt-8">
         <Link
-          href={localePath(locale, "/quiz")}
+          href={localePath(locale, `/${league}/quiz`)}
           className={cn(
             buttonVariants({ size: "lg" }),
             "h-10 gap-2 px-5 text-sm font-semibold uppercase tracking-[0.16em]",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sortPicksByKickoffDesc, type SortablePick } from "@/lib/picks-order";
+import { type SortablePick, sortPicksByKickoffDesc } from "@/lib/picks-order";
 
 // The My Picks list must read latest-kickoff-first as a deterministic
 // property, established over the full set before pagination. The embedded
@@ -19,24 +19,14 @@ describe("sortPicksByKickoffDesc", () => {
       pick("a", "2026-06-18T15:00:00Z"),
       pick("b", "2026-06-19T12:00:00Z"),
     ];
-    expect(sortPicksByKickoffDesc(picks).map((p) => p.match_id)).toEqual([
-      "c",
-      "b",
-      "a",
-    ]);
+    expect(sortPicksByKickoffDesc(picks).map((p) => p.match_id)).toEqual(["c", "b", "a"]);
   });
 
   it("breaks kickoff ties by match_id ascending, deterministically", () => {
     const kickoff = "2026-06-18T15:00:00Z";
-    const picks = [
-      pick("m3", kickoff),
-      pick("m1", kickoff),
-      pick("m2", kickoff),
-    ];
+    const picks = [pick("m3", kickoff), pick("m1", kickoff), pick("m2", kickoff)];
     const once = sortPicksByKickoffDesc(picks).map((p) => p.match_id);
-    const twice = sortPicksByKickoffDesc([...picks].reverse()).map(
-      (p) => p.match_id,
-    );
+    const twice = sortPicksByKickoffDesc([...picks].reverse()).map((p) => p.match_id);
     expect(once).toEqual(["m1", "m2", "m3"]);
     // Same result regardless of input order → stable / reproducible.
     expect(twice).toEqual(once);
@@ -56,10 +46,7 @@ describe("sortPicksByKickoffDesc", () => {
   });
 
   it("returns a new array and does not mutate the input", () => {
-    const picks = [
-      pick("a", "2026-06-18T15:00:00Z"),
-      pick("b", "2026-06-19T12:00:00Z"),
-    ];
+    const picks = [pick("a", "2026-06-18T15:00:00Z"), pick("b", "2026-06-19T12:00:00Z")];
     const original = [...picks];
     const sorted = sortPicksByKickoffDesc(picks);
     expect(sorted).not.toBe(picks);
@@ -95,7 +82,7 @@ describe("sortPicksByKickoffDesc", () => {
     ];
 
     const sorted = sortPicksByKickoffDesc(picks);
-    const times = sorted.map((p) => Date.parse(p.matches!.kickoff_at!));
+    const times = sorted.map((p) => Date.parse(p.matches?.kickoff_at!));
 
     // Globally non-increasing.
     for (let i = 1; i < times.length; i++) {

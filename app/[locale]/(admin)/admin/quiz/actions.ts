@@ -1,26 +1,19 @@
 "use server";
 
-import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { dispatchQuizReminders } from "@/lib/notifications/quiz-reminder-emails";
+import { z } from "zod";
 import { getActiveBranding } from "@/lib/competition";
+import { DEFAULT_LOCALE, isLocale, localePath, SUPPORTED_LOCALES } from "@/lib/i18n";
+import { dispatchQuizReminders } from "@/lib/notifications/quiz-reminder-emails";
 import type { QuizTranslations } from "@/lib/quiz";
-import {
-  SUPPORTED_LOCALES,
-  DEFAULT_LOCALE,
-  isLocale,
-  localePath,
-} from "@/lib/i18n";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 // Non-default locales that can carry a quiz translation. The default locale is
 // canonical and lives in the base prompt/options columns. Derived from
 // SUPPORTED_LOCALES so adding a locale never needs a second edit here.
-const TRANSLATABLE_LOCALES = SUPPORTED_LOCALES.filter(
-  (l) => l !== DEFAULT_LOCALE,
-);
+const TRANSLATABLE_LOCALES = SUPPORTED_LOCALES.filter((l) => l !== DEFAULT_LOCALE);
 
 async function assertAdmin() {
   const supabase = await createServerSupabaseClient();
@@ -38,6 +31,7 @@ async function assertAdmin() {
 
 const questionSchema = z
   .object({
+    competition_id: z.string().uuid("Select a competition"),
     prompt: z.string().trim().min(1),
     options: z.array(z.string().trim().min(1)).min(2).max(4),
     correct_index: z.number().int().min(0).max(3),
@@ -63,10 +57,7 @@ function revalidateQuiz() {
 // prompt is non-blank; if included, every aligned option must be non-blank and
 // match the English option count — otherwise the submit is rejected so a
 // half-translated question can never be stored.
-function buildTranslations(
-  formData: FormData,
-  filledSlots: number[],
-): QuizTranslations {
+function buildTranslations(formData: FormData, filledSlots: number[]): QuizTranslations {
   const translations: QuizTranslations = {};
   for (const locale of TRANSLATABLE_LOCALES) {
     const prompt = ((formData.get(`${locale}_prompt`) as string) ?? "").trim();
@@ -111,6 +102,7 @@ export async function saveQuestion(formData: FormData) {
   const correct_index = rawOptions.slice(0, correctRaw).filter(Boolean).length;
 
   const parsed = questionSchema.parse({
+    competition_id: formData.get("competition_id"),
     prompt: formData.get("prompt"),
     options,
     correct_index,
@@ -121,13 +113,20 @@ export async function saveQuestion(formData: FormData) {
 
   const admin = createAdminSupabaseClient();
   const { error } = await admin.from("quiz_questions").insert({
+    competition_id: parsed.competition_id,
     prompt: parsed.prompt,
     options: parsed.options,
     correct_index: parsed.correct_index,
     active_on: parsed.active_on,
     translations,
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    // (competition_id, active_on) unique — surface a clear duplicate message.
+    if (error.code === "23505" || /duplicate key|unique/i.test(error.message)) {
+      throw new Error("A question already exists for that competition and date");
+    }
+    throw new Error(error.message);
+  }
 
   revalidateQuiz();
 }
@@ -142,20 +141,27 @@ export async function resendQuizReminder(formData: FormData): Promise<void> {
   await assertAdmin();
 
   const rawLocale = formData.get("locale");
-  const locale =
-    typeof rawLocale === "string" && isLocale(rawLocale)
-      ? rawLocale
-      : DEFAULT_LOCALE;
+  const locale = typeof rawLocale === "string" && isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
 
-  // No active question for the current UTC day → nothing to send. Re-check here
-  // (the dispatcher would also no-op) so the UI can show a distinct message.
+  // No active question for the active competition's current UTC day → nothing to
+  // send. Re-check here (the dispatcher would also no-op) so the UI can show a
+  // distinct message. Scoped to the active competition to match the dispatcher's
+  // no-slug default now that questions are per-competition.
   const admin = createAdminSupabaseClient();
   const today = new Date().toISOString().slice(0, 10);
-  const { data: question, error } = await admin
-    .from("quiz_questions")
+  const { data: activeComp } = await admin
+    .from("competitions")
     .select("id")
-    .eq("active_on", today)
+    .eq("is_active", true)
     .maybeSingle();
+  const { data: question, error } = activeComp
+    ? await admin
+        .from("quiz_questions")
+        .select("id")
+        .eq("competition_id", activeComp.id)
+        .eq("active_on", today)
+        .maybeSingle()
+    : { data: null, error: null };
   if (error) throw new Error(error.message);
 
   if (!question) {

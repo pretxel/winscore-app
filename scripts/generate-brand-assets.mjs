@@ -2,8 +2,9 @@
  * Regenerate brand icon + OG image assets for the winscore.me rebrand.
  * Run with: node scripts/generate-brand-assets.mjs
  */
-import sharp from "sharp";
+
 import { writeFileSync } from "node:fs";
+import sharp from "sharp";
 
 const TILE = "#16a34a"; // pitch green (matches existing icon brand color)
 const TILE_FG = "#f8fafc";
@@ -29,10 +30,7 @@ const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
 writeFileSync("app/icon.svg", iconSvg);
 
 // ------------------------------------------------- icon.png / apple-icon.png
-await sharp(Buffer.from(iconSvg), { density: 384 })
-  .resize(512, 512)
-  .png()
-  .toFile("app/icon.png");
+await sharp(Buffer.from(iconSvg), { density: 384 }).resize(512, 512).png().toFile("app/icon.png");
 
 await sharp(Buffer.from(iconSvg), { density: 384 })
   .resize(180, 180)
@@ -43,12 +41,7 @@ await sharp(Buffer.from(iconSvg), { density: 384 })
 // Multi-size ICO embedding PNG payloads (16 / 32 / 48).
 const sizes = [16, 32, 48];
 const pngs = await Promise.all(
-  sizes.map((s) =>
-    sharp(Buffer.from(iconSvg), { density: 384 })
-      .resize(s, s)
-      .png()
-      .toBuffer(),
-  ),
+  sizes.map((s) => sharp(Buffer.from(iconSvg), { density: 384 }).resize(s, s).png().toBuffer()),
 );
 
 const header = Buffer.alloc(6);
@@ -111,4 +104,6 @@ await sharp(Buffer.from(ogSvg), { density: 144 })
   .png()
   .toFile("app/opengraph-image.png");
 
-console.log("brand assets regenerated: icon.svg, icon.png, apple-icon.png, favicon.ico, opengraph-image.png");
+console.log(
+  "brand assets regenerated: icon.svg, icon.png, apple-icon.png, favicon.ico, opengraph-image.png",
+);

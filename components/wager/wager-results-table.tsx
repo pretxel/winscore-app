@@ -1,15 +1,15 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
-  TrophyIcon,
-  MedalIcon,
   CheckCircle2Icon,
   ClockIcon,
-  XCircleIcon,
   ExternalLinkIcon,
+  MedalIcon,
+  TrophyIcon,
+  XCircleIcon,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface WagerResultEntry {
   rank: number;
@@ -42,10 +42,25 @@ export function WagerResultsTable({
   const winners = entries.filter((e) => e.award !== "0");
 
   const claimBadge = (state: WagerResultEntry["claimState"]) => {
-    const variants: Record<string, { label: string; icon: React.ReactNode; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+    const variants: Record<
+      string,
+      {
+        label: string;
+        icon: React.ReactNode;
+        variant: "default" | "secondary" | "destructive" | "outline";
+      }
+    > = {
       pending: { label: "Pending", icon: <ClockIcon className="size-3" />, variant: "secondary" },
-      claimed: { label: "Claimed", icon: <CheckCircle2Icon className="size-3" />, variant: "default" },
-      refunded: { label: "Refunded", icon: <XCircleIcon className="size-3" />, variant: "destructive" },
+      claimed: {
+        label: "Claimed",
+        icon: <CheckCircle2Icon className="size-3" />,
+        variant: "default",
+      },
+      refunded: {
+        label: "Refunded",
+        icon: <XCircleIcon className="size-3" />,
+        variant: "destructive",
+      },
       not_winner: { label: "—", icon: null, variant: "outline" },
     };
     const v = variants[state];
@@ -85,8 +100,7 @@ export function WagerResultsTable({
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-pitch hover:underline"
               >
-                Settlement tx{" "}
-                <ExternalLinkIcon className="size-3" />
+                Settlement tx <ExternalLinkIcon className="size-3" />
               </a>
             )}
           </div>
@@ -133,9 +147,7 @@ export function WagerResultsTable({
                 <span className="font-medium truncate">{entry.displayName}</span>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <span className="font-mono text-xs tabular-nums">
-                  {entry.points} pts
-                </span>
+                <span className="font-mono text-xs tabular-nums">{entry.points} pts</span>
                 <span className="hidden sm:inline text-xs text-muted-foreground">
                   {entry.exactHits}E {entry.winnerGdHits}G {entry.winnerHits}W
                 </span>
@@ -145,9 +157,7 @@ export function WagerResultsTable({
                   </span>
                 )}
                 {entry.award === "0" && entry.claimState !== "not_winner" && (
-                  <span className="font-mono text-xs text-muted-foreground">
-                    Refunded
-                  </span>
+                  <span className="font-mono text-xs text-muted-foreground">Refunded</span>
                 )}
                 {claimBadge(entry.claimState)}
               </div>
@@ -157,9 +167,8 @@ export function WagerResultsTable({
 
         {/* Oracle trust disclosure */}
         <p className="text-center text-[11px] text-muted-foreground">
-          Results settled by the Winscore oracle on Solana Devnet. Devnet
-          tokens have no real value. The settlement manifest is immutable and
-          published on-chain.
+          Results settled by the Winscore oracle on Solana Devnet. Devnet tokens have no real value.
+          The settlement manifest is immutable and published on-chain.
         </p>
       </CardContent>
     </Card>

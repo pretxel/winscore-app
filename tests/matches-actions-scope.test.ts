@@ -91,28 +91,22 @@ beforeEach(() => {
 
 describe("saveFixture scoping", () => {
   it("stamps the managed competition_id on a new fixture", async () => {
-    const { saveFixture } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { saveFixture } = await import("@/app/[locale]/(admin)/admin/matches/actions");
     await saveFixture(fixtureForm());
     expect(insertMock).toHaveBeenCalledOnce();
     expect(insertMock.mock.calls[0][0]).toMatchObject({ competition_id: "comp-1" });
   });
 
   it("rejects a posted competition_id that is not the managed one", async () => {
-    const { saveFixture } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
+    const { saveFixture } = await import("@/app/[locale]/(admin)/admin/matches/actions");
+    await expect(saveFixture(fixtureForm({ competition_id: "other-comp" }))).rejects.toThrow(
+      /competition mismatch/i,
     );
-    await expect(
-      saveFixture(fixtureForm({ competition_id: "other-comp" })),
-    ).rejects.toThrow(/competition mismatch/i);
     expect(insertMock).not.toHaveBeenCalled();
   });
 
   it("rejects a stage that is not in the managed competition format", async () => {
-    const { saveFixture } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { saveFixture } = await import("@/app/[locale]/(admin)/admin/matches/actions");
     await expect(saveFixture(fixtureForm({ stage: "r16" }))).rejects.toThrow();
     expect(insertMock).not.toHaveBeenCalled();
   });
@@ -123,9 +117,7 @@ describe("cross-competition mutation guard", () => {
     assertMatchInManagedMock.mockRejectedValueOnce(
       new Error("Match does not belong to the managed competition"),
     );
-    const { setMatchResult } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { setMatchResult } = await import("@/app/[locale]/(admin)/admin/matches/actions");
     const fd = new FormData();
     fd.set("match_id", MATCH_ID);
     fd.set("home_score", "1");
@@ -139,9 +131,7 @@ describe("cross-competition mutation guard", () => {
     assertMatchInManagedMock.mockRejectedValueOnce(
       new Error("Match does not belong to the managed competition"),
     );
-    const { deleteMatch } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { deleteMatch } = await import("@/app/[locale]/(admin)/admin/matches/actions");
     const fd = new FormData();
     fd.set("id", MATCH_ID);
     await expect(deleteMatch(fd)).rejects.toThrow(/managed competition/i);

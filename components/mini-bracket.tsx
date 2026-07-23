@@ -19,10 +19,7 @@ const FINAL: Match[] = [{ home: "Argentina", away: "Spain" }];
 export function MiniBracket({ className }: { className?: string }) {
   return (
     <div
-      className={cn(
-        "relative grid grid-cols-[1fr_auto_1fr_auto_1fr] gap-2 sm:gap-3",
-        className,
-      )}
+      className={cn("relative grid grid-cols-[1fr_auto_1fr_auto_1fr] gap-2 sm:gap-3", className)}
       aria-hidden="true"
     >
       <Column matches={QF} label="QF" align="left" />
@@ -62,38 +59,16 @@ function Column({
   );
 }
 
-function MatchPill({
-  match,
-  winner,
-}: {
-  match: Match;
-  winner?: "home" | "away";
-}) {
+function MatchPill({ match, winner }: { match: Match; winner?: "home" | "away" }) {
   return (
     <div className="rounded-md bg-pitch-foreground/8 px-2 py-1.5 ring-1 ring-pitch-foreground/12 backdrop-blur-sm">
-      <Row
-        team={match.home}
-        score={match.score?.[0]}
-        winner={winner === "home"}
-      />
-      <Row
-        team={match.away}
-        score={match.score?.[1]}
-        winner={winner === "away"}
-      />
+      <Row team={match.home} score={match.score?.[0]} winner={winner === "home"} />
+      <Row team={match.away} score={match.score?.[1]} winner={winner === "away"} />
     </div>
   );
 }
 
-function Row({
-  team,
-  score,
-  winner,
-}: {
-  team: string;
-  score?: number;
-  winner?: boolean;
-}) {
+function Row({ team, score, winner }: { team: string; score?: number; winner?: boolean }) {
   return (
     <div
       className={cn(

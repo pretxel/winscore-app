@@ -1,4 +1,4 @@
-import { localePath, type Locale } from "@/lib/i18n";
+import { type Locale, localePath } from "@/lib/i18n";
 
 // Mirrors the prediction form's MAX_GOALS; share URLs are user-editable so
 // the clamp is the only guarantee the rendered numbers stay sane.
@@ -32,10 +32,10 @@ export function buildRankSharePath(locale: Locale, userId: string): string {
   return localePath(locale, `/share/rank/${userId}`);
 }
 
-export function buildQuizSharePath(locale: Locale, userId: string): string {
+export function buildQuizSharePath(locale: Locale, league: string, userId: string): string {
   // Like rank sharing: the landing page and OG card re-derive the quiz standing
-  // live from v_quiz_standing, so the URL only identifies the user.
-  return localePath(locale, `/share/quiz/${userId}`);
+  // live from v_quiz_standing, so the URL only identifies the competition + user.
+  return localePath(locale, `/share/quiz/${league}/${userId}`);
 }
 
 // Canonicalize a head-to-head pair into a single deterministic order

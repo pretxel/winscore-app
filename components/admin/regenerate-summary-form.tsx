@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/admin/submit-button";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 // Style choices an admin can post. `custom` reveals a free-text instruction that

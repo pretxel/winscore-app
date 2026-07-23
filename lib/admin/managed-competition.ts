@@ -1,8 +1,8 @@
 import "server-only";
-import { cache } from "react";
 import { cookies } from "next/headers";
+import { cache } from "react";
+import { type ResolvedCompetition, resolveCompetition } from "@/lib/competition";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { resolveCompetition, type ResolvedCompetition } from "@/lib/competition";
 
 // Admin-only "managed competition" context: which competition the admin is
 // editing in the fixtures/results/sync surface. Distinct from the PUBLIC active
@@ -12,37 +12,31 @@ import { resolveCompetition, type ResolvedCompetition } from "@/lib/competition"
 // the cookie is missing, invalid, or points at a deleted row.
 export const MANAGED_COMPETITION_COOKIE = "wcp_admin_managed_competition";
 
-export const getManagedCompetition = cache(
-  async (): Promise<ResolvedCompetition | null> => {
-    const admin = createAdminSupabaseClient();
-    const cookieStore = await cookies();
-    const cookieId = cookieStore.get(MANAGED_COMPETITION_COOKIE)?.value;
+export const getManagedCompetition = cache(async (): Promise<ResolvedCompetition | null> => {
+  const admin = createAdminSupabaseClient();
+  const cookieStore = await cookies();
+  const cookieId = cookieStore.get(MANAGED_COMPETITION_COOKIE)?.value;
 
-    if (cookieId) {
-      const { data } = await admin
-        .from("competitions")
-        .select("*")
-        .eq("id", cookieId)
-        .maybeSingle();
-      if (data) return resolveCompetition(data);
-      // Stale cookie (deleted competition) → clear best-effort. Setting a
-      // cookie throws outside an action/route handler, so swallow it; the
-      // fallback below still returns a sane value.
-      try {
-        cookieStore.delete(MANAGED_COMPETITION_COOKIE);
-      } catch {
-        // ignore — can't mutate cookies during a render
-      }
+  if (cookieId) {
+    const { data } = await admin.from("competitions").select("*").eq("id", cookieId).maybeSingle();
+    if (data) return resolveCompetition(data);
+    // Stale cookie (deleted competition) → clear best-effort. Setting a
+    // cookie throws outside an action/route handler, so swallow it; the
+    // fallback below still returns a sane value.
+    try {
+      cookieStore.delete(MANAGED_COMPETITION_COOKIE);
+    } catch {
+      // ignore — can't mutate cookies during a render
     }
+  }
 
-    const { data: active } = await admin
-      .from("competitions")
-      .select("*")
-      .eq("is_active", true)
-      .maybeSingle();
-    return active ? resolveCompetition(active) : null;
-  },
-);
+  const { data: active } = await admin
+    .from("competitions")
+    .select("*")
+    .eq("is_active", true)
+    .maybeSingle();
+  return active ? resolveCompetition(active) : null;
+});
 
 export async function getManagedCompetitionId(): Promise<string | null> {
   return (await getManagedCompetition())?.id ?? null;

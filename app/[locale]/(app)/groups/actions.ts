@@ -1,13 +1,13 @@
 "use server";
 
-import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { DEFAULT_LOCALE, isLocale, localePath, type Locale } from "@/lib/i18n";
-import { isSendableEmail } from "@/lib/notifications/result-emails";
+import { z } from "zod";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { sendGroupInviteEmails } from "@/lib/notifications/group-invite-email";
+import { isSendableEmail } from "@/lib/notifications/result-emails";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const nameSchema = z.string().trim().min(2).max(40);
 const codeSchema = z.string().trim().min(1).max(16);
@@ -92,9 +92,7 @@ export async function joinGroupAction(
   });
   if (error) {
     return {
-      error: /invalid join code/i.test(error.message)
-        ? "errorInvalidCode"
-        : "errorGeneric",
+      error: /invalid join code/i.test(error.message) ? "errorInvalidCode" : "errorGeneric",
     };
   }
 
@@ -235,10 +233,7 @@ export async function renameGroupAction(formData: FormData): Promise<void> {
   const name = nameSchema.parse(formData.get("name"));
   const { supabase } = await requireUserClient();
 
-  const { error } = await supabase
-    .from("groups")
-    .update({ name })
-    .eq("id", groupId);
+  const { error } = await supabase.from("groups").update({ name }).eq("id", groupId);
   if (error) throw new Error(error.message);
 
   revalidatePath("/groups");

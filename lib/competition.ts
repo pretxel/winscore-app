@@ -1,17 +1,17 @@
 import "server-only";
 import { cache } from "react";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { CompetitionRow } from "@/lib/db";
-import type { Locale } from "@/lib/i18n";
 import {
-  getStageLabel,
-  parseFormatConfig,
-  providersSchema,
   brandingSchema,
   type CompetitionBranding,
   type CompetitionFormat,
   type CompetitionProviders,
+  getStageLabel,
+  parseFormatConfig,
+  providersSchema,
 } from "@/lib/competition-schema";
+import type { CompetitionRow } from "@/lib/db";
+import type { Locale } from "@/lib/i18n";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 // A competition row with its JSONB columns parsed into typed objects.
 export type ResolvedCompetition = CompetitionRow & {
@@ -33,24 +33,19 @@ export function resolveCompetition(row: CompetitionRow): ResolvedCompetition {
 // no competition is active (helpers must treat that as "no competition
 // selected" rather than throwing). Switching the active competition revalidates
 // the affected paths/tags, so a fresh request picks up the change.
-export const getActiveCompetition = cache(
-  async (): Promise<ResolvedCompetition | null> => {
-    const supabase = await createServerSupabaseClient();
-    const { data } = await supabase
-      .from("competitions")
-      .select("*")
-      .eq("is_active", true)
-      .maybeSingle();
-    return data ? resolveCompetition(data) : null;
-  },
-);
+export const getActiveCompetition = cache(async (): Promise<ResolvedCompetition | null> => {
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase
+    .from("competitions")
+    .select("*")
+    .eq("is_active", true)
+    .maybeSingle();
+  return data ? resolveCompetition(data) : null;
+});
 
 // Localized label for a stage in the active competition, falling back to the
 // raw stage key when there is no active competition or the stage is unknown.
-export async function getActiveStageLabel(
-  stage: string,
-  locale: Locale,
-): Promise<string> {
+export async function getActiveStageLabel(stage: string, locale: Locale): Promise<string> {
   const comp = await getActiveCompetition();
   return comp ? getStageLabel(comp.format, stage, locale) : stage;
 }
@@ -78,9 +73,7 @@ export type ResolvedBranding = {
 // Cup defaults. The product name is fixed; the league surfaces only as the
 // edition. Pass the league resolved from route/pool context, or null for the
 // cold-DB fallback.
-export function resolveBranding(
-  comp: ResolvedCompetition | null,
-): ResolvedBranding {
+export function resolveBranding(comp: ResolvedCompetition | null): ResolvedBranding {
   const b = comp?.brandingConfig;
   const shortName = comp?.short_name ?? FALLBACK_SHORT_NAME;
   return {
@@ -101,9 +94,7 @@ export async function getActiveBranding(): Promise<ResolvedBranding> {
 }
 
 // Branding for a league resolved from route/pool context.
-export function getBrandingForLeague(
-  comp: ResolvedCompetition | null,
-): ResolvedBranding {
+export function getBrandingForLeague(comp: ResolvedCompetition | null): ResolvedBranding {
   return resolveBranding(comp);
 }
 
@@ -118,18 +109,16 @@ export function getBrandingForLeague(
 
 // Resolve a live league by slug. Returns null ("league unavailable") when the
 // slug does not exist or the league is not live.
-export const getLeagueBySlug = cache(
-  async (slug: string): Promise<ResolvedCompetition | null> => {
-    const supabase = await createServerSupabaseClient();
-    const { data } = await supabase
-      .from("competitions")
-      .select("*")
-      .eq("slug", slug)
-      .eq("is_live", true)
-      .maybeSingle();
-    return data ? resolveCompetition(data) : null;
-  },
-);
+export const getLeagueBySlug = cache(async (slug: string): Promise<ResolvedCompetition | null> => {
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase
+    .from("competitions")
+    .select("*")
+    .eq("slug", slug)
+    .eq("is_live", true)
+    .maybeSingle();
+  return data ? resolveCompetition(data) : null;
+});
 
 // Resolve the league a pool belongs to, from the pool's competition_id. The
 // pool's league resolves even if it is no longer live (the pool still exists).
@@ -173,25 +162,23 @@ export type LeagueCatalogEntry = {
 };
 
 // Catalog of every live league, for the "start a pool" picker. Ordered by name.
-export const listLiveLeagues = cache(
-  async (): Promise<LeagueCatalogEntry[]> => {
-    const supabase = await createServerSupabaseClient();
-    const { data } = await supabase
-      .from("competitions")
-      .select("*")
-      .eq("is_live", true)
-      .is("finished_at", null)
-      .order("name", { ascending: true });
-    return (data ?? []).map((row) => {
-      const comp = resolveCompetition(row);
-      return {
-        id: comp.id,
-        slug: comp.slug,
-        name: comp.name,
-        shortName: comp.short_name,
-        brandCode: comp.brandingConfig.brandCode ?? FALLBACK_BRAND_CODE,
-        joinCodePrefix: comp.brandingConfig.joinCodePrefix ?? "WC",
-      } satisfies LeagueCatalogEntry;
-    });
-  },
-);
+export const listLiveLeagues = cache(async (): Promise<LeagueCatalogEntry[]> => {
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase
+    .from("competitions")
+    .select("*")
+    .eq("is_live", true)
+    .is("finished_at", null)
+    .order("name", { ascending: true });
+  return (data ?? []).map((row) => {
+    const comp = resolveCompetition(row);
+    return {
+      id: comp.id,
+      slug: comp.slug,
+      name: comp.name,
+      shortName: comp.short_name,
+      brandCode: comp.brandingConfig.brandCode ?? FALLBACK_BRAND_CODE,
+      joinCodePrefix: comp.brandingConfig.joinCodePrefix ?? "WC",
+    } satisfies LeagueCatalogEntry;
+  });
+});

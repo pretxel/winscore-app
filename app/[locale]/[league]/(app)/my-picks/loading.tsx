@@ -7,9 +7,7 @@ import { cn } from "@/lib/utils";
 // (PAGE_SIZE = 5 rows), then the pagination controls.
 export default function MyPicksLoading() {
   return (
-    <PageSkeletonShell
-      headerRight={<StatCardsSkeleton count={3} className="gap-2 sm:gap-3" />}
-    >
+    <PageSkeletonShell headerRight={<StatCardsSkeleton count={3} className="gap-2 sm:gap-3" />}>
       <ul className="overflow-hidden rounded-xl border border-border bg-card">
         {Array.from({ length: 5 }).map((_, i) => (
           <li

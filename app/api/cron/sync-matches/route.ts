@@ -1,19 +1,19 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { forEachLiveLeague } from "@/lib/cron/for-each-league";
 import { env } from "@/lib/env";
-import { availableProviders, runSync } from "@/lib/result-sync/core";
-import { syncLiveEvents } from "@/lib/result-sync/events";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { generatePendingImagePrompts } from "@/lib/matches/match-image-prompt";
+import { requestPendingRenders } from "@/lib/matches/match-image-render";
+import { generatePendingSummaries } from "@/lib/matches/match-summary";
+import { captureRankSnapshot } from "@/lib/notifications/rank-snapshot";
 import {
   dispatchResultEmails,
   dispatchStandingChangedPush,
 } from "@/lib/notifications/result-emails";
-import { captureRankSnapshot } from "@/lib/notifications/rank-snapshot";
-import { forEachLiveLeague } from "@/lib/cron/for-each-league";
 import { recordRun } from "@/lib/operations/record-run";
 import { isOperationEnabled } from "@/lib/operations/settings";
-import { generatePendingSummaries } from "@/lib/matches/match-summary";
-import { generatePendingImagePrompts } from "@/lib/matches/match-image-prompt";
-import { requestPendingRenders } from "@/lib/matches/match-image-render";
+import { availableProviders, runSync } from "@/lib/result-sync/core";
+import { syncLiveEvents } from "@/lib/result-sync/events";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 function unauthorized() {
   return new NextResponse("unauthorized", { status: 401 });
@@ -163,9 +163,21 @@ export async function GET(request: NextRequest) {
         renders: a.renders + r.renders,
       }),
       {
-        fetched: 0, matched: 0, live: 0, final: 0, recomputed: 0,
-        unmatched: 0, errors: 0, stale: 0, staleResolved: 0,
-        events: 0, emailed: 0, pushed: 0, summaries: 0, imagePrompts: 0, renders: 0,
+        fetched: 0,
+        matched: 0,
+        live: 0,
+        final: 0,
+        recomputed: 0,
+        unmatched: 0,
+        errors: 0,
+        stale: 0,
+        staleResolved: 0,
+        events: 0,
+        emailed: 0,
+        pushed: 0,
+        summaries: 0,
+        imagePrompts: 0,
+        renders: 0,
       },
     );
     return { ...sums, source };

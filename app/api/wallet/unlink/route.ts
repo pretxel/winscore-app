@@ -10,28 +10,19 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   let body: { linkId?: string };
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const { linkId } = body;
   if (!linkId) {
-    return NextResponse.json(
-      { error: "linkId is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "linkId is required" }, { status: 400 });
   }
 
   // Verify link exists and belongs to the user
@@ -44,10 +35,7 @@ export async function POST(request: Request) {
     .single();
 
   if (linkError || !link) {
-    return NextResponse.json(
-      { error: "Active link not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Active link not found" }, { status: 404 });
   }
 
   // Check for pending intents that require this wallet
@@ -63,7 +51,7 @@ export async function POST(request: Request) {
         error: "Cannot unlink: pending wager intents exist",
         pendingIntents: pendingIntents.length,
       },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -80,7 +68,7 @@ export async function POST(request: Request) {
         error: "Cannot unlink: unsettled wager entries exist",
         unsettledEntries: unsettledEntries.length,
       },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -97,7 +85,7 @@ export async function POST(request: Request) {
         error: "Cannot unlink: pending claims exist",
         pendingClaims: pendingClaims.length,
       },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -112,16 +100,13 @@ export async function POST(request: Request) {
     .eq("is_active", true);
 
   if (updateError) {
-    return NextResponse.json(
-      { error: "Failed to unlink wallet" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to unlink wallet" }, { status: 500 });
   }
 
   return NextResponse.json(
     { ok: true },
     {
       headers: { "Cache-Control": "no-store" },
-    }
+    },
   );
 }

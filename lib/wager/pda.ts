@@ -1,6 +1,6 @@
-import { getWagerEnv } from "./env";
+import { createHash } from "node:crypto";
 import { base58 } from "@scure/base";
-import { createHash } from "crypto";
+import { getWagerEnv } from "./env";
 
 const PROGRAM_VERSION = 1;
 
@@ -67,11 +67,7 @@ export function deriveVaultAta(
   );
 
   // ATA always uses bump 255 (or find first valid)
-  return new Uint8Array(
-    baseHashWithAta.buffer,
-    baseHashWithAta.byteOffset,
-    32,
-  );
+  return new Uint8Array(baseHashWithAta.buffer, baseHashWithAta.byteOffset, 32);
 }
 
 function findPda(seeds: Uint8Array[]): { pda: Uint8Array; bump: number } {

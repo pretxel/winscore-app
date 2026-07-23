@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { describe, expect, it } from "vitest";
 import type { Database } from "@/lib/database.types";
 import { loadH2HStandings, loadRecentForm } from "@/lib/h2h";
 
@@ -50,15 +50,15 @@ describe("loadH2HStandings", () => {
     ]);
     const standings = await loadH2HStandings(supabase, "u-a", "u-b");
     expect(standings).not.toBeNull();
-    expect(standings!.a).toEqual({
+    expect(standings?.a).toEqual({
       userId: "u-a",
       displayName: "Ada",
       rank: 3,
       totalPoints: 47,
       exactHits: 9,
     });
-    expect(standings!.b.userId).toBe("u-b");
-    expect(standings!.b.rank).toBe(5);
+    expect(standings?.b.userId).toBe("u-b");
+    expect(standings?.b.rank).toBe(5);
   });
 
   it("returns null when either player is missing", async () => {
@@ -89,7 +89,7 @@ describe("loadH2HStandings", () => {
       { data: { user_id: "u-b", rank: 2, display_name: "Bo", total_points: 5, exact_hits: 1 } },
     ]);
     const standings = await loadH2HStandings(supabase, "u-a", "u-b");
-    expect(standings!.a).toEqual({
+    expect(standings?.a).toEqual({
       userId: "u-a",
       displayName: null,
       rank: 0,

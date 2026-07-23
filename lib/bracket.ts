@@ -1,11 +1,7 @@
 import "server-only";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { type Bracket, type BracketMatchInput, buildBracket } from "@/lib/bracket-core";
 import { getActiveCompetition, type ResolvedCompetition } from "@/lib/competition";
-import {
-  buildBracket,
-  type Bracket,
-  type BracketMatchInput,
-} from "@/lib/bracket-core";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type BracketResult = Bracket & {
   // Raw rows the bracket was built from, for opportunistic sync.
@@ -17,9 +13,7 @@ export type BracketResult = Bracket & {
 // context; omit to fall back to the active competition (transition behavior).
 // Never throws — a missing competition or no knockout fixtures yields an empty,
 // `hasKnockout: false` result.
-export async function getBracket(
-  competition?: ResolvedCompetition | null,
-): Promise<BracketResult> {
+export async function getBracket(competition?: ResolvedCompetition | null): Promise<BracketResult> {
   const comp = competition ?? (await getActiveCompetition());
   if (!comp) return { rounds: [], hasKnockout: false, matches: [] };
 

@@ -1,18 +1,18 @@
 import "server-only";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { Resend } from "resend";
+import { isOptedIn } from "@/lib/email-prefs";
 import { env } from "@/lib/env";
 import { DEFAULT_LOCALE, localePath } from "@/lib/i18n";
-import { isOptedIn } from "@/lib/email-prefs";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { checkEmailSenderConfig } from "./email-sender-config";
-import { isSendableEmail, type DispatchSummary } from "./result-emails";
+import { type DispatchSummary, isSendableEmail } from "./result-emails";
 import {
-  renderResultsDigest,
   type DigestMover,
   type DigestTopRow,
   type ResultsDigestData,
   type ResultsDigestStrings,
+  renderResultsDigest,
 } from "./results-digest-template";
 
 // Resend caps a single batch.send call at 100 messages.
@@ -211,7 +211,10 @@ async function loadBoard(admin: AdminClient): Promise<BoardRow[]> {
 // results_digest_log ledger. No-ops when RESEND_API_KEY is unset. Per-batch
 // failures are logged and counted, never aborting the rest; ledger rows are
 // written only for batches Resend accepted, so failures retry next run that day.
-export async function dispatchResultsDigest(fromName?: string, leagueSlug?: string): Promise<DispatchSummary> {
+export async function dispatchResultsDigest(
+  fromName?: string,
+  leagueSlug?: string,
+): Promise<DispatchSummary> {
   const senderMisconfigured = warnIfSenderMisconfigured("dispatch");
   if (!env.resendApiKey) {
     console.log("[results-digest] RESEND_API_KEY unset — skipping dispatch");
@@ -231,12 +234,10 @@ export async function dispatchResultsDigest(fromName?: string, leagueSlug?: stri
 
   // Upsert today's snapshot so tomorrow has a baseline, then load the most
   // recent PRIOR snapshot (any date before today) to compute deltas + movers.
-  const { error: snapErr } = await admin
-    .from("leaderboard_rank_daily")
-    .upsert(
-      board.map((b) => ({ snapshot_date: digestDate, user_id: b.user_id, rank: b.rank })),
-      { onConflict: "snapshot_date,user_id" },
-    );
+  const { error: snapErr } = await admin.from("leaderboard_rank_daily").upsert(
+    board.map((b) => ({ snapshot_date: digestDate, user_id: b.user_id, rank: b.rank })),
+    { onConflict: "snapshot_date,user_id" },
+  );
   if (snapErr) {
     // The snapshot is best-effort for tomorrow's baseline; a failure must not
     // abort today's send. Log loudly and continue.

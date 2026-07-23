@@ -1,22 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
+  type GroupStageFixture,
   groupFixturesByCode,
+  type PredictedScore,
   simulateAllGroups,
   simulateGroup,
-  type GroupStageFixture,
-  type PredictedScore,
 } from "@/lib/group-standings";
 
 // Small builders so each test reads as "these fixtures + these picks".
 function fx(id: string, home: string, away: string): GroupStageFixture {
   return { id, home_team: home, away_team: away, group_code: "A" };
 }
-function picks(
-  entries: [string, number, number][],
-): Map<string, PredictedScore> {
-  return new Map(
-    entries.map(([id, home_goals, away_goals]) => [id, { home_goals, away_goals }]),
-  );
+function picks(entries: [string, number, number][]): Map<string, PredictedScore> {
+  return new Map(entries.map(([id, home_goals, away_goals]) => [id, { home_goals, away_goals }]));
 }
 
 describe("simulateGroup — points and goal aggregation", () => {
@@ -67,10 +63,7 @@ describe("simulateGroup — points and goal aggregation", () => {
   });
 
   it("updates both teams of a single predicted match (home win => away loss)", () => {
-    const rows = simulateGroup(
-      [fx("m1", "Mexico", "South Africa")],
-      picks([["m1", 2, 1]]),
-    );
+    const rows = simulateGroup([fx("m1", "Mexico", "South Africa")], picks([["m1", 2, 1]]));
     const home = rows.find((r) => r.team === "Mexico")!;
     const away = rows.find((r) => r.team === "South Africa")!;
     expect(home).toMatchObject({
@@ -96,10 +89,7 @@ describe("simulateGroup — tie-break ladder", () => {
   it("points decide first", () => {
     // A beats B and C; D loses both => A on top, D bottom.
     const rows = simulateGroup(
-      [
-        fx("m1", "Alpha", "Bravo"),
-        fx("m2", "Alpha", "Charlie"),
-      ],
+      [fx("m1", "Alpha", "Bravo"), fx("m2", "Alpha", "Charlie")],
       picks([
         ["m1", 1, 0],
         ["m2", 1, 0],
@@ -112,10 +102,7 @@ describe("simulateGroup — tie-break ladder", () => {
   it("goal difference breaks a points tie", () => {
     // Both winners by 1 win each, equal points; Alpha +3, Bravo +1.
     const rows = simulateGroup(
-      [
-        fx("m1", "Alpha", "Xray"),
-        fx("m2", "Bravo", "Yankee"),
-      ],
+      [fx("m1", "Alpha", "Xray"), fx("m2", "Bravo", "Yankee")],
       picks([
         ["m1", 3, 0],
         ["m2", 1, 0],
@@ -129,10 +116,7 @@ describe("simulateGroup — tie-break ladder", () => {
   it("goals for breaks a points-and-GD tie", () => {
     // Both win by 2-goal margin (equal points, equal GD); Alpha 4-2, Bravo 2-0.
     const rows = simulateGroup(
-      [
-        fx("m1", "Alpha", "Xray"),
-        fx("m2", "Bravo", "Yankee"),
-      ],
+      [fx("m1", "Alpha", "Xray"), fx("m2", "Bravo", "Yankee")],
       picks([
         ["m1", 4, 2],
         ["m2", 2, 0],
@@ -145,10 +129,7 @@ describe("simulateGroup — tie-break ladder", () => {
 
   it("team name (A–Z) breaks a fully equal tie", () => {
     // Zulu vs Alpha draw 0-0: identical stats => Alpha ranks first by name.
-    const rows = simulateGroup(
-      [fx("m1", "Zulu", "Alpha")],
-      picks([["m1", 0, 0]]),
-    );
+    const rows = simulateGroup([fx("m1", "Zulu", "Alpha")], picks([["m1", 0, 0]]));
     expect(rows[0].team).toBe("Alpha");
     expect(rows[1].team).toBe("Zulu");
     expect(rows[0].rank).toBe(1);
@@ -175,10 +156,7 @@ describe("simulateGroup — unpredicted matches are skipped", () => {
   });
 
   it("zero predictions => all teams present at played 0 / points 0", () => {
-    const fixtures = [
-      fx("m1", "Mexico", "South Africa"),
-      fx("m2", "Brazil", "France"),
-    ];
+    const fixtures = [fx("m1", "Mexico", "South Africa"), fx("m2", "Brazil", "France")];
     const rows = simulateGroup(fixtures, picks([]));
     expect(rows).toHaveLength(4);
     expect(rows.every((r) => r.played === 0 && r.points === 0)).toBe(true);

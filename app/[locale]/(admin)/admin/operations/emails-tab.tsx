@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { type Locale, localePath } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import { localePath, type Locale } from "@/lib/i18n";
-import { EmailsView } from "./emails-view";
 import { EmailPreviewsView } from "./email-previews-view";
+import { EmailsView } from "./emails-view";
 
 const MODES = ["log", "previews"] as const;
 type Mode = (typeof MODES)[number];
@@ -26,9 +26,7 @@ export async function EmailsTab({
   const modeHref = (m: Mode) =>
     localePath(
       locale,
-      m === "log"
-        ? "/admin/operations?view=emails"
-        : "/admin/operations?view=emails&mode=previews",
+      m === "log" ? "/admin/operations?view=emails" : "/admin/operations?view=emails&mode=previews",
     );
 
   return (
@@ -58,11 +56,7 @@ export async function EmailsTab({
         })}
       </div>
 
-      {mode === "log" ? (
-        <EmailsView />
-      ) : (
-        <EmailPreviewsView locale={locale} searchParams={sp} />
-      )}
+      {mode === "log" ? <EmailsView /> : <EmailPreviewsView locale={locale} searchParams={sp} />}
     </div>
   );
 }

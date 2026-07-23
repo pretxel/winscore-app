@@ -6,22 +6,12 @@
 //   * the `check (reaction in (...))` constraint on public.recap_reactions, and
 //   * the server-side re-check in public.toggle_recap_reaction,
 // both in supabase/migrations/20260620020000_recap_reactions.sql.
-export const REACTION_TYPES = [
-  "fire",
-  "goal",
-  "shock",
-  "laugh",
-  "clap",
-  "sad",
-] as const;
+export const REACTION_TYPES = ["fire", "goal", "shock", "laugh", "clap", "sad"] as const;
 
 export type ReactionType = (typeof REACTION_TYPES)[number];
 
 export function isReactionType(value: unknown): value is ReactionType {
-  return (
-    typeof value === "string" &&
-    (REACTION_TYPES as readonly string[]).includes(value)
-  );
+  return typeof value === "string" && (REACTION_TYPES as readonly string[]).includes(value);
 }
 
 // Display emoji for each reaction type (used by the bar and gallery badge). The

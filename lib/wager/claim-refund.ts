@@ -2,8 +2,6 @@
 
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getWagerEnv } from "@/lib/wager/env";
-import { verifyMerkleProof as verifyProof } from "@/lib/wager/merkle-tree";
-import { base58 } from "@scure/base";
 
 /**
  * Prepare a claim transaction for a winner.
@@ -14,7 +12,7 @@ export async function prepareClaim(
   entryId: string,
 ): Promise<{ claimable: boolean; claimSignature?: string; error?: string }> {
   const admin = createAdminSupabaseClient();
-  const env = getWagerEnv();
+  const _env = getWagerEnv();
 
   // Fetch settlement with Merkle root
   const { data: settlement } = await admin
@@ -52,7 +50,7 @@ export async function prepareClaim(
   }
 
   // Get winner allocation from settlement manifest
-  const manifest = await admin
+  const _manifest = await admin
     .from("wager_settlements")
     .select("manifest_canonical_bytes")
     .eq("id", settlementId)
@@ -61,9 +59,10 @@ export async function prepareClaim(
   // For MVP: build the claim using the Merkle proof from the manifest
   // In production: compute the proof dynamically from the Merkle tree
 
-  const walletBytes = typeof entry.wallet_address === "string"
-    ? Buffer.from(entry.wallet_address, "hex")
-    : Buffer.from(entry.wallet_address as unknown as ArrayBuffer);
+  const _walletBytes =
+    typeof entry.wallet_address === "string"
+      ? Buffer.from(entry.wallet_address, "hex")
+      : Buffer.from(entry.wallet_address as unknown as ArrayBuffer);
 
   const wagerRoundPubkey = new Uint8Array(32); // Derive from wager_round PDA
 
@@ -124,10 +123,7 @@ export async function activateRefund(
   }
 
   // Mark round as cancelled
-  await admin
-    .from("wager_rounds")
-    .update({ state: "cancelled" })
-    .eq("id", wagerRoundId);
+  await admin.from("wager_rounds").update({ state: "cancelled" }).eq("id", wagerRoundId);
 
   // Apppend chain event
   await admin.from("wager_chain_events").insert({

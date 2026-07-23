@@ -1,6 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { setActiveCompetition } from "@/app/[locale]/(admin)/admin/competitions/actions";
+import { ActionStatus } from "@/components/admin/action-status";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,9 +15,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ActionStatus } from "@/components/admin/action-status";
-import { SubmitButton } from "@/components/admin/submit-button";
-import { setActiveCompetition } from "@/app/[locale]/(admin)/admin/competitions/actions";
 
 // Confirmation-gated activation — the ONLY path that flips the public flag.
 // Names the outgoing/incoming competition, lists consequences, and warns when
@@ -49,9 +49,7 @@ export function SetActiveDialog({
         </DialogHeader>
 
         {!hasFixtures ? (
-          <ActionStatus variant="error">
-            {t("setActive.noFixturesWarning")}
-          </ActionStatus>
+          <ActionStatus variant="error">{t("setActive.noFixturesWarning")}</ActionStatus>
         ) : null}
 
         <DialogFooter>
@@ -60,9 +58,7 @@ export function SetActiveDialog({
           </DialogClose>
           <form action={setActiveCompetition}>
             <input type="hidden" name="id" value={id} />
-            <SubmitButton variant="destructive">
-              {t("setActive.confirm")}
-            </SubmitButton>
+            <SubmitButton variant="destructive">{t("setActive.confirm")}</SubmitButton>
           </form>
         </DialogFooter>
       </DialogContent>

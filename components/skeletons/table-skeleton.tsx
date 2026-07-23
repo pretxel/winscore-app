@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -7,26 +8,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
 
 // Mirrors LeaderboardTable's container, columns and responsive `hidden
 // sm:table-cell` behavior so the skeleton occupies the same width at every
 // breakpoint. `rows` should match the real board's default count (10 overall /
 // quiz, 4 group board) to avoid a height jump.
-export function TableSkeleton({
-  rows = 10,
-  className,
-}: {
-  rows?: number;
-  className?: string;
-}) {
+export function TableSkeleton({ rows = 10, className }: { rows?: number; className?: string }) {
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-xl border border-border bg-card",
-        className,
-      )}
-    >
+    <div className={cn("overflow-hidden rounded-xl border border-border bg-card", className)}>
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/40 hover:bg-muted/40">

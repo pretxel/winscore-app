@@ -1,16 +1,22 @@
-import { Suspense } from "react";
-import Link from "next/link";
+import { CheckCircle2Icon, ChevronRightIcon, MapPinIcon } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { Suspense } from "react";
 import { LocalTime } from "@/components/local-time";
 import { MatchDaySection } from "@/components/match-day-section";
 import { MatchLockCountdown } from "@/components/match-lock-countdown";
+import { MatchRoundFilter } from "@/components/match-round-filter";
 import { MatchStateBadge } from "@/components/match-state-badge";
 import { MatchStatusFilter } from "@/components/match-status-filter";
 import { MatchTeamFilter } from "@/components/match-team-filter";
 import { NeedsPickToggle } from "@/components/needs-pick-toggle";
 import { PendingPicksNudge } from "@/components/pending-picks-nudge";
+import { TimezoneSync } from "@/components/timezone-sync";
+import { getLeagueFromContext } from "@/lib/competition";
+import { getStageLabel, revealedKnockoutStageKeys, sortedStages } from "@/lib/competition-schema";
+import type { MatchRow } from "@/lib/db";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import {
   dayKeyForTimeZone,
   filterableTeams,
@@ -29,20 +35,10 @@ import {
   stagesPresent,
   statusBucket,
 } from "@/lib/match-utils";
-import { persistTimeZoneForCurrentUser, readTimeZoneCookie } from "@/lib/timezone";
-import { TimezoneSync } from "@/components/timezone-sync";
-import { MatchRoundFilter } from "@/components/match-round-filter";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
-import { getLeagueFromContext } from "@/lib/competition";
-import {
-  getStageLabel,
-  revealedKnockoutStageKeys,
-  sortedStages,
-} from "@/lib/competition-schema";
-import type { MatchRow } from "@/lib/db";
-import { CheckCircle2Icon, ChevronRightIcon, MapPinIcon } from "lucide-react";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { persistTimeZoneForCurrentUser, readTimeZoneCookie } from "@/lib/timezone";
 import { cn } from "@/lib/utils";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 const ROW_STAGGER_MS = 20;
 const ROW_STAGGER_CAP_MS = 800;
@@ -220,10 +216,7 @@ export default async function MatchesPage({
     : statusFiltered;
 
   const isFiltered =
-    selectedTeams.length > 0 ||
-    statusFilter !== null ||
-    picksNeeded ||
-    selectedRound !== null;
+    selectedTeams.length > 0 || statusFilter !== null || picksNeeded || selectedRound !== null;
 
   // Default view is empty only because every in-scope fixture is finished:
   // guide to the Final filter instead of the generic "no matches" state.

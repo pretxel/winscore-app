@@ -21,9 +21,7 @@ export type SettingsReader = () => Promise<OperationSettingRow[]>;
 
 const defaultReader: SettingsReader = async () => {
   const admin = createAdminSupabaseClient();
-  const { data, error } = await admin
-    .from("operation_settings")
-    .select("kind, enabled");
+  const { data, error } = await admin.from("operation_settings").select("kind, enabled");
   if (error) throw new Error(error.message);
   return data ?? [];
 };
@@ -35,9 +33,10 @@ const defaultReader: SettingsReader = async () => {
 export async function getOperationSettings(
   reader: SettingsReader = defaultReader,
 ): Promise<Record<OperationKind, boolean>> {
-  const settings = Object.fromEntries(
-    OPERATION_KINDS.map((kind) => [kind, true]),
-  ) as Record<OperationKind, boolean>;
+  const settings = Object.fromEntries(OPERATION_KINDS.map((kind) => [kind, true])) as Record<
+    OperationKind,
+    boolean
+  >;
   try {
     for (const row of await reader()) {
       if ((OPERATION_KINDS as readonly string[]).includes(row.kind)) {
@@ -45,10 +44,7 @@ export async function getOperationSettings(
       }
     }
   } catch (err) {
-    console.error(
-      "[operation-settings] read failed; treating all jobs as enabled:",
-      err,
-    );
+    console.error("[operation-settings] read failed; treating all jobs as enabled:", err);
   }
   return settings;
 }
@@ -67,10 +63,7 @@ export async function isOperationEnabled(
 // Persists one switch (upsert: first toggle for a kind creates its row).
 // Unlike the reads this THROWS on failure — a pause that didn't stick must
 // surface to the admin, not pretend success.
-export async function setOperationEnabled(
-  kind: OperationKind,
-  enabled: boolean,
-): Promise<void> {
+export async function setOperationEnabled(kind: OperationKind, enabled: boolean): Promise<void> {
   const admin = createAdminSupabaseClient();
   const { error } = await admin
     .from("operation_settings")

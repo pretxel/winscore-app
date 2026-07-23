@@ -1,10 +1,8 @@
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { normalizeTeamName } from "@/lib/team-name-aliases";
 import { isConfirmedMatch } from "@/lib/match-utils";
-import { findStaleMatches, isStaleMatch } from "@/lib/result-sync/staleness";
-import { footballDataProvider } from "@/lib/result-sync/providers/football-data";
-import { espnProvider } from "@/lib/result-sync/providers/espn";
 import { syncMatchEvents } from "@/lib/result-sync/events";
+import { espnProvider } from "@/lib/result-sync/providers/espn";
+import { footballDataProvider } from "@/lib/result-sync/providers/football-data";
+import { findStaleMatches, isStaleMatch } from "@/lib/result-sync/staleness";
 import type {
   LocalMatch,
   ProviderConfig,
@@ -12,6 +10,8 @@ import type {
   ResultProvider,
   RunSummary,
 } from "@/lib/result-sync/types";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { normalizeTeamName } from "@/lib/team-name-aliases";
 
 // Order matters: first available provider is primary, the rest are fallbacks.
 export function defaultProviders(): ResultProvider[] {
@@ -84,9 +84,7 @@ async function applyRemote(
     const local = byKey.get(`${home}|${away}|${date}`);
     if (!local) {
       summary.unmatched++;
-      console.warn(
-        `[result-sync:${providerName}] unmatched remote: ${home} vs ${away} @ ${date}`,
-      );
+      console.warn(`[result-sync:${providerName}] unmatched remote: ${home} vs ${away} @ ${date}`);
       continue;
     }
     summary.matched++;
@@ -108,9 +106,7 @@ async function applyRemote(
         // previously failed compute_match_scores call (the idempotent
         // re-run contract: public.scores must converge even if a past
         // run's RPC errored after its write succeeded).
-        const identical =
-          local.home_score === fullTime.home &&
-          local.away_score === fullTime.away;
+        const identical = local.home_score === fullTime.home && local.away_score === fullTime.away;
         if (identical) {
           const { error: rpcErr } = await admin.rpc("compute_match_scores", {
             p_match_id: local.id,
@@ -229,15 +225,11 @@ export async function runSync(opts: RunSyncOptions = {}): Promise<RunSummary> {
     ? await compQuery.eq("id", opts.competitionId).maybeSingle()
     : await compQuery.eq("is_active", true).maybeSingle();
   const competitionId = comp?.id ?? opts.competitionId;
-  const providerConfig = (comp?.providers ?? undefined) as
-    | ProviderConfig
-    | undefined;
+  const providerConfig = (comp?.providers ?? undefined) as ProviderConfig | undefined;
 
   let matchesQuery = admin
     .from("matches")
-    .select(
-      "id, home_team, away_team, kickoff_at, home_score, away_score, status",
-    );
+    .select("id, home_team, away_team, kickoff_at, home_score, away_score, status");
   if (competitionId) matchesQuery = matchesQuery.eq("competition_id", competitionId);
   const { data: localRows, error: loadErr } = await matchesQuery;
   if (loadErr) {
@@ -300,34 +292,21 @@ export async function runSync(opts: RunSyncOptions = {}): Promise<RunSummary> {
   if (primary && fallback && summary.source === primary.name) {
     const staleAfterMain = findStaleMatches(locals, now);
     if (staleAfterMain.length > 0) {
-      const staleDates = [
-        ...new Set(staleAfterMain.map((m) => m.kickoff_at.slice(0, 10))),
-      ];
+      const staleDates = [...new Set(staleAfterMain.map((m) => m.kickoff_at.slice(0, 10)))];
       try {
         const extra = await fallback.fetchMatches(staleDates, providerConfig);
         summary.fetched += extra.length;
-        const written = await applyRemote(
-          admin,
-          byKey,
-          extra,
-          fallback.name,
-          summary,
-        );
+        const written = await applyRemote(admin, byKey, extra, fallback.name, summary);
         if (written > 0) summary.source = fallback.name;
       } catch (err) {
         summary.errors++;
-        console.error(
-          `[result-sync] ${fallback.name} escalation fetch failed:`,
-          err,
-        );
+        console.error(`[result-sync] ${fallback.name} escalation fetch failed:`, err);
       }
     }
   }
 
   summary.stale = findStaleMatches(locals, now).length;
-  summary.staleResolved = staleAtStart.filter(
-    (m) => !isStaleMatch(m, now),
-  ).length;
+  summary.staleResolved = staleAtStart.filter((m) => !isStaleMatch(m, now)).length;
 
   return summary;
 }
@@ -367,9 +346,7 @@ export async function runMatchSync(
 
   const { data: row, error } = await admin
     .from("matches")
-    .select(
-      "id, home_team, away_team, kickoff_at, home_score, away_score, status, competition_id",
-    )
+    .select("id, home_team, away_team, kickoff_at, home_score, away_score, status, competition_id")
     .eq("id", matchId)
     .maybeSingle();
   if (error) {
@@ -393,15 +370,10 @@ export async function runMatchSync(
     .select("providers")
     .eq("id", local.competition_id)
     .maybeSingle();
-  const providerConfig = (comp?.providers ?? undefined) as
-    | ProviderConfig
-    | undefined;
+  const providerConfig = (comp?.providers ?? undefined) as ProviderConfig | undefined;
 
   const byKey = new Map<string, LocalMatch>();
-  byKey.set(
-    `${local.home_team}|${local.away_team}|${local.kickoff_at.slice(0, 10)}`,
-    local,
-  );
+  byKey.set(`${local.home_team}|${local.away_team}|${local.kickoff_at.slice(0, 10)}`, local);
 
   // 1) Score/status via ESPN scoreboard. Isolated.
   const scoreSummary: RunSummary = {

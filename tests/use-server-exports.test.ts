@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { describe, expect, it } from "vitest";
 
 // Guard: a `"use server"` module may export ONLY async functions (server
 // actions) and type-only declarations. A non-function export (e.g. a Zod
@@ -29,8 +29,7 @@ function hasUseServerDirective(src: string): boolean {
 }
 
 // A top-level export that is allowed in a "use server" module.
-const ALLOWED =
-  /^export (async function |default async function |type |interface |type\{|type \{)/;
+const ALLOWED = /^export (async function |default async function |type |interface |type\{|type \{)/;
 
 function badExports(src: string): string[] {
   return src

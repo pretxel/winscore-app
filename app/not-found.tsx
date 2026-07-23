@@ -29,10 +29,7 @@ export default function NotFound() {
         <Link href="/" className={buttonVariants()}>
           Back home
         </Link>
-        <Link
-          href="/matches"
-          className={buttonVariants({ variant: "outline" })}
-        >
+        <Link href="/matches" className={buttonVariants({ variant: "outline" })}>
           Browse matches
         </Link>
       </div>

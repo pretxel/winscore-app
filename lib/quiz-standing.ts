@@ -13,19 +13,26 @@ export type QuizStanding = { row: QuizStandingRow; players: number };
  * null when the user has no quiz answers (no row in the view).
  *
  * Accepts the caller's client so both the cookie-bound landing page and the
- * cookie-less OG route (anon scrapers) share one query.
+ * cookie-less OG route (anon scrapers) share one query. Scoped to a competition:
+ * v_quiz_standing has one row per (user, competition), and `players` counts only
+ * that competition's ranked field.
  */
 export async function loadQuizStanding(
   supabase: SupabaseClient<Database>,
   userId: string,
+  competitionId: string,
 ): Promise<QuizStanding | null> {
   const [{ data: row }, { count }] = await Promise.all([
     supabase
       .from("v_quiz_standing")
-      .select("user_id, display_name, streak, total_points, total_answered, rank")
+      .select("user_id, competition_id, display_name, streak, total_points, total_answered, rank")
       .eq("user_id", userId)
+      .eq("competition_id", competitionId)
       .maybeSingle(),
-    supabase.from("v_quiz_standing").select("*", { count: "exact", head: true }),
+    supabase
+      .from("v_quiz_standing")
+      .select("*", { count: "exact", head: true })
+      .eq("competition_id", competitionId),
   ]);
   if (!row) return null;
   return { row, players: count ?? 0 };

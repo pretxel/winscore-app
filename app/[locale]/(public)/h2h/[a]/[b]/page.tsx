@@ -1,16 +1,16 @@
-import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ShareButtons } from "@/components/share-buttons";
-import { H2HViewTracker } from "./h2h-view-tracker";
 import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { env } from "@/lib/env";
-import { loadH2HStandings, loadRecentForm, type FormPip, type H2HStanding } from "@/lib/h2h";
+import { type FormPip, type H2HStanding, loadH2HStandings, loadRecentForm } from "@/lib/h2h";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { buildH2HPath, canonicalH2HPair } from "@/lib/share";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
+import { H2HViewTracker } from "./h2h-view-tracker";
 
 type H2HParams = Promise<{ locale: string; a: string; b: string }>;
 

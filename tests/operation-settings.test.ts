@@ -42,9 +42,7 @@ describe("getOperationSettings", () => {
   });
 
   it("ignores rows for unknown kinds", async () => {
-    const reader: SettingsReader = async () => [
-      { kind: "not_a_job", enabled: false },
-    ];
+    const reader: SettingsReader = async () => [{ kind: "not_a_job", enabled: false }];
     const settings = await getOperationSettings(reader);
     for (const kind of OPERATION_KINDS) {
       expect(settings[kind]).toBe(true);
@@ -66,19 +64,13 @@ describe("getOperationSettings", () => {
 
 describe("isOperationEnabled", () => {
   it("is false for a kind stored as disabled", async () => {
-    const reader: SettingsReader = async () => [
-      { kind: "quiz_reminders", enabled: false },
-    ];
-    await expect(isOperationEnabled("quiz_reminders", reader)).resolves.toBe(
-      false,
-    );
+    const reader: SettingsReader = async () => [{ kind: "quiz_reminders", enabled: false }];
+    await expect(isOperationEnabled("quiz_reminders", reader)).resolves.toBe(false);
   });
 
   it("is true for a kind with no stored row", async () => {
     const reader: SettingsReader = async () => [];
-    await expect(isOperationEnabled("sync_matches", reader)).resolves.toBe(
-      true,
-    );
+    await expect(isOperationEnabled("sync_matches", reader)).resolves.toBe(true);
   });
 
   it("fails open when the read throws", async () => {

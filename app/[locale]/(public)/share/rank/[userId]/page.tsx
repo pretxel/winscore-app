@@ -1,11 +1,11 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { buttonVariants } from "@/components/ui/button";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 type RankParams = Promise<{ locale: string; userId: string }>;
 
@@ -20,19 +20,13 @@ async function loadStanding(userId: string) {
       .select("rank, display_name, total_points, exact_hits")
       .eq("user_id", userId)
       .maybeSingle(),
-    supabase
-      .from("v_leaderboard_overall")
-      .select("*", { count: "exact", head: true }),
+    supabase.from("v_leaderboard_overall").select("*", { count: "exact", head: true }),
   ]);
   if (!row) return null;
   return { row, players: count ?? 0 };
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: RankParams;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: RankParams }): Promise<Metadata> {
   const { locale: raw, userId } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const standing = await loadStanding(userId);

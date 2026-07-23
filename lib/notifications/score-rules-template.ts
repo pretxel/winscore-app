@@ -16,10 +16,8 @@
 // ---------------------------------------------------------------------------
 import { C } from "./email-theme";
 
-const SANS =
-  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO =
-  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // One phase row: a localized stage label, its multiplier, and the resolved
 // points for each accuracy tier (already base × multiplier).
@@ -179,9 +177,7 @@ function renderFooter(s: ScoreRulesStrings): string {
 
 // --- public renderer -------------------------------------------------------
 
-export function renderScoreRulesEmail(
-  data: ScoreRulesData,
-): ScoreRulesRendered {
+export function renderScoreRulesEmail(data: ScoreRulesData): ScoreRulesRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>
@@ -225,9 +221,7 @@ function renderText(data: ScoreRulesData): string {
     `  ${s.phaseHeader} | ${s.multHeader} | ${s.exactHeader} | ${s.winnerGdHeader} | ${s.winnerHeader}`,
   );
   for (const p of data.phases) {
-    lines.push(
-      `  ${p.stageLabel} | ${p.multiplier}× | ${p.exact} | ${p.winnerGd} | ${p.winner}`,
-    );
+    lines.push(`  ${p.stageLabel} | ${p.multiplier}× | ${p.exact} | ${p.winnerGd} | ${p.winner}`);
   }
   lines.push("");
   lines.push(`${s.ctaLabel}: ${data.ctaUrl}`);

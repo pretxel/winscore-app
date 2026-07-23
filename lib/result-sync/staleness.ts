@@ -23,9 +23,6 @@ export function isStaleMatch(match: StalenessShape, now: Date): boolean {
   return now.getTime() - kickoff > STALE_AFTER_MS;
 }
 
-export function findStaleMatches<T extends StalenessShape>(
-  matches: T[],
-  now: Date,
-): T[] {
+export function findStaleMatches<T extends StalenessShape>(matches: T[], now: Date): T[] {
   return matches.filter((m) => isStaleMatch(m, now));
 }

@@ -1,26 +1,26 @@
-import Link from "next/link";
-import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { LeaderboardLive } from "@/components/leaderboard-live";
-import { LeaderboardTable } from "@/components/leaderboard-table";
-import { LeaderboardSegmentSwitcher } from "@/components/leaderboard-segment-switcher";
-import { LeaderboardViewTracker } from "./leaderboard-view-tracker";
-import { LeaderboardChallenge } from "./leaderboard-challenge";
-import { ShareButtons } from "@/components/share-buttons";
-import type { LeaderboardRow } from "@/lib/db";
 import { ArrowRightIcon } from "lucide-react";
-import { buildRankSharePath } from "@/lib/share";
-import { env } from "@/lib/env";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { LeaderboardLive } from "@/components/leaderboard-live";
+import { LeaderboardSegmentSwitcher } from "@/components/leaderboard-segment-switcher";
+import { LeaderboardTable } from "@/components/leaderboard-table";
+import { ShareButtons } from "@/components/share-buttons";
 import { getLeagueFromContext } from "@/lib/competition";
 import { getStageLabel, sortedStages } from "@/lib/competition-schema";
+import type { LeaderboardRow } from "@/lib/db";
+import { env } from "@/lib/env";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import {
   currentWeekBoundsUtc,
   parseSegmentParam,
   reconcileStageParam,
   resolveSegment,
 } from "@/lib/leaderboard-segment";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { buildRankSharePath } from "@/lib/share";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { LeaderboardChallenge } from "./leaderboard-challenge";
+import { LeaderboardViewTracker } from "./leaderboard-view-tracker";
 
 export async function generateMetadata({
   params,

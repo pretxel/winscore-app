@@ -2,11 +2,11 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  REACTION_TYPES,
   buildReactionSummary,
   emptyCounts,
   foldCounts,
   isReactionType,
+  REACTION_TYPES,
   sumCounts,
 } from "@/lib/recap-reactions";
 
@@ -18,10 +18,7 @@ import {
 
 const raw = readFileSync(
   fileURLToPath(
-    new URL(
-      "../supabase/migrations/20260620020002_recap_reactions.sql",
-      import.meta.url,
-    ),
+    new URL("../supabase/migrations/20260620020002_recap_reactions.sql", import.meta.url),
   ),
   "utf8",
 );
@@ -49,9 +46,7 @@ describe("recap_reactions migration — scoring isolation invariant", () => {
 
 describe("recap_reactions migration — anti-inflation uniqueness", () => {
   it("declares unique (user_id, summary_id, reaction)", () => {
-    expect(sql).toMatch(
-      /unique\s*\(\s*user_id\s*,\s*summary_id\s*,\s*reaction\s*\)/i,
-    );
+    expect(sql).toMatch(/unique\s*\(\s*user_id\s*,\s*summary_id\s*,\s*reaction\s*\)/i);
   });
 });
 
@@ -72,9 +67,7 @@ describe("recap_reactions migration — allowlist", () => {
 
 describe("recap_reactions migration — RLS own-row + active/final scoping", () => {
   it("enables row level security", () => {
-    expect(sql).toMatch(
-      /alter table public\.recap_reactions enable row level security/i,
-    );
+    expect(sql).toMatch(/alter table public\.recap_reactions enable row level security/i);
   });
 
   it("scopes select/insert/delete to the owner (auth.uid())", () => {
@@ -100,9 +93,7 @@ describe("recap_reactions migration — public counts view", () => {
   it("exposes counts only for active-version rows, granted to anon", () => {
     expect(sql).toMatch(/create or replace view public\.v_recap_reaction_counts/i);
     expect(sql).toMatch(/security_invoker\s*=\s*off/i);
-    expect(sql).toMatch(
-      /grant select on public\.v_recap_reaction_counts to anon, authenticated/i,
-    );
+    expect(sql).toMatch(/grant select on public\.v_recap_reaction_counts to anon, authenticated/i);
   });
 });
 
@@ -164,12 +155,7 @@ describe("buildReactionSummary", () => {
         { reaction: "fire", count: 4 },
         { reaction: "clap", count: 2 },
       ],
-      [
-        { reaction: "fire" },
-        { reaction: "fire" },
-        { reaction: "spam" },
-        { reaction: null },
-      ],
+      [{ reaction: "fire" }, { reaction: "fire" }, { reaction: "spam" }, { reaction: null }],
     );
     expect(summary.mine).toEqual(["fire"]);
     expect(summary.total).toBe(6);

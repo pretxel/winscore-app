@@ -1,11 +1,11 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { env } from "@/lib/env";
 import { createChatCompletion } from "@/lib/ai/openrouter";
+import type { Database } from "@/lib/database.types";
+import { env } from "@/lib/env";
+import type { MatchEventTeam, MatchEventType } from "@/lib/matches/match-events";
 import { generateMatchImagePrompt } from "@/lib/matches/match-image-prompt";
 import { requestMatchImageRender } from "@/lib/matches/match-image-render";
-import type { MatchEventType, MatchEventTeam } from "@/lib/matches/match-events";
-import type { Database } from "@/lib/database.types";
 
 // The summary generator runs server-side with the service-role admin client
 // (RLS-bypassing) and calls OpenRouter. It is invoked from the result-sync flow
@@ -168,11 +168,10 @@ export async function generateMatchSummary(
   opts: GenerateOptions = {},
 ): Promise<GenerateResult> {
   const mode = opts.mode ?? "auto";
-  const style =
-    opts.style ?? {
-      key: AUTO_SUMMARY_STYLE_KEY,
-      instruction: STYLE_PRESETS[AUTO_SUMMARY_STYLE_KEY] || null,
-    };
+  const style = opts.style ?? {
+    key: AUTO_SUMMARY_STYLE_KEY,
+    instruction: STYLE_PRESETS[AUTO_SUMMARY_STYLE_KEY] || null,
+  };
 
   // Gate on the key first so a dormant deploy never touches the DB or network.
   if (!env.openrouterApiKey) return { generated: false, reason: "no-key" };

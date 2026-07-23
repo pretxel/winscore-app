@@ -63,9 +63,7 @@ export interface EligibilityCheck {
   termsVersionAccepted: string | null;
 }
 
-export function checkEligibility(
-  check: EligibilityCheck,
-): { eligible: boolean; reason?: string } {
+export function checkEligibility(check: EligibilityCheck): { eligible: boolean; reason?: string } {
   if (!check.ageConfirmed) {
     return { eligible: false, reason: "Age not confirmed" };
   }

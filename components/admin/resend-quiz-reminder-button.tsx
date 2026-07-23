@@ -1,7 +1,7 @@
 "use client";
 
-import { SubmitButton } from "@/components/admin/submit-button";
 import { resendQuizReminder } from "@/app/[locale]/(admin)/admin/quiz/actions";
+import { SubmitButton } from "@/components/admin/submit-button";
 
 // Force-resend of today's quiz reminder. Re-emails opted-in, still-unanswered
 // players even if the cron already reminded them, so it is confirm-gated and

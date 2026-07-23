@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
+import { useEffect } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { TriangleAlertIcon } from "lucide-react";
-import { isLocale, localePath, DEFAULT_LOCALE } from "@/lib/i18n";
+import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n";
 
 export default function LocaleError({
   error,
@@ -46,10 +46,7 @@ export default function LocaleError({
       ) : null}
       <div className="mt-6 flex justify-center gap-3">
         <Button onClick={reset}>{t("tryAgain")}</Button>
-        <Link
-          href={localePath(locale, "/")}
-          className={buttonVariants({ variant: "outline" })}
-        >
+        <Link href={localePath(locale, "/")} className={buttonVariants({ variant: "outline" })}>
           {t("home")}
         </Link>
       </div>

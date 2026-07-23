@@ -6,23 +6,35 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // thrown errors and the delete-active guard) is surfaced via the redirect's
 // query params rather than a server-error page.
 
-const generateMatchSummaryMock = vi.fn(async () => ({ generated: true }) as {
-  generated: boolean;
-  reason?: string;
-  summaryId?: string;
-});
-const generateImagePromptMock = vi.fn(async () => ({ generated: true }) as {
-  generated: boolean;
-  reason?: string;
-});
-const requestRenderMock = vi.fn(async () => ({ requested: true }) as {
-  requested: boolean;
-  reason?: string;
-});
-const pollRenderMock = vi.fn(async () => ({ polled: true }) as {
-  polled: boolean;
-  reason?: string;
-});
+const generateMatchSummaryMock = vi.fn(
+  async () =>
+    ({ generated: true }) as {
+      generated: boolean;
+      reason?: string;
+      summaryId?: string;
+    },
+);
+const generateImagePromptMock = vi.fn(
+  async () =>
+    ({ generated: true }) as {
+      generated: boolean;
+      reason?: string;
+    },
+);
+const requestRenderMock = vi.fn(
+  async () =>
+    ({ requested: true }) as {
+      requested: boolean;
+      reason?: string;
+    },
+);
+const pollRenderMock = vi.fn(
+  async () =>
+    ({ polled: true }) as {
+      polled: boolean;
+      reason?: string;
+    },
+);
 const assertMatchInManagedMock = vi.fn(async () => {});
 const getManagedCompetitionMock = vi.fn(async () => ({ id: "comp1", is_active: true }));
 const getUserMock = vi.fn();
@@ -88,11 +100,13 @@ vi.mock("@/lib/supabase/admin", () => ({
 //  select().eq().maybeSingle()  → the version row
 //  update(payload).eq()         → resolves { error }  (tracked in updatePayloads)
 //  delete().eq()                → resolves { error }
-function makeAdmin(opts: {
-  version?: Record<string, unknown> | null;
-  updateError?: { message: string } | null;
-  deleteError?: { message: string } | null;
-} = {}) {
+function makeAdmin(
+  opts: {
+    version?: Record<string, unknown> | null;
+    updateError?: { message: string } | null;
+    deleteError?: { message: string } | null;
+  } = {},
+) {
   const updatePayloads: Record<string, unknown>[] = [];
   const deleteEq = vi.fn(async () => ({ error: opts.deleteError ?? null }));
   const from = vi.fn(() => ({
@@ -143,7 +157,9 @@ describe("regenerateMatchSummary action", () => {
   });
 
   it("rejects a match outside the managed competition", async () => {
-    assertMatchInManagedMock.mockRejectedValue(new Error("Match does not belong to the managed competition"));
+    assertMatchInManagedMock.mockRejectedValue(
+      new Error("Match does not belong to the managed competition"),
+    );
     const { regenerateMatchSummary } = await importActions();
     await expect(
       regenerateMatchSummary(form({ match_id: MATCH_ID, locale: "en", style_key: "neutral" })),
@@ -156,25 +172,28 @@ describe("regenerateMatchSummary action", () => {
     await expect(
       regenerateMatchSummary(form({ match_id: MATCH_ID, locale: "en", style_key: "dramatic" })),
     ).rejects.toThrow(/regenMatchId=.*regenResult=generated/);
-    expect(generateMatchSummaryMock).toHaveBeenCalledWith(
-      expect.anything(),
-      MATCH_ID,
-      { mode: "regenerate", style: { key: "dramatic", instruction: "DRAMA" } },
-    );
+    expect(generateMatchSummaryMock).toHaveBeenCalledWith(expect.anything(), MATCH_ID, {
+      mode: "regenerate",
+      style: { key: "dramatic", instruction: "DRAMA" },
+    });
   });
 
   it("passes the free-text instruction for a custom style", async () => {
     const { regenerateMatchSummary } = await importActions();
     await expect(
       regenerateMatchSummary(
-        form({ match_id: MATCH_ID, locale: "en", style_key: "custom", style_instruction: "  Focus on the keeper.  " }),
+        form({
+          match_id: MATCH_ID,
+          locale: "en",
+          style_key: "custom",
+          style_instruction: "  Focus on the keeper.  ",
+        }),
       ),
     ).rejects.toThrow(/regenResult=generated/);
-    expect(generateMatchSummaryMock).toHaveBeenCalledWith(
-      expect.anything(),
-      MATCH_ID,
-      { mode: "regenerate", style: { key: "custom", instruction: "Focus on the keeper." } },
-    );
+    expect(generateMatchSummaryMock).toHaveBeenCalledWith(expect.anything(), MATCH_ID, {
+      mode: "regenerate",
+      style: { key: "custom", instruction: "Focus on the keeper." },
+    });
   });
 
   it("rejects a custom style with no instruction (UI-required guard)", async () => {
@@ -275,7 +294,9 @@ describe("generateMatchImagePromptAction action", () => {
     profileSingleMock.mockResolvedValue({ data: { is_admin: false } });
     const { generateMatchImagePromptAction } = await importActions();
     await expect(
-      generateMatchImagePromptAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateMatchImagePromptAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow("Admin only");
     expect(generateImagePromptMock).not.toHaveBeenCalled();
   });
@@ -286,7 +307,9 @@ describe("generateMatchImagePromptAction action", () => {
     );
     const { generateMatchImagePromptAction } = await importActions();
     await expect(
-      generateMatchImagePromptAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateMatchImagePromptAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow("managed");
     expect(generateImagePromptMock).not.toHaveBeenCalled();
   });
@@ -296,7 +319,9 @@ describe("generateMatchImagePromptAction action", () => {
     holder.admin = admin;
     const { generateMatchImagePromptAction } = await importActions();
     await expect(
-      generateMatchImagePromptAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateMatchImagePromptAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/imagePromptResult=generated/);
     expect(generateImagePromptMock).toHaveBeenCalledWith(admin, SUMMARY_ID);
   });
@@ -305,7 +330,9 @@ describe("generateMatchImagePromptAction action", () => {
     holder.admin = makeAdmin({ version: { id: SUMMARY_ID, match_id: OTHER_MATCH_ID } });
     const { generateMatchImagePromptAction } = await importActions();
     await expect(
-      generateMatchImagePromptAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateMatchImagePromptAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/imagePromptResult=error/);
     expect(generateImagePromptMock).not.toHaveBeenCalled();
   });
@@ -314,7 +341,9 @@ describe("generateMatchImagePromptAction action", () => {
     holder.admin = makeAdmin({ version: null });
     const { generateMatchImagePromptAction } = await importActions();
     await expect(
-      generateMatchImagePromptAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateMatchImagePromptAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/imagePromptResult=error/);
     expect(generateImagePromptMock).not.toHaveBeenCalled();
   });
@@ -324,7 +353,9 @@ describe("generateMatchImagePromptAction action", () => {
     generateImagePromptMock.mockResolvedValue({ generated: false, reason: "no-key" });
     const { generateMatchImagePromptAction } = await importActions();
     await expect(
-      generateMatchImagePromptAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateMatchImagePromptAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/imagePromptResult=no-key/);
   });
 
@@ -333,7 +364,9 @@ describe("generateMatchImagePromptAction action", () => {
     generateImagePromptMock.mockRejectedValue(new Error("openrouter down"));
     const { generateMatchImagePromptAction } = await importActions();
     await expect(
-      generateMatchImagePromptAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateMatchImagePromptAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/imagePromptResult=error/);
   });
 });
@@ -391,7 +424,9 @@ describe("syncMatchImageRenderAction action", () => {
     profileSingleMock.mockResolvedValue({ data: { is_admin: false } });
     const { syncMatchImageRenderAction } = await importActions();
     await expect(
-      syncMatchImageRenderAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      syncMatchImageRenderAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow("Admin only");
     expect(pollRenderMock).not.toHaveBeenCalled();
   });
@@ -401,7 +436,9 @@ describe("syncMatchImageRenderAction action", () => {
     holder.admin = admin;
     const { syncMatchImageRenderAction } = await importActions();
     await expect(
-      syncMatchImageRenderAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      syncMatchImageRenderAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/syncRenderResult=synced/);
     expect(pollRenderMock).toHaveBeenCalledWith(admin, SUMMARY_ID);
   });
@@ -411,7 +448,9 @@ describe("syncMatchImageRenderAction action", () => {
     pollRenderMock.mockResolvedValue({ polled: false, reason: "pending" });
     const { syncMatchImageRenderAction } = await importActions();
     await expect(
-      syncMatchImageRenderAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      syncMatchImageRenderAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/syncRenderResult=pending/);
   });
 });
@@ -421,7 +460,9 @@ describe("generateAndRenderImageAction action", () => {
     profileSingleMock.mockResolvedValue({ data: { is_admin: false } });
     const { generateAndRenderImageAction } = await importActions();
     await expect(
-      generateAndRenderImageAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateAndRenderImageAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow("Admin only");
     expect(generateImagePromptMock).not.toHaveBeenCalled();
     expect(requestRenderMock).not.toHaveBeenCalled();
@@ -432,7 +473,9 @@ describe("generateAndRenderImageAction action", () => {
     holder.admin = admin;
     const { generateAndRenderImageAction } = await importActions();
     await expect(
-      generateAndRenderImageAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateAndRenderImageAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/comboResult=rendered/);
     expect(generateImagePromptMock).toHaveBeenCalledWith(admin, SUMMARY_ID);
     expect(requestRenderMock).toHaveBeenCalledWith(admin, SUMMARY_ID);
@@ -442,7 +485,9 @@ describe("generateAndRenderImageAction action", () => {
     holder.admin = makeAdmin({ version: { id: SUMMARY_ID, match_id: OTHER_MATCH_ID } });
     const { generateAndRenderImageAction } = await importActions();
     await expect(
-      generateAndRenderImageAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateAndRenderImageAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/comboResult=error/);
     expect(generateImagePromptMock).not.toHaveBeenCalled();
     expect(requestRenderMock).not.toHaveBeenCalled();
@@ -453,7 +498,9 @@ describe("generateAndRenderImageAction action", () => {
     generateImagePromptMock.mockResolvedValue({ generated: false, reason: "no-key" });
     const { generateAndRenderImageAction } = await importActions();
     await expect(
-      generateAndRenderImageAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateAndRenderImageAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/comboResult=no-key/);
     expect(requestRenderMock).not.toHaveBeenCalled();
   });
@@ -463,7 +510,9 @@ describe("generateAndRenderImageAction action", () => {
     generateImagePromptMock.mockResolvedValue({ generated: false, reason: "missing" });
     const { generateAndRenderImageAction } = await importActions();
     await expect(
-      generateAndRenderImageAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateAndRenderImageAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/comboResult=error/);
     expect(requestRenderMock).not.toHaveBeenCalled();
   });
@@ -473,7 +522,9 @@ describe("generateAndRenderImageAction action", () => {
     requestRenderMock.mockResolvedValue({ requested: false, reason: "no-key" });
     const { generateAndRenderImageAction } = await importActions();
     await expect(
-      generateAndRenderImageAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateAndRenderImageAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/comboResult=prompt-only/);
   });
 
@@ -482,7 +533,9 @@ describe("generateAndRenderImageAction action", () => {
     requestRenderMock.mockRejectedValue(new Error("leonardo down"));
     const { generateAndRenderImageAction } = await importActions();
     await expect(
-      generateAndRenderImageAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateAndRenderImageAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/comboResult=prompt-only/);
   });
 
@@ -491,7 +544,9 @@ describe("generateAndRenderImageAction action", () => {
     generateImagePromptMock.mockRejectedValue(new Error("openrouter down"));
     const { generateAndRenderImageAction } = await importActions();
     await expect(
-      generateAndRenderImageAction(form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" })),
+      generateAndRenderImageAction(
+        form({ summary_id: SUMMARY_ID, match_id: MATCH_ID, locale: "en" }),
+      ),
     ).rejects.toThrow(/comboResult=error/);
     expect(requestRenderMock).not.toHaveBeenCalled();
   });

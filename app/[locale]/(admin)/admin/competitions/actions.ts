@@ -1,14 +1,14 @@
 "use server";
 
-import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { competitionSchema } from "@/lib/competition-schema";
+import { redirect } from "next/navigation";
+import { z } from "zod";
 import { MANAGED_COMPETITION_COOKIE } from "@/lib/admin/managed-competition";
-import { isLocale, localePath, DEFAULT_LOCALE } from "@/lib/i18n";
+import { competitionSchema } from "@/lib/competition-schema";
+import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const WC_SEED_SLUG = "world-cup-2026";
 
@@ -106,10 +106,7 @@ export async function updateCompetition(formData: FormData): Promise<void> {
 
   const admin = createAdminSupabaseClient();
   // Never touch is_active here.
-  const { error } = await admin
-    .from("competitions")
-    .update(input)
-    .eq("id", id);
+  const { error } = await admin.from("competitions").update(input).eq("id", id);
   if (error) throw dbError(error);
 
   revalidatePath(localePath(locale, `/admin/competitions/${id}`));
@@ -151,14 +148,8 @@ export async function deleteCompetition(formData: FormData): Promise<void> {
   }
 
   const [{ count: matchCount }, { count: groupCount }] = await Promise.all([
-    admin
-      .from("matches")
-      .select("id", { count: "exact", head: true })
-      .eq("competition_id", id),
-    admin
-      .from("groups")
-      .select("id", { count: "exact", head: true })
-      .eq("competition_id", id),
+    admin.from("matches").select("id", { count: "exact", head: true }).eq("competition_id", id),
+    admin.from("groups").select("id", { count: "exact", head: true }).eq("competition_id", id),
   ]);
   if ((matchCount ?? 0) > 0 || (groupCount ?? 0) > 0) {
     throw new Error(
@@ -179,11 +170,7 @@ export async function setManagedCompetition(formData: FormData): Promise<void> {
   const id = z.string().uuid().parse(formData.get("id"));
 
   const admin = createAdminSupabaseClient();
-  const { data } = await admin
-    .from("competitions")
-    .select("id")
-    .eq("id", id)
-    .maybeSingle();
+  const { data } = await admin.from("competitions").select("id").eq("id", id).maybeSingle();
   if (!data) throw new Error("Competition not found");
 
   const cookieStore = await cookies();

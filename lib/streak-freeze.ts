@@ -41,9 +41,7 @@ export function currentFreezeWeekBounds(now: Date = new Date()): {
   start: Date;
   end: Date;
 } {
-  const start = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   // getUTCDay(): 0 = Sunday … 6 = Saturday. Days since Monday: Sun → 6, else d-1.
   const daysSinceMonday = (start.getUTCDay() + 6) % 7;
   start.setUTCDate(start.getUTCDate() - daysSinceMonday);
@@ -129,9 +127,7 @@ export function detectEligibleGapDay(
 ): string | null {
   if (activityDays.size === 0) return null;
 
-  const cursor = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
+  const cursor = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   // Anchor on real activity (today, else yesterday). No anchor → nothing alive.
   if (!activityDays.has(utcDayKey(cursor))) {
     cursor.setUTCDate(cursor.getUTCDate() - 1);
@@ -150,11 +146,7 @@ export function detectEligibleGapDay(
   const gapKey = utcDayKey(cursor);
   const probe = new Date(cursor);
   probe.setUTCDate(probe.getUTCDate() - 1);
-  if (
-    activityDays.has(utcDayKey(probe)) &&
-    inWindow(cursor) &&
-    inWindow(probe)
-  ) {
+  if (activityDays.has(utcDayKey(probe)) && inWindow(cursor) && inWindow(probe)) {
     return gapKey;
   }
   return null;

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
+import { isValidTimeZone, TZ_COOKIE } from "@/lib/match-utils";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { TZ_COOKIE, isValidTimeZone } from "@/lib/match-utils";
 
 // Read the visitor's IANA timezone from the `tz` cookie (written client-side by
 // <TimezoneSync/>). Returns a validated zone, or null when the cookie is absent

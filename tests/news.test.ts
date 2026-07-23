@@ -16,15 +16,11 @@ import {
 
 describe("normalizeSourceUrl", () => {
   it("strips query string and fragment", () => {
-    expect(normalizeSourceUrl("https://ex.com/a/b?utm=1&x=2#frag")).toBe(
-      "https://ex.com/a/b",
-    );
+    expect(normalizeSourceUrl("https://ex.com/a/b?utm=1&x=2#frag")).toBe("https://ex.com/a/b");
   });
 
   it("lowercases the host but preserves path case", () => {
-    expect(normalizeSourceUrl("https://Example.COM/A/B")).toBe(
-      "https://example.com/A/B",
-    );
+    expect(normalizeSourceUrl("https://Example.COM/A/B")).toBe("https://example.com/A/B");
   });
 
   it("strips a trailing slash on a path but keeps root slash", () => {
@@ -48,9 +44,7 @@ describe("dedupKeyFor", () => {
   });
 
   it("falls back to a normalized-URL key when id is null", () => {
-    expect(dedupKeyFor(null, "https://ex.com/x/?utm=1")).toBe(
-      "url:https://ex.com/x",
-    );
+    expect(dedupKeyFor(null, "https://ex.com/x/?utm=1")).toBe("url:https://ex.com/x");
   });
 
   it("yields the same key for URLs differing only by query string", () => {
@@ -222,9 +216,7 @@ beforeEach(() => {
   upsertMock.mockReset();
   upsertMock.mockResolvedValue({ error: null });
   inMock.mockReset();
-  inMock.mockImplementation(() =>
-    Promise.resolve({ data: existingKeys, error: null }),
-  );
+  inMock.mockImplementation(() => Promise.resolve({ data: existingKeys, error: null }));
   selectMock.mockReset();
   selectMock.mockImplementation(() => ({ in: inMock }));
   fromMock.mockImplementation(() => ({
@@ -252,11 +244,12 @@ describe("GET /api/cron/sync-news", () => {
   });
 
   it("inserts new articles on first run", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => feedResponse()));
-    const { GET } = await import("@/app/api/cron/sync-news/route");
-    const res = await GET(
-      makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never,
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => feedResponse()),
     );
+    const { GET } = await import("@/app/api/cron/sync-news/route");
+    const res = await GET(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never);
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, number>;
     expect(body.fetched).toBe(1);
@@ -267,11 +260,12 @@ describe("GET /api/cron/sync-news", () => {
 
   it("is idempotent — a re-run reports updated, not inserted", async () => {
     existingKeys = [{ dedup_key: "url:https://bbc.com/1" }];
-    vi.stubGlobal("fetch", vi.fn(async () => feedResponse()));
-    const { GET } = await import("@/app/api/cron/sync-news/route");
-    const res = await GET(
-      makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never,
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => feedResponse()),
     );
+    const { GET } = await import("@/app/api/cron/sync-news/route");
+    const res = await GET(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never);
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, number>;
     expect(body.fetched).toBe(1);

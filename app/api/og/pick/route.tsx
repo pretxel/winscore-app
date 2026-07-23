@@ -1,11 +1,11 @@
-import { ImageResponse } from "next/og";
 import { createClient } from "@supabase/supabase-js";
-import { env } from "@/lib/env";
-import { clampGoals } from "@/lib/share";
-import { isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
-import type { Database } from "@/lib/database.types";
+import { ImageResponse } from "next/og";
 import { getStageLabel, safeParseFormatConfig } from "@/lib/competition-schema";
+import type { Database } from "@/lib/database.types";
+import { env } from "@/lib/env";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n";
 import { loadOgFonts, OG_FONT_FAMILY } from "@/lib/og-fonts";
+import { clampGoals } from "@/lib/share";
 
 // Node runtime (no `runtime = "edge"`): lib/og-fonts.ts reads font binaries via
 // node:fs/promises. The pick card is deterministic from its URL params, so its
@@ -24,7 +24,7 @@ function initials(team: string): string {
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 3)
-    .map((w) => w[0]!.toUpperCase())
+    .map((w) => w[0]?.toUpperCase())
     .join("");
 }
 
@@ -89,9 +89,7 @@ export async function GET(request: Request) {
   const supabase = createClient<Database>(env.supabaseUrl, env.supabaseAnonKey);
   const { data: match } = await supabase
     .from("matches")
-    .select(
-      "home_team, away_team, stage, group_code, kickoff_at, competition_id",
-    )
+    .select("home_team, away_team, stage, group_code, kickoff_at, competition_id")
     .eq("id", matchId)
     .maybeSingle();
   if (!match) return new Response("Match not found", { status: 404 });

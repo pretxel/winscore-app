@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
-
-import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 // Mirrors the universal page wrapper (`mx-auto max-w-4xl px-4 py-10`) and the
 // standard eyebrow / headline / lede header used across leaderboard, matches,

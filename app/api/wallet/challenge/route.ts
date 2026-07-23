@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import {
-  buildChallengeParams,
-  formatChallengeMessage,
-  challengeExpirySeconds,
-} from "@/lib/wallet/challenge";
+import { buildChallengeParams, formatChallengeMessage } from "@/lib/wallet/challenge";
 
 export const dynamic = "force-dynamic";
 
@@ -15,37 +11,25 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   let body: { walletAddress?: string; cluster?: string };
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const walletAddressBase58 = body.walletAddress;
   const cluster = body.cluster ?? "devnet";
 
   if (!walletAddressBase58 || typeof walletAddressBase58 !== "string") {
-    return NextResponse.json(
-      { error: "walletAddress is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "walletAddress is required" }, { status: 400 });
   }
 
   if (cluster !== "devnet") {
-    return NextResponse.json(
-      { error: "Only devnet is supported" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Only devnet is supported" }, { status: 400 });
   }
 
   const domain = request.headers.get("host") ?? "localhost";
@@ -62,10 +46,7 @@ export async function POST(request: Request) {
       throw new Error("Invalid address length");
     }
   } catch {
-    return NextResponse.json(
-      { error: "Invalid wallet address" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid wallet address" }, { status: 400 });
   }
 
   // Persist challenge
@@ -85,10 +66,7 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json(
-      { error: "Failed to create challenge" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create challenge" }, { status: 500 });
   }
 
   return NextResponse.json(
@@ -102,6 +80,6 @@ export async function POST(request: Request) {
       headers: {
         "Cache-Control": "no-store",
       },
-    }
+    },
   );
 }

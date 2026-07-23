@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { AlertTriangleIcon, CheckCircle2Icon, ClockIcon, RefreshCwIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ReconciliationStatus {
   roundId: string;
@@ -34,9 +34,7 @@ export function ReconciliationDashboard({ items, locale }: Props) {
           <CardContent className="flex items-center justify-between py-4">
             <div>
               <p className="text-xs text-muted-foreground">Balance Mismatch</p>
-              <p className="text-2xl font-mono font-bold">
-                {totalMismatch}
-              </p>
+              <p className="text-2xl font-mono font-bold">{totalMismatch}</p>
             </div>
             {totalMismatch === 0 ? (
               <CheckCircle2Icon className="size-8 text-pitch" />

@@ -1,15 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { z } from "zod";
 import { displayNameSchema } from "@/lib/display-name";
 import {
-  emailPrefsSchema,
-  normalizeEmailPrefs,
   type EmailPrefs,
   type EmailPrefsInput,
+  emailPrefsSchema,
+  normalizeEmailPrefs,
 } from "@/lib/email-prefs";
-import { z } from "zod";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 // Result the profile menu acts on. `error` is a code the client maps to a
 // localized message ("invalid" → validation, "failed" → not signed in / DB).
@@ -21,9 +21,7 @@ export type UpdateDisplayNameResult =
 // setDisplayName it does NOT redirect — it returns a result so the menu can
 // stay open and show inline feedback. revalidatePath refreshes server-rendered
 // names (leaderboard, picks, groups) on their next load.
-export async function updateDisplayName(
-  formData: FormData,
-): Promise<UpdateDisplayNameResult> {
+export async function updateDisplayName(formData: FormData): Promise<UpdateDisplayNameResult> {
   const parsed = displayNameSchema.safeParse({
     display_name: formData.get("display_name"),
   });
@@ -58,9 +56,7 @@ export type UpdateEmailPrefsResult =
 // is merged onto the player's current prefs so flipping one toggle never
 // disturbs the others. revalidatePath refreshes server-rendered surfaces (the
 // nav passes email_prefs into the menu) on their next load.
-export async function updateEmailPrefs(
-  input: EmailPrefsInput,
-): Promise<UpdateEmailPrefsResult> {
+export async function updateEmailPrefs(input: EmailPrefsInput): Promise<UpdateEmailPrefsResult> {
   const parsed = emailPrefsSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "invalid" };
 
@@ -105,9 +101,7 @@ const pushSubscriptionSchema = z.object({
 
 type PushSubscriptionInput = z.infer<typeof pushSubscriptionSchema>;
 
-export type PushSubscriptionResult =
-  | { ok: true }
-  | { ok: false; error: "invalid" | "failed" };
+export type PushSubscriptionResult = { ok: true } | { ok: false; error: "invalid" | "failed" };
 
 // Persists the caller's own Web Push subscription under RLS. Upserts on the
 // unique `endpoint` so re-subscribing the same browser updates rather than
@@ -146,9 +140,7 @@ export async function savePushSubscription(
 // Removes the caller's stored subscription for a given endpoint (RLS scopes the
 // delete to their own rows). Called when the player turns the push toggle off
 // or revokes permission.
-export async function removePushSubscription(
-  endpoint: string,
-): Promise<PushSubscriptionResult> {
+export async function removePushSubscription(endpoint: string): Promise<PushSubscriptionResult> {
   const parsed = z.string().url().safeParse(endpoint);
   if (!parsed.success) return { ok: false, error: "invalid" };
 

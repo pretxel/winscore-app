@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { type BracketMatchInput, buildBracket } from "@/lib/bracket-core";
 import {
   allocateBestThirds,
   comboKey,
@@ -6,7 +7,6 @@ import {
   THIRD_SLOT_WINNERS,
 } from "@/lib/bracket-third-allocation";
 import { THIRD_PLACE_ALLOCATION } from "@/lib/bracket-third-allocation.generated";
-import { buildBracket, type BracketMatchInput } from "@/lib/bracket-core";
 
 describe("third-place allocation table integrity", () => {
   const rows = Object.entries(THIRD_PLACE_ALLOCATION);
@@ -31,10 +31,24 @@ describe("third-place allocation table integrity", () => {
 
   it("matches known Annex C rows", () => {
     expect(allocateBestThirds([..."ABCDEFGH"])).toEqual({
-      A: "H", B: "G", D: "B", E: "C", G: "A", I: "F", K: "D", L: "E",
+      A: "H",
+      B: "G",
+      D: "B",
+      E: "C",
+      G: "A",
+      I: "F",
+      K: "D",
+      L: "E",
     });
     expect(allocateBestThirds([..."EFGHIJKL"])).toEqual({
-      A: "E", B: "J", D: "I", E: "F", G: "H", I: "G", K: "L", L: "K",
+      A: "E",
+      B: "J",
+      D: "I",
+      E: "F",
+      G: "H",
+      I: "G",
+      K: "L",
+      L: "K",
     });
   });
 
@@ -110,7 +124,7 @@ describe("buildBracket — best-third resolution", () => {
       venue: null,
     };
     const b = buildBracket([...groups, r32]);
-    const m = b.rounds.find((r) => r.stage === "r32")!.matches[0];
+    const m = b.rounds.find((r) => r.stage === "r32")?.matches[0];
     expect(m.home).toMatchObject({ team: "A1", status: "confirmed" });
     expect(m.away).toMatchObject({ team: "H3", status: "confirmed" });
   });
@@ -146,16 +160,18 @@ describe("buildBracket — best-third resolution", () => {
       venue: null,
     };
     const b = buildBracket([...groups, r32]);
-    const m = b.rounds.find((r) => r.stage === "r32")!.matches[0];
-    expect(m.away).toMatchObject({ team: null, label: "3rd Group C/E/F/H/I", status: "placeholder" });
+    const m = b.rounds.find((r) => r.stage === "r32")?.matches[0];
+    expect(m.away).toMatchObject({
+      team: null,
+      label: "3rd Group C/E/F/H/I",
+      status: "placeholder",
+    });
   });
 
   it("projects a 3rd slot provisionally once every group has a result but is not complete", () => {
     // 8 groups A–H, each with a result but an unplayed decider → same combo
     // ABCDEFGH → slot A gets group H's 3rd, marked provisional (not confirmed).
-    const groups = ["A", "B", "C", "D", "E", "F", "G", "H"].flatMap((c) =>
-      partialGroup(c),
-    );
+    const groups = ["A", "B", "C", "D", "E", "F", "G", "H"].flatMap((c) => partialGroup(c));
     const r32: BracketMatchInput = {
       id: "ko1",
       stage: "r32",
@@ -169,7 +185,7 @@ describe("buildBracket — best-third resolution", () => {
       venue: null,
     };
     const b = buildBracket([...groups, r32]);
-    const m = b.rounds.find((r) => r.stage === "r32")!.matches[0];
+    const m = b.rounds.find((r) => r.stage === "r32")?.matches[0];
     expect(m.home).toMatchObject({ team: "A1", status: "provisional" });
     expect(m.away).toMatchObject({ team: "H3", status: "provisional" });
   });
@@ -205,7 +221,7 @@ describe("buildBracket — best-third resolution", () => {
       venue: null,
     };
     const b = buildBracket([...groups, r32]);
-    const m = b.rounds.find((r) => r.stage === "r32")!.matches[0];
+    const m = b.rounds.find((r) => r.stage === "r32")?.matches[0];
     expect(m.away).toMatchObject({
       team: null,
       label: "3rd Group C/E/F/H/I",
@@ -235,12 +251,7 @@ describe("buildBracket — best-third resolution", () => {
     // we control which two are the worst (and thus excluded from the best-8).
     const group = (code: string, thirdGC: number): BracketMatchInput[] => {
       const t = [`${code}1`, `${code}2`, `${code}3`];
-      const mk = (
-        home: string,
-        away: string,
-        h: number,
-        a: number,
-      ): BracketMatchInput => ({
+      const mk = (home: string, away: string, h: number, a: number): BracketMatchInput => ({
         id: `${home}-${away}`,
         stage: "group",
         group_code: code,
@@ -254,26 +265,21 @@ describe("buildBracket — best-third resolution", () => {
       });
       // 1 beats 2 and 3; 2 beats 3 → ranks 1,2,3. Third loses both games by
       // `thirdGC` goals each — more conceded = weaker third (worse GD).
-      return [
-        mk(t[0], t[1], 2, 0),
-        mk(t[0], t[2], thirdGC, 0),
-        mk(t[1], t[2], thirdGC, 0),
-      ];
+      return [mk(t[0], t[1], 2, 0), mk(t[0], t[2], thirdGC, 0), mk(t[1], t[2], thirdGC, 0)];
     };
 
     const codes = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
     // Make every third concede 1, except one "weak" group that concedes more and
     // is excluded as the single worst third. With 9 groups the best-8 set is
     // "everyone but the weakest", so the excluded group decides the combo.
-    const build = (weak: string) =>
-      codes.map((c) => group(c, c === weak ? 6 : 1)).flat();
+    const build = (weak: string) => codes.flatMap((c) => group(c, c === weak ? 6 : 1));
 
     // Drop I → best-8 = ABCDEFGH; allocation maps slot E (faces winner E) to C3.
     const ba = buildBracket([...build("I"), r32]);
-    const ma = ba.rounds.find((r) => r.stage === "r32")!.matches[0].away;
+    const ma = ba.rounds.find((r) => r.stage === "r32")?.matches[0].away;
     // Drop H → best-8 = ABCDEFGI; the same slot now maps to D3.
     const bb = buildBracket([...build("H"), r32]);
-    const mb = bb.rounds.find((r) => r.stage === "r32")!.matches[0].away;
+    const mb = bb.rounds.find((r) => r.stage === "r32")?.matches[0].away;
 
     // Both resolve to a real team, confirmed (all groups complete)…
     expect(ma).toMatchObject({ team: "C3", status: "confirmed" });

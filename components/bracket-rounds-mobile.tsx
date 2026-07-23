@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { type Labels, MatchCard } from "@/components/bracket-match-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MatchCard, type Labels } from "@/components/bracket-match-card";
 import type { BracketRound } from "@/lib/bracket-core";
 
 // Small-screen bracket: a scrollable round strip (only the thin strip scrolls

@@ -21,25 +21,18 @@ describe("currentFreezeWeekBounds", () => {
 describe("detectEligibleGapDay", () => {
   it("returns the missed day of a single isolated gap", () => {
     // activity on 06 (today) and 04, missing 05 → 05 is bridgeable
-    expect(
-      detectEligibleGapDay(new Set(["2026-06-06", "2026-06-04"]), NOW),
-    ).toBe("2026-06-05");
+    expect(detectEligibleGapDay(new Set(["2026-06-06", "2026-06-04"]), NOW)).toBe("2026-06-05");
   });
 
   it("returns null when the run is unbroken (no gap)", () => {
     expect(
-      detectEligibleGapDay(
-        new Set(["2026-06-06", "2026-06-05", "2026-06-04"]),
-        NOW,
-      ),
+      detectEligibleGapDay(new Set(["2026-06-06", "2026-06-05", "2026-06-04"]), NOW),
     ).toBeNull();
   });
 
   it("returns null for a two-day gap (not a single isolated gap)", () => {
     // activity on 06 and 03, missing 05 and 04 → not bridgeable by one freeze
-    expect(
-      detectEligibleGapDay(new Set(["2026-06-06", "2026-06-03"]), NOW),
-    ).toBeNull();
+    expect(detectEligibleGapDay(new Set(["2026-06-06", "2026-06-03"]), NOW)).toBeNull();
   });
 
   it("returns null when there is no activity (nothing to protect)", () => {
@@ -48,20 +41,14 @@ describe("detectEligibleGapDay", () => {
 
   it("returns null when the anchor (today/yesterday) is missing", () => {
     // last activity two days ago → streak already dead, no gap to bridge
-    expect(
-      detectEligibleGapDay(new Set(["2026-06-04", "2026-06-02"]), NOW),
-    ).toBeNull();
+    expect(detectEligibleGapDay(new Set(["2026-06-04", "2026-06-02"]), NOW)).toBeNull();
   });
 
   it("does not bridge across the week start when bounded", () => {
     const { start } = currentFreezeWeekBounds(new Date("2026-06-08T12:00:00Z"));
     // Monday today; only today's activity in-week, prior day is last week.
     expect(
-      detectEligibleGapDay(
-        new Set(["2026-06-08"]),
-        new Date("2026-06-08T12:00:00Z"),
-        start,
-      ),
+      detectEligibleGapDay(new Set(["2026-06-08"]), new Date("2026-06-08T12:00:00Z"), start),
     ).toBeNull();
   });
 });
@@ -96,15 +83,11 @@ function makeFakeClient(uid: string, now: Date, rows: Row[] = []) {
           return builder;
         },
         eq(col: string, val: unknown) {
-          filtered = filtered.filter(
-            (r) => (r as Record<string, unknown>)[col] === val,
-          );
+          filtered = filtered.filter((r) => (r as Record<string, unknown>)[col] === val);
           return builder;
         },
         in(col: string, vals: unknown[]) {
-          filtered = filtered.filter((r) =>
-            vals.includes((r as Record<string, unknown>)[col]),
-          );
+          filtered = filtered.filter((r) => vals.includes((r as Record<string, unknown>)[col]));
           return builder;
         },
         maybeSingle() {
@@ -223,8 +206,7 @@ describe("resolveStreakFreeze", () => {
     expect(first.remaining).toBe(WEEKLY_FREEZE_ALLOWANCE - 1);
 
     // Re-read with the SAME rows: no additional consumption.
-    const consumptionRows = () =>
-      rows.filter((r) => r.row_kind === "consumption").length;
+    const consumptionRows = () => rows.filter((r) => r.row_kind === "consumption").length;
     const before = consumptionRows();
     const second = await resolveStreakFreeze(
       makeFakeClient("u1", NOW, rows),

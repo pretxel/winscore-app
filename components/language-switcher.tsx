@@ -1,15 +1,10 @@
 "use client";
 
-import * as React from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter, usePathname } from "next/navigation";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
-import {
-  SUPPORTED_LOCALES,
-  LOCALE_LABELS,
-  isLocale,
-  type Locale,
-} from "@/lib/i18n";
+import { usePathname, useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import * as React from "react";
+import { isLocale, LOCALE_LABELS, type Locale, SUPPORTED_LOCALES } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
@@ -50,7 +45,7 @@ export function LocaleList({
   const change = useChangeLocale();
 
   return (
-    <ul className={cn("flex flex-col gap-0.5", className)} role="menu">
+    <ul className={cn("flex flex-col gap-0.5", className)}>
       {SUPPORTED_LOCALES.map((loc: Locale) => {
         const active = loc === current;
         return (
@@ -74,12 +69,7 @@ export function LocaleList({
                 {loc}
               </span>
               <span className="flex-1 font-medium">{LOCALE_LABELS[loc]}</span>
-              {active ? (
-                <CheckIcon
-                  className="size-3.5 text-foreground"
-                  aria-hidden
-                />
-              ) : null}
+              {active ? <CheckIcon className="size-3.5 text-foreground" aria-hidden /> : null}
             </button>
           </li>
         );
@@ -128,10 +118,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         <span className="text-foreground">{currentLocale}</span>
         <ChevronDownIcon
           aria-hidden
-          className={cn(
-            "size-3 transition-transform",
-            open && "rotate-180",
-          )}
+          className={cn("size-3 transition-transform", open && "rotate-180")}
         />
       </button>
       {open ? (

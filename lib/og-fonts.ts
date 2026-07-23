@@ -54,10 +54,7 @@ async function loadFontFile(spec: FontSpec): Promise<OgFont> {
   const buf = await readFile(join(process.cwd(), "assets", "og", spec.file));
   // Copy into a standalone ArrayBuffer (Node Buffers are views over a shared
   // pool; ImageResponse wants the bytes for exactly this font).
-  const data = buf.buffer.slice(
-    buf.byteOffset,
-    buf.byteOffset + buf.byteLength,
-  ) as ArrayBuffer;
+  const data = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
   return { name: spec.name, data, weight: spec.weight, style: "normal" };
 }
 
@@ -80,9 +77,7 @@ export function loadOgFonts(): Promise<OgFont[]> {
 // Codepoints covered by the embedded heading subset (see assets/og/README.md):
 // Basic Latin + Latin-1 Supplement + Latin Extended-A + a few punctuation marks.
 // Anything outside this needs a fallback face or it renders as an empty box.
-const EMBEDDED_PUNCTUATION = new Set([
-  0x2013, 0x2014, 0x2018, 0x2019, 0x201c, 0x201d, 0x2026,
-]);
+const EMBEDDED_PUNCTUATION = new Set([0x2013, 0x2014, 0x2018, 0x2019, 0x201c, 0x201d, 0x2026]);
 function isEmbeddedGlyph(cp: number): boolean {
   return (cp >= 0x20 && cp <= 0x17f) || EMBEDDED_PUNCTUATION.has(cp);
 }
@@ -105,8 +100,7 @@ function fallbackFamilyFor(text: string): string {
 // glyphs. Match the first non-woff2 face (woff / truetype / opentype).
 const LEGACY_UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Version/5.1 Safari/534.30";
-const FACE_URL_RE =
-  /src:\s*url\((https:\/\/[^)]+)\)\s*format\('(?:woff|truetype|opentype)'\)/;
+const FACE_URL_RE = /src:\s*url\((https:\/\/[^)]+)\)\s*format\('(?:woff|truetype|opentype)'\)/;
 
 /**
  * Glyph-subset fallback for a display name that contains characters outside the
@@ -114,12 +108,8 @@ const FACE_URL_RE =
  * face fetched for just that name's glyphs, or [] when the name is fully covered
  * (the common Latin case — no network call) or the fetch fails (degrade quietly).
  */
-export async function loadDisplayNameFallback(
-  name: string,
-): Promise<OgFont[]> {
-  const needsFallback = [...name].some(
-    (ch) => !isEmbeddedGlyph(ch.codePointAt(0) ?? 0),
-  );
+export async function loadDisplayNameFallback(name: string): Promise<OgFont[]> {
+  const needsFallback = [...name].some((ch) => !isEmbeddedGlyph(ch.codePointAt(0) ?? 0));
   if (!needsFallback) return [];
 
   try {

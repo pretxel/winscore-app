@@ -50,11 +50,11 @@ export type RunSummary = {
 
 /** Round review state surfaced when provider round data conflicts with existing assignments. */
 export type RoundReviewState =
-  | "unmapped"   // No provider round key mapped to a competition_round
-  | "mapped"     // Provider round key matches existing assignment
-  | "conflict"   // Provider round key differs from existing assignment
-  | "changed"    // Previously reviewed, now different
-  | "reviewed";  // Admin has confirmed the assignment
+  | "unmapped" // No provider round key mapped to a competition_round
+  | "mapped" // Provider round key matches existing assignment
+  | "conflict" // Provider round key differs from existing assignment
+  | "changed" // Previously reviewed, now different
+  | "reviewed"; // Admin has confirmed the assignment
 
 /** Per-match round metadata preserved during sync for admin review. */
 export type MatchRoundContext = {
@@ -73,8 +73,5 @@ export interface ResultProvider {
   // providers that always return the full competition may ignore it. `config`
   // carries the active competition's provider settings (endpoint codes/paths);
   // providers fall back to the World Cup 2026 defaults when it is absent.
-  fetchMatches(
-    dates?: string[],
-    config?: ProviderConfig,
-  ): Promise<RemoteMatch[]>;
+  fetchMatches(dates?: string[], config?: ProviderConfig): Promise<RemoteMatch[]>;
 }

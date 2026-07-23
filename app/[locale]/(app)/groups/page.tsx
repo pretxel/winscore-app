@@ -1,11 +1,11 @@
+import { ChevronRightIcon, CrownIcon, UsersIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { listMyGroups } from "@/lib/groups";
 import { listLiveLeagues } from "@/lib/competition";
+import { listMyGroups } from "@/lib/groups";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { CreateGroupForm, JoinGroupForm } from "./group-forms";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
-import { ChevronRightIcon, CrownIcon, UsersIcon } from "lucide-react";
 
 export async function generateMetadata({
   params,
@@ -21,11 +21,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function GroupsPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function GroupsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
@@ -51,15 +47,11 @@ export default async function GroupsPage({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <section className="rounded-xl border border-border bg-card p-4">
-          <h2 className="mb-3 font-heading text-base font-semibold">
-            {t("createTitle")}
-          </h2>
+          <h2 className="mb-3 font-heading text-base font-semibold">{t("createTitle")}</h2>
           <CreateGroupForm locale={locale} leagues={leagues} />
         </section>
         <section className="rounded-xl border border-border bg-card p-4">
-          <h2 className="mb-3 font-heading text-base font-semibold">
-            {t("joinTitle")}
-          </h2>
+          <h2 className="mb-3 font-heading text-base font-semibold">{t("joinTitle")}</h2>
           <JoinGroupForm locale={locale} />
         </section>
       </div>
@@ -74,9 +66,7 @@ export default async function GroupsPage({
             <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
               {t("emptyTitle")}
             </p>
-            <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-              {t("emptyBody")}
-            </p>
+            <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">{t("emptyBody")}</p>
           </div>
         ) : (
           <ul className="flex flex-col gap-2">
@@ -89,9 +79,7 @@ export default async function GroupsPage({
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="truncate font-medium">{g.name}</span>
-                      {g.isOwner ? (
-                        <CrownIcon className="size-3.5 shrink-0 text-flag" />
-                      ) : null}
+                      {g.isOwner ? <CrownIcon className="size-3.5 shrink-0 text-flag" /> : null}
                     </div>
                     <div className="mt-0.5 flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
                       <UsersIcon className="size-3" />

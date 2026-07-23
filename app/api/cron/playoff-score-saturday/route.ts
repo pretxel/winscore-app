@@ -1,10 +1,7 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { env } from "@/lib/env";
-import {
-  dispatchPlayoffScoreEmail,
-  isSaturdayUtc,
-} from "@/lib/notifications/playoff-score-emails";
+import { type NextRequest, NextResponse } from "next/server";
 import { forEachLiveLeague, sumDispatch } from "@/lib/cron/for-each-league";
+import { env } from "@/lib/env";
+import { dispatchPlayoffScoreEmail, isSaturdayUtc } from "@/lib/notifications/playoff-score-emails";
 import { recordRun } from "@/lib/operations/record-run";
 import { isOperationEnabled } from "@/lib/operations/settings";
 

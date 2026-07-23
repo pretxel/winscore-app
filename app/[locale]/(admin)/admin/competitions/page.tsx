@@ -1,17 +1,17 @@
-import Link from "next/link";
-import { setRequestLocale, getTranslations } from "next-intl/server";
 import { PlusIcon, TrophyIcon } from "lucide-react";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { getManagedCompetitionId } from "@/lib/admin/managed-competition";
+import Link from "next/link";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { EmptyState } from "@/components/admin/empty-state";
+import { SetActiveDialog } from "@/components/admin/set-active-dialog";
+import { StatusCard } from "@/components/admin/status-card";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { StatusCard } from "@/components/admin/status-card";
-import { EmptyState } from "@/components/admin/empty-state";
-import { SubmitButton } from "@/components/admin/submit-button";
-import { SetActiveDialog } from "@/components/admin/set-active-dialog";
-import { deleteCompetition, setManagedCompetition, finishLeague, restartLeague } from "./actions";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { getManagedCompetitionId } from "@/lib/admin/managed-competition";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { deleteCompetition, finishLeague, restartLeague, setManagedCompetition } from "./actions";
 
 const WC_SEED_SLUG = "world-cup-2026";
 
@@ -87,8 +87,7 @@ export default async function AdminCompetitionsPage({
               const fixtures = fixtureCounts.get(c.id) ?? 0;
               const isFinished = Boolean(c.finished_at);
               const isWcSeed = c.slug === WC_SEED_SLUG;
-              const deletable =
-                !c.is_active && !isWcSeed && fixtures === 0;
+              const deletable = !c.is_active && !isWcSeed && fixtures === 0;
               return (
                 <li key={c.id}>
                   <StatusCard
@@ -96,16 +95,15 @@ export default async function AdminCompetitionsPage({
                     value={c.name}
                     badges={
                       <>
-                        {c.is_active ? (
-                          <Badge>{t("competitions.badgeActive")}</Badge>
-                        ) : null}
+                        {c.is_active ? <Badge>{t("competitions.badgeActive")}</Badge> : null}
                         {isManaged ? (
-                          <Badge variant="outline">
-                            {t("competitions.badgeManaging")}
-                          </Badge>
+                          <Badge variant="outline">{t("competitions.badgeManaging")}</Badge>
                         ) : null}
                         {isFinished ? (
-                          <Badge variant="outline" className="border-muted-foreground/30 text-muted-foreground">
+                          <Badge
+                            variant="outline"
+                            className="border-muted-foreground/30 text-muted-foreground"
+                          >
                             {t("competitions.badgeFinished")}
                           </Badge>
                         ) : null}
@@ -140,9 +138,7 @@ export default async function AdminCompetitionsPage({
                           />
                         ) : null}
 
-                        <Link
-                          href={localePath(locale, `/admin/competitions/${c.id}`)}
-                        >
+                        <Link href={localePath(locale, `/admin/competitions/${c.id}`)}>
                           <Button size="sm" variant="ghost">
                             {t("competitions.edit")}
                           </Button>

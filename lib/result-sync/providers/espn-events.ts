@@ -1,10 +1,7 @@
-import { normalizeTeamName } from "@/lib/team-name-aliases";
 import type { Json } from "@/lib/database.types";
+import type { MatchEventTeam, MatchEventType } from "@/lib/matches/match-events";
 import type { ProviderConfig } from "@/lib/result-sync/types";
-import type {
-  MatchEventTeam,
-  MatchEventType,
-} from "@/lib/matches/match-events";
+import { normalizeTeamName } from "@/lib/team-name-aliases";
 
 // ESPN's keyless summary endpoint carries play-by-play ("key events") that the
 // scoreboard does not. To reach it we first resolve the match's ESPN event id
@@ -78,9 +75,7 @@ export async function resolveEspnEventId(
     cache: "no-store",
   });
   if (!resp.ok) {
-    throw new Error(
-      `ESPN scoreboard fetch failed for ${range}: ${resp.status} ${resp.statusText}`,
-    );
+    throw new Error(`ESPN scoreboard fetch failed for ${range}: ${resp.status} ${resp.statusText}`);
   }
   const body = (await resp.json()) as { events?: ScoreboardEvent[] };
   const wantHome = normalizeTeamName(match.home_team);
@@ -187,15 +182,11 @@ export function normalizeEspnKeyEvents(
     const typeText = ke.type?.text ?? "";
     const scoringPlay = ke.scoringPlay === true;
     const detail = ke.text ?? ke.type?.text ?? null;
-    const { minute, extraMinute } = parseClock(
-      ke.clock?.displayValue ?? ke.time?.displayValue,
-    );
+    const { minute, extraMinute } = parseClock(ke.clock?.displayValue ?? ke.time?.displayValue);
     const teamId = ke.team?.id != null ? String(ke.team.id) : null;
     const team = teamId ? (teamSide.get(teamId) ?? null) : null;
     const player =
-      ke.athletesInvolved?.[0]?.displayName ??
-      ke.participants?.[0]?.athlete?.displayName ??
-      null;
+      ke.athletesInvolved?.[0]?.displayName ?? ke.participants?.[0]?.athlete?.displayName ?? null;
     const type = mapEventType(typeText, scoringPlay, detail);
 
     // Idempotency key. Prefer ESPN's play id; synthesize a stable key from the
@@ -209,8 +200,7 @@ export function normalizeEspnKeyEvents(
     // Ordering within the match. minute is cumulative across halves in soccer,
     // so minute*1000+extra is chronological; pre-kickoff entries (no minute)
     // keep their small array index, sorting them ahead of in-match events.
-    const sequence =
-      minute != null ? minute * 1000 + (extraMinute ?? 0) : index;
+    const sequence = minute != null ? minute * 1000 + (extraMinute ?? 0) : index;
 
     out.push({
       providerEventId,
@@ -238,9 +228,7 @@ export async function fetchEspnMatchEvents(
   url.searchParams.set("event", eventId);
   const resp = await fetch(url, { cache: "no-store" });
   if (!resp.ok) {
-    throw new Error(
-      `ESPN summary fetch failed for ${eventId}: ${resp.status} ${resp.statusText}`,
-    );
+    throw new Error(`ESPN summary fetch failed for ${eventId}: ${resp.status} ${resp.statusText}`);
   }
   const body = (await resp.json()) as {
     keyEvents?: KeyEvent[];

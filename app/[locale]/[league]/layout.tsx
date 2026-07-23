@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { getLeagueFromContext } from "@/lib/competition";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 
 // Validates the `[league]` slug once for every page beneath it. An unknown or
 // non-live slug routes to the league catalog rather than 404-ing (spec:

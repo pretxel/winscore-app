@@ -1,11 +1,11 @@
-import type { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import type { ProviderConfig } from "@/lib/result-sync/types";
 import {
   fetchEspnMatchEvents,
-  resolveEspnEventId,
   type MatchRef,
   type NormalizedEspnEvent,
+  resolveEspnEventId,
 } from "@/lib/result-sync/providers/espn-events";
+import type { ProviderConfig } from "@/lib/result-sync/types";
+import type { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 type AdminClient = ReturnType<typeof createAdminSupabaseClient>;
 

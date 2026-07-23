@@ -1,12 +1,12 @@
-import { getTranslations, getFormatter, getLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { KickoffCountdown } from "@/components/kickoff-countdown";
 import { LiveMatchList } from "@/components/live-match-list";
 import { getActiveCompetition, listLiveLeagues } from "@/lib/competition";
-import { getLiveAndNextUp } from "@/lib/matches/live";
-import { TOURNAMENT_OPENING, TOURNAMENT_START_ISO } from "@/lib/tournament";
-import { isConfirmedMatch } from "@/lib/match-utils";
 import type { Locale } from "@/lib/i18n";
+import { isConfirmedMatch } from "@/lib/match-utils";
+import { getLiveAndNextUp } from "@/lib/matches/live";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { TOURNAMENT_OPENING, TOURNAMENT_START_ISO } from "@/lib/tournament";
 
 type OpeningMatch = {
   kickoff_at: string;
@@ -15,19 +15,12 @@ type OpeningMatch = {
   venue: string | null;
 };
 
-async function fetchOpeningMatch(
-  competitionId?: string,
-): Promise<OpeningMatch | null> {
+async function fetchOpeningMatch(competitionId?: string): Promise<OpeningMatch | null> {
   try {
     const supabase = await createServerSupabaseClient();
-    let query = supabase
-      .from("matches")
-      .select("kickoff_at, home_team, away_team, venue");
+    let query = supabase.from("matches").select("kickoff_at, home_team, away_team, venue");
     if (competitionId) query = query.eq("competition_id", competitionId);
-    const { data } = await query
-      .order("kickoff_at", { ascending: true })
-      .limit(1)
-      .maybeSingle();
+    const { data } = await query.order("kickoff_at", { ascending: true }).limit(1).maybeSingle();
     return (data as OpeningMatch | null) ?? null;
   } catch {
     return null;
@@ -49,10 +42,7 @@ export async function TournamentCountdown() {
   const competition = await getActiveCompetition();
   const opening = await fetchOpeningMatch(competition?.id);
 
-  const iso =
-    opening?.kickoff_at ??
-    competition?.tournament_start_at ??
-    TOURNAMENT_START_ISO;
+  const iso = opening?.kickoff_at ?? competition?.tournament_start_at ?? TOURNAMENT_START_ISO;
   const targetMs = new Date(iso).getTime();
   // The section is "live" when any league is currently active (is_live and not
   // finished) — picks are open across the bracket regardless of the countdown
@@ -85,10 +75,10 @@ export async function TournamentCountdown() {
 
   const useDbFixture = opening && looksLikeRealFixture(opening);
   const home = useDbFixture
-    ? opening!.home_team
+    ? opening?.home_team
     : (competition?.opening_home ?? TOURNAMENT_OPENING.home);
   const away = useDbFixture
-    ? opening!.away_team
+    ? opening?.away_team
     : (competition?.opening_away ?? TOURNAMENT_OPENING.away);
   const dateLabel = format.dateTime(new Date(iso), {
     weekday: "short",
@@ -116,15 +106,9 @@ export async function TournamentCountdown() {
               <span aria-hidden className="size-1.5 rounded-full bg-destructive" />
               {t("countdownLive")}
             </span>
-            <p className="max-w-xl text-sm text-muted-foreground">
-              {t("countdownLiveSubhead")}
-            </p>
+            <p className="max-w-xl text-sm text-muted-foreground">{t("countdownLiveSubhead")}</p>
             {liveData ? (
-              <LiveMatchList
-                initialData={liveData}
-                locale={locale as Locale}
-                labels={liveLabels}
-              />
+              <LiveMatchList initialData={liveData} locale={locale as Locale} labels={liveLabels} />
             ) : null}
           </>
         ) : (

@@ -1,10 +1,10 @@
-import Link from "next/link";
-import type { Metadata } from "next";
 import { ArrowRightIcon, PlusIcon } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { listLiveLeagues } from "@/lib/competition";
 import { LeagueRail } from "@/components/league-rail";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { listLiveLeagues } from "@/lib/competition";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 
 export async function generateMetadata({
   params,
@@ -24,11 +24,7 @@ export async function generateMetadata({
 // for legacy single-competition paths / unknown league slugs. Each live league is
 // a matchday-board card: its vertical nameplate rail, name + edition code, and
 // the two startable actions (browse fixtures, start a group).
-export default async function CatalogPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function CatalogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);

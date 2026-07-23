@@ -4,14 +4,13 @@ import { describe, expect, it } from "vitest";
 import { localizeQuizQuestion } from "@/lib/quiz";
 import {
   QUIZ_QUESTIONS,
+  type QuizSeedQuestion,
   quizTranslations,
   quizTranslationsSqlLiteral,
-  type QuizSeedQuestion,
 } from "./fixtures/quiz-translations";
 
 // Resolve repo files relative to THIS test, not the cwd, so it runs anywhere.
-const read = (rel: string) =>
-  readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
+const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
 
 const SEED_SQL = read("../supabase/seed/quiz.sql");
 // The German backfill is a new, dated migration; the historical es/fr backfill

@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  MAX_SHARE_GOALS,
   buildFacebookShareUrl,
   buildH2HPath,
   buildPickSharePath,
@@ -8,6 +7,7 @@ import {
   buildTweetIntentUrl,
   canonicalH2HPair,
   clampGoals,
+  MAX_SHARE_GOALS,
 } from "@/lib/share";
 
 describe("clampGoals", () => {

@@ -8,11 +8,10 @@ import { cn } from "@/lib/utils";
 // markup below is source-agnostic.
 export type StandingsSource = "picks" | "results";
 
-const NAMESPACE: Record<StandingsSource, "groupSimulation" | "groupStandings"> =
-  {
-    picks: "groupSimulation",
-    results: "groupStandings",
-  };
+const NAMESPACE: Record<StandingsSource, "groupSimulation" | "groupStandings"> = {
+  picks: "groupSimulation",
+  results: "groupStandings",
+};
 
 // One group's standings table. Async server component so it can pull its own
 // translations; every call site (match detail, My Picks, /standings) is a
@@ -32,17 +31,10 @@ export async function GroupStandingsTable({
 }) {
   const t = await getTranslations(NAMESPACE[source]);
   const hasPicks = rows.some((r) => r.played > 0);
-  const highlight = new Set(
-    (highlightTeams ?? []).map((team) => team.toLowerCase()),
-  );
+  const highlight = new Set((highlightTeams ?? []).map((team) => team.toLowerCase()));
 
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-xl border border-border bg-card",
-        className,
-      )}
-    >
+    <div className={cn("overflow-hidden rounded-xl border border-border bg-card", className)}>
       <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
         <h3 className="font-heading text-sm font-semibold tracking-tight">
           {t("groupHeading", { code: groupCode })}
@@ -60,11 +52,7 @@ export async function GroupStandingsTable({
                 {t("colTeam")}
               </th>
               <NumHead abbr={t("colPlayed")} full={t("colPlayedFull")} />
-              <NumHead
-                abbr={t("colWon")}
-                full={t("colWonFull")}
-                className="hidden sm:table-cell"
-              />
+              <NumHead abbr={t("colWon")} full={t("colWonFull")} className="hidden sm:table-cell" />
               <NumHead
                 abbr={t("colDrawn")}
                 full={t("colDrawnFull")}
@@ -86,11 +74,7 @@ export async function GroupStandingsTable({
                 className="hidden md:table-cell"
               />
               <NumHead abbr={t("colGoalDiff")} full={t("colGoalDiffFull")} />
-              <NumHead
-                abbr={t("colPoints")}
-                full={t("colPointsFull")}
-                className="pr-3"
-              />
+              <NumHead abbr={t("colPoints")} full={t("colPointsFull")} className="pr-3" />
             </tr>
           </thead>
           <tbody>
@@ -99,22 +83,14 @@ export async function GroupStandingsTable({
               return (
                 <tr
                   key={row.team}
-                  className={cn(
-                    "border-b border-border/60 last:border-0",
-                    lit && "bg-pitch/5",
-                  )}
+                  className={cn("border-b border-border/60 last:border-0", lit && "bg-pitch/5")}
                 >
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
                       <span className="w-3.5 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">
                         {row.rank}
                       </span>
-                      <span
-                        className={cn(
-                          "truncate font-medium",
-                          lit && "text-pitch",
-                        )}
-                      >
+                      <span className={cn("truncate font-medium", lit && "text-pitch")}>
                         {row.team}
                       </span>
                     </div>
@@ -123,14 +99,8 @@ export async function GroupStandingsTable({
                   <NumCell value={row.won} className="hidden sm:table-cell" />
                   <NumCell value={row.drawn} className="hidden sm:table-cell" />
                   <NumCell value={row.lost} className="hidden sm:table-cell" />
-                  <NumCell
-                    value={row.goalsFor}
-                    className="hidden md:table-cell"
-                  />
-                  <NumCell
-                    value={row.goalsAgainst}
-                    className="hidden md:table-cell"
-                  />
+                  <NumCell value={row.goalsFor} className="hidden md:table-cell" />
+                  <NumCell value={row.goalsAgainst} className="hidden md:table-cell" />
                   <NumCell value={signed(row.goalDiff)} />
                   <td className="px-3 py-2 text-right font-mono font-semibold tabular-nums">
                     {row.points}
@@ -179,9 +149,7 @@ export async function AllGroupsSimulation({
         >
           {t("allGroupsHeading")}
         </h2>
-        <p className="mt-1 max-w-md text-sm text-muted-foreground">
-          {t("allGroupsLede")}
-        </p>
+        <p className="mt-1 max-w-md text-sm text-muted-foreground">{t("allGroupsLede")}</p>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         {groups.map((group) => (
@@ -201,21 +169,9 @@ function signed(n: number): string {
   return n > 0 ? `+${n}` : String(n);
 }
 
-function NumHead({
-  abbr,
-  full,
-  className,
-}: {
-  abbr: string;
-  full: string;
-  className?: string;
-}) {
+function NumHead({ abbr, full, className }: { abbr: string; full: string; className?: string }) {
   return (
-    <th
-      scope="col"
-      title={full}
-      className={cn("px-1.5 py-2 text-right font-medium", className)}
-    >
+    <th scope="col" title={full} className={cn("px-1.5 py-2 text-right font-medium", className)}>
       <abbr title={full} className="no-underline">
         {abbr}
       </abbr>
@@ -223,13 +179,7 @@ function NumHead({
   );
 }
 
-function NumCell({
-  value,
-  className,
-}: {
-  value: number | string;
-  className?: string;
-}) {
+function NumCell({ value, className }: { value: number | string; className?: string }) {
   return (
     <td
       className={cn(

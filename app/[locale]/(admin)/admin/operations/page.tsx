@@ -1,18 +1,14 @@
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { ActivityView } from "./activity-view";
+import { EmailsTab } from "./emails-tab";
 import { Overview } from "./overview";
 import { RunsView } from "./runs-view";
-import { EmailsTab } from "./emails-tab";
-import { ActivityView } from "./activity-view";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "admin.operations" });
   return { title: t("title") };
@@ -35,9 +31,7 @@ export default async function AdminOperationsPage({
   const t = await getTranslations("admin.operations");
   const sp = await searchParams;
   const rawView = typeof sp.view === "string" ? sp.view : undefined;
-  const view: View = VIEWS.includes(rawView as View)
-    ? (rawView as View)
-    : "overview";
+  const view: View = VIEWS.includes(rawView as View) ? (rawView as View) : "overview";
 
   // Tabs preserve only `view`; entering a tab drops the previous tab's filters.
   const tabHref = (v: View) =>
@@ -48,11 +42,7 @@ export default async function AdminOperationsPage({
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
       <div className="admin-reveal space-y-8">
-        <AdminPageHeader
-          eyebrow={t("eyebrow")}
-          title={t("title")}
-          description={t("description")}
-        />
+        <AdminPageHeader eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
         <nav
           aria-label={t("title")}
@@ -78,15 +68,9 @@ export default async function AdminOperationsPage({
           })}
         </nav>
 
-        {view === "overview" ? (
-          <Overview locale={locale} searchParams={sp} />
-        ) : null}
-        {view === "runs" ? (
-          <RunsView locale={locale} searchParams={sp} />
-        ) : null}
-        {view === "emails" ? (
-          <EmailsTab locale={locale} searchParams={sp} />
-        ) : null}
+        {view === "overview" ? <Overview locale={locale} searchParams={sp} /> : null}
+        {view === "runs" ? <RunsView locale={locale} searchParams={sp} /> : null}
+        {view === "emails" ? <EmailsTab locale={locale} searchParams={sp} /> : null}
         {view === "activity" ? <ActivityView /> : null}
       </div>
     </main>

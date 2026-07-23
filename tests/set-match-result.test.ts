@@ -87,9 +87,7 @@ function makeFormData(overrides: Partial<Record<string, string>> = {}): FormData
 
 describe("setMatchResult", () => {
   it("calls compute_match_scores exactly once after the UPDATE on a final save", async () => {
-    const { setMatchResult } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { setMatchResult } = await import("@/app/[locale]/(admin)/admin/matches/actions");
     await setMatchResult(makeFormData());
 
     expect(updateMock).toHaveBeenCalledTimes(1);
@@ -100,9 +98,7 @@ describe("setMatchResult", () => {
   });
 
   it("re-saving identical values still triggers the RPC", async () => {
-    const { setMatchResult } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { setMatchResult } = await import("@/app/[locale]/(admin)/admin/matches/actions");
     await setMatchResult(makeFormData());
     await setMatchResult(makeFormData());
 
@@ -110,9 +106,7 @@ describe("setMatchResult", () => {
   });
 
   it("calls the RPC even when status is not final", async () => {
-    const { setMatchResult } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { setMatchResult } = await import("@/app/[locale]/(admin)/admin/matches/actions");
     await setMatchResult(makeFormData({ status: "scheduled" }));
 
     expect(rpcMock).toHaveBeenCalledTimes(1);
@@ -120,12 +114,8 @@ describe("setMatchResult", () => {
 
   it("throws if the RPC returns an error", async () => {
     rpcMock.mockResolvedValueOnce({ error: { message: "scoring failed" } });
-    const { setMatchResult } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { setMatchResult } = await import("@/app/[locale]/(admin)/admin/matches/actions");
 
-    await expect(setMatchResult(makeFormData())).rejects.toThrow(
-      "scoring failed",
-    );
+    await expect(setMatchResult(makeFormData())).rejects.toThrow("scoring failed");
   });
 });

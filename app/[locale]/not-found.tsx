@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
-import { isLocale, localePath, DEFAULT_LOCALE } from "@/lib/i18n";
+import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n";
 
 export default async function LocaleNotFound() {
   const t = await getTranslations("notFound");

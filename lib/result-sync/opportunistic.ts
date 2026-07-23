@@ -1,9 +1,6 @@
 import { after } from "next/server";
 import { runMatchSync, runSync } from "@/lib/result-sync/core";
-import {
-  findStaleMatches,
-  type StalenessShape,
-} from "@/lib/result-sync/staleness";
+import { findStaleMatches, type StalenessShape } from "@/lib/result-sync/staleness";
 
 // Per-instance debounce. Fluid Compute reuses instances across requests, so
 // this meaningfully caps the trigger rate; the worst case (many cold
@@ -38,10 +35,7 @@ export function maybeScheduleOpportunisticSync(
   after(async () => {
     try {
       const summary = await runSync();
-      console.log(
-        "[result-sync:opportunistic] summary:",
-        JSON.stringify(summary),
-      );
+      console.log("[result-sync:opportunistic] summary:", JSON.stringify(summary));
     } catch (err) {
       console.error("[result-sync:opportunistic] run failed:", err);
     }
@@ -61,10 +55,7 @@ type MatchSyncShape = { id: string; status: string };
 // Schedule a per-match ESPN event+score sync after the response is sent. Never
 // runs for terminal matches; debounced per match id. Returns whether a run was
 // scheduled. Call from the per-match live API when the match isLive.
-export function maybeScheduleMatchSync(
-  match: MatchSyncShape,
-  now: Date = new Date(),
-): boolean {
+export function maybeScheduleMatchSync(match: MatchSyncShape, now: Date = new Date()): boolean {
   if (match.status === "final" || match.status === "cancelled") return false;
   const last = matchLastAttemptAt.get(match.id) ?? 0;
   if (now.getTime() - last < MATCH_MIN_INTERVAL_MS) return false;
@@ -72,10 +63,7 @@ export function maybeScheduleMatchSync(
   after(async () => {
     try {
       const summary = await runMatchSync(match.id);
-      console.log(
-        "[result-sync:match] summary:",
-        JSON.stringify(summary),
-      );
+      console.log("[result-sync:match] summary:", JSON.stringify(summary));
     } catch (err) {
       console.error(`[result-sync:match] run failed for ${match.id}:`, err);
     }

@@ -91,7 +91,10 @@ describe("POST /api/callback-image", () => {
   it("acks (200) and ignores a completion with no image url", async () => {
     const res = await POST(
       post(
-        { type: "image_generation.complete", data: { object: { id: "gen-1", generated_images: [] } } },
+        {
+          type: "image_generation.complete",
+          data: { object: { id: "gen-1", generated_images: [] } },
+        },
         "Bearer whsec",
       ),
     );

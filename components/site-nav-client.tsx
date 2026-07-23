@@ -1,12 +1,12 @@
 "use client";
 
-import * as React from "react";
+import { MenuIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { MenuIcon, XIcon } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import * as React from "react";
 import { LocaleList } from "@/components/language-switcher";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type NavLink = { href: string; label: string };
@@ -17,13 +17,7 @@ function isActive(pathname: string | null, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function NavLinks({
-  links,
-  className,
-}: {
-  links: NavLink[];
-  className?: string;
-}) {
+export function NavLinks({ links, className }: { links: NavLink[]; className?: string }) {
   const pathname = usePathname();
   return (
     <ul className={cn("items-center gap-0.5 text-sm", className)}>
@@ -36,9 +30,7 @@ export function NavLinks({
               aria-current={active ? "page" : undefined}
               className={cn(
                 "relative inline-flex items-center rounded-md px-3 py-1.5 font-medium transition-colors",
-                active
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground",
+                active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
               )}
             >
               {link.label}
@@ -124,10 +116,7 @@ export function MobileNav({
                   >
                     <span>{link.label}</span>
                     {active ? (
-                      <span
-                        aria-hidden
-                        className="size-1.5 rounded-full bg-pitch"
-                      />
+                      <span aria-hidden className="size-1.5 rounded-full bg-pitch" />
                     ) : null}
                   </Link>
                 </li>

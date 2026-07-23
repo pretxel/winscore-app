@@ -1,23 +1,23 @@
 "use client";
 
-import { Children, cloneElement, isValidElement, useId, useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
 import { ChevronDownIcon, ChevronUpIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Children, cloneElement, isValidElement, useId, useMemo, useState } from "react";
+import { ActionStatus } from "@/components/admin/action-status";
+import { FormSection } from "@/components/admin/form-section";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import { FormSection } from "@/components/admin/form-section";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ActionStatus } from "@/components/admin/action-status";
-import { SubmitButton } from "@/components/admin/submit-button";
-import { SUPPORTED_LOCALES } from "@/lib/i18n";
 import {
-  formatConfigSchema,
   type CompetitionBranding,
   type CompetitionFormat,
   type CompetitionProviders,
+  formatConfigSchema,
 } from "@/lib/competition-schema";
+import { SUPPORTED_LOCALES } from "@/lib/i18n";
 
 const STAGE_KINDS = ["group", "knockout", "league"] as const;
 
@@ -48,7 +48,14 @@ export type CompetitionFormInitial = {
 };
 
 function emptyStage(): StageDraft {
-  return { key: "", kind: "knockout", icon: "", hasGroupCode: false, pointMultiplier: undefined, labels: {} };
+  return {
+    key: "",
+    kind: "knockout",
+    icon: "",
+    hasGroupCode: false,
+    pointMultiplier: undefined,
+    labels: {},
+  };
 }
 
 function toDrafts(format?: CompetitionFormat): StageDraft[] {
@@ -152,10 +159,7 @@ export function CompetitionForm({
           >
             {t("form.sectionFormat")}
             {!validation.success ? (
-              <span
-                className="ml-1.5 size-1.5 shrink-0 rounded-full bg-destructive"
-                aria-hidden
-              />
+              <span className="ml-1.5 size-1.5 shrink-0 rounded-full bg-destructive" aria-hidden />
             ) : null}
           </TabsTrigger>
           <TabsTrigger value="providers">{t("form.sectionProviders")}</TabsTrigger>
@@ -163,247 +167,230 @@ export function CompetitionForm({
         </TabsList>
 
         <TabsContent value="identity" keepMounted>
-      <FormSection
-        title={t("form.sectionIdentity")}
-        description={t("form.sectionIdentityDesc")}
-      >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={t("form.slug")}>
-            <Input
-              name="slug"
-              defaultValue={initial?.slug ?? ""}
-              readOnly={slugLocked}
-              aria-describedby={slugLocked ? "slug-locked" : undefined}
-              required
-              placeholder="champions-league-2027"
-            />
-            {slugLocked ? (
-              <p id="slug-locked" className="text-xs text-muted-foreground">
-                {t("form.slugLocked")}
-              </p>
-            ) : null}
-          </Field>
-          <Field label={t("form.kind")}>
-            <Input name="kind" defaultValue={initial?.kind ?? "custom"} required />
-          </Field>
-          <Field label={t("form.name")}>
-            <Input name="name" defaultValue={initial?.name ?? ""} required />
-          </Field>
-          <Field label={t("form.shortName")}>
-            <Input
-              name="short_name"
-              defaultValue={initial?.short_name ?? ""}
-              required
-            />
-          </Field>
-          <Field label={t("form.season")}>
-            <Input name="season" defaultValue={initial?.season ?? ""} />
-          </Field>
-        </div>
-      </FormSection>
+          <FormSection
+            title={t("form.sectionIdentity")}
+            description={t("form.sectionIdentityDesc")}
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={t("form.slug")}>
+                <Input
+                  name="slug"
+                  defaultValue={initial?.slug ?? ""}
+                  readOnly={slugLocked}
+                  aria-describedby={slugLocked ? "slug-locked" : undefined}
+                  required
+                  placeholder="champions-league-2027"
+                />
+                {slugLocked ? (
+                  <p id="slug-locked" className="text-xs text-muted-foreground">
+                    {t("form.slugLocked")}
+                  </p>
+                ) : null}
+              </Field>
+              <Field label={t("form.kind")}>
+                <Input name="kind" defaultValue={initial?.kind ?? "custom"} required />
+              </Field>
+              <Field label={t("form.name")}>
+                <Input name="name" defaultValue={initial?.name ?? ""} required />
+              </Field>
+              <Field label={t("form.shortName")}>
+                <Input name="short_name" defaultValue={initial?.short_name ?? ""} required />
+              </Field>
+              <Field label={t("form.season")}>
+                <Input name="season" defaultValue={initial?.season ?? ""} />
+              </Field>
+            </div>
+          </FormSection>
         </TabsContent>
 
         <TabsContent value="dates" keepMounted>
-      <FormSection
-        title={t("form.sectionDates")}
-        description={t("form.sectionDatesDesc")}
-      >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={t("form.tournamentStart")}>
-            <Input
-              type="datetime-local"
-              name="tournament_start_at"
-              defaultValue={toLocalInput(initial?.tournament_start_at)}
-              required
-            />
-          </Field>
-          <Field label={t("form.openingHome")}>
-            <Input name="opening_home" defaultValue={initial?.opening_home ?? ""} />
-          </Field>
-          <Field label={t("form.openingAway")}>
-            <Input name="opening_away" defaultValue={initial?.opening_away ?? ""} />
-          </Field>
-          <Field label={t("form.openingVenue")}>
-            <Input
-              name="opening_venue"
-              defaultValue={initial?.opening_venue ?? ""}
-            />
-          </Field>
-        </div>
-      </FormSection>
+          <FormSection title={t("form.sectionDates")} description={t("form.sectionDatesDesc")}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={t("form.tournamentStart")}>
+                <Input
+                  type="datetime-local"
+                  name="tournament_start_at"
+                  defaultValue={toLocalInput(initial?.tournament_start_at)}
+                  required
+                />
+              </Field>
+              <Field label={t("form.openingHome")}>
+                <Input name="opening_home" defaultValue={initial?.opening_home ?? ""} />
+              </Field>
+              <Field label={t("form.openingAway")}>
+                <Input name="opening_away" defaultValue={initial?.opening_away ?? ""} />
+              </Field>
+              <Field label={t("form.openingVenue")}>
+                <Input name="opening_venue" defaultValue={initial?.opening_venue ?? ""} />
+              </Field>
+            </div>
+          </FormSection>
         </TabsContent>
 
         <TabsContent value="format" keepMounted>
-      <FormSection
-        title={t("form.sectionFormat")}
-        description={t("form.sectionFormatDesc")}
-        action={
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => setStages((p) => [...p, emptyStage()])}
+          <FormSection
+            title={t("form.sectionFormat")}
+            description={t("form.sectionFormatDesc")}
+            action={
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setStages((p) => [...p, emptyStage()])}
+              >
+                <PlusIcon aria-hidden />
+                {t("form.addStage")}
+              </Button>
+            }
           >
-            <PlusIcon aria-hidden />
-            {t("form.addStage")}
-          </Button>
-        }
-      >
-        <ul className="space-y-3">
-          {stages.map((s, i) => (
-            <li key={i} className="rounded-lg border border-border p-3">
-              <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
-                <Field label={t("form.stageKey")}>
-                  <Input
-                    value={s.key}
-                    onChange={(e) => patch(i, { key: e.target.value })}
-                    placeholder="group / r16 / league"
-                  />
-                </Field>
-                <Field label={t("form.stageKind")}>
-                  <NativeSelect
-                    value={s.kind}
-                    onChange={(e) =>
-                      patch(i, { kind: e.target.value as StageDraft["kind"] })
-                    }
-                  >
-                    {STAGE_KINDS.map((k) => (
-                      <option key={k} value={k}>
-                        {t(`form.stageKind_${k}`)}
-                      </option>
+            <ul className="space-y-3">
+              {stages.map((s, i) => (
+                <li key={i} className="rounded-lg border border-border p-3">
+                  <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                    <Field label={t("form.stageKey")}>
+                      <Input
+                        value={s.key}
+                        onChange={(e) => patch(i, { key: e.target.value })}
+                        placeholder="group / r16 / league"
+                      />
+                    </Field>
+                    <Field label={t("form.stageKind")}>
+                      <NativeSelect
+                        value={s.kind}
+                        onChange={(e) => patch(i, { kind: e.target.value as StageDraft["kind"] })}
+                      >
+                        {STAGE_KINDS.map((k) => (
+                          <option key={k} value={k}>
+                            {t(`form.stageKind_${k}`)}
+                          </option>
+                        ))}
+                      </NativeSelect>
+                    </Field>
+                    <div className="flex items-end gap-1">
+                      <Button
+                        type="button"
+                        size="icon-sm"
+                        variant="ghost"
+                        aria-label={t("form.moveUp")}
+                        disabled={i === 0}
+                        onClick={() => move(i, -1)}
+                      >
+                        <ChevronUpIcon aria-hidden />
+                      </Button>
+                      <Button
+                        type="button"
+                        size="icon-sm"
+                        variant="ghost"
+                        aria-label={t("form.moveDown")}
+                        disabled={i === stages.length - 1}
+                        onClick={() => move(i, 1)}
+                      >
+                        <ChevronDownIcon aria-hidden />
+                      </Button>
+                      <Button
+                        type="button"
+                        size="icon-sm"
+                        variant="ghost"
+                        aria-label={t("form.removeStage")}
+                        onClick={() => setStages((p) => p.filter((_, idx) => idx !== i))}
+                      >
+                        <Trash2Icon aria-hidden />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                    {SUPPORTED_LOCALES.map((loc) => (
+                      <Field key={loc} label={t("form.stageLabel", { locale: loc })}>
+                        <Input
+                          value={s.labels[loc] ?? ""}
+                          onChange={(e) =>
+                            patch(i, { labels: { ...s.labels, [loc]: e.target.value } })
+                          }
+                        />
+                      </Field>
                     ))}
-                  </NativeSelect>
-                </Field>
-                <div className="flex items-end gap-1">
-                  <Button
-                    type="button"
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label={t("form.moveUp")}
-                    disabled={i === 0}
-                    onClick={() => move(i, -1)}
-                  >
-                    <ChevronUpIcon aria-hidden />
-                  </Button>
-                  <Button
-                    type="button"
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label={t("form.moveDown")}
-                    disabled={i === stages.length - 1}
-                    onClick={() => move(i, 1)}
-                  >
-                    <ChevronDownIcon aria-hidden />
-                  </Button>
-                  <Button
-                    type="button"
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label={t("form.removeStage")}
-                    onClick={() => setStages((p) => p.filter((_, idx) => idx !== i))}
-                  >
-                    <Trash2Icon aria-hidden />
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                {SUPPORTED_LOCALES.map((loc) => (
-                  <Field key={loc} label={t("form.stageLabel", { locale: loc })}>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-4">
+                    <Field label={t("form.stageIcon")}>
+                      <Input
+                        value={s.icon}
+                        onChange={(e) => patch(i, { icon: e.target.value })}
+                        placeholder="group / final"
+                      />
+                    </Field>
+                    <Field label={t("form.stageMultiplier")}>
+                      <Input
+                        type="number"
+                        min={1}
+                        step={1}
+                        value={s.pointMultiplier ?? ""}
+                        onChange={(e) =>
+                          patch(i, {
+                            pointMultiplier: e.target.value ? Number(e.target.value) : undefined,
+                          })
+                        }
+                        placeholder="1"
+                      />
+                    </Field>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        className={CHECKBOX_CLASS}
+                        checked={s.hasGroupCode}
+                        onChange={(e) => patch(i, { hasGroupCode: e.target.checked })}
+                      />
+                      {t("form.stageHasGroupCode")}
+                    </label>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="rounded-lg border border-border p-3">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  className={CHECKBOX_CLASS}
+                  checked={groupsEnabled}
+                  onChange={(e) => setGroupsEnabled(e.target.checked)}
+                />
+                {t("form.groupsEnabled")}
+              </label>
+              {groupsEnabled ? (
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <Field label={t("form.groupPattern")}>
+                    <Input value={groupPattern} onChange={(e) => setGroupPattern(e.target.value)} />
+                  </Field>
+                  <Field label={t("form.groupCount")}>
                     <Input
-                      value={s.labels[loc] ?? ""}
-                      onChange={(e) =>
-                        patch(i, { labels: { ...s.labels, [loc]: e.target.value } })
-                      }
+                      type="number"
+                      min={1}
+                      value={groupCount}
+                      onChange={(e) => setGroupCount(Number(e.target.value))}
                     />
                   </Field>
-                ))}
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-4">
-                <Field label={t("form.stageIcon")}>
-                  <Input
-                    value={s.icon}
-                    onChange={(e) => patch(i, { icon: e.target.value })}
-                    placeholder="group / final"
-                  />
-                </Field>
-                <Field label={t("form.stageMultiplier")}>
-                  <Input
-                    type="number"
-                    min={1}
-                    step={1}
-                    value={s.pointMultiplier ?? ""}
-                    onChange={(e) =>
-                      patch(i, {
-                        pointMultiplier: e.target.value ? Number(e.target.value) : undefined,
-                      })
-                    }
-                    placeholder="1"
-                  />
-                </Field>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    className={CHECKBOX_CLASS}
-                    checked={s.hasGroupCode}
-                    onChange={(e) => patch(i, { hasGroupCode: e.target.checked })}
-                  />
-                  {t("form.stageHasGroupCode")}
-                </label>
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        <div className="rounded-lg border border-border p-3">
-          <label className="flex items-center gap-2 text-sm font-medium">
-            <input
-              type="checkbox"
-              className={CHECKBOX_CLASS}
-              checked={groupsEnabled}
-              onChange={(e) => setGroupsEnabled(e.target.checked)}
-            />
-            {t("form.groupsEnabled")}
-          </label>
-          {groupsEnabled ? (
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <Field label={t("form.groupPattern")}>
-                <Input
-                  value={groupPattern}
-                  onChange={(e) => setGroupPattern(e.target.value)}
-                />
-              </Field>
-              <Field label={t("form.groupCount")}>
-                <Input
-                  type="number"
-                  min={1}
-                  value={groupCount}
-                  onChange={(e) => setGroupCount(Number(e.target.value))}
-                />
-              </Field>
+                </div>
+              ) : null}
             </div>
-          ) : null}
-        </div>
-
-      </FormSection>
-
+          </FormSection>
         </TabsContent>
 
         <TabsContent value="providers" keepMounted>
-      <FormSection
-        title={t("form.sectionProviders")}
-        description={t("form.sectionProvidersDesc")}
-      >
-        <ProvidersFields initial={initial?.providers} />
-      </FormSection>
+          <FormSection
+            title={t("form.sectionProviders")}
+            description={t("form.sectionProvidersDesc")}
+          >
+            <ProvidersFields initial={initial?.providers} />
+          </FormSection>
         </TabsContent>
 
         <TabsContent value="branding" keepMounted>
-      <FormSection
-        title={t("form.sectionBranding")}
-        description={t("form.sectionBrandingDesc")}
-      >
-        <BrandingFields initial={initial?.branding} />
-      </FormSection>
+          <FormSection
+            title={t("form.sectionBranding")}
+            description={t("form.sectionBrandingDesc")}
+          >
+            <BrandingFields initial={initial?.branding} />
+          </FormSection>
         </TabsContent>
       </Tabs>
 
@@ -466,9 +453,7 @@ function ProvidersFields({ initial }: { initial?: CompetitionProviders }) {
   const [espnPath, setEspnPath] = useState(initial?.espn?.leaguePath ?? "");
 
   const value = JSON.stringify({
-    ...(fdCode
-      ? { footballData: { code: fdCode, season: fdSeason || undefined } }
-      : {}),
+    ...(fdCode ? { footballData: { code: fdCode, season: fdSeason || undefined } } : {}),
     ...(espnPath ? { espn: { leaguePath: espnPath } } : {}),
   });
 
@@ -480,10 +465,18 @@ function ProvidersFields({ initial }: { initial?: CompetitionProviders }) {
           <Input value={fdCode} onChange={(e) => setFdCode(e.target.value)} placeholder="WC" />
         </Field>
         <Field label={t("form.fdSeason")}>
-          <Input value={fdSeason} onChange={(e) => setFdSeason(e.target.value)} placeholder="2026" />
+          <Input
+            value={fdSeason}
+            onChange={(e) => setFdSeason(e.target.value)}
+            placeholder="2026"
+          />
         </Field>
         <Field label={t("form.espnPath")}>
-          <Input value={espnPath} onChange={(e) => setEspnPath(e.target.value)} placeholder="fifa.world" />
+          <Input
+            value={espnPath}
+            onChange={(e) => setEspnPath(e.target.value)}
+            placeholder="fifa.world"
+          />
         </Field>
       </div>
     </>
@@ -504,7 +497,12 @@ function BrandingFields({ initial }: { initial?: CompetitionBranding }) {
     ...(newsQuery ? { newsQuery } : {}),
     ...(emailFromName ? { emailFromName } : {}),
     ...(hosts.trim()
-      ? { hosts: hosts.split(",").map((h) => h.trim()).filter(Boolean) }
+      ? {
+          hosts: hosts
+            .split(",")
+            .map((h) => h.trim())
+            .filter(Boolean),
+        }
       : {}),
   });
 
@@ -513,10 +511,18 @@ function BrandingFields({ initial }: { initial?: CompetitionBranding }) {
       <input type="hidden" name="branding" value={value} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t("form.brandCode")}>
-          <Input value={brandCode} onChange={(e) => setBrandCode(e.target.value)} placeholder="WC26" />
+          <Input
+            value={brandCode}
+            onChange={(e) => setBrandCode(e.target.value)}
+            placeholder="WC26"
+          />
         </Field>
         <Field label={t("form.joinCodePrefix")}>
-          <Input value={joinCodePrefix} onChange={(e) => setJoinCodePrefix(e.target.value)} placeholder="WC" />
+          <Input
+            value={joinCodePrefix}
+            onChange={(e) => setJoinCodePrefix(e.target.value)}
+            placeholder="WC"
+          />
         </Field>
         <Field label={t("form.newsQuery")}>
           <Input value={newsQuery} onChange={(e) => setNewsQuery(e.target.value)} />

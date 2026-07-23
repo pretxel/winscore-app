@@ -1,11 +1,11 @@
-import Link from "next/link";
 import { ArrowRightIcon, PlusIcon, UsersIcon } from "lucide-react";
-import { LeagueRail } from "@/components/league-rail";
-import { FixturesStrip } from "@/components/fixtures-strip";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { localePath, type Locale } from "@/lib/i18n";
+import { FixturesStrip } from "@/components/fixtures-strip";
+import { LeagueRail } from "@/components/league-rail";
 import type { LeaguePools } from "@/lib/groups";
 import type { LaneFixture } from "@/lib/home";
+import { type Locale, localePath } from "@/lib/i18n";
 
 // The `home` namespace translator, matching what the home page passes down.
 type HomeT = Awaited<ReturnType<typeof getTranslations<"home">>>;
@@ -64,9 +64,7 @@ export function LeagueLane({
                 href={localePath(locale, `/groups/${pool.id}`)}
                 className="border-border hover:bg-secondary flex items-center justify-between rounded-lg border px-3 py-2.5 transition-colors"
               >
-                <span className="text-foreground truncate font-medium">
-                  {pool.name}
-                </span>
+                <span className="text-foreground truncate font-medium">{pool.name}</span>
                 <span className="text-muted-foreground inline-flex shrink-0 items-center gap-1 text-xs">
                   <UsersIcon className="size-3.5" />
                   {t("memberCount", { count: pool.memberCount })}

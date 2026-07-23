@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   buildMagicLinkEmailStrings,
   isLinkAction,
-  renderMagicLinkEmail,
   type MagicLinkEmailStrings,
+  renderMagicLinkEmail,
 } from "@/lib/notifications/magic-link-email-template";
 
 const STRINGS: MagicLinkEmailStrings = {
@@ -55,8 +55,7 @@ describe("renderMagicLinkEmail", () => {
   });
 
   it("escapes user/request-derived values in the HTML", () => {
-    const evil =
-      'https://ref.supabase.co/auth/v1/verify?redirect_to="><script>alert(1)</script>';
+    const evil = 'https://ref.supabase.co/auth/v1/verify?redirect_to="><script>alert(1)</script>';
     const { html } = renderMagicLinkEmail({
       actionUrl: evil,
       strings: { ...STRINGS, heading: "<b>x</b>" },
@@ -77,12 +76,8 @@ describe("isLinkAction / buildMagicLinkEmailStrings", () => {
 
   it("selects per-action copy and falls back to magiclink for unknown types", () => {
     const t = (key: string) => key;
-    expect(buildMagicLinkEmailStrings(t, "recovery").subject).toBe(
-      "actions.recovery.subject",
-    );
-    expect(buildMagicLinkEmailStrings(t, "bogus").ctaLabel).toBe(
-      "actions.magiclink.ctaLabel",
-    );
+    expect(buildMagicLinkEmailStrings(t, "recovery").subject).toBe("actions.recovery.subject");
+    expect(buildMagicLinkEmailStrings(t, "bogus").ctaLabel).toBe("actions.magiclink.ctaLabel");
     // Shared keys resolve regardless of action.
     expect(buildMagicLinkEmailStrings(t, "magiclink").footer).toBe("footer");
   });

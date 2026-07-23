@@ -1,22 +1,22 @@
-import Link from "next/link";
-import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
-  TrophyIcon,
+  ArrowRightIcon,
   CalendarClockIcon,
   CircleHelpIcon,
   LayoutDashboardIcon,
-  ArrowRightIcon,
+  TrophyIcon,
 } from "lucide-react";
-import { getActiveCompetition } from "@/lib/competition";
-import { getManagedCompetition } from "@/lib/admin/managed-competition";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import Link from "next/link";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { EmptyState } from "@/components/admin/empty-state";
+import { StatusCard } from "@/components/admin/status-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { StatusCard } from "@/components/admin/status-card";
-import { EmptyState } from "@/components/admin/empty-state";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { getManagedCompetition } from "@/lib/admin/managed-competition";
+import { getActiveCompetition } from "@/lib/competition";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 type Counts = { fixtures: number; final: number };
 
@@ -41,10 +41,7 @@ export default async function AdminDashboardPage({
 
   async function countsFor(id: string): Promise<Counts> {
     const [{ count: fixtures }, { count: final }] = await Promise.all([
-      admin
-        .from("matches")
-        .select("id", { count: "exact", head: true })
-        .eq("competition_id", id),
+      admin.from("matches").select("id", { count: "exact", head: true }).eq("competition_id", id),
       admin
         .from("matches")
         .select("id", { count: "exact", head: true })
@@ -103,9 +100,7 @@ export default async function AdminDashboardPage({
               <StatusCard
                 label={t("dashboard.liveLabel")}
                 value={active?.name ?? t("dashboard.none")}
-                badges={
-                  active ? <Badge>{t("competitions.badgeActive")}</Badge> : null
-                }
+                badges={active ? <Badge>{t("competitions.badgeActive")}</Badge> : null}
                 meta={activeCounts ? fixturesMeta(activeCounts) : null}
               />
               <StatusCard
@@ -113,9 +108,7 @@ export default async function AdminDashboardPage({
                 value={managed?.name ?? t("dashboard.none")}
                 badges={
                   managed ? (
-                    <Badge variant="outline">
-                      {t("competitions.badgeManaging")}
-                    </Badge>
+                    <Badge variant="outline">{t("competitions.badgeManaging")}</Badge>
                   ) : null
                 }
                 meta={managedCounts ? fixturesMeta(managedCounts) : null}
@@ -143,12 +136,8 @@ export default async function AdminDashboardPage({
                           className="size-4 text-muted-foreground transition-transform group-hover/link:translate-x-0.5"
                         />
                       </div>
-                      <div className="mt-1 font-heading font-medium">
-                        {link.title}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {link.body}
-                      </div>
+                      <div className="mt-1 font-heading font-medium">{link.title}</div>
+                      <div className="text-sm text-muted-foreground">{link.body}</div>
                     </Card>
                   </Link>
                 ))}

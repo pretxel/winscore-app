@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  renderPredictionReminderEmail,
   type PredictionReminderEmailData,
   type PredictionReminderEmailStrings,
+  renderPredictionReminderEmail,
 } from "@/lib/notifications/prediction-reminder-template";
 
 // ---------------------------------------------------------------------------
@@ -22,7 +22,9 @@ const STRINGS: PredictionReminderEmailStrings = {
   unsubscribeLabel: "Unsubscribe from daily prediction reminders",
 };
 
-function makeData(overrides: Partial<PredictionReminderEmailData> = {}): PredictionReminderEmailData {
+function makeData(
+  overrides: Partial<PredictionReminderEmailData> = {},
+): PredictionReminderEmailData {
   return {
     strings: STRINGS,
     matches: [
@@ -299,9 +301,7 @@ describe("dispatchPredictionReminders", () => {
   });
 
   it("still emails a player with no explicit prediction_reminder preference", async () => {
-    profileData = [
-      { id: "u1", display_name: "Alex", unsubscribe_token: "tok1", email_prefs: {} },
-    ];
+    profileData = [{ id: "u1", display_name: "Alex", unsubscribe_token: "tok1", email_prefs: {} }];
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
     const { dispatchPredictionReminders } = await import(
       "@/lib/notifications/prediction-reminder-emails"

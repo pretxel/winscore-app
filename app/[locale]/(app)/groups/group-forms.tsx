@@ -1,18 +1,14 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { Loader2Icon, PlusIcon, TicketIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2Icon, PlusIcon, TicketIcon } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
-import {
-  createGroupAction,
-  joinGroupAction,
-  type GroupActionState,
-} from "./actions";
+import { createGroupAction, type GroupActionState, joinGroupAction } from "./actions";
 
 const INITIAL: GroupActionState = {};
 
@@ -24,19 +20,14 @@ export function CreateGroupForm({
   leagues: { id: string; name: string }[];
 }) {
   const t = useTranslations("groups");
-  const [state, formAction, pending] = useActionState(
-    createGroupAction,
-    INITIAL,
-  );
+  const [state, formAction, pending] = useActionState(createGroupAction, INITIAL);
 
   useEffect(() => {
     if (state.error) toast.error(t(state.error));
   }, [state, t]);
 
   if (leagues.length === 0) {
-    return (
-      <p className="text-muted-foreground text-sm">{t("noLiveLeagues")}</p>
-    );
+    return <p className="text-muted-foreground text-sm">{t("noLiveLeagues")}</p>;
   }
 
   return (
@@ -80,11 +71,7 @@ export function CreateGroupForm({
           placeholder={t("createNamePlaceholder")}
           className="h-11"
         />
-        <Button
-          type="submit"
-          disabled={pending}
-          className="h-11 gap-2 whitespace-nowrap"
-        >
+        <Button type="submit" disabled={pending} className="h-11 gap-2 whitespace-nowrap">
           {pending ? (
             <Loader2Icon className="size-4 animate-spin" />
           ) : (
@@ -97,13 +84,7 @@ export function CreateGroupForm({
   );
 }
 
-export function JoinGroupForm({
-  locale,
-  defaultCode,
-}: {
-  locale: string;
-  defaultCode?: string;
-}) {
+export function JoinGroupForm({ locale, defaultCode }: { locale: string; defaultCode?: string }) {
   const t = useTranslations("groups");
   const [state, formAction, pending] = useActionState(joinGroupAction, INITIAL);
 

@@ -29,8 +29,7 @@ export function MatchCard({
     match.homeScore !== match.awayScore;
   const homeWon = decided && match.homeScore! > match.awayScore!;
   const awayWon = decided && match.awayScore! > match.homeScore!;
-  const provisional =
-    match.home.status === "provisional" || match.away.status === "provisional";
+  const provisional = match.home.status === "provisional" || match.away.status === "provisional";
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card">
@@ -49,9 +48,7 @@ export function MatchCard({
       />
       <div className="border-t border-border/60 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
         <LocalTime iso={match.kickoffAt} format="datetime" />
-        {match.venue ? (
-          <span className="mt-0.5 block truncate">{match.venue}</span>
-        ) : null}
+        {match.venue ? <span className="mt-0.5 block truncate">{match.venue}</span> : null}
       </div>
       {provisional ? (
         <div className="border-t border-dashed border-border/60 px-2.5 py-1">
@@ -77,23 +74,24 @@ function ParticipantRow({
 }) {
   const resolved = p.team != null;
   return (
-    <div
-      className={cn(
-        "flex items-center gap-2 px-2.5 py-2 text-sm",
-        won && "bg-pitch/5",
-      )}
-    >
+    <div className={cn("flex items-center gap-2 px-2.5 py-2 text-sm", won && "bg-pitch/5")}>
       <span
         className={cn(
           "min-w-0 flex-1 truncate",
-          resolved ? (won ? "font-semibold text-foreground" : "text-foreground") : "text-muted-foreground",
+          resolved
+            ? won
+              ? "font-semibold text-foreground"
+              : "text-foreground"
+            : "text-muted-foreground",
           p.status === "provisional" && "italic",
         )}
       >
         {p.label}
       </span>
       {showScore && score != null ? (
-        <span className={cn("font-mono tabular-nums", won ? "font-semibold" : "text-muted-foreground")}>
+        <span
+          className={cn("font-mono tabular-nums", won ? "font-semibold" : "text-muted-foreground")}
+        >
           {score}
         </span>
       ) : null}

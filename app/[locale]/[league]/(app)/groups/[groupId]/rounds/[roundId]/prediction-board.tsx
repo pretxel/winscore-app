@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { CheckIcon, Loader2Icon, LockIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
+import { useState, useTransition } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { MinusIcon, PlusIcon, CheckIcon, Loader2Icon, LockIcon } from "lucide-react";
-import { submitBulkPredictions } from "./actions";
+import { cn } from "@/lib/utils";
 import type { BulkPredictionResult } from "./actions";
+import { submitBulkPredictions } from "./actions";
 
 interface Fixture {
   id: string;
@@ -40,12 +39,10 @@ export function MatchdayPredictionBoard({
   locale,
 }: Props) {
   const t = useTranslations("matchdaySheet");
-  const common = useTranslations("matchStatus");
+  const _common = useTranslations("matchStatus");
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<BulkPredictionResult | null>(null);
-  const [picks, setPicks] = useState<
-    Map<string, { home: number; away: number }>
-  >(() => {
+  const [picks, setPicks] = useState<Map<string, { home: number; away: number }>>(() => {
     const map = new Map(initialPredictions);
     for (const f of fixtures) {
       if (!map.has(f.id)) {
@@ -55,16 +52,12 @@ export function MatchdayPredictionBoard({
     return map;
   });
 
-  const [lockedIds, setLockedIds] = useState<Set<string>>(() => {
+  const [lockedIds, _setLockedIds] = useState<Set<string>>(() => {
     const now = Date.now();
     return new Set(
       fixtures
-        .filter(
-          (f) =>
-            f.status !== "scheduled" ||
-            new Date(f.kickoff_at).getTime() <= now
-        )
-        .map((f) => f.id)
+        .filter((f) => f.status !== "scheduled" || new Date(f.kickoff_at).getTime() <= now)
+        .map((f) => f.id),
     );
   });
 
@@ -98,16 +91,12 @@ export function MatchdayPredictionBoard({
       {fixtures.map((fixture) => {
         const pick = picks.get(fixture.id) ?? { home: 0, away: 0 };
         const locked = lockedIds.has(fixture.id);
-        const hasPick =
-          initialPredictions.has(fixture.id) && !locked;
+        const hasPick = initialPredictions.has(fixture.id) && !locked;
 
         return (
           <Card
             key={fixture.id}
-            className={cn(
-              "bg-scoreboard/80 border-border/50",
-              locked && "opacity-50"
-            )}
+            className={cn("bg-scoreboard/80 border-border/50", locked && "opacity-50")}
           >
             <CardContent className="flex items-center gap-3 py-3">
               {/* Team info */}
@@ -120,9 +109,7 @@ export function MatchdayPredictionBoard({
                         : fixture.stage}
                     </Badge>
                   )}
-                  {locked && (
-                    <LockIcon className="size-3" aria-label={t("locked")} />
-                  )}
+                  {locked && <LockIcon className="size-3" aria-label={t("locked")} />}
                   {hasPick && !locked && (
                     <CheckIcon className="size-3 text-pitch" aria-label={t("picked")} />
                   )}
@@ -131,9 +118,7 @@ export function MatchdayPredictionBoard({
                   <span className="font-heading text-base font-semibold leading-tight truncate">
                     {fixture.home_team}
                   </span>
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    vs
-                  </span>
+                  <span className="text-xs text-muted-foreground shrink-0">vs</span>
                   <span className="font-heading text-base font-semibold leading-tight truncate">
                     {fixture.away_team}
                   </span>
@@ -166,7 +151,7 @@ export function MatchdayPredictionBoard({
                           new Map(picks).set(fixture.id, {
                             ...current,
                             home: current.home - 1,
-                          })
+                          }),
                         );
                       }
                     }}
@@ -191,7 +176,7 @@ export function MatchdayPredictionBoard({
                           new Map(picks).set(fixture.id, {
                             ...current,
                             home: current.home + 1,
-                          })
+                          }),
                         );
                       }
                     }}
@@ -200,9 +185,7 @@ export function MatchdayPredictionBoard({
                   </Button>
                 </div>
 
-                <span className="w-4 text-center text-xs text-muted-foreground font-mono">
-                  –
-                </span>
+                <span className="w-4 text-center text-xs text-muted-foreground font-mono">–</span>
 
                 {/* Away goals */}
                 <div className="flex items-center gap-0.5">
@@ -221,7 +204,7 @@ export function MatchdayPredictionBoard({
                           new Map(picks).set(fixture.id, {
                             ...current,
                             away: current.away - 1,
-                          })
+                          }),
                         );
                       }
                     }}
@@ -246,7 +229,7 @@ export function MatchdayPredictionBoard({
                           new Map(picks).set(fixture.id, {
                             ...current,
                             away: current.away + 1,
-                          })
+                          }),
                         );
                       }
                     }}
@@ -263,12 +246,7 @@ export function MatchdayPredictionBoard({
       {/* Save button */}
       {fixtures.some((f) => !lockedIds.has(f.id)) && (
         <div className="space-y-2">
-          <Button
-            onClick={handleSave}
-            disabled={isPending}
-            className="w-full"
-            size="lg"
-          >
+          <Button onClick={handleSave} disabled={isPending} className="w-full" size="lg">
             {isPending ? (
               <>
                 <Loader2Icon className="mr-2 size-4 animate-spin" />
@@ -280,9 +258,7 @@ export function MatchdayPredictionBoard({
           </Button>
 
           {result && result.ok === false && (
-            <p className="text-center text-sm text-destructive">
-              {result.error}
-            </p>
+            <p className="text-center text-sm text-destructive">{result.error}</p>
           )}
           {result && result.ok === true && (
             <p className="text-center text-sm text-pitch">

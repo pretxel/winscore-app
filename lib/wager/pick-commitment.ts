@@ -1,5 +1,5 @@
+import { createHash } from "node:crypto";
 import canonicalize from "canonicalize";
-import { createHash } from "crypto";
 
 /**
  * A single match prediction in the canonicalization payload.
@@ -66,9 +66,7 @@ export function canonicalizePicks(payload: PickCommitmentPayload): Uint8Array {
  * Uses Node.js crypto for server-side computation.
  * On-chain stores only these 32 bytes — not the picks or personal data.
  */
-export async function computePickCommitment(
-  payload: PickCommitmentPayload,
-): Promise<Uint8Array> {
+export async function computePickCommitment(payload: PickCommitmentPayload): Promise<Uint8Array> {
   const bytes = canonicalizePicks(payload);
   const buf = createHash("sha256").update(Buffer.from(bytes)).digest();
   return new Uint8Array(buf);
@@ -77,9 +75,7 @@ export async function computePickCommitment(
 /**
  * Synchronous SHA-256 from canonicalized payload.
  */
-export function computePickCommitmentSync(
-  payload: PickCommitmentPayload,
-): Uint8Array {
+export function computePickCommitmentSync(payload: PickCommitmentPayload): Uint8Array {
   const bytes = canonicalizePicks(payload);
   const buf = createHash("sha256").update(Buffer.from(bytes)).digest();
   return new Uint8Array(buf);

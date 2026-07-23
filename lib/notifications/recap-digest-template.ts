@@ -17,10 +17,8 @@
 // ---------------------------------------------------------------------------
 import { C } from "./email-theme";
 
-const SANS =
-  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO =
-  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // One newly-rendered recap comic to surface in the digest.
 export interface RecapDigestComic {

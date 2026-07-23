@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { TZ_COOKIE } from "@/lib/match-utils";
 
 // One-year cookie: the timezone rarely changes, and a stale value self-heals on

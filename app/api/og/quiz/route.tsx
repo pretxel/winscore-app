@@ -1,21 +1,12 @@
-import { ImageResponse } from "next/og";
 import { createClient } from "@supabase/supabase-js";
+import { ImageResponse } from "next/og";
 import { getTranslations } from "next-intl/server";
-import { env } from "@/lib/env";
-import { isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import type { Database } from "@/lib/database.types";
+import { env } from "@/lib/env";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n";
+import { cardETag, ifNoneMatchSatisfied, notModified, OG_CACHE_CONTROL } from "@/lib/og-cache";
+import { loadDisplayNameFallback, loadOgFonts, OG_FONT_FAMILY } from "@/lib/og-fonts";
 import { loadQuizStanding } from "@/lib/quiz-standing";
-import {
-  loadOgFonts,
-  loadDisplayNameFallback,
-  OG_FONT_FAMILY,
-} from "@/lib/og-fonts";
-import {
-  cardETag,
-  ifNoneMatchSatisfied,
-  notModified,
-  OG_CACHE_CONTROL,
-} from "@/lib/og-cache";
 
 // Node runtime (no `runtime = "edge"`): lib/og-fonts.ts reads font binaries via
 // node:fs/promises, and the @vercel/og Edge bundle cap does not apply.
@@ -76,6 +67,8 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const userId = url.searchParams.get("userId");
   if (!userId) return new Response("Missing userId", { status: 400 });
+  const league = url.searchParams.get("league");
+  if (!league) return new Response("Missing league", { status: 400 });
 
   const rawLocale = url.searchParams.get("locale") ?? DEFAULT_LOCALE;
   const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
@@ -84,7 +77,14 @@ export async function GET(request: Request) {
   // fetched by social scrapers with no session. Numbers are read live so the
   // card always reflects the current standing, never the URL.
   const supabase = createClient<Database>(env.supabaseUrl, env.supabaseAnonKey);
-  const standing = await loadQuizStanding(supabase, userId);
+  const { data: competition } = await supabase
+    .from("competitions")
+    .select("id")
+    .eq("slug", league)
+    .eq("is_live", true)
+    .maybeSingle();
+  if (!competition) return new Response("League not found", { status: 404 });
+  const standing = await loadQuizStanding(supabase, userId, competition.id);
   const brandCode = "WINSCORE";
   // Validate inputs before any render or ETag work — an unknown user is a 404,
   // never a half-rendered card.
@@ -100,15 +100,7 @@ export async function GET(request: Request) {
 
   // Conditional cache: the ETag covers every value the card draws, so an
   // unchanged standing answers 304 without paying for a fresh raster.
-  const etag = cardETag([
-    QUIZ_CARD_VERSION,
-    streak,
-    name,
-    points,
-    rank,
-    players,
-    locale,
-  ]);
+  const etag = cardETag([QUIZ_CARD_VERSION, streak, name, points, rank, players, locale]);
   if (ifNoneMatchSatisfied(request, etag)) return notModified(etag);
 
   const [brandFonts, nameFallback] = await Promise.all([

@@ -1,13 +1,16 @@
 "use server";
 
-import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { z } from "zod";
 import { isCurrentUserAdmin } from "@/lib/admin/current-user";
+import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const schema = z.object({
   questionId: z.string().uuid(),
   choice: z.number().int().min(0).max(3),
+  league: z.string().min(1),
+  locale: z.string().min(2),
 });
 
 export type AnswerResult =
@@ -15,10 +18,11 @@ export type AnswerResult =
   | { ok: false; error: "invalid" | "not-signed-in" | "already-answered" | "blocked" | "failed" };
 
 /**
- * Submit an answer to today's question. Grading happens entirely in the
- * answer_quiz RPC (SECURITY DEFINER) — the client never sees the correct
- * option until this returns, and a second answer is rejected by the unique
- * constraint surfaced as 23505.
+ * Submit an answer to the league's question for today. Grading happens entirely
+ * in the answer_quiz RPC (SECURITY DEFINER) — the client never sees the correct
+ * option until this returns, the RPC stamps the answer with the question's
+ * competition, and a second answer is rejected by the unique constraint
+ * surfaced as 23505.
  */
 export async function submitQuizAnswer(input: unknown): Promise<AnswerResult> {
   const parsed = schema.safeParse(input);
@@ -49,9 +53,8 @@ export async function submitQuizAnswer(input: unknown): Promise<AnswerResult> {
   const row = Array.isArray(data) ? data[0] : data;
   if (!row) return { ok: false, error: "failed" };
 
-  revalidatePath("/en/quiz");
-  revalidatePath("/es/quiz");
-  revalidatePath("/fr/quiz");
+  const locale = isLocale(parsed.data.locale) ? parsed.data.locale : DEFAULT_LOCALE;
+  revalidatePath(localePath(locale, `/${parsed.data.league}/quiz`));
 
   return { ok: true, isCorrect: !!row.is_correct, correctIndex: row.correct_index };
 }

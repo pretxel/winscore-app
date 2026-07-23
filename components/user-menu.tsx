@@ -1,31 +1,27 @@
 "use client";
 
-import * as React from "react";
 import { Popover } from "@base-ui/react/popover";
 import { Switch } from "@base-ui/react/switch";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 import { CheckIcon, LogOutIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
+import * as React from "react";
+import { toast } from "sonner";
+import {
+  removePushSubscription,
+  savePushSubscription,
+  updateDisplayName,
+  updateEmailPrefs,
+} from "@/app/[locale]/profile-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  updateDisplayName,
-  updateEmailPrefs,
-  savePushSubscription,
-  removePushSubscription,
-} from "@/app/[locale]/profile-actions";
-import {
   EMAIL_PREF_KEYS,
-  normalizeEmailPrefs,
   type EmailPrefKey,
   type EmailPrefs,
+  normalizeEmailPrefs,
 } from "@/lib/email-prefs";
-import {
-  isPushSupported,
-  subscribeToPush,
-  unsubscribeFromPush,
-} from "@/lib/push-client";
+import { isPushSupported, subscribeToPush, unsubscribeFromPush } from "@/lib/push-client";
 import { cn } from "@/lib/utils";
 
 function initialOf(name: string | null, email: string): string {
@@ -52,9 +48,7 @@ export function UserMenu({
   const [name, setName] = React.useState(displayName ?? "");
   const [value, setValue] = React.useState(displayName ?? "");
   const [pending, startTransition] = React.useTransition();
-  const [prefs, setPrefs] = React.useState<EmailPrefs>(() =>
-    normalizeEmailPrefs(emailPrefs),
-  );
+  const [prefs, setPrefs] = React.useState<EmailPrefs>(() => normalizeEmailPrefs(emailPrefs));
   const [prefsPending, startPrefsTransition] = React.useTransition();
   const fieldId = React.useId();
   const prefsId = React.useId();
@@ -229,8 +223,7 @@ export function UserMenu({
                   // The push toggle is disabled on browsers without Web Push
                   // (incl. iOS Safari outside a Home-Screen install).
                   const isPush = key === "push";
-                  const disabled =
-                    prefsPending || (isPush && !pushSupported);
+                  const disabled = prefsPending || (isPush && !pushSupported);
                   return (
                     <li key={key} className="flex flex-col gap-0.5">
                       <div className="flex items-center justify-between gap-2">
@@ -248,9 +241,7 @@ export function UserMenu({
                         </Switch.Root>
                       </div>
                       {isPush && !pushSupported && (
-                        <p className="text-xs text-muted-foreground">
-                          {tPrefs("pushHint")}
-                        </p>
+                        <p className="text-xs text-muted-foreground">{tPrefs("pushHint")}</p>
                       )}
                     </li>
                   );

@@ -25,19 +25,21 @@ export async function getLeagueLaneFixtures(slug: string): Promise<LaneFixture[]
     .limit(8);
 
   const now = Date.now();
-  return (data ?? [])
-    .map((m) => ({
-      id: m.id,
-      homeTeam: m.home_team,
-      awayTeam: m.away_team,
-      homeScore: m.home_score,
-      awayScore: m.away_score,
-      status: m.status,
-      kickoffAt: m.kickoff_at,
-    }))
-    // Keep live matches and upcoming kickoffs; drop stale scheduled rows.
-    .filter((m) => m.status === "live" || new Date(m.kickoffAt).getTime() >= now)
-    // Live first, then by kickoff (the query already ordered by kickoff).
-    .sort((a, b) => Number(b.status === "live") - Number(a.status === "live"))
-    .slice(0, 4);
+  return (
+    (data ?? [])
+      .map((m) => ({
+        id: m.id,
+        homeTeam: m.home_team,
+        awayTeam: m.away_team,
+        homeScore: m.home_score,
+        awayScore: m.away_score,
+        status: m.status,
+        kickoffAt: m.kickoff_at,
+      }))
+      // Keep live matches and upcoming kickoffs; drop stale scheduled rows.
+      .filter((m) => m.status === "live" || new Date(m.kickoffAt).getTime() >= now)
+      // Live first, then by kickoff (the query already ordered by kickoff).
+      .sort((a, b) => Number(b.status === "live") - Number(a.status === "live"))
+      .slice(0, 4)
+  );
 }

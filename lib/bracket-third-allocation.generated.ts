@@ -4,7 +4,7 @@
 // Key  = the 8 qualifying third-place groups, sorted alphabetically (e.g. "ABCDEFGH").
 // Value= 8 group letters giving the third-place team that faces each group winner,
 //        in slot order: [1A, 1B, 1D, 1E, 1G, 1I, 1K, 1L].
-export const THIRD_PLACE_SLOT_ORDER = ["1A","1B","1D","1E","1G","1I","1K","1L"] as const;
+export const THIRD_PLACE_SLOT_ORDER = ["1A", "1B", "1D", "1E", "1G", "1I", "1K", "1L"] as const;
 export const THIRD_PLACE_ALLOCATION: Record<string, string> = {
   ABCDEFGH: "HGBCAFDE",
   ABCDEFGI: "CGBDAFEI",

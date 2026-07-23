@@ -1,29 +1,23 @@
 "use server";
 
-import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { runSync } from "@/lib/result-sync/core";
-import { forceDispatchResultEmails } from "@/lib/notifications/result-emails";
+import { z } from "zod";
+import { applyKnockoutTeamConfirmation } from "@/lib/admin/confirm-knockout-teams";
+import { assertMatchInManaged, getManagedCompetition } from "@/lib/admin/managed-competition";
+import type { Json } from "@/lib/database.types";
+import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n";
+import { generateMatchImagePrompt } from "@/lib/matches/match-image-prompt";
+import { pollMatchImageRender, requestMatchImageRender } from "@/lib/matches/match-image-render";
 import {
   generateMatchSummary,
   STYLE_PRESETS,
   type SummaryStyle,
 } from "@/lib/matches/match-summary";
-import { generateMatchImagePrompt } from "@/lib/matches/match-image-prompt";
-import {
-  requestMatchImageRender,
-  pollMatchImageRender,
-} from "@/lib/matches/match-image-render";
-import {
-  getManagedCompetition,
-  assertMatchInManaged,
-} from "@/lib/admin/managed-competition";
-import { applyKnockoutTeamConfirmation } from "@/lib/admin/confirm-knockout-teams";
-import { isLocale, localePath, DEFAULT_LOCALE } from "@/lib/i18n";
-import type { Json } from "@/lib/database.types";
+import { forceDispatchResultEmails } from "@/lib/notifications/result-emails";
+import { runSync } from "@/lib/result-sync/core";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const resultSchema = z.object({
   match_id: z.string().uuid(),
@@ -263,10 +257,7 @@ export async function syncNow(formData: FormData): Promise<void> {
   if (!managed) throw new Error("No competition to manage");
 
   const rawLocale = formData.get("locale");
-  const locale =
-    typeof rawLocale === "string" && isLocale(rawLocale)
-      ? rawLocale
-      : DEFAULT_LOCALE;
+  const locale = typeof rawLocale === "string" && isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
 
   const summary = await runSync({ competitionId: managed.id });
 
@@ -296,10 +287,7 @@ export async function confirmKnockoutTeams(formData: FormData): Promise<void> {
   if (!managed) throw new Error("No competition to manage");
 
   const rawLocale = formData.get("locale");
-  const locale =
-    typeof rawLocale === "string" && isLocale(rawLocale)
-      ? rawLocale
-      : DEFAULT_LOCALE;
+  const locale = typeof rawLocale === "string" && isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
 
   const result = await applyKnockoutTeamConfirmation(managed.id);
 
@@ -323,10 +311,7 @@ export async function toggleKnockoutRoundReveal(formData: FormData): Promise<voi
   if (!managed) throw new Error("No competition to manage");
 
   const rawLocale = formData.get("locale");
-  const locale =
-    typeof rawLocale === "string" && isLocale(rawLocale)
-      ? rawLocale
-      : DEFAULT_LOCALE;
+  const locale = typeof rawLocale === "string" && isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
 
   const stageKey = formData.get("stage");
   const reveal = formData.get("reveal") === "true";
@@ -334,15 +319,13 @@ export async function toggleKnockoutRoundReveal(formData: FormData): Promise<voi
     throw new Error("Missing stage");
   }
   const target = managed.format.stages.find((s) => s.key === stageKey);
-  if (!target || target.kind !== "knockout") {
+  if (target?.kind !== "knockout") {
     throw new Error("Stage is not a knockout round");
   }
 
   const newFormat = {
     ...managed.format,
-    stages: managed.format.stages.map((s) =>
-      s.key === stageKey ? { ...s, revealed: reveal } : s,
-    ),
+    stages: managed.format.stages.map((s) => (s.key === stageKey ? { ...s, revealed: reveal } : s)),
   };
 
   const admin = createAdminSupabaseClient();
@@ -367,10 +350,7 @@ export async function resendResultEmails(formData: FormData): Promise<void> {
   const match_id = z.string().uuid().parse(formData.get("match_id"));
 
   const rawLocale = formData.get("locale");
-  const locale =
-    typeof rawLocale === "string" && isLocale(rawLocale)
-      ? rawLocale
-      : DEFAULT_LOCALE;
+  const locale = typeof rawLocale === "string" && isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
 
   const admin = createAdminSupabaseClient();
   await assertMatchInManaged(admin, match_id, managed.id);
@@ -413,10 +393,7 @@ export async function summarizeMatch(formData: FormData): Promise<void> {
   const match_id = z.string().uuid().parse(formData.get("match_id"));
 
   const rawLocale = formData.get("locale");
-  const locale =
-    typeof rawLocale === "string" && isLocale(rawLocale)
-      ? rawLocale
-      : DEFAULT_LOCALE;
+  const locale = typeof rawLocale === "string" && isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
 
   const admin = createAdminSupabaseClient();
   await assertMatchInManaged(admin, match_id, managed.id);
@@ -594,10 +571,7 @@ export async function deleteSummaryVersion(formData: FormData): Promise<void> {
     } else if (version.is_active) {
       params.set("deleteResult", "active-blocked");
     } else {
-      const { error } = await admin
-        .from("match_summaries")
-        .delete()
-        .eq("id", parsed.summary_id);
+      const { error } = await admin.from("match_summaries").delete().eq("id", parsed.summary_id);
       if (error) throw new Error(error.message);
       params.set("deleteResult", "deleted");
     }
@@ -641,10 +615,7 @@ export async function generateMatchImagePromptAction(formData: FormData): Promis
       const result = await generateMatchImagePrompt(admin, parsed.summary_id);
       // "generated" on success, else the generator's skip reason
       // (no-key, missing, empty-content).
-      params.set(
-        "imagePromptResult",
-        result.generated ? "generated" : (result.reason ?? "error"),
-      );
+      params.set("imagePromptResult", result.generated ? "generated" : (result.reason ?? "error"));
     }
   } catch (err) {
     console.error("[admin:generateMatchImagePromptAction] generation failed:", err);

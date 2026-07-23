@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  type CompetitionFormat,
   competitionSchema,
   formatConfigSchema,
   getStageLabel,
@@ -10,13 +11,18 @@ import {
   revealedKnockoutStageKeys,
   sortedStages,
   stageSchema,
-  type CompetitionFormat,
 } from "@/lib/competition-schema";
 
 // World Cup 2026 format — the exact shape seeded by the M2 migration.
 const WC_FORMAT = {
   stages: [
-    { key: "group", kind: "group", order: 1, hasGroupCode: true, labels: { en: "Group stage", es: "Fase de grupos", fr: "Phase de groupes" } },
+    {
+      key: "group",
+      kind: "group",
+      order: 1,
+      hasGroupCode: true,
+      labels: { en: "Group stage", es: "Fase de grupos", fr: "Phase de groupes" },
+    },
     { key: "r16", kind: "knockout", order: 3, hasGroupCode: false, labels: { en: "Round of 16" } },
     { key: "final", kind: "knockout", order: 7, hasGroupCode: false, labels: { en: "Final" } },
   ],
@@ -26,7 +32,13 @@ const WC_FORMAT = {
 // Champions League "Swiss" league phase — single league stage, no groups.
 const LEAGUE_FORMAT = {
   stages: [
-    { key: "league", kind: "league", order: 1, hasGroupCode: false, labels: { en: "League phase" } },
+    {
+      key: "league",
+      kind: "league",
+      order: 1,
+      hasGroupCode: false,
+      labels: { en: "League phase" },
+    },
     { key: "final", kind: "knockout", order: 2, hasGroupCode: false, labels: { en: "Final" } },
   ],
   groups: { enabled: false },
@@ -157,10 +169,31 @@ describe("stageSchema revealed default", () => {
 describe("revealedKnockoutStageKeys", () => {
   const FORMAT = {
     stages: [
-      { key: "group", kind: "group", order: 1, hasGroupCode: false, labels: { en: "Group" }, revealed: true },
-      { key: "r32", kind: "knockout", order: 2, hasGroupCode: false, labels: { en: "R32" }, revealed: true },
+      {
+        key: "group",
+        kind: "group",
+        order: 1,
+        hasGroupCode: false,
+        labels: { en: "Group" },
+        revealed: true,
+      },
+      {
+        key: "r32",
+        kind: "knockout",
+        order: 2,
+        hasGroupCode: false,
+        labels: { en: "R32" },
+        revealed: true,
+      },
       { key: "r16", kind: "knockout", order: 3, hasGroupCode: false, labels: { en: "R16" } },
-      { key: "final", kind: "knockout", order: 4, hasGroupCode: false, labels: { en: "Final" }, revealed: true },
+      {
+        key: "final",
+        kind: "knockout",
+        order: 4,
+        hasGroupCode: false,
+        labels: { en: "Final" },
+        revealed: true,
+      },
     ],
     groups: { enabled: false },
   };

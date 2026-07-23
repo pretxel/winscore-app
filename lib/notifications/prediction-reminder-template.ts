@@ -9,10 +9,8 @@
 
 import { C } from "./email-theme";
 
-const SANS =
-  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO =
-  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // All copy is resolved by the caller (next-intl) and passed in — value-bearing
 // strings (subject, heading) arrive already interpolated. `vs` is the separator

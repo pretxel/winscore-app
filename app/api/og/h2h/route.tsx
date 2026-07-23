@@ -1,21 +1,12 @@
-import { ImageResponse } from "next/og";
 import { createClient } from "@supabase/supabase-js";
+import { ImageResponse } from "next/og";
 import { getTranslations } from "next-intl/server";
-import { env } from "@/lib/env";
-import { isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import type { Database } from "@/lib/database.types";
-import { loadH2HStandings, loadRecentForm, type FormPip } from "@/lib/h2h";
-import {
-  loadOgFonts,
-  loadDisplayNameFallback,
-  OG_FONT_FAMILY,
-} from "@/lib/og-fonts";
-import {
-  cardETag,
-  ifNoneMatchSatisfied,
-  notModified,
-  OG_CACHE_CONTROL,
-} from "@/lib/og-cache";
+import { env } from "@/lib/env";
+import { type FormPip, loadH2HStandings, loadRecentForm } from "@/lib/h2h";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n";
+import { cardETag, ifNoneMatchSatisfied, notModified, OG_CACHE_CONTROL } from "@/lib/og-cache";
+import { loadDisplayNameFallback, loadOgFonts, OG_FONT_FAMILY } from "@/lib/og-fonts";
 
 // Node runtime (no `runtime = "edge"`): lib/og-fonts.ts reads font binaries via
 // node:fs/promises, and the @vercel/og Edge bundle cap does not apply.
@@ -47,8 +38,7 @@ function FormPips({ pips }: { pips: FormPip[] }) {
             width: 18,
             height: 18,
             borderRadius: 9,
-            backgroundColor:
-              p.outcome === "hit" ? FG : "rgba(251,250,246,0.22)",
+            backgroundColor: p.outcome === "hit" ? FG : "rgba(251,250,246,0.22)",
           }}
         />
       ))}

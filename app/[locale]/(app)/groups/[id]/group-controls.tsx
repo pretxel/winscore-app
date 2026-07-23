@@ -1,11 +1,18 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  CheckIcon,
+  CopyIcon,
+  LogOutIcon,
+  MailIcon,
+  SendIcon,
+  Trash2Icon,
+  UserMinusIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogClose,
@@ -16,22 +23,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  CheckIcon,
-  CopyIcon,
-  LogOutIcon,
-  MailIcon,
-  SendIcon,
-  Trash2Icon,
-  UserMinusIcon,
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   deleteGroupAction,
+  type InviteByEmailState,
   inviteToGroupByEmailAction,
   leaveGroupAction,
   removeMemberAction,
   renameGroupAction,
-  type InviteByEmailState,
 } from "../actions";
 
 export function InviteShare({
@@ -108,13 +108,7 @@ export function InviteShare({
   );
 }
 
-export function InviteByEmail({
-  groupId,
-  locale,
-}: {
-  groupId: string;
-  locale: string;
-}) {
+export function InviteByEmail({ groupId, locale }: { groupId: string; locale: string }) {
   const t = useTranslations("groupInvite");
   const formRef = useRef<HTMLFormElement>(null);
   const [state, action, pending] = useActionState<InviteByEmailState, FormData>(
@@ -172,11 +166,7 @@ export function InviteByEmail({
           disabled={pending}
           className="gap-1.5 self-start"
         >
-          {pending ? (
-            <MailIcon className="size-3.5" />
-          ) : (
-            <SendIcon className="size-3.5" />
-          )}
+          {pending ? <MailIcon className="size-3.5" /> : <SendIcon className="size-3.5" />}
           {pending ? t("sending") : t("sendInvite")}
         </Button>
       </form>
@@ -233,12 +223,7 @@ export function RemoveMemberButton({
     <Dialog>
       <DialogTrigger
         render={
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="ghost"
-            aria-label={t("removeMember")}
-          />
+          <Button type="button" size="icon-sm" variant="ghost" aria-label={t("removeMember")} />
         }
       >
         <UserMinusIcon className="size-4 text-muted-foreground" />
@@ -246,14 +231,10 @@ export function RemoveMemberButton({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("removeMemberTitle")}</DialogTitle>
-          <DialogDescription>
-            {t("removeMemberBody", { name: memberName })}
-          </DialogDescription>
+          <DialogDescription>{t("removeMemberBody", { name: memberName })}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose render={<Button variant="outline" />}>
-            {t("cancel")}
-          </DialogClose>
+          <DialogClose render={<Button variant="outline" />}>{t("cancel")}</DialogClose>
           <form action={removeMemberAction}>
             <input type="hidden" name="group_id" value={groupId} />
             <input type="hidden" name="user_id" value={userId} />
@@ -268,20 +249,12 @@ export function RemoveMemberButton({
   );
 }
 
-export function LeaveGroupButton({
-  groupId,
-  locale,
-}: {
-  groupId: string;
-  locale: string;
-}) {
+export function LeaveGroupButton({ groupId, locale }: { groupId: string; locale: string }) {
   const t = useTranslations("groups");
   return (
     <Dialog>
       <DialogTrigger
-        render={
-          <Button type="button" variant="outline" size="sm" className="gap-1.5" />
-        }
+        render={<Button type="button" variant="outline" size="sm" className="gap-1.5" />}
       >
         <LogOutIcon className="size-3.5" />
         {t("leave")}
@@ -292,9 +265,7 @@ export function LeaveGroupButton({
           <DialogDescription>{t("leaveBody")}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose render={<Button variant="outline" />}>
-            {t("cancel")}
-          </DialogClose>
+          <DialogClose render={<Button variant="outline" />}>{t("cancel")}</DialogClose>
           <form action={leaveGroupAction}>
             <input type="hidden" name="group_id" value={groupId} />
             <input type="hidden" name="locale" value={locale} />
@@ -309,13 +280,7 @@ export function LeaveGroupButton({
   );
 }
 
-export function DeleteGroupButton({
-  groupId,
-  locale,
-}: {
-  groupId: string;
-  locale: string;
-}) {
+export function DeleteGroupButton({ groupId, locale }: { groupId: string; locale: string }) {
   const t = useTranslations("groups");
   return (
     <Dialog>
@@ -338,9 +303,7 @@ export function DeleteGroupButton({
           <DialogDescription>{t("deleteBody")}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose render={<Button variant="outline" />}>
-            {t("cancel")}
-          </DialogClose>
+          <DialogClose render={<Button variant="outline" />}>{t("cancel")}</DialogClose>
           <form action={deleteGroupAction}>
             <input type="hidden" name="group_id" value={groupId} />
             <input type="hidden" name="locale" value={locale} />
@@ -368,7 +331,7 @@ export function WagerConfigPanel({
   stakeDisplay?: string;
   tokenSymbol?: string;
 }) {
-  const t = useTranslations("wager");
+  const _t = useTranslations("wager");
   const [open, setOpen] = useState(false);
 
   if (!wagerEnabled) {
@@ -386,11 +349,12 @@ export function WagerConfigPanel({
             <DialogHeader>
               <DialogTitle>Enable Matchday Wagers</DialogTitle>
               <DialogDescription>
-                This will allow pool members to stake tokens on their round predictions using Solana Devnet.
+                This will allow pool members to stake tokens on their round predictions using Solana
+                Devnet.
               </DialogDescription>
             </DialogHeader>
             <form
-              action={async (formData: FormData) => {
+              action={async (_formData: FormData) => {
                 setOpen(false);
               }}
               className="space-y-4"
@@ -405,9 +369,7 @@ export function WagerConfigPanel({
                 </p>
               </div>
               <DialogFooter>
-                <DialogClose render={<Button variant="outline" />}>
-                  Cancel
-                </DialogClose>
+                <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
                 <Button type="submit">Enable Wagers</Button>
               </DialogFooter>
             </form>

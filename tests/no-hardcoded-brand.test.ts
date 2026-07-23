@@ -11,10 +11,7 @@ import { describe, expect, it } from "vitest";
 // like /_not-found, so they must not touch the DB at build time. OG routes keep
 // a `?? "WC26"` fallback. Per-locale competition names remain a documented
 // deferred follow-up.
-const CLEAN_FILES = [
-  "components/site-nav.tsx",
-  "components/tournament-countdown.tsx",
-];
+const CLEAN_FILES = ["components/site-nav.tsx", "components/tournament-countdown.tsx"];
 
 const BRAND_LITERAL = /World Cup|WC26/;
 

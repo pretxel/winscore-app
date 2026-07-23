@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { VENUE_PHOTOS, venueSlug } from "@/lib/venues";
 import { cn } from "@/lib/utils";
+import { VENUE_PHOTOS, venueSlug } from "@/lib/venues";
 
 export function VenueImage({
   venue,

@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useQueryParamWriter } from "@/components/use-query-param-writer";
 import type { MatchStatusFilter as StatusValue } from "@/lib/match-utils";
 import { cn } from "@/lib/utils";
@@ -28,11 +27,7 @@ export function MatchStatusFilter({
   };
 
   return (
-    <dl
-      role="group"
-      aria-label={groupLabel}
-      className="grid grid-cols-3 gap-2 sm:shrink-0 sm:gap-3"
-    >
+    <dl aria-label={groupLabel} className="grid grid-cols-3 gap-2 sm:shrink-0 sm:gap-3">
       {(["upcoming", "live", "final"] as const).map((status) => (
         <StatCard
           key={status}
@@ -68,9 +63,7 @@ function StatCard({
         onClick={onClick}
         className={cn(
           "w-full rounded-md border px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          active
-            ? "border-pitch/50 bg-pitch/10"
-            : "border-border bg-card hover:bg-muted/50",
+          active ? "border-pitch/50 bg-pitch/10" : "border-border bg-card hover:bg-muted/50",
         )}
       >
         <dt

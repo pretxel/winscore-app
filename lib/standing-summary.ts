@@ -1,6 +1,6 @@
 import "server-only";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { HitType } from "@/lib/db";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 // One player's at-a-glance standing, assembled read-only from existing tables
 // and views (`scores`, `predictions`, `v_leaderboard_overall`,
@@ -44,8 +44,7 @@ export function deriveStandingSummary(input: {
   currentRank: number | null;
   previousRank: number | null;
 }): StandingSummary {
-  const { scores, totalPicks, matchStatusById, currentRank, previousRank } =
-    input;
+  const { scores, totalPicks, matchStatusById, currentRank, previousRank } = input;
 
   let totalPoints = 0;
   let exactCount = 0;
@@ -59,17 +58,13 @@ export function deriveStandingSummary(input: {
     if (matchStatusById.get(s.match_id) !== "final") continue;
     finals.scored += 1;
     if (s.hit_type === "exact") finals.exact += 1;
-    else if (s.hit_type === "winner_gd" || s.hit_type === "winner")
-      finals.winner += 1;
+    else if (s.hit_type === "winner_gd" || s.hit_type === "winner") finals.winner += 1;
     else finals.miss += 1;
   }
 
   // `previousRank - currentRank`: positive = climbed. Missing either side (no
   // snapshot baseline / unranked) yields no delta rather than a guess.
-  const rankDelta =
-    previousRank != null && currentRank != null
-      ? previousRank - currentRank
-      : null;
+  const rankDelta = previousRank != null && currentRank != null ? previousRank - currentRank : null;
 
   return {
     totalPoints,
@@ -85,30 +80,17 @@ export function deriveStandingSummary(input: {
 // views. Read-only. Both `/my-picks` and the signed-in landing call this so the
 // queries live in one place. Never throws on missing rows — a player with no
 // scores / no rank / no snapshot degrades to an empty-but-valid summary.
-export async function getStandingSummary(
-  userId: string,
-): Promise<StandingSummary> {
+export async function getStandingSummary(userId: string): Promise<StandingSummary> {
   const supabase = await createServerSupabaseClient();
 
   const [scoresRes, picksRes, rankRes, snapshotRes] = await Promise.all([
-    supabase
-      .from("scores")
-      .select("match_id, points, hit_type")
-      .eq("user_id", userId),
+    supabase.from("scores").select("match_id, points, hit_type").eq("user_id", userId),
     supabase
       .from("predictions")
       .select("match_id", { count: "exact", head: true })
       .eq("user_id", userId),
-    supabase
-      .from("v_leaderboard_overall")
-      .select("rank")
-      .eq("user_id", userId)
-      .maybeSingle(),
-    supabase
-      .from("leaderboard_rank_snapshot")
-      .select("rank")
-      .eq("user_id", userId)
-      .maybeSingle(),
+    supabase.from("v_leaderboard_overall").select("rank").eq("user_id", userId).maybeSingle(),
+    supabase.from("leaderboard_rank_snapshot").select("rank").eq("user_id", userId).maybeSingle(),
   ]);
 
   const scores = (scoresRes.data ?? []) as Array<{
@@ -128,8 +110,7 @@ export async function getStandingSummary(
     for (const m of matchRows ?? []) {
       // Only treat as final when both scores are present, mirroring how the
       // per-match badges and `buildGroupTables` gate on completed results.
-      const complete =
-        m.status === "final" && m.home_score != null && m.away_score != null;
+      const complete = m.status === "final" && m.home_score != null && m.away_score != null;
       matchStatusById.set(m.id, complete ? "final" : (m.status ?? ""));
     }
   }

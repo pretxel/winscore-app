@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 // Presentational prev/next + "Page X of Y" pager. Server component (link-based,
@@ -29,10 +29,7 @@ export function PaginationControls({
   const hrefFor = (n: number) => `${basePath}?page=${n}`;
 
   return (
-    <nav
-      aria-label={navLabel}
-      className="mt-4 flex items-center justify-between gap-3"
-    >
+    <nav aria-label={navLabel} className="mt-4 flex items-center justify-between gap-3">
       <PagerLink
         href={hasPrev ? hrefFor(page - 1) : undefined}
         label={prevLabel}

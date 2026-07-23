@@ -3,18 +3,18 @@
 // gaining or changing a field breaks the build here instead of silently
 // rendering a stale preview. No database reads — previews must work on an
 // empty local stack.
-import { localePath, type Locale } from "@/lib/i18n";
-import type { WelcomeEmailData } from "./welcome-email-template";
-import type { ResultEmailData, RankDelta } from "./result-email-template";
-import type { ResultsDigestData } from "./results-digest-template";
-import type { RecapDigestData } from "./recap-digest-template";
-import type { PredictionReminderEmailData } from "./prediction-reminder-template";
-import type { QuizReminderEmailData } from "./quiz-reminder-template";
-import type { PlayoffScoreData } from "./playoff-score-template";
+import { type Locale, localePath } from "@/lib/i18n";
 import type { ComebackEmailData } from "./comeback-email-template";
-import type { ScoreRulesData } from "./score-rules-template";
 import type { GroupInviteEmailData } from "./group-invite-template";
 import type { MagicLinkEmailData } from "./magic-link-email-template";
+import type { PlayoffScoreData } from "./playoff-score-template";
+import type { PredictionReminderEmailData } from "./prediction-reminder-template";
+import type { QuizReminderEmailData } from "./quiz-reminder-template";
+import type { RecapDigestData } from "./recap-digest-template";
+import type { RankDelta, ResultEmailData } from "./result-email-template";
+import type { ResultsDigestData } from "./results-digest-template";
+import type { ScoreRulesData } from "./score-rules-template";
+import type { WelcomeEmailData } from "./welcome-email-template";
 import type { WinnersEmailData } from "./winners-email-template";
 
 // Deliberately long display name so previews surface truncation/wrap issues.
@@ -45,8 +45,7 @@ const COMIC_PLACEHOLDER =
 
 type Fixture<T> = (siteUrl: string, locale: Locale) => Omit<T, "strings">;
 
-const path = (siteUrl: string, locale: Locale, p: string) =>
-  `${siteUrl}${localePath(locale, p)}`;
+const path = (siteUrl: string, locale: Locale, p: string) => `${siteUrl}${localePath(locale, p)}`;
 
 export const welcomeFixture: Fixture<WelcomeEmailData> = (siteUrl, locale) => ({
   displayName: SAMPLE_NAME,
@@ -88,10 +87,7 @@ export const resultFixture: Fixture<ResultEmailData> = (siteUrl, locale) => ({
   leaderboardUrl: path(siteUrl, locale, "/leaderboard"),
 });
 
-export const resultsDigestFixture: Fixture<ResultsDigestData> = (
-  siteUrl,
-  locale,
-) => ({
+export const resultsDigestFixture: Fixture<ResultsDigestData> = (siteUrl, locale) => ({
   displayName: SAMPLE_NAME,
   top5: [
     { rank: 1, displayName: LONG_NAME, totalPoints: 61 },
@@ -108,10 +104,7 @@ export const resultsDigestFixture: Fixture<ResultsDigestData> = (
   leaderboardUrl: path(siteUrl, locale, "/leaderboard"),
 });
 
-export const recapDigestFixture: Fixture<RecapDigestData> = (
-  siteUrl,
-  locale,
-) => ({
+export const recapDigestFixture: Fixture<RecapDigestData> = (siteUrl, locale) => ({
   displayName: SAMPLE_NAME,
   comics: [
     {
@@ -144,18 +137,12 @@ export const predictionReminderFixture: Fixture<PredictionReminderEmailData> = (
   unsubscribeUrl: path(siteUrl, locale, "/settings/notifications"),
 });
 
-export const quizReminderFixture: Fixture<QuizReminderEmailData> = (
-  siteUrl,
-  locale,
-) => ({
+export const quizReminderFixture: Fixture<QuizReminderEmailData> = (siteUrl, locale) => ({
   quizUrl: path(siteUrl, locale, "/quiz"),
   unsubscribeUrl: path(siteUrl, locale, "/settings/notifications"),
 });
 
-export const playoffScoreFixture: Fixture<PlayoffScoreData> = (
-  siteUrl,
-  locale,
-) => ({
+export const playoffScoreFixture: Fixture<PlayoffScoreData> = (siteUrl, locale) => ({
   matches: [
     {
       home: "México",
@@ -177,10 +164,7 @@ export const playoffScoreFixture: Fixture<PlayoffScoreData> = (
   bracketUrl: path(siteUrl, locale, "/bracket"),
 });
 
-export const comebackFixture: Fixture<ComebackEmailData> = (
-  siteUrl,
-  locale,
-) => ({
+export const comebackFixture: Fixture<ComebackEmailData> = (siteUrl, locale) => ({
   rank: SAMPLE_COMEBACK_RANK,
   totalPoints: SAMPLE_COMEBACK_POINTS,
   matches: [
@@ -194,10 +178,7 @@ export const comebackFixture: Fixture<ComebackEmailData> = (
 // Mirrors BASE_POINTS × STAGE_POINT_MULTIPLIER (lib/scoring.ts) for the World
 // Cup stages. Labels are format-config strings in production, so they are
 // intentionally fixed English here rather than message-driven.
-export const scoreRulesFixture: Fixture<ScoreRulesData> = (
-  siteUrl,
-  locale,
-) => ({
+export const scoreRulesFixture: Fixture<ScoreRulesData> = (siteUrl, locale) => ({
   phases: [
     {
       stageLabel: "Group stage",
@@ -245,19 +226,13 @@ export const scoreRulesFixture: Fixture<ScoreRulesData> = (
   ctaUrl: path(siteUrl, locale, "/standings"),
 });
 
-export const groupInviteFixture: Fixture<GroupInviteEmailData> = (
-  siteUrl,
-  locale,
-) => ({
+export const groupInviteFixture: Fixture<GroupInviteEmailData> = (siteUrl, locale) => ({
   inviterName: SAMPLE_INVITER,
   groupName: SAMPLE_GROUP_NAME,
   joinUrl: path(siteUrl, locale, "/groups"),
 });
 
-export const magicLinkFixture: Fixture<MagicLinkEmailData> = (
-  siteUrl,
-  locale,
-) => ({
+export const magicLinkFixture: Fixture<MagicLinkEmailData> = (siteUrl, locale) => ({
   actionUrl: `${siteUrl}${localePath(locale, "/auth/confirm")}?token=preview`,
 });
 

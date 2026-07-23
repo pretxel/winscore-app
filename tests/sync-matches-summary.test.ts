@@ -7,7 +7,6 @@ vi.mock("@/lib/operations/settings", () => ({
   isOperationEnabled: vi.fn(async () => true),
 }));
 
-
 // Verifies the cron route isolates AI summary generation: a generation failure
 // never fails the sync (score writes have already committed), and a successful
 // pass's generated count is surfaced.

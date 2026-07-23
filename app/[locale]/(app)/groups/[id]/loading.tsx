@@ -1,17 +1,12 @@
-import { TableSkeleton } from "@/components/skeletons/table-skeleton";
 import { ListRowsSkeleton } from "@/components/skeletons/list-rows-skeleton";
+import { TableSkeleton } from "@/components/skeletons/table-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Param-agnostic group-detail fallback (max-w-3xl): back-link, group header,
 // invite-share bar, the 4-row board table, the members list, and the controls.
 export default function GroupDetailLoading() {
   return (
-    <main
-      role="status"
-      aria-busy="true"
-      aria-live="off"
-      className="mx-auto max-w-3xl px-4 py-10"
-    >
+    <main role="status" aria-busy="true" aria-live="off" className="mx-auto max-w-3xl px-4 py-10">
       <span className="sr-only">Loading</span>
       <Skeleton className="mb-4 h-4 w-28" />
 

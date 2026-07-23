@@ -302,6 +302,7 @@
     "fieldOption": "Opción {n}",
     "fieldCorrect": "Opción correcta",
     "fieldDate": "Fecha activa (UTC)",
+    "fieldCompetition": "Competición",
     "create": "Crear pregunta",
     "scheduled": "Programadas ({count})",
     "deleteQ": "Eliminar",

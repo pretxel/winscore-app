@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { CheckIcon, Loader2Icon, MinusIcon, PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { MinusIcon, PlusIcon, Loader2Icon, CheckIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { KickoffCountdown } from "@/components/kickoff-countdown";
 import { ShareButtons } from "@/components/share-buttons";
-import { buildPickSharePath } from "@/lib/share";
-import type { Locale } from "@/lib/i18n";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
+import type { Locale } from "@/lib/i18n";
+import { buildPickSharePath } from "@/lib/share";
+import { cn } from "@/lib/utils";
 import { submitPrediction } from "./actions";
 
 const MAX_GOALS = 20;
@@ -58,13 +58,9 @@ export function PredictionForm({
     return () => clearInterval(id);
   }, [kickoffAt]);
 
-  const initialPick =
-    initial?.home_goals !== undefined && initial?.away_goals !== undefined;
+  const initialPick = initial?.home_goals !== undefined && initial?.away_goals !== undefined;
   const isDirty =
-    !initialPick ||
-    touched ||
-    home !== initial?.home_goals ||
-    away !== initial?.away_goals;
+    !initialPick || touched || home !== initial?.home_goals || away !== initial?.away_goals;
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -93,127 +89,113 @@ export function PredictionForm({
 
   return (
     <>
-    <form
-      onSubmit={onSubmit}
-      className="rounded-xl border border-border bg-card p-5 shadow-sm"
-    >
-      <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-5">
-        <ScoreStepper
-          id={`home-${matchId}`}
-          team={homeTeam}
-          value={home}
-          onChange={(v) => {
-            setHome(v);
-            setTouched(true);
-            setSharedPick(null);
-          }}
-          disabled={lockedNow || isPending || isAdmin}
-          tDecrease={t("decreaseAria", { team: homeTeam })}
-          tIncrease={t("increaseAria", { team: homeTeam })}
-          tInputAria={t("homeAria", { team: homeTeam })}
-        />
+      <form onSubmit={onSubmit} className="rounded-xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-5">
+          <ScoreStepper
+            id={`home-${matchId}`}
+            team={homeTeam}
+            value={home}
+            onChange={(v) => {
+              setHome(v);
+              setTouched(true);
+              setSharedPick(null);
+            }}
+            disabled={lockedNow || isPending || isAdmin}
+            tDecrease={t("decreaseAria", { team: homeTeam })}
+            tIncrease={t("increaseAria", { team: homeTeam })}
+            tInputAria={t("homeAria", { team: homeTeam })}
+          />
 
-        <div className="flex flex-col items-center gap-1">
-          <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
-            vs
-          </span>
-          <span className="font-mono text-2xl font-semibold text-muted-foreground">
-            –
-          </span>
+          <div className="flex flex-col items-center gap-1">
+            <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+              vs
+            </span>
+            <span className="font-mono text-2xl font-semibold text-muted-foreground">–</span>
+          </div>
+
+          <ScoreStepper
+            id={`away-${matchId}`}
+            team={awayTeam}
+            value={away}
+            onChange={(v) => {
+              setAway(v);
+              setTouched(true);
+              setSharedPick(null);
+            }}
+            disabled={lockedNow || isPending || isAdmin}
+            align="end"
+            tDecrease={t("decreaseAria", { team: awayTeam })}
+            tIncrease={t("increaseAria", { team: awayTeam })}
+            tInputAria={t("awayAria", { team: awayTeam })}
+          />
         </div>
 
-        <ScoreStepper
-          id={`away-${matchId}`}
-          team={awayTeam}
-          value={away}
-          onChange={(v) => {
-            setAway(v);
-            setTouched(true);
-            setSharedPick(null);
-          }}
-          disabled={lockedNow || isPending || isAdmin}
-          align="end"
-          tDecrease={t("decreaseAria", { team: awayTeam })}
-          tIncrease={t("increaseAria", { team: awayTeam })}
-          tInputAria={t("awayAria", { team: awayTeam })}
-        />
-      </div>
-
-      <div className="mt-5 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
-          {isAdmin ? (
-            <span className="font-mono uppercase tracking-[0.2em]">
-              {t("adminBlocked")}
-            </span>
-          ) : lockedNow ? (
-            <span className="font-mono uppercase tracking-[0.2em]">
-              {t("lockedAtKickoff")}
-            </span>
-          ) : (
-            <>
-              <KickoffCountdown
-                kickoffAt={kickoffAt}
-                lockedLabel={t("lockedAtKickoff")}
-              />
-              <span>{initialPick ? t("lastSaveWins") : t("submitFirst")}</span>
-            </>
-          )}
-        </div>
-
-        <Button
-          type="submit"
-          disabled={lockedNow || isPending || isAdmin || (initialPick && !isDirty)}
-          className={cn(
-            "h-10 gap-2 px-5 text-sm font-semibold uppercase tracking-[0.16em]",
-          )}
-        >
-          {isPending ? (
-            <>
-              <Loader2Icon className="size-4 animate-spin" /> {t("saving")}
-            </>
-          ) : initialPick ? (
-            isDirty ? (
-              <>
-                <CheckIcon className="size-4" /> {t("updatePick")}
-              </>
+        <div className="mt-5 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+            {isAdmin ? (
+              <span className="font-mono uppercase tracking-[0.2em]">{t("adminBlocked")}</span>
+            ) : lockedNow ? (
+              <span className="font-mono uppercase tracking-[0.2em]">{t("lockedAtKickoff")}</span>
             ) : (
               <>
-                <CheckIcon className="size-4" /> {t("saved")}
+                <KickoffCountdown kickoffAt={kickoffAt} lockedLabel={t("lockedAtKickoff")} />
+                <span>{initialPick ? t("lastSaveWins") : t("submitFirst")}</span>
               </>
-            )
-          ) : (
-            <>
-              <CheckIcon className="size-4" /> {t("submitPick")}
-            </>
-          )}
-        </Button>
-      </div>
-    </form>
+            )}
+          </div>
 
-    {sharedPick ? (
-      <section className="mt-4 rounded-xl border border-border bg-card p-5 shadow-sm motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300">
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-          {tShare("heading")}
-        </p>
-        <ShareButtons
-          context="pick"
-          shareUrl={`${shareBaseUrl}${buildPickSharePath(locale, matchId, sharedPick.home, sharedPick.away)}`}
-          shareText={tShare("shareText", {
-            home: homeTeam,
-            away: awayTeam,
-            h: sharedPick.home,
-            a: sharedPick.away,
-          })}
-          labels={{
-            x: tShare("shareOnX"),
-            facebook: tShare("shareOnFacebook"),
-            native: tShare("shareNative"),
-            copy: tShare("copyLink"),
-            copied: tShare("copied"),
-          }}
-        />
-      </section>
-    ) : null}
+          <Button
+            type="submit"
+            disabled={lockedNow || isPending || isAdmin || (initialPick && !isDirty)}
+            className={cn("h-10 gap-2 px-5 text-sm font-semibold uppercase tracking-[0.16em]")}
+          >
+            {isPending ? (
+              <>
+                <Loader2Icon className="size-4 animate-spin" /> {t("saving")}
+              </>
+            ) : initialPick ? (
+              isDirty ? (
+                <>
+                  <CheckIcon className="size-4" /> {t("updatePick")}
+                </>
+              ) : (
+                <>
+                  <CheckIcon className="size-4" /> {t("saved")}
+                </>
+              )
+            ) : (
+              <>
+                <CheckIcon className="size-4" /> {t("submitPick")}
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+
+      {sharedPick ? (
+        <section className="mt-4 rounded-xl border border-border bg-card p-5 shadow-sm motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300">
+          <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+            {tShare("heading")}
+          </p>
+          <ShareButtons
+            context="pick"
+            shareUrl={`${shareBaseUrl}${buildPickSharePath(locale, matchId, sharedPick.home, sharedPick.away)}`}
+            shareText={tShare("shareText", {
+              home: homeTeam,
+              away: awayTeam,
+              h: sharedPick.home,
+              a: sharedPick.away,
+            })}
+            labels={{
+              x: tShare("shareOnX"),
+              facebook: tShare("shareOnFacebook"),
+              native: tShare("shareNative"),
+              copy: tShare("copyLink"),
+              copied: tShare("copied"),
+            }}
+          />
+        </section>
+      ) : null}
     </>
   );
 }
@@ -240,12 +222,7 @@ function ScoreStepper({
   tInputAria: string;
 }) {
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-2",
-        align === "end" && "items-end text-right",
-      )}
-    >
+    <div className={cn("flex flex-col gap-2", align === "end" && "items-end text-right")}>
       <div className="min-w-0">
         <div className="mt-0.5 truncate font-heading text-sm font-semibold tracking-tight sm:text-base">
           {team}

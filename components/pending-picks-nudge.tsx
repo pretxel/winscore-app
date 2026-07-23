@@ -1,7 +1,7 @@
 "use client";
 
-import * as React from "react";
 import { BellRingIcon, ChevronRightIcon, XIcon } from "lucide-react";
+import * as React from "react";
 import { useQueryParamWriter } from "@/components/use-query-param-writer";
 
 // Signed-in-only nudge shown at the top of /matches when the user still has
@@ -31,9 +31,7 @@ export function PendingPicksNudge({
   return (
     <div className="flex items-center gap-3 rounded-xl border border-pitch/40 bg-pitch/10 px-4 py-3 text-pitch">
       <BellRingIcon className="size-4 shrink-0" aria-hidden />
-      <p className="min-w-0 flex-1 font-heading text-sm font-medium tracking-tight">
-        {message}
-      </p>
+      <p className="min-w-0 flex-1 font-heading text-sm font-medium tracking-tight">{message}</p>
       <button
         type="button"
         onClick={() => writeParams({ picks: "needed" })}

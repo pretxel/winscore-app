@@ -12,7 +12,7 @@ afterEach(() => {
 });
 
 describe("trackEvent", () => {
-  it("forwards to gtag with (\"event\", name, params) when gtag is present", () => {
+  it('forwards to gtag with ("event", name, params) when gtag is present', () => {
     const gtag = vi.fn();
     g.window = { gtag };
 

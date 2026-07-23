@@ -1,11 +1,11 @@
 import "server-only";
 import {
-  listLiveLeagues,
-  getLeagueBySlug,
-  getBrandingForLeague,
   getActiveBranding,
-  resolveBranding,
+  getBrandingForLeague,
+  getLeagueBySlug,
+  listLiveLeagues,
   type ResolvedBranding,
+  resolveBranding,
 } from "@/lib/competition";
 
 // The context one cron pass runs against: the league's slug (sent as the
@@ -70,9 +70,11 @@ export async function forEachLiveLeague<T>(
 // Folds the common `{ emailed, failed, skipped }` dispatch summary across the
 // per-league passes. Extra fields (e.g. `senderMisconfigured`) are intentionally
 // dropped from the aggregate — the per-league logs carry them.
-export function sumDispatch(
-  list: { emailed: number; failed: number; skipped: number }[],
-): { emailed: number; failed: number; skipped: number } {
+export function sumDispatch(list: { emailed: number; failed: number; skipped: number }[]): {
+  emailed: number;
+  failed: number;
+  skipped: number;
+} {
   return list.reduce(
     (a, s) => ({
       emailed: a.emailed + s.emailed,

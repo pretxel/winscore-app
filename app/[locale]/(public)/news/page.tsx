@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { NewsArticleRow } from "@/lib/db";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import { NEWS_PAGE_SIZE } from "@/lib/news";
-import { isLocale, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { NewsFeed } from "./news-feed";
 
 export async function generateMetadata({
@@ -26,11 +26,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function NewsPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function NewsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
@@ -71,9 +67,7 @@ export default async function NewsPage({
         >
           {t("headline")}
         </h1>
-        <p className="mt-2 max-w-md text-sm text-muted-foreground">
-          {t("lede")}
-        </p>
+        <p className="mt-2 max-w-md text-sm text-muted-foreground">{t("lede")}</p>
       </header>
 
       {list.length === 0 ? (

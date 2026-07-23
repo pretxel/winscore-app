@@ -9,9 +9,7 @@ const SEGMENTS: readonly LeaderboardSegment[] = ["overall", "week", "stage"];
 
 // Normalize a `?segment=` value into a known segment. A repeated param keeps the
 // first recognized value; anything unknown/missing yields "overall".
-export function parseSegmentParam(
-  raw: string | string[] | undefined,
-): LeaderboardSegment {
+export function parseSegmentParam(raw: string | string[] | undefined): LeaderboardSegment {
   if (!raw) return "overall";
   for (const value of Array.isArray(raw) ? raw : [raw]) {
     const key = value.trim().toLowerCase();
@@ -62,11 +60,7 @@ export function currentWeekBoundsUtc(now: Date = new Date()): {
   toTs: string;
 } {
   // Midnight UTC of the instant's calendar day.
-  const dayStart = Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
-    now.getUTCDate(),
-  );
+  const dayStart = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   // getUTCDay(): 0 = Sunday … 6 = Saturday. Days since the most recent Monday.
   const daysSinceMonday = (now.getUTCDay() + 6) % 7;
   const from = dayStart - daysSinceMonday * 86_400_000;

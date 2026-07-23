@@ -84,13 +84,7 @@ export function Logotype({
       {compact ? null : (
         <g fill="currentColor">
           {/* INSCORE — completes the WINSCORE wordmark after the W tile */}
-          <text
-            x="64"
-            y="43"
-            style={{ fontFamily: DISPLAY_FONT }}
-            fontSize="26"
-            letterSpacing="1"
-          >
+          <text x="64" y="43" style={{ fontFamily: DISPLAY_FONT }} fontSize="26" letterSpacing="1">
             INSCORE
           </text>
           {edition ? (

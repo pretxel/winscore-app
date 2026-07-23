@@ -18,12 +18,7 @@ export type IntentState =
   | "expired"
   | "reconciliation_required";
 
-export type EntryState =
-  | "confirmed"
-  | "locked"
-  | "settled"
-  | "cancelled"
-  | "refunded";
+export type EntryState = "confirmed" | "locked" | "settled" | "cancelled" | "refunded";
 
 const VALID_INTENT_TRANSITIONS: Record<IntentState, IntentState[]> = {
   preparing: ["awaiting_signature"],
@@ -57,9 +52,7 @@ export async function transitionIntentState(
 
   const allowed = VALID_INTENT_TRANSITIONS[intent.state as IntentState] ?? [];
   if (!allowed.includes(newState)) {
-    throw new Error(
-      `Invalid state transition: ${intent.state} -> ${newState}`
-    );
+    throw new Error(`Invalid state transition: ${intent.state} -> ${newState}`);
   }
 
   await admin

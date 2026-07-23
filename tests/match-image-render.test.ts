@@ -20,9 +20,9 @@ const envMock = vi.hoisted(
 vi.mock("@/lib/env", () => ({ env: envMock }));
 
 import {
-  requestMatchImageRender,
   finalizeRender,
   pollMatchImageRender,
+  requestMatchImageRender,
 } from "@/lib/matches/match-image-render";
 
 type AdminOpts = {
@@ -169,7 +169,10 @@ describe("requestMatchImageRender", () => {
     fetchMock.mockResolvedValue({ ok: true, json: async () => ({ generation_id: "gen-snake" }) });
     const admin = makeAdmin({ summary: { image_prompt: "P", match_id: "m1" } });
     expect(await requestMatchImageRender(admin as never, "s1")).toEqual({ requested: true });
-    expect(admin.upsertPayloads[0]).toMatchObject({ generation_id: "gen-snake", status: "pending" });
+    expect(admin.upsertPayloads[0]).toMatchObject({
+      generation_id: "gen-snake",
+      status: "pending",
+    });
   });
 
   it("deep-scans for a nested generation id", async () => {
@@ -238,7 +241,10 @@ describe("finalizeRender", () => {
     const result = await finalizeRender(admin as never, "gen-1", "http://img/x.png");
     expect(result).toEqual({ finalized: true, storagePath: "m1/s1.png" });
     expect(admin.uploads[0].path).toBe("m1/s1.png");
-    expect(admin.updatePayloads[0]).toMatchObject({ status: "complete", storage_path: "m1/s1.png" });
+    expect(admin.updatePayloads[0]).toMatchObject({
+      status: "complete",
+      storage_path: "m1/s1.png",
+    });
   });
 
   it("throws when the image download fails", async () => {
@@ -287,7 +293,10 @@ describe("pollMatchImageRender", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          generations_by_pk: { status: "COMPLETE", generated_images: [{ url: "http://img/x.png" }] },
+          generations_by_pk: {
+            status: "COMPLETE",
+            generated_images: [{ url: "http://img/x.png" }],
+          },
         }),
       })
       .mockResolvedValueOnce(imageResponse("image/png"));

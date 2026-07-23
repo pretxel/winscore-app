@@ -57,13 +57,9 @@ describe("maybeScheduleOpportunisticSync", () => {
 
     expect(maybeScheduleOpportunisticSync([staleMatch], NOW)).toBe(true);
     const fourMinLater = new Date(NOW.getTime() + 4 * 60 * 1000);
-    expect(maybeScheduleOpportunisticSync([staleMatch], fourMinLater)).toBe(
-      false,
-    );
+    expect(maybeScheduleOpportunisticSync([staleMatch], fourMinLater)).toBe(false);
     const sixMinLater = new Date(NOW.getTime() + 6 * 60 * 1000);
-    expect(maybeScheduleOpportunisticSync([staleMatch], sixMinLater)).toBe(
-      true,
-    );
+    expect(maybeScheduleOpportunisticSync([staleMatch], sixMinLater)).toBe(true);
     expect(afterMock).toHaveBeenCalledTimes(2);
   });
 

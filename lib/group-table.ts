@@ -1,5 +1,4 @@
 import "server-only";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getActiveCompetition, type ResolvedCompetition } from "@/lib/competition";
 import { getStageConfig, groupStageKey, leagueStageKey } from "@/lib/competition-schema";
 import {
@@ -9,6 +8,7 @@ import {
   type SimulatedGroup,
   type Tiebreaker,
 } from "@/lib/group-standings";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type { GroupTableMatch } from "@/lib/group-standings";
 
@@ -38,9 +38,7 @@ export async function getGroupTables(
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
     .from("matches")
-    .select(
-      "id, home_team, away_team, group_code, home_score, away_score, status, kickoff_at",
-    )
+    .select("id, home_team, away_team, group_code, home_score, away_score, status, kickoff_at")
     .eq("competition_id", comp.id)
     .eq("stage", groupKey);
 
@@ -61,9 +59,7 @@ export async function getLeagueTable(
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
     .from("matches")
-    .select(
-      "id, home_team, away_team, group_code, home_score, away_score, status, kickoff_at",
-    )
+    .select("id, home_team, away_team, group_code, home_score, away_score, status, kickoff_at")
     .eq("competition_id", comp.id)
     .eq("stage", leagueKey);
 

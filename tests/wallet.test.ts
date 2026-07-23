@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  formatChallengeMessage,
   buildChallengeParams,
+  formatChallengeMessage,
   generateNonce,
 } from "@/lib/wallet/challenge";
 

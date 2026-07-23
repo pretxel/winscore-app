@@ -30,9 +30,7 @@ export function StatusCard({
               {label}
             </div>
           ) : null}
-          <div className="font-heading text-lg leading-snug font-semibold">
-            {value}
-          </div>
+          <div className="font-heading text-lg leading-snug font-semibold">{value}</div>
           {meta ? (
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
               {meta}
@@ -40,15 +38,11 @@ export function StatusCard({
           ) : null}
         </div>
         {badges ? (
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
-            {badges}
-          </div>
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">{badges}</div>
         ) : null}
       </div>
       {children}
-      {actions ? (
-        <div className="flex flex-wrap items-center gap-2 pt-1">{actions}</div>
-      ) : null}
+      {actions ? <div className="flex flex-wrap items-center gap-2 pt-1">{actions}</div> : null}
     </Card>
   );
 }

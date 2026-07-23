@@ -8,19 +8,17 @@ import { SUPPORTED_LOCALES } from "@/lib/i18n";
 vi.mock("next-intl/server", async () => {
   const { createTranslator } = await import("next-intl");
   return {
-    getTranslations: vi.fn(
-      async ({ locale, namespace }: { locale: string; namespace: string }) => {
-        const messages = JSON.parse(readFileSync(`messages/${locale}.json`, "utf8"));
-        return createTranslator({
-          locale,
-          messages,
-          namespace: namespace as never,
-          onError(error) {
-            throw error;
-          },
-        });
-      },
-    ),
+    getTranslations: vi.fn(async ({ locale, namespace }: { locale: string; namespace: string }) => {
+      const messages = JSON.parse(readFileSync(`messages/${locale}.json`, "utf8"));
+      return createTranslator({
+        locale,
+        messages,
+        namespace: namespace as never,
+        onError(error) {
+          throw error;
+        },
+      });
+    }),
   };
 });
 

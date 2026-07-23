@@ -1,8 +1,8 @@
-import Link from "next/link";
-import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeftIcon } from "lucide-react";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 
 export async function generateMetadata({
   params,
@@ -24,11 +24,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function HowItWorksPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function HowItWorksPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
@@ -55,9 +51,7 @@ export default async function HowItWorksPage({
         >
           {t("headline")}
         </h1>
-        <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-          {t("lede")}
-        </p>
+        <p className="mt-3 max-w-xl text-sm text-muted-foreground">{t("lede")}</p>
       </header>
 
       <Section index="01" title={t("section1Title")}>
@@ -89,19 +83,17 @@ export default async function HowItWorksPage({
       <Section index="03" title={t("section3Title")}>
         <p>{t("section3Intro")}</p>
         <ol className="mt-3 grid gap-2">
-          {[t("section3Item1"), t("section3Item2"), t("section3Item3")].map(
-            (line, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-3 rounded-lg border border-border bg-card px-4 py-3"
-              >
-                <span className="grid size-6 shrink-0 place-items-center rounded-md bg-pitch text-pitch-foreground font-mono text-[11px] font-bold tabular-nums">
-                  {i + 1}
-                </span>
-                <span className="text-sm">{line}</span>
-              </li>
-            ),
-          )}
+          {[t("section3Item1"), t("section3Item2"), t("section3Item3")].map((line, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-3 rounded-lg border border-border bg-card px-4 py-3"
+            >
+              <span className="grid size-6 shrink-0 place-items-center rounded-md bg-pitch text-pitch-foreground font-mono text-[11px] font-bold tabular-nums">
+                {i + 1}
+              </span>
+              <span className="text-sm">{line}</span>
+            </li>
+          ))}
         </ol>
       </Section>
 

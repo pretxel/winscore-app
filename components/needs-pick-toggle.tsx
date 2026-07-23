@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { CircleDashedIcon } from "lucide-react";
 import { useQueryParamWriter } from "@/components/use-query-param-writer";
 import { cn } from "@/lib/utils";

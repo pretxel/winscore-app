@@ -66,7 +66,7 @@ describe("GET /api/og/h2h", () => {
     expect(res.status).toBe(200);
     const etag = res.headers.get("ETag");
     expect(etag).toBeTruthy();
-    expect(etag!.startsWith('"')).toBe(true);
+    expect(etag?.startsWith('"')).toBe(true);
     expect(res.headers.get("Cache-Control")).toContain("max-age=300");
   });
 

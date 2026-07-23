@@ -4,12 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 // the stack of competition status cards.
 export default function AdminCompetitionsLoading() {
   return (
-    <main
-      role="status"
-      aria-busy="true"
-      aria-live="off"
-      className="mx-auto max-w-4xl px-4 py-10"
-    >
+    <main role="status" aria-busy="true" aria-live="off" className="mx-auto max-w-4xl px-4 py-10">
       <span className="sr-only">Loading</span>
       <div className="space-y-8">
         <div className="flex items-start justify-between gap-4">
@@ -22,10 +17,7 @@ export default function AdminCompetitionsLoading() {
 
         <ul className="grid gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <li
-              key={i}
-              className="rounded-xl bg-card p-4 ring-1 ring-foreground/10"
-            >
+            <li key={i} className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-2">
                   <Skeleton className="h-3 w-24" />

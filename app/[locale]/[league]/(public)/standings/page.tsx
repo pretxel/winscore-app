@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GroupStandingsTable } from "@/components/group-standings-table";
 import { LeagueStandingsTable } from "@/components/league-standings-table";
-import { getGroupTables, getLeagueTable } from "@/lib/group-table";
 import { getLeagueFromContext } from "@/lib/competition";
 import { hasGroupStage, leagueStageKey } from "@/lib/competition-schema";
+import { getGroupTables, getLeagueTable } from "@/lib/group-table";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
-import { isLocale, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 export async function generateMetadata({
   params,

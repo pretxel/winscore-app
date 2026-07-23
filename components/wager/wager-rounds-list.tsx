@@ -1,9 +1,9 @@
 "use client";
 
+import { ClockIcon, CoinsIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CoinsIcon, ClockIcon, UsersIcon } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface WagerRoundCard {
   roundId: string;
@@ -80,7 +80,10 @@ export function WagerRoundsList({
 }
 
 function StatusBadge({ status }: { status: WagerRoundCard["status"] }) {
-  const variants: Record<string, { label: string; variant: "default" | "secondary" | "outline" | "destructive" }> = {
+  const variants: Record<
+    string,
+    { label: string; variant: "default" | "secondary" | "outline" | "destructive" }
+  > = {
     initialized: { label: "Open", variant: "default" },
     locked: { label: "Locked", variant: "secondary" },
     settled: { label: "Settled", variant: "outline" },

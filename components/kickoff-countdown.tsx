@@ -74,10 +74,7 @@ export function KickoffCountdown({
   if (variant === "stacked") {
     return (
       <div
-        className={cn(
-          "inline-grid grid-cols-4 gap-2 text-center font-mono",
-          className,
-        )}
+        className={cn("inline-grid grid-cols-4 gap-2 text-center font-mono", className)}
         aria-label={`${days}d ${hours}h ${mins}m ${secs}s until kickoff`}
       >
         {[
@@ -90,9 +87,7 @@ export function KickoffCountdown({
             key={u.label}
             className="flex flex-col items-center rounded-md bg-card px-3 py-2 ring-1 ring-border"
           >
-            <span className="text-2xl font-semibold leading-none tabular-nums">
-              {pad(u.value)}
-            </span>
+            <span className="text-2xl font-semibold leading-none tabular-nums">{pad(u.value)}</span>
             <span className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
               {u.label}
             </span>
@@ -102,11 +97,12 @@ export function KickoffCountdown({
     );
   }
 
-  const parts = days > 0
-    ? `${days}d ${pad(hours)}h ${pad(mins)}m`
-    : hours > 0
-      ? `${pad(hours)}:${pad(mins)}:${pad(secs)}`
-      : `${pad(mins)}:${pad(secs)}`;
+  const parts =
+    days > 0
+      ? `${days}d ${pad(hours)}h ${pad(mins)}m`
+      : hours > 0
+        ? `${pad(hours)}:${pad(mins)}:${pad(secs)}`
+        : `${pad(mins)}:${pad(secs)}`;
 
   return (
     <span

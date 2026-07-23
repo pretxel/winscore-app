@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
-  WalletIcon,
-  UnlinkIcon,
-  Loader2Icon,
   AlertCircleIcon,
   CheckCircle2Icon,
+  Loader2Icon,
+  UnlinkIcon,
+  WalletIcon,
 } from "lucide-react";
+import { useCallback, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 type LinkState = "idle" | "connecting" | "linked" | "unlinking" | "error";
 
@@ -96,7 +96,14 @@ export function WalletLinkButton() {
             <p className="text-sm font-medium">Wallet Error</p>
             <p className="text-xs text-muted-foreground truncate">{error}</p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => { setState("idle"); setError(null); }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setState("idle");
+              setError(null);
+            }}
+          >
             Retry
           </Button>
         </CardContent>
@@ -116,18 +123,10 @@ export function WalletLinkButton() {
               {walletAddress.slice(0, 8)}...{walletAddress.slice(-4)}
             </p>
           </div>
-          <Badge
-            variant="outline"
-            className="text-[10px] bg-blue-500/10 text-blue-500"
-          >
+          <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-500">
             Devnet
           </Badge>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleUnlink}
-            disabled={isUnlinking}
-          >
+          <Button variant="ghost" size="sm" onClick={handleUnlink} disabled={isUnlinking}>
             {isUnlinking ? (
               <Loader2Icon className="size-4 animate-spin" />
             ) : (
@@ -142,13 +141,7 @@ export function WalletLinkButton() {
   const isLoading = state === "connecting";
 
   return (
-    <Button
-      onClick={handleLink}
-      disabled={isLoading}
-      variant="outline"
-      size="sm"
-      className="gap-2"
-    >
+    <Button onClick={handleLink} disabled={isLoading} variant="outline" size="sm" className="gap-2">
       {isLoading ? (
         <Loader2Icon className="size-4 animate-spin" />
       ) : (

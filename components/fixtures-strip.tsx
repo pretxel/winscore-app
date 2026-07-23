@@ -1,5 +1,5 @@
-import { Scoreline } from "@/components/scoreline";
 import { LocalTime } from "@/components/local-time";
+import { Scoreline } from "@/components/scoreline";
 import type { LaneFixture } from "@/lib/home";
 
 // Compact horizontal strip of a league's live/next fixtures. Live matches show a
@@ -26,19 +26,13 @@ export function FixturesStrip({ fixtures }: { fixtures: LaneFixture[] }) {
                 <LocalTime iso={f.kickoffAt} format="time" />
               </span>
             )}
-            <span
-              className="max-w-24 truncate text-right text-xs font-medium"
-              title={f.awayTeam}
-            >
+            <span className="max-w-24 truncate text-right text-xs font-medium" title={f.awayTeam}>
               {f.awayTeam}
             </span>
           </div>
           {f.status === "live" ? (
             <span className="text-live inline-flex items-center gap-1 font-mono text-[10px] tracking-widest uppercase">
-              <span
-                aria-hidden
-                className="bg-live size-1.5 animate-pulse rounded-full"
-              />
+              <span aria-hidden className="bg-live size-1.5 animate-pulse rounded-full" />
               Live
             </span>
           ) : null}

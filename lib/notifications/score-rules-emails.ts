@@ -1,18 +1,14 @@
 import "server-only";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { env } from "@/lib/env";
-import { DEFAULT_LOCALE, localePath, type Locale } from "@/lib/i18n";
+import { Resend } from "resend";
+import { type CompetitionFormat, getStageLabel, parseFormatConfig } from "@/lib/competition-schema";
 import { isOptedIn } from "@/lib/email-prefs";
+import { env } from "@/lib/env";
+import { DEFAULT_LOCALE, type Locale, localePath } from "@/lib/i18n";
 import { BASE_POINTS, STAGE_POINT_MULTIPLIER } from "@/lib/scoring";
-import {
-  getStageLabel,
-  parseFormatConfig,
-  type CompetitionFormat,
-} from "@/lib/competition-schema";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { checkEmailSenderConfig } from "./email-sender-config";
-import { isSendableEmail, type DispatchSummary } from "./result-emails";
+import { type DispatchSummary, isSendableEmail } from "./result-emails";
 import {
   renderScoreRulesEmail,
   type ScoreRulesPhaseRow,
@@ -87,9 +83,7 @@ export function computePendingRecipients(
   alreadySent: { user_id: string }[],
 ): RecipientProfile[] {
   const sent = new Set(alreadySent.map((r) => r.user_id));
-  return profiles.filter(
-    (p) => !sent.has(p.user_id) && isOptedIn(p.email_prefs, "results_digest"),
-  );
+  return profiles.filter((p) => !sent.has(p.user_id) && isOptedIn(p.email_prefs, "results_digest"));
 }
 
 // Minimal translator shape so this stays decoupled from next-intl internals.

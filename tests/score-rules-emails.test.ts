@@ -7,8 +7,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   buildScoreRulesPhases,
-  computePendingRecipients,
   buildScoreRulesStrings,
+  computePendingRecipients,
 } from "@/lib/notifications/score-rules-emails";
 
 describe("buildScoreRulesPhases", () => {
@@ -96,7 +96,9 @@ vi.mock("@/lib/supabase/admin", () => ({
       if (table === "competitions") {
         return {
           select: () => ({
-            eq: () => ({ maybeSingle: () => Promise.resolve({ data: competitionData, error: null }) }),
+            eq: () => ({
+              maybeSingle: () => Promise.resolve({ data: competitionData, error: null }),
+            }),
           }),
         };
       }

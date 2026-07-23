@@ -1,17 +1,17 @@
 import "server-only";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { Resend } from "resend";
+import { isOptedIn } from "@/lib/email-prefs";
 import { env } from "@/lib/env";
 import { DEFAULT_LOCALE, localePath } from "@/lib/i18n";
-import { isOptedIn } from "@/lib/email-prefs";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { checkEmailSenderConfig } from "./email-sender-config";
-import { isSendableEmail, type DispatchSummary } from "./result-emails";
 import {
-  renderPlayoffScoreEmail,
   type PlayoffScoreMatch,
   type PlayoffScoreStrings,
+  renderPlayoffScoreEmail,
 } from "./playoff-score-template";
+import { type DispatchSummary, isSendableEmail } from "./result-emails";
 
 // Resend caps a single batch.send call at 100 messages.
 const RESEND_BATCH_LIMIT = 100;
@@ -113,9 +113,7 @@ export function computePendingRecipients(
   sentToday: { user_id: string }[],
 ): RecipientProfile[] {
   const sent = new Set(sentToday.map((r) => r.user_id));
-  return profiles.filter(
-    (p) => !sent.has(p.user_id) && isOptedIn(p.email_prefs, "results_digest"),
-  );
+  return profiles.filter((p) => !sent.has(p.user_id) && isOptedIn(p.email_prefs, "results_digest"));
 }
 
 // Minimal translator shape so this stays decoupled from next-intl internals.
@@ -220,7 +218,10 @@ async function loadProfiles(admin: AdminClient): Promise<RecipientProfile[]> {
 // competition is active, or when the day has no finished playoff matches.
 // Per-batch failures are logged and counted, never aborting the rest; ledger
 // rows are written only for batches Resend accepted, so failures retry next run.
-export async function dispatchPlayoffScoreEmail(fromName?: string, leagueSlug?: string): Promise<DispatchSummary> {
+export async function dispatchPlayoffScoreEmail(
+  fromName?: string,
+  leagueSlug?: string,
+): Promise<DispatchSummary> {
   const senderMisconfigured = warnIfSenderMisconfigured("dispatch");
   const withFlag = (s: DispatchSummary): DispatchSummary =>
     senderMisconfigured ? { ...s, senderMisconfigured } : s;

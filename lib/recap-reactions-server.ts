@@ -1,10 +1,6 @@
 import "server-only";
+import { buildReactionSummary, emptyCounts, type ReactionSummary } from "@/lib/recap-reactions";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import {
-  buildReactionSummary,
-  emptyCounts,
-  type ReactionSummary,
-} from "@/lib/recap-reactions";
 
 // Server-side reads for the recap reaction feature. Counts come from the public,
 // active-version-scoped view (v_recap_reaction_counts); the viewer's own

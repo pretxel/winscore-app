@@ -22,10 +22,10 @@ vi.mock("@/lib/ai/openrouter", () => ({ createChatCompletion: vi.fn() }));
 
 import { createChatCompletion } from "@/lib/ai/openrouter";
 import {
-  IMAGE_PROMPT_TEMPLATE_HEADER,
   assembleImagePrompt,
   buildImagePromptMessages,
   generateMatchImagePrompt,
+  IMAGE_PROMPT_TEMPLATE_HEADER,
 } from "@/lib/matches/match-image-prompt";
 import type { SummaryMatch } from "@/lib/matches/match-summary";
 
@@ -42,16 +42,16 @@ const MATCH: SummaryMatch = {
 
 const PANELS = [
   "### **Panel 1**",
-  '* **Visual:** Kenji watches kickoff on TV.',
+  "* **Visual:** Kenji watches kickoff on TV.",
   '* **Narration Box:** "Mexico vs Canada begins!"',
   "### **Panel 2**",
-  '* **Visual:** Lozano strikes.',
+  "* **Visual:** Lozano strikes.",
   '* **Narration Box:** "12th minute — Mexico lead!"',
   "### **Panel 3**",
-  '* **Visual:** Canada pull one back.',
+  "* **Visual:** Canada pull one back.",
   '* **Narration Box:** "Canada respond."',
   "### **Panel 4**",
-  '* **Visual:** Kenji cheers the final whistle.',
+  "* **Visual:** Kenji cheers the final whistle.",
   '* **Narration Box:** "Mexico hold on, 2-1."',
 ].join("\n");
 
@@ -208,9 +208,7 @@ describe("generateMatchImagePrompt", () => {
       summary: { content: "Recap.", match_id: "m1" },
       match: MATCH,
     });
-    await expect(generateMatchImagePrompt(admin as never, "s1")).rejects.toThrow(
-      "OpenRouter 500",
-    );
+    await expect(generateMatchImagePrompt(admin as never, "s1")).rejects.toThrow("OpenRouter 500");
   });
 
   it("throws on a DB write error", async () => {

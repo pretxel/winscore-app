@@ -1,15 +1,15 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { LocalTime } from "@/components/local-time";
 import { StageIcon } from "@/components/stage-icon";
 import { buttonVariants } from "@/components/ui/button";
-import { clampGoals } from "@/lib/share";
 import { getActiveStageLabel } from "@/lib/competition";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { clampGoals } from "@/lib/share";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 type ShareParams = Promise<{ locale: string; matchId: string }>;
 type ShareSearchParams = Promise<{ h?: string | string[]; a?: string | string[] }>;
@@ -50,9 +50,7 @@ export async function generateMetadata({
     h: h ?? 0,
     a: a ?? 0,
   };
-  const title = hasScores
-    ? t("pageTitle", values)
-    : `${match.home_team} vs ${match.away_team}`;
+  const title = hasScores ? t("pageTitle", values) : `${match.home_team} vs ${match.away_team}`;
   const description = t("pageDescription", values);
 
   const og = new URLSearchParams({ matchId, locale });
@@ -185,9 +183,7 @@ export default async function SharePickPage({
 
         <div className="relative border-t border-pitch-foreground/15 bg-black/10 px-6 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-pitch-foreground/85">
           <LocalTime iso={match.kickoff_at} />
-          {match.venue ? (
-            <span className="text-pitch-foreground/70"> · {match.venue}</span>
-          ) : null}
+          {match.venue ? <span className="text-pitch-foreground/70"> · {match.venue}</span> : null}
         </div>
       </section>
 

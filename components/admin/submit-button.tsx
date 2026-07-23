@@ -1,8 +1,8 @@
 "use client";
 
+import { Loader2Icon } from "lucide-react";
 import * as React from "react";
 import { useFormStatus } from "react-dom";
-import { Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // The shared pending-aware submit pattern for admin Server Action forms.

@@ -1,21 +1,22 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
 import { MessageCircleQuestionIcon } from "lucide-react";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ActionStatus } from "@/components/admin/action-status";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { EmptyState } from "@/components/admin/empty-state";
+import { FormSection } from "@/components/admin/form-section";
+import { LiveRegion } from "@/components/admin/live-region";
+import { ResendQuizReminderButton } from "@/components/admin/resend-quiz-reminder-button";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { FormSection } from "@/components/admin/form-section";
-import { EmptyState } from "@/components/admin/empty-state";
-import { ActionStatus } from "@/components/admin/action-status";
-import { LiveRegion } from "@/components/admin/live-region";
-import { SubmitButton } from "@/components/admin/submit-button";
-import { saveQuestion, deleteQuestion } from "./actions";
-import { ResendQuizReminderButton } from "@/components/admin/resend-quiz-reminder-button";
-import { isLocale, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { listLiveLeagues } from "@/lib/competition";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import { localizeQuizQuestion } from "@/lib/quiz";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { deleteQuestion, saveQuestion } from "./actions";
 
 // The resendQuizReminder action reports back via query params (server-rendered
 // page, no client state). `resendQuiz=1` marks a completed run; `noQuestion`
@@ -46,11 +47,7 @@ const TRANSLATION_LOCALES = [
   { code: "de", langKey: "langDe", badgeKey: "badgeDe" },
 ] as const;
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "quiz" });
   return { title: t("adminTitle") };
@@ -78,6 +75,11 @@ export default async function AdminQuizPage({
     .select("*")
     .order("active_on", { ascending: true });
   const list = questions ?? [];
+
+  // Competitions a question can belong to, for the authoring selector and the
+  // scheduled-list label.
+  const leagues = await listLiveLeagues();
+  const leagueName = new Map(leagues.map((l) => [l.id, l.shortName]));
 
   // Announced via the always-mounted live region; the visible panel mounts only
   // after the resend redirect, which is not reliably announced on its own.
@@ -135,6 +137,17 @@ export default async function AdminQuizPage({
           <form action={saveQuestion} className="space-y-8">
             <FormSection title={t("adminNew")}>
               <div className="flex flex-col gap-1.5">
+                <Label htmlFor="competition_id">{t("fieldCompetition")}</Label>
+                <NativeSelect id="competition_id" name="competition_id" required>
+                  {leagues.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
                 <Label htmlFor="prompt">{t("fieldPrompt")}</Label>
                 <Input id="prompt" name="prompt" required />
               </div>
@@ -142,9 +155,7 @@ export default async function AdminQuizPage({
               <div className="grid gap-3 sm:grid-cols-2">
                 {[0, 1, 2, 3].map((i) => (
                   <div key={i} className="flex flex-col gap-1.5">
-                    <Label htmlFor={`option_${i}`}>
-                      {t("fieldOption", { n: i + 1 })}
-                    </Label>
+                    <Label htmlFor={`option_${i}`}>{t("fieldOption", { n: i + 1 })}</Label>
                     <Input id={`option_${i}`} name={`option_${i}`} />
                   </div>
                 ))}
@@ -169,10 +180,7 @@ export default async function AdminQuizPage({
             </FormSection>
 
             <div className="border-t border-border pt-6">
-              <FormSection
-                title={t("adminTranslations")}
-                description={t("adminTranslationsHint")}
-              >
+              <FormSection title={t("adminTranslations")} description={t("adminTranslationsHint")}>
                 {TRANSLATION_LOCALES.map(({ code, langKey }) => {
                   const lang = t(langKey);
                   return (
@@ -184,9 +192,7 @@ export default async function AdminQuizPage({
                         {lang}
                       </legend>
                       <div className="flex flex-col gap-1.5">
-                        <Label htmlFor={`${code}_prompt`}>
-                          {t("fieldPromptLocale", { lang })}
-                        </Label>
+                        <Label htmlFor={`${code}_prompt`}>{t("fieldPromptLocale", { lang })}</Label>
                         <Input id={`${code}_prompt`} name={`${code}_prompt`} />
                       </div>
                       <div className="grid gap-3 sm:grid-cols-2">
@@ -195,10 +201,7 @@ export default async function AdminQuizPage({
                             <Label htmlFor={`${code}_option_${i}`}>
                               {t("fieldOptionLocale", { n: i + 1, lang })}
                             </Label>
-                            <Input
-                              id={`${code}_option_${i}`}
-                              name={`${code}_option_${i}`}
-                            />
+                            <Input id={`${code}_option_${i}`} name={`${code}_option_${i}`} />
                           </div>
                         ))}
                       </div>
@@ -243,6 +246,9 @@ export default async function AdminQuizPage({
                         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                           {q.active_on}
                         </p>
+                        <Badge variant="outline">
+                          {leagueName.get(q.competition_id) ?? q.competition_id}
+                        </Badge>
                         {translated.length > 0 ? (
                           translated.map(({ code, badgeKey }) => (
                             <Badge key={code} variant="secondary">
@@ -253,9 +259,7 @@ export default async function AdminQuizPage({
                           <Badge variant="outline">{t("badgeUntranslated")}</Badge>
                         )}
                       </div>
-                      <p className="mt-0.5 truncate text-sm font-medium">
-                        {q.prompt}
-                      </p>
+                      <p className="mt-0.5 truncate text-sm font-medium">{q.prompt}</p>
                       <p className="mt-0.5 truncate text-xs text-muted-foreground">
                         {q.options
                           .map((o, i) => (i === q.correct_index ? `✓ ${o}` : o))

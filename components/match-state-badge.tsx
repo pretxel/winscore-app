@@ -1,19 +1,14 @@
-import { LockIcon, CircleDotIcon, FlagIcon, CalendarClockIcon, BanIcon } from "lucide-react";
+import { BanIcon, CalendarClockIcon, CircleDotIcon, FlagIcon, LockIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Status = "scheduled" | "live" | "final" | "cancelled" | "locked";
 
 const palette: Record<Status, string> = {
-  scheduled:
-    "bg-secondary text-secondary-foreground ring-1 ring-inset ring-border",
-  locked:
-    "bg-muted text-muted-foreground ring-1 ring-inset ring-border",
-  live:
-    "bg-destructive/10 text-destructive ring-1 ring-inset ring-destructive/30 dark:bg-destructive/20",
-  final:
-    "bg-pitch text-pitch-foreground ring-1 ring-inset ring-pitch/50",
-  cancelled:
-    "bg-muted text-muted-foreground line-through ring-1 ring-inset ring-border",
+  scheduled: "bg-secondary text-secondary-foreground ring-1 ring-inset ring-border",
+  locked: "bg-muted text-muted-foreground ring-1 ring-inset ring-border",
+  live: "bg-destructive/10 text-destructive ring-1 ring-inset ring-destructive/30 dark:bg-destructive/20",
+  final: "bg-pitch text-pitch-foreground ring-1 ring-inset ring-pitch/50",
+  cancelled: "bg-muted text-muted-foreground line-through ring-1 ring-inset ring-border",
 };
 
 const label: Record<Status, string> = {

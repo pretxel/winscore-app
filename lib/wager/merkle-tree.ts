@@ -6,7 +6,7 @@
  * This mirrors the Rust program's claim verification logic exactly.
  */
 
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 
 /**
  * Build a Merkle tree from a list of (winner_wallet_bytes, award_base_units) tuples.
@@ -24,11 +24,7 @@ export interface MerkleTreeResult {
 
 const DOMAIN_SEPARATOR = Buffer.from("winscore-wager-claim-v1");
 
-function hashLeaf(
-  wagerRoundPubkey: Uint8Array,
-  winnerWallet: Uint8Array,
-  amount: number,
-): Buffer {
+function hashLeaf(wagerRoundPubkey: Uint8Array, winnerWallet: Uint8Array, amount: number): Buffer {
   const amountBuf = Buffer.alloc(8);
   amountBuf.writeBigUInt64LE(BigInt(amount));
 
@@ -62,11 +58,7 @@ export function buildMerkleTree(
 
   if (leaves.length === 1) {
     const leaf = leaves[0];
-    const leafHash = hashLeaf(
-      wagerRoundPubkey,
-      leaf.winnerWalletBytes,
-      leaf.awardBaseUnits,
-    );
+    const leafHash = hashLeaf(wagerRoundPubkey, leaf.winnerWalletBytes, leaf.awardBaseUnits);
     const root = hashPair(leafHash, leafHash); // convention: single leaf → hash(leaf, leaf)
     const key = Buffer.from(leaf.winnerWalletBytes).toString("hex");
     const proofs = new Map<string, Uint8Array[]>();
@@ -77,11 +69,7 @@ export function buildMerkleTree(
   // Build leaf hashes
   const leafEntries = leaves.map((leaf) => ({
     key: Buffer.from(leaf.winnerWalletBytes).toString("hex"),
-    hash: hashLeaf(
-      wagerRoundPubkey,
-      leaf.winnerWalletBytes,
-      leaf.awardBaseUnits,
-    ),
+    hash: hashLeaf(wagerRoundPubkey, leaf.winnerWalletBytes, leaf.awardBaseUnits),
   }));
 
   const proofsMap = new Map<string, Buffer[]>();
@@ -126,7 +114,10 @@ export function buildMerkleTree(
 
   const result = new Map<string, Uint8Array[]>();
   for (const [key, proofs] of proofsMap) {
-    result.set(key, proofs.map((p) => new Uint8Array(p as unknown as ArrayBuffer)));
+    result.set(
+      key,
+      proofs.map((p) => new Uint8Array(p as unknown as ArrayBuffer)),
+    );
   }
 
   return { root: layerHashes[0], proofs: result };

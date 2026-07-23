@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Webhook } from "standardwebhooks";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Base64 secret shared by the route (via mocked env) and the test signer.
 const B64_SECRET = Buffer.from("magic-link-hook-test-secret-0001").toString("base64");
@@ -12,10 +12,18 @@ const h = vi.hoisted(() => ({
     emailFrom: "World Cup Pools <noreply@wc26pool.com>",
     supabaseUrl: "https://ref.supabase.co",
   },
-  sendMock: vi.fn(async (_payload: { from: string; to: string; subject: string; html: string; text: string }) => ({
-    data: { id: "msg_1" },
-    error: null as { message?: string } | null,
-  })),
+  sendMock: vi.fn(
+    async (_payload: {
+      from: string;
+      to: string;
+      subject: string;
+      html: string;
+      text: string;
+    }) => ({
+      data: { id: "msg_1" },
+      error: null as { message?: string } | null,
+    }),
+  ),
 }));
 
 vi.mock("@/lib/env", () => ({ env: h.env }));
@@ -108,7 +116,10 @@ describe("POST /api/auth/send-email", () => {
   });
 
   it("rejects an invalid signature with 401 and sends nothing", async () => {
-    const bad = signedRequest(makePayload("magiclink"), Buffer.from("wrong-secret").toString("base64"));
+    const bad = signedRequest(
+      makePayload("magiclink"),
+      Buffer.from("wrong-secret").toString("base64"),
+    );
     const res = await POST(bad);
     expect(res.status).toBe(401);
     expect(h.sendMock).not.toHaveBeenCalled();

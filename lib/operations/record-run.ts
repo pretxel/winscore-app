@@ -1,6 +1,6 @@
 import "server-only";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/database.types";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 // The background jobs the operations control room observes. Shared by the cron
 // handlers (which record their runs) and the dashboard (which lists them).

@@ -1,39 +1,28 @@
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { getTranslations } from "next-intl/server";
-import { isLocale } from "@/lib/i18n";
-import type { Locale } from "@/lib/i18n";
 import type { Metadata } from "next";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { NativeSelect } from "@/components/ui/native-select";
-import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
-import { SubmitButton } from "@/components/admin/submit-button";
-import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import {
-  createRound,
-  assignFixtureToRound,
-  unassignFixture,
-  markRoundReviewed,
-  closeRound,
-} from "./actions";
+import { getTranslations } from "next-intl/server";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { SubmitButton } from "@/components/admin/submit-button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Locale } from "@/lib/i18n";
+import { isLocale } from "@/lib/i18n";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { assignFixtureToRound, closeRound, createRound, markRoundReviewed } from "./actions";
 
 export const metadata: Metadata = {
   title: "Competition Rounds — Admin",
 };
 
-export default async function RoundsPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function RoundsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : "en";
   const t = await getTranslations({ locale, namespace: "admin" });
-  const common = await getTranslations({ locale, namespace: "common" });
+  const _common = await getTranslations({ locale, namespace: "common" });
 
   const admin = createAdminSupabaseClient();
 
@@ -44,9 +33,7 @@ export default async function RoundsPage({
 
   const { data: rounds } = await admin
     .from("competition_rounds")
-    .select(
-      `*, matches (id, home_team, away_team, kickoff_at, status, stage)`
-    )
+    .select(`*, matches (id, home_team, away_team, kickoff_at, status, stage)`)
     .order("display_order");
 
   const { data: unassignedMatches } = await admin
@@ -90,10 +77,7 @@ export default async function RoundsPage({
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader
-        title={t("rounds.title")}
-        description={t("rounds.description")}
-      />
+      <AdminPageHeader title={t("rounds.title")} description={t("rounds.description")} />
 
       <Tabs defaultValue="rounds">
         <TabsList>
@@ -118,34 +102,27 @@ export default async function RoundsPage({
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div className="space-y-1">
                     <CardTitle className="flex items-center gap-2">
-                      <Link
-                        href={`/admin/rounds/${r.id}`}
-                        className="hover:underline"
-                      >
-                        {r.round_number
-                          ? `#${r.round_number} — ${r.round_key}`
-                          : r.round_key}
+                      <Link href={`/admin/rounds/${r.id}`} className="hover:underline">
+                        {r.round_number ? `#${r.round_number} — ${r.round_key}` : r.round_key}
                       </Link>
                       {statusBadge(r.status)}
                       {reviewBadge(r.provider_review_status)}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      {getCompName(r.competition_id)} ·{" "}
-                      {r.matches?.length ?? 0} {t("rounds.fixtures")} ·{" "}
-                      {t("rounds.opens")}{" "}
+                      {getCompName(r.competition_id)} · {r.matches?.length ?? 0}{" "}
+                      {t("rounds.fixtures")} · {t("rounds.opens")}{" "}
                       {new Date(r.opens_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    {r.status !== "closed" &&
-                      r.provider_review_status !== "reviewed" && (
-                        <form action={markRoundReviewed}>
-                          <input type="hidden" name="round_id" value={r.id} />
-                          <SubmitButton size="sm" variant="outline">
-                            {t("rounds.markReviewed")}
-                          </SubmitButton>
-                        </form>
-                      )}
+                    {r.status !== "closed" && r.provider_review_status !== "reviewed" && (
+                      <form action={markRoundReviewed}>
+                        <input type="hidden" name="round_id" value={r.id} />
+                        <SubmitButton size="sm" variant="outline">
+                          {t("rounds.markReviewed")}
+                        </SubmitButton>
+                      </form>
+                    )}
                     {r.status !== "closed" && (
                       <form action={closeRound}>
                         <input type="hidden" name="round_id" value={r.id} />
@@ -174,9 +151,7 @@ export default async function RoundsPage({
                           <span className="flex items-center gap-2 text-muted-foreground">
                             <Badge variant="outline">{m.stage as string}</Badge>
                             <Badge variant="secondary">{m.status as string}</Badge>
-                            {new Date(
-                              m.kickoff_at as string
-                            ).toLocaleDateString()}
+                            {new Date(m.kickoff_at as string).toLocaleDateString()}
                           </span>
                         </div>
                       ))}
@@ -197,9 +172,7 @@ export default async function RoundsPage({
             </Card>
           ) : (
             <>
-              <p className="text-sm text-muted-foreground">
-                {t("rounds.unmappedDescription")}
-              </p>
+              <p className="text-sm text-muted-foreground">{t("rounds.unmappedDescription")}</p>
               {unassignedMatches.map((m) => (
                 <Card key={m.id}>
                   <CardContent className="flex items-center justify-between py-4">
@@ -212,31 +185,16 @@ export default async function RoundsPage({
                         {new Date(m.kickoff_at).toLocaleString()}
                       </p>
                     </div>
-                    <form
-                      action={assignFixtureToRound}
-                      className="flex items-center gap-2"
-                    >
-                      <input
-                        type="hidden"
-                        name="match_id"
-                        value={m.id}
-                      />
+                    <form action={assignFixtureToRound} className="flex items-center gap-2">
+                      <input type="hidden" name="match_id" value={m.id} />
                       <input type="hidden" name="locale" value={locale} />
-                      <NativeSelect
-                        name="round_id"
-                        className="w-56"
-                        required
-                      >
-                        <option value="">
-                          {t("rounds.selectRound")}
-                        </option>
+                      <NativeSelect name="round_id" className="w-56" required>
+                        <option value="">{t("rounds.selectRound")}</option>
                         {(rounds ?? [])
                           .filter((r) => r.competition_id === m.competition_id)
                           .map((r) => (
                             <option key={r.id} value={r.id}>
-                              {r.round_number
-                                ? `#${r.round_number} ${r.round_key}`
-                                : r.round_key}
+                              {r.round_number ? `#${r.round_number} ${r.round_key}` : r.round_key}
                             </option>
                           ))}
                       </NativeSelect>
@@ -260,17 +218,10 @@ export default async function RoundsPage({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label
-                      htmlFor="competition_id"
-                      className="text-sm font-medium"
-                    >
+                    <label htmlFor="competition_id" className="text-sm font-medium">
                       {t("rounds.form.competition")}
                     </label>
-                    <NativeSelect
-                      id="competition_id"
-                      name="competition_id"
-                      required
-                    >
+                    <NativeSelect id="competition_id" name="competition_id" required>
                       <option value="">{t("rounds.form.selectComp")}</option>
                       {(competitions ?? []).map((c) => (
                         <option key={c.id} value={c.id}>
@@ -281,54 +232,28 @@ export default async function RoundsPage({
                   </div>
 
                   <div className="space-y-2">
-                    <label
-                      htmlFor="round_key"
-                      className="text-sm font-medium"
-                    >
+                    <label htmlFor="round_key" className="text-sm font-medium">
                       {t("rounds.form.roundKey")}
                     </label>
-                    <Input
-                      id="round_key"
-                      name="round_key"
-                      required
-                      placeholder="e.g. Matchday 1"
-                    />
+                    <Input id="round_key" name="round_key" required placeholder="e.g. Matchday 1" />
                   </div>
 
                   <div className="space-y-2">
-                    <label
-                      htmlFor="round_number"
-                      className="text-sm font-medium"
-                    >
+                    <label htmlFor="round_number" className="text-sm font-medium">
                       {t("rounds.form.roundNumber")}
                     </label>
-                    <Input
-                      id="round_number"
-                      name="round_number"
-                      type="number"
-                      placeholder="1"
-                    />
+                    <Input id="round_number" name="round_number" type="number" placeholder="1" />
                   </div>
 
                   <div className="space-y-2">
-                    <label
-                      htmlFor="display_order"
-                      className="text-sm font-medium"
-                    >
+                    <label htmlFor="display_order" className="text-sm font-medium">
                       {t("rounds.form.displayOrder")}
                     </label>
-                    <Input
-                      id="display_order"
-                      name="display_order"
-                      type="number"
-                      defaultValue="0"
-                    />
+                    <Input id="display_order" name="display_order" type="number" defaultValue="0" />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      {t("rounds.form.labels")}
-                    </label>
+                    <label className="text-sm font-medium">{t("rounds.form.labels")}</label>
                     <input
                       type="hidden"
                       name="labels"
@@ -339,47 +264,24 @@ export default async function RoundsPage({
                         de: "",
                       })}
                     />
-                    <Input
-                      name="label_en"
-                      placeholder="en"
-                      className="mb-1"
-                    />
-                    <Input
-                      name="label_es"
-                      placeholder="es"
-                      className="mb-1"
-                    />
+                    <Input name="label_en" placeholder="en" className="mb-1" />
+                    <Input name="label_es" placeholder="es" className="mb-1" />
                     <Input name="label_fr" placeholder="fr" className="mb-1" />
                     <Input name="label_de" placeholder="de" />
                   </div>
 
                   <div className="space-y-2">
-                    <label
-                      htmlFor="opens_at"
-                      className="text-sm font-medium"
-                    >
+                    <label htmlFor="opens_at" className="text-sm font-medium">
                       {t("rounds.form.opensAt")}
                     </label>
-                    <Input
-                      id="opens_at"
-                      name="opens_at"
-                      type="datetime-local"
-                      required
-                    />
+                    <Input id="opens_at" name="opens_at" type="datetime-local" required />
                   </div>
 
                   <div className="space-y-2">
-                    <label
-                      htmlFor="admin_closes_at"
-                      className="text-sm font-medium"
-                    >
+                    <label htmlFor="admin_closes_at" className="text-sm font-medium">
                       {t("rounds.form.adminClosesAt")}
                     </label>
-                    <Input
-                      id="admin_closes_at"
-                      name="admin_closes_at"
-                      type="datetime-local"
-                    />
+                    <Input id="admin_closes_at" name="admin_closes_at" type="datetime-local" />
                   </div>
 
                   <div className="space-y-2">
@@ -397,15 +299,8 @@ export default async function RoundsPage({
                     <label className="text-sm font-medium">
                       {t("rounds.form.providerMetadata")}
                     </label>
-                    <input
-                      type="hidden"
-                      name="provider_metadata"
-                      defaultValue="{}"
-                    />
-                    <Input
-                      name="provider_key"
-                      placeholder="e.g. Regular Season - 1"
-                    />
+                    <input type="hidden" name="provider_metadata" defaultValue="{}" />
+                    <Input name="provider_key" placeholder="e.g. Regular Season - 1" />
                   </div>
                 </div>
 

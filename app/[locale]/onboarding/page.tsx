@@ -1,27 +1,19 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { setDisplayName } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { setDisplayName } from "./actions";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "onboarding" });
   return { title: t("title") };
 }
 
-export default async function OnboardingPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function OnboardingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
@@ -48,10 +40,8 @@ export default async function OnboardingPage({
         aria-hidden
         className="bg-pitch-stripes absolute -right-40 -top-20 h-[28rem] w-[28rem] -rotate-12 opacity-[0.08] dark:opacity-[0.18]"
         style={{
-          maskImage:
-            "radial-gradient(closest-side at 50% 50%, black 30%, transparent 75%)",
-          WebkitMaskImage:
-            "radial-gradient(closest-side at 50% 50%, black 30%, transparent 75%)",
+          maskImage: "radial-gradient(closest-side at 50% 50%, black 30%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(closest-side at 50% 50%, black 30%, transparent 75%)",
         }}
       />
       <div className="relative">

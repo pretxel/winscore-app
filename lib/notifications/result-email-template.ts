@@ -14,10 +14,8 @@ import type { HitType } from "@/lib/db";
 // ---------------------------------------------------------------------------
 import { C } from "./email-theme";
 
-const SANS =
-  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO =
-  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 export type EmailOutcome = HitType;
 
@@ -111,7 +109,6 @@ function outcomeChipColors(hit: EmailOutcome): { bg: string; fg: string } {
       return { bg: C.pitch, fg: C.pitchFg };
     case "winner":
       return { bg: C.pitchTint, fg: C.pitch };
-    case "miss":
     default:
       return { bg: C.mutedTint, fg: C.muted };
   }
@@ -199,9 +196,7 @@ function renderMatchCard(m: EmailFinishedMatch, s: ResultEmailStrings): string {
 }
 
 function renderResults(data: ResultEmailData): string {
-  const cards = data.matches
-    .map((m) => renderMatchCard(m, data.strings))
-    .join("");
+  const cards = data.matches.map((m) => renderMatchCard(m, data.strings)).join("");
   return `
     <tr>
       <td style="padding:18px 28px 4px 28px;">
@@ -334,8 +329,7 @@ function renderText(data: ResultEmailData): string {
   }
   lines.push("");
   lines.push(s.standingLabel.toUpperCase());
-  const rankText =
-    data.standing.rank != null ? String(data.standing.rank) : "—";
+  const rankText = data.standing.rank != null ? String(data.standing.rank) : "—";
   lines.push(
     `  ${s.rankLabel} ${rankText} · ${s.pointsLabel} ${data.standing.totalPoints} · ${s.exactLabel} ${data.standing.exactHits} · ${s.winnerGdLabel} ${data.standing.winnerGdHits}`,
   );

@@ -7,7 +7,6 @@ vi.mock("@/lib/operations/settings", () => ({
   isOperationEnabled: vi.fn(async () => true),
 }));
 
-
 const MATCH_ID = "11111111-1111-4111-8111-111111111111";
 const CRON_SECRET = "test-secret";
 const FOOTBALL_TOKEN = "test-token";
@@ -57,8 +56,7 @@ function setupLocalMatches(rows: unknown[]) {
       const compChain: Record<string, unknown> = {
         select: () => compChain,
         eq: () => compChain,
-        maybeSingle: () =>
-          Promise.resolve({ data: { id: "comp-1", providers: {} }, error: null }),
+        maybeSingle: () => Promise.resolve({ data: { id: "comp-1", providers: {} }, error: null }),
       };
       return compChain;
     }
@@ -85,9 +83,7 @@ function stubFetchByHost({
           : new Response(JSON.stringify({ matches: [] }), { status: 200 });
       }
       if (url.includes("espn.com")) {
-        return espn
-          ? espn()
-          : new Response(JSON.stringify({ events: [] }), { status: 200 });
+        return espn ? espn() : new Response(JSON.stringify({ events: [] }), { status: 200 });
       }
       throw new Error(`unexpected fetch ${url}`);
     }),
@@ -121,9 +117,7 @@ describe("GET /api/cron/sync-matches", () => {
 
   it("returns 401 when bearer is wrong", async () => {
     const { GET } = await import("@/app/api/cron/sync-matches/route");
-    const res = await GET(
-      makeRequest({ authorization: "Bearer wrong" }) as never,
-    );
+    const res = await GET(makeRequest({ authorization: "Bearer wrong" }) as never);
     expect(res.status).toBe(401);
   });
 
@@ -159,9 +153,7 @@ describe("GET /api/cron/sync-matches", () => {
     });
 
     const { GET } = await import("@/app/api/cron/sync-matches/route");
-    const res = await GET(
-      makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never,
-    );
+    const res = await GET(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never);
 
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, number | string>;
@@ -187,9 +179,7 @@ describe("GET /api/cron/sync-matches", () => {
     stubFetchByHost();
 
     const { GET } = await import("@/app/api/cron/sync-matches/route");
-    const res = await GET(
-      makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never,
-    );
+    const res = await GET(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never);
 
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
@@ -242,9 +232,7 @@ describe("GET /api/cron/sync-matches", () => {
     });
 
     const { GET } = await import("@/app/api/cron/sync-matches/route");
-    const res = await GET(
-      makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never,
-    );
+    const res = await GET(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never);
 
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, number>;
@@ -284,9 +272,7 @@ describe("GET /api/cron/sync-matches", () => {
     });
 
     const { GET } = await import("@/app/api/cron/sync-matches/route");
-    const res = await GET(
-      makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never,
-    );
+    const res = await GET(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never);
 
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, number>;
@@ -317,9 +303,7 @@ describe("GET /api/cron/sync-matches", () => {
     });
 
     const { GET } = await import("@/app/api/cron/sync-matches/route");
-    const res = await GET(
-      makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never,
-    );
+    const res = await GET(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }) as never);
 
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, number>;

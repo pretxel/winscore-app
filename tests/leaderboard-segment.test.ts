@@ -70,26 +70,20 @@ describe("resolveSegment", () => {
 describe("currentWeekBoundsUtc", () => {
   it("returns a Monday-start, 7-day half-open window", () => {
     // Wednesday 2026-06-17T12:00Z → week is Mon 2026-06-15 .. Mon 2026-06-22.
-    const { fromTs, toTs } = currentWeekBoundsUtc(
-      new Date("2026-06-17T12:00:00.000Z"),
-    );
+    const { fromTs, toTs } = currentWeekBoundsUtc(new Date("2026-06-17T12:00:00.000Z"));
     expect(fromTs).toBe("2026-06-15T00:00:00.000Z");
     expect(toTs).toBe("2026-06-22T00:00:00.000Z");
   });
 
   it("treats Monday as the first day of the week", () => {
-    const { fromTs, toTs } = currentWeekBoundsUtc(
-      new Date("2026-06-15T00:00:00.000Z"),
-    );
+    const { fromTs, toTs } = currentWeekBoundsUtc(new Date("2026-06-15T00:00:00.000Z"));
     expect(fromTs).toBe("2026-06-15T00:00:00.000Z");
     expect(toTs).toBe("2026-06-22T00:00:00.000Z");
   });
 
   it("treats Sunday as the last day of the prior Monday's week", () => {
     // Sunday 2026-06-21 belongs to the week starting Mon 2026-06-15.
-    const { fromTs, toTs } = currentWeekBoundsUtc(
-      new Date("2026-06-21T23:59:59.000Z"),
-    );
+    const { fromTs, toTs } = currentWeekBoundsUtc(new Date("2026-06-21T23:59:59.000Z"));
     expect(fromTs).toBe("2026-06-15T00:00:00.000Z");
     expect(toTs).toBe("2026-06-22T00:00:00.000Z");
   });

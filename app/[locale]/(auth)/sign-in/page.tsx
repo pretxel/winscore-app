@@ -1,11 +1,11 @@
-import { redirect } from "next/navigation";
-import Link from "next/link";
+import { TargetIcon, TrophyIcon, ZapIcon } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { SignInForm } from "./sign-in-form";
-import { TargetIcon, TrophyIcon, ZapIcon } from "lucide-react";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 export async function generateMetadata({
   params,
@@ -50,10 +50,8 @@ export default async function SignInPage({
         aria-hidden
         className="bg-pitch-stripes absolute -right-32 -top-32 h-[36rem] w-[36rem] -rotate-12 opacity-[0.08] dark:opacity-[0.18]"
         style={{
-          maskImage:
-            "radial-gradient(closest-side at 50% 50%, black 30%, transparent 75%)",
-          WebkitMaskImage:
-            "radial-gradient(closest-side at 50% 50%, black 30%, transparent 75%)",
+          maskImage: "radial-gradient(closest-side at 50% 50%, black 30%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(closest-side at 50% 50%, black 30%, transparent 75%)",
         }}
       />
       <div className="bg-grain pointer-events-none absolute inset-0" />
@@ -70,9 +68,7 @@ export default async function SignInPage({
             <span className="block">{t("headlineLine1")}</span>
             <span className="block text-pitch">{t("headlineLine2")}</span>
           </h1>
-          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-            {t("lede")}
-          </p>
+          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{t("lede")}</p>
 
           <ul className="mt-2 grid gap-3">
             {[
@@ -88,9 +84,7 @@ export default async function SignInPage({
                   <b.Icon className="size-4" />
                 </span>
                 <div>
-                  <div className="font-heading text-sm font-semibold tracking-tight">
-                    {b.title}
-                  </div>
+                  <div className="font-heading text-sm font-semibold tracking-tight">{b.title}</div>
                   <div className="text-xs text-muted-foreground">{b.copy}</div>
                 </div>
               </li>
@@ -105,9 +99,7 @@ export default async function SignInPage({
                 aria-hidden
                 className="grid size-7 place-items-center rounded-md bg-pitch text-pitch-foreground"
               >
-                <span className="font-mono text-[10px] font-bold leading-none">
-                  26
-                </span>
+                <span className="font-mono text-[10px] font-bold leading-none">26</span>
               </span>
               <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
                 {t("cardEyebrow")}
@@ -119,9 +111,7 @@ export default async function SignInPage({
             >
               {t("cardHeadline")}
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("cardLede")}
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">{t("cardLede")}</p>
 
             <div className="mt-6">
               <SignInForm next={next} />

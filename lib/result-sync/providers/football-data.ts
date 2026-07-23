@@ -1,9 +1,5 @@
 import { env } from "@/lib/env";
-import type {
-  ProviderConfig,
-  RemoteMatch,
-  ResultProvider,
-} from "@/lib/result-sync/types";
+import type { ProviderConfig, RemoteMatch, ResultProvider } from "@/lib/result-sync/types";
 
 // World Cup 2026 defaults; overridden per competition via ProviderConfig.
 const DEFAULT_CODE = "WC";
@@ -24,10 +20,7 @@ export const footballDataProvider: ResultProvider = {
     return env.footballDataToken != null;
   },
 
-  async fetchMatches(
-    _dates?: string[],
-    config?: ProviderConfig,
-  ): Promise<RemoteMatch[]> {
+  async fetchMatches(_dates?: string[], config?: ProviderConfig): Promise<RemoteMatch[]> {
     if (!env.footballDataToken) return [];
     const resp = await fetch(footballDataUrl(config), {
       headers: { "X-Auth-Token": env.footballDataToken },
@@ -35,9 +28,7 @@ export const footballDataProvider: ResultProvider = {
       cache: "no-store",
     });
     if (!resp.ok) {
-      throw new Error(
-        `Football-Data fetch failed: ${resp.status} ${resp.statusText}`,
-      );
+      throw new Error(`Football-Data fetch failed: ${resp.status} ${resp.statusText}`);
     }
     const body = (await resp.json()) as {
       matches?: (RemoteMatch & { matchday?: number; stage?: string })[];
@@ -47,10 +38,7 @@ export const footballDataProvider: ResultProvider = {
       // Preserve reliable provider round key: combine stage + matchday when available.
       // Example: "REGULAR_SEASON:3" or "GROUP_STAGE:1"
       // Falls back to the API's stage field alone.
-      stage:
-        m.stage && m.matchday != null
-          ? `${m.stage}:${m.matchday}`
-          : m.stage ?? null,
+      stage: m.stage && m.matchday != null ? `${m.stage}:${m.matchday}` : (m.stage ?? null),
     }));
   },
 };

@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { env } from "@/lib/env";
 import type { Database } from "@/lib/database.types";
+import { env } from "@/lib/env";
 
 // Renders a recap's `image_prompt` into an image via Leonardo.ai (gpt-image-2)
 // and stores it in the public `match-recap-images` Supabase Storage bucket.
@@ -173,7 +173,7 @@ export async function requestMatchImageRender(
           quantity: 1,
           width: IMAGE_WIDTH,
           height: IMAGE_HEIGHT,
-          prompt_enhance: "OFF"
+          prompt_enhance: "OFF",
         },
       }),
     });
@@ -293,7 +293,7 @@ export async function pollMatchImageRender(
     .select("generation_id, status")
     .eq("summary_id", summaryId)
     .maybeSingle();
-  if (!row || !row.generation_id) return { polled: false, reason: "missing" };
+  if (!row?.generation_id) return { polled: false, reason: "missing" };
   if (row.status === "complete") return { polled: false, reason: "already-complete" };
 
   const res = await fetch(`${LEONARDO_GENERATION_BY_ID_URL}/${row.generation_id}`, {

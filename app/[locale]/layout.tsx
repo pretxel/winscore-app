@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
-import { SiteNav, SiteFooter } from "@/components/site-nav";
-import {
-  SUPPORTED_LOCALES,
-  isLocale,
-  DEFAULT_LOCALE,
-  type Locale,
-} from "@/lib/i18n";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { SiteFooter, SiteNav } from "@/components/site-nav";
+import { DEFAULT_LOCALE, isLocale, type Locale, SUPPORTED_LOCALES } from "@/lib/i18n";
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((locale) => ({ locale }));

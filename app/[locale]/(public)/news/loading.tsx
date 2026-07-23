@@ -1,5 +1,5 @@
-import { PageSkeletonShell } from "@/components/skeletons/page-skeleton-shell";
 import { CardGridSkeleton } from "@/components/skeletons/card-grid-skeleton";
+import { PageSkeletonShell } from "@/components/skeletons/page-skeleton-shell";
 
 // Mirrors the news index (max-w-6xl): header + the first page of the article
 // card grid (1/2/3 columns). Infinite-scroll loading is client-side and not

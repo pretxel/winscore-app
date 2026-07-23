@@ -28,9 +28,7 @@ function kickoffTime(pick: SortablePick): number {
 // descending (latest first). Ties (same kickoff) break by `match_id`
 // ascending so the order is total and reproducible run-to-run. Does not
 // mutate the input.
-export function sortPicksByKickoffDesc<T extends SortablePick>(
-  picks: readonly T[],
-): T[] {
+export function sortPicksByKickoffDesc<T extends SortablePick>(picks: readonly T[]): T[] {
   return [...picks].sort((a, b) => {
     const ta = kickoffTime(a);
     const tb = kickoffTime(b);

@@ -1,6 +1,6 @@
 import "server-only";
+import { type BracketMatchInput, buildBracket } from "@/lib/bracket-core";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { buildBracket, type BracketMatchInput } from "@/lib/bracket-core";
 
 // One fixture to update: the row id, the confirmed team(s) to stamp on it, and a
 // human label for the admin summary. A side is present only when it changed.
@@ -23,9 +23,7 @@ export interface ConfirmKnockoutTeamsResult {
 // complete) AND that differs from what is stored. Provisional/placeholder
 // resolutions and group-stage rows are never written, so the result is empty
 // when nothing is newly confirmed (idempotent). Exported for unit testing.
-export function computeKnockoutTeamUpdates(
-  matches: BracketMatchInput[],
-): KnockoutTeamUpdate[] {
+export function computeKnockoutTeamUpdates(matches: BracketMatchInput[]): KnockoutTeamUpdate[] {
   const storedById = new Map(matches.map((m) => [m.id, m]));
   const { rounds } = buildBracket(matches);
   const updates: KnockoutTeamUpdate[] = [];
@@ -36,15 +34,11 @@ export function computeKnockoutTeamUpdates(
       if (!stored) continue;
 
       const homeNew =
-        slot.home.status === "confirmed" &&
-        slot.home.team &&
-        slot.home.team !== stored.home_team
+        slot.home.status === "confirmed" && slot.home.team && slot.home.team !== stored.home_team
           ? slot.home.team
           : undefined;
       const awayNew =
-        slot.away.status === "confirmed" &&
-        slot.away.team &&
-        slot.away.team !== stored.away_team
+        slot.away.status === "confirmed" && slot.away.team && slot.away.team !== stored.away_team
           ? slot.away.team
           : undefined;
 

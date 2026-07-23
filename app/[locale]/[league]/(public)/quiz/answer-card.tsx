@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { CheckCircle2Icon, Loader2Icon, XCircleIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { CheckCircle2Icon, XCircleIcon, Loader2Icon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useTransition } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { cn } from "@/lib/utils";
 import { submitQuizAnswer } from "./actions";
 
 type Answered = {
@@ -20,17 +20,25 @@ export function AnswerCard({
   signedIn,
   isAdmin = false,
   initialAnswer,
+  league,
+  locale,
 }: {
   questionId: string;
   options: string[];
   signedIn: boolean;
   isAdmin?: boolean;
   initialAnswer: { choiceIndex: number; isCorrect: boolean } | null;
+  league: string;
+  locale: string;
 }) {
   const t = useTranslations("quiz");
   const [answered, setAnswered] = useState<Answered | null>(
     initialAnswer
-      ? { choice: initialAnswer.choiceIndex, isCorrect: initialAnswer.isCorrect, correctIndex: null }
+      ? {
+          choice: initialAnswer.choiceIndex,
+          isCorrect: initialAnswer.isCorrect,
+          correctIndex: null,
+        }
       : null,
   );
   const [isPending, startTransition] = useTransition();
@@ -44,7 +52,7 @@ export function AnswerCard({
       return;
     }
     startTransition(async () => {
-      const res = await submitQuizAnswer({ questionId, choice: i });
+      const res = await submitQuizAnswer({ questionId, choice: i, league, locale });
       if (res.ok) {
         trackEvent("quiz_answered", { question_id: questionId, correct: res.isCorrect });
         setAnswered({ choice: i, isCorrect: res.isCorrect, correctIndex: res.correctIndex });

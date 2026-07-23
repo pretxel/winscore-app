@@ -5,10 +5,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // the generator's result (or a thrown error) must be surfaced via the redirect's
 // query params rather than producing a server-error page.
 
-const generateMatchSummaryMock = vi.fn(async () => ({ generated: true }) as {
-  generated: boolean;
-  reason?: string;
-});
+const generateMatchSummaryMock = vi.fn(
+  async () =>
+    ({ generated: true }) as {
+      generated: boolean;
+      reason?: string;
+    },
+);
 const assertMatchInManagedMock = vi.fn(async () => {});
 const getManagedCompetitionMock = vi.fn(async () => ({ id: "comp1", is_active: true }));
 const getUserMock = vi.fn();
@@ -84,55 +87,47 @@ beforeEach(() => {
 describe("summarizeMatch action", () => {
   it("rejects a non-admin and never generates", async () => {
     profileSingleMock.mockResolvedValue({ data: { is_admin: false } });
-    const { summarizeMatch } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
+    const { summarizeMatch } = await import("@/app/[locale]/(admin)/admin/matches/actions");
+    await expect(summarizeMatch(form({ match_id: MATCH_ID, locale: "en" }))).rejects.toThrow(
+      "Admin only",
     );
-    await expect(
-      summarizeMatch(form({ match_id: MATCH_ID, locale: "en" })),
-    ).rejects.toThrow("Admin only");
     expect(generateMatchSummaryMock).not.toHaveBeenCalled();
   });
 
   it("rejects a match outside the managed competition and never generates", async () => {
-    assertMatchInManagedMock.mockRejectedValue(new Error("Match does not belong to the managed competition"));
-    const { summarizeMatch } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
+    assertMatchInManagedMock.mockRejectedValue(
+      new Error("Match does not belong to the managed competition"),
     );
-    await expect(
-      summarizeMatch(form({ match_id: MATCH_ID, locale: "en" })),
-    ).rejects.toThrow("managed");
+    const { summarizeMatch } = await import("@/app/[locale]/(admin)/admin/matches/actions");
+    await expect(summarizeMatch(form({ match_id: MATCH_ID, locale: "en" }))).rejects.toThrow(
+      "managed",
+    );
     expect(generateMatchSummaryMock).not.toHaveBeenCalled();
   });
 
   it("surfaces a no-events skip via the redirect params", async () => {
     generateMatchSummaryMock.mockResolvedValue({ generated: false, reason: "no-events" });
-    const { summarizeMatch } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
+    const { summarizeMatch } = await import("@/app/[locale]/(admin)/admin/matches/actions");
+    await expect(summarizeMatch(form({ match_id: MATCH_ID, locale: "en" }))).rejects.toThrow(
+      /summaryMatchId=.*summaryReason=no-events/,
     );
-    await expect(
-      summarizeMatch(form({ match_id: MATCH_ID, locale: "en" })),
-    ).rejects.toThrow(/summaryMatchId=.*summaryReason=no-events/);
     expect(generateMatchSummaryMock).toHaveBeenCalledTimes(1);
   });
 
   it("surfaces a successful generation via the redirect params", async () => {
-    const { summarizeMatch } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
+    const { summarizeMatch } = await import("@/app/[locale]/(admin)/admin/matches/actions");
+    await expect(summarizeMatch(form({ match_id: MATCH_ID, locale: "en" }))).rejects.toThrow(
+      /summaryReason=generated/,
     );
-    await expect(
-      summarizeMatch(form({ match_id: MATCH_ID, locale: "en" })),
-    ).rejects.toThrow(/summaryReason=generated/);
   });
 
   it("maps a thrown generator error to an error outcome, not a server error", async () => {
     generateMatchSummaryMock.mockRejectedValue(new Error("openrouter down"));
-    const { summarizeMatch } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { summarizeMatch } = await import("@/app/[locale]/(admin)/admin/matches/actions");
     // The action catches the throw and still redirects (with reason=error).
-    await expect(
-      summarizeMatch(form({ match_id: MATCH_ID, locale: "en" })),
-    ).rejects.toThrow(/summaryReason=error/);
+    await expect(summarizeMatch(form({ match_id: MATCH_ID, locale: "en" }))).rejects.toThrow(
+      /summaryReason=error/,
+    );
     expect(generateMatchSummaryMock).toHaveBeenCalledTimes(1);
   });
 });

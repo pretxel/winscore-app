@@ -88,9 +88,7 @@ beforeEach(() => {
 describe("syncNow", () => {
   it("runs the sync and redirects back with the summary in query params", async () => {
     runSyncMock.mockResolvedValue(summary());
-    const { syncNow } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { syncNow } = await import("@/app/[locale]/(admin)/admin/matches/actions");
 
     await syncNow(makeFormData("es"));
 
@@ -111,9 +109,7 @@ describe("syncNow", () => {
 
   it("surfaces a total failure as syncSource=none instead of silent success", async () => {
     runSyncMock.mockResolvedValue(summary({ source: "none", errors: 2 }));
-    const { syncNow } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { syncNow } = await import("@/app/[locale]/(admin)/admin/matches/actions");
 
     await syncNow(makeFormData("en"));
 
@@ -125,21 +121,15 @@ describe("syncNow", () => {
 
   it("falls back to the default locale for a bogus locale value", async () => {
     runSyncMock.mockResolvedValue(summary());
-    const { syncNow } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { syncNow } = await import("@/app/[locale]/(admin)/admin/matches/actions");
 
     await syncNow(makeFormData("zz"));
-    expect(String(redirectMock.mock.calls[0][0])).toMatch(
-      /^\/en\/admin\/matches\?/,
-    );
+    expect(String(redirectMock.mock.calls[0][0])).toMatch(/^\/en\/admin\/matches\?/);
   });
 
   it("rejects non-admins before running anything", async () => {
     isAdmin = false;
-    const { syncNow } = await import(
-      "@/app/[locale]/(admin)/admin/matches/actions"
-    );
+    const { syncNow } = await import("@/app/[locale]/(admin)/admin/matches/actions");
 
     await expect(syncNow(makeFormData("en"))).rejects.toThrow("Admin only");
     expect(runSyncMock).not.toHaveBeenCalled();

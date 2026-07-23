@@ -1,9 +1,9 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export default async function AdminLayout({
   children,
@@ -36,13 +36,8 @@ export default async function AdminLayout({
     return (
       <main className="mx-auto max-w-md px-6 py-20 text-center">
         <h1 className="text-2xl font-bold">{t("forbiddenTitle")}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {t("forbiddenBody")}
-        </p>
-        <Link
-          href={localePath(locale, "/")}
-          className="mt-6 inline-block text-sm underline"
-        >
+        <p className="mt-2 text-sm text-muted-foreground">{t("forbiddenBody")}</p>
+        <Link href={localePath(locale, "/")} className="mt-6 inline-block text-sm underline">
           {t("goHome")}
         </Link>
       </main>

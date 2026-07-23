@@ -16,10 +16,8 @@
 // ---------------------------------------------------------------------------
 import { C } from "./email-theme";
 
-const SANS =
-  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO =
-  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // One row of the leaderboard top 5.
 export interface DigestTopRow {
@@ -289,9 +287,7 @@ function renderFooter(s: ResultsDigestStrings): string {
 
 // --- public renderer -------------------------------------------------------
 
-export function renderResultsDigest(
-  data: ResultsDigestData,
-): ResultsDigestRendered {
+export function renderResultsDigest(data: ResultsDigestData): ResultsDigestRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>
@@ -336,14 +332,11 @@ function renderText(data: ResultsDigestData): string {
   lines.push("");
   lines.push(s.top5Label.toUpperCase());
   for (const r of data.top5) {
-    lines.push(
-      `  ${r.rank}. ${r.displayName ?? "—"} — ${r.totalPoints} ${s.pointsLabel}`,
-    );
+    lines.push(`  ${r.rank}. ${r.displayName ?? "—"} — ${r.totalPoints} ${s.pointsLabel}`);
   }
   lines.push("");
   lines.push(s.yourRankLabel.toUpperCase());
-  const rankText =
-    data.personal.rank != null ? String(data.personal.rank) : "—";
+  const rankText = data.personal.rank != null ? String(data.personal.rank) : "—";
   let yourLine = `  ${s.rankLabel} ${rankText} · ${s.pointsLabel} ${data.personal.totalPoints}`;
   if (data.personal.delta != null) {
     const d = data.personal.delta;
@@ -362,12 +355,8 @@ function renderText(data: ResultsDigestData): string {
     for (const m of data.movers) {
       const label = m.delta < 0 ? s.climbedLabel : s.droppedLabel;
       const mag =
-        m.delta < 0
-          ? `${s.deltaUpLabel} ${Math.abs(m.delta)}`
-          : `${s.deltaDownLabel} ${m.delta}`;
-      lines.push(
-        `  ${m.displayName ?? "—"} (${s.rankLabel} ${m.rank}) — ${label}, ${mag}`,
-      );
+        m.delta < 0 ? `${s.deltaUpLabel} ${Math.abs(m.delta)}` : `${s.deltaDownLabel} ${m.delta}`;
+      lines.push(`  ${m.displayName ?? "—"} (${s.rankLabel} ${m.rank}) — ${label}, ${mag}`);
     }
   }
   lines.push("");

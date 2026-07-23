@@ -4,8 +4,7 @@ type Variant = "info" | "success" | "error";
 
 const VARIANT_CLASS: Record<Variant, string> = {
   info: "border-border bg-muted/40 text-foreground",
-  success:
-    "border-primary/30 bg-primary/10 text-foreground [&_strong]:text-primary",
+  success: "border-primary/30 bg-primary/10 text-foreground [&_strong]:text-primary",
   error: "border-destructive/40 bg-destructive/10 text-destructive",
 };
 
@@ -33,11 +32,7 @@ export function ActionStatus({
     <div
       role={live ? (variant === "error" ? "alert" : "status") : undefined}
       aria-live={live ? (variant === "error" ? "assertive" : "polite") : undefined}
-      className={cn(
-        "rounded-lg border px-3 py-2 text-sm",
-        VARIANT_CLASS[variant],
-        className,
-      )}
+      className={cn("rounded-lg border px-3 py-2 text-sm", VARIANT_CLASS[variant], className)}
     >
       {children}
     </div>

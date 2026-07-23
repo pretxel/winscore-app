@@ -16,10 +16,8 @@
 // ---------------------------------------------------------------------------
 import { C } from "./email-theme";
 
-const SANS =
-  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO =
-  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // One finished knockout match. Scores are nullable defensively, though a `final`
 // match should always carry both. `resultNote` is an optional knockout decider
@@ -117,11 +115,7 @@ function renderIntro(s: PlayoffScoreStrings): string {
     </tr>`;
 }
 
-function renderMatchRow(
-  match: PlayoffScoreMatch,
-  s: PlayoffScoreStrings,
-  zebra: string,
-): string {
+function renderMatchRow(match: PlayoffScoreMatch, s: PlayoffScoreStrings, zebra: string): string {
   const eyebrow = match.stageLabel
     ? `<div style="margin-bottom:4px;">${monoLabel(match.stageLabel, C.muted)}</div>`
     : "";
@@ -186,9 +180,7 @@ function renderFooter(s: PlayoffScoreStrings): string {
 
 // --- public renderer -------------------------------------------------------
 
-export function renderPlayoffScoreEmail(
-  data: PlayoffScoreData,
-): PlayoffScoreRendered {
+export function renderPlayoffScoreEmail(data: PlayoffScoreData): PlayoffScoreRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>
@@ -231,9 +223,7 @@ function renderText(data: PlayoffScoreData): string {
   for (const m of data.matches) {
     const stage = m.stageLabel ? `[${m.stageLabel}] ` : "";
     const note = m.resultNote ? ` (${m.resultNote})` : "";
-    lines.push(
-      `  ${stage}${m.home} ${scoreText(m, s.scoreSeparator)} ${m.away}${note}`,
-    );
+    lines.push(`  ${stage}${m.home} ${scoreText(m, s.scoreSeparator)} ${m.away}${note}`);
   }
   lines.push("");
   lines.push(`${s.ctaLabel}: ${data.bracketUrl}`);

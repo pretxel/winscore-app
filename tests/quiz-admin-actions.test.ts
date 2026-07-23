@@ -51,6 +51,7 @@ function makeFormData(fields: Record<string, string>): FormData {
 // English question: 3 filled options (slot 3 left blank), correct = slot 1.
 function englishFields(): Record<string, string> {
   return {
+    competition_id: "11111111-1111-4111-8111-111111111111",
     prompt: "Who won the 2022 World Cup?",
     option_0: "Argentina",
     option_1: "France",
@@ -69,9 +70,7 @@ beforeEach(() => {
 
 describe("saveQuestion translations", () => {
   it("stores empty translations for an English-only submission", async () => {
-    const { saveQuestion } = await import(
-      "@/app/[locale]/(admin)/admin/quiz/actions"
-    );
+    const { saveQuestion } = await import("@/app/[locale]/(admin)/admin/quiz/actions");
     await saveQuestion(makeFormData(englishFields()));
 
     expect(insertMock).toHaveBeenCalledTimes(1);
@@ -82,9 +81,7 @@ describe("saveQuestion translations", () => {
   });
 
   it("stores ES + FR translations aligned to the filled English options", async () => {
-    const { saveQuestion } = await import(
-      "@/app/[locale]/(admin)/admin/quiz/actions"
-    );
+    const { saveQuestion } = await import("@/app/[locale]/(admin)/admin/quiz/actions");
     await saveQuestion(
       makeFormData({
         ...englishFields(),
@@ -114,9 +111,7 @@ describe("saveQuestion translations", () => {
   });
 
   it("ignores a fully blank translation block", async () => {
-    const { saveQuestion } = await import(
-      "@/app/[locale]/(admin)/admin/quiz/actions"
-    );
+    const { saveQuestion } = await import("@/app/[locale]/(admin)/admin/quiz/actions");
     await saveQuestion(
       makeFormData({
         ...englishFields(),
@@ -133,9 +128,7 @@ describe("saveQuestion translations", () => {
   });
 
   it("rejects a translation missing an option for a filled English slot", async () => {
-    const { saveQuestion } = await import(
-      "@/app/[locale]/(admin)/admin/quiz/actions"
-    );
+    const { saveQuestion } = await import("@/app/[locale]/(admin)/admin/quiz/actions");
     await expect(
       saveQuestion(
         makeFormData({
@@ -151,24 +144,16 @@ describe("saveQuestion translations", () => {
   });
 
   it("rejects a translation prompt without any options", async () => {
-    const { saveQuestion } = await import(
-      "@/app/[locale]/(admin)/admin/quiz/actions"
-    );
+    const { saveQuestion } = await import("@/app/[locale]/(admin)/admin/quiz/actions");
     await expect(
-      saveQuestion(
-        makeFormData({ ...englishFields(), fr_prompt: "Énoncé en français" }),
-      ),
+      saveQuestion(makeFormData({ ...englishFields(), fr_prompt: "Énoncé en français" })),
     ).rejects.toThrow(/Incomplete FR translation/);
   });
 
   it("rejects non-admins before inserting", async () => {
     isAdmin = false;
-    const { saveQuestion } = await import(
-      "@/app/[locale]/(admin)/admin/quiz/actions"
-    );
-    await expect(saveQuestion(makeFormData(englishFields()))).rejects.toThrow(
-      "Admin only",
-    );
+    const { saveQuestion } = await import("@/app/[locale]/(admin)/admin/quiz/actions");
+    await expect(saveQuestion(makeFormData(englishFields()))).rejects.toThrow("Admin only");
     expect(insertMock).not.toHaveBeenCalled();
   });
 });

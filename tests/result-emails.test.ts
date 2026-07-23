@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  renderResultEmail,
   type ResultEmailData,
   type ResultEmailStrings,
+  renderResultEmail,
 } from "@/lib/notifications/result-email-template";
 
 // ---------------------------------------------------------------------------
@@ -135,9 +135,7 @@ describe("renderResultEmail", () => {
   });
 
   it("escapes HTML in names to prevent injection", () => {
-    const out = renderResultEmail(
-      makeData({ displayName: "<script>alert(1)</script>" }),
-    );
+    const out = renderResultEmail(makeData({ displayName: "<script>alert(1)</script>" }));
     expect(out.html).not.toContain("<script>alert(1)</script>");
     expect(out.html).toContain("&lt;script&gt;");
   });
@@ -173,9 +171,7 @@ describe("renderResultEmail", () => {
       { direction: "same" as const, magnitude: 0, previousRank: 7 },
       null,
     ]) {
-      const out = renderResultEmail(
-        makeData({ rankDelta: delta, strings: neutralStrings }),
-      );
+      const out = renderResultEmail(makeData({ rankDelta: delta, strings: neutralStrings }));
       expect(out.html).toContain("You are on the board now.");
       expect(out.text).toContain("You are on the board now.");
       expect(out.html).not.toContain("moved up");
@@ -283,10 +279,7 @@ describe("computePendingByUser", () => {
 
   it("only the unsent pairs survive a partial ledger", () => {
     const pending = computePendingByUser(
-      [
-        scoredRow({ user_id: "u1", match_id: "m1" }),
-        scoredRow({ user_id: "u2", match_id: "m1" }),
-      ],
+      [scoredRow({ user_id: "u1", match_id: "m1" }), scoredRow({ user_id: "u2", match_id: "m1" })],
       [{ match_id: "m1", user_id: "u1" }],
     );
     expect(pending).toHaveLength(1);
@@ -392,9 +385,7 @@ vi.mock("@/lib/supabase/admin", () => ({
         const chain: {
           select: () => typeof chain;
           eq: (col: string, val: unknown) => typeof chain;
-          then: (
-            resolve: (v: { data: unknown[]; error: null }) => unknown,
-          ) => unknown;
+          then: (resolve: (v: { data: unknown[]; error: null }) => unknown) => unknown;
         } = {
           select: () => chain,
           eq: (col: string, val: unknown) => {
@@ -484,8 +475,7 @@ afterEach(() => {
 describe("dispatchResultEmails", () => {
   it("no-ops without throwing when RESEND_API_KEY is unset", async () => {
     resendApiKey = null;
-    const { dispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary).toEqual({ emailed: 0, failed: 0, skipped: 0 });
     expect(batchSendMock).not.toHaveBeenCalled();
@@ -493,8 +483,7 @@ describe("dispatchResultEmails", () => {
 
   it("writes ledger rows only after Resend accepts the batch", async () => {
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { dispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary.emailed).toBe(1);
     expect(batchSendMock).toHaveBeenCalledTimes(1);
@@ -510,8 +499,7 @@ describe("dispatchResultEmails", () => {
       data: null,
       error: { message: "rate limited" },
     });
-    const { dispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary.failed).toBe(1);
     expect(summary.emailed).toBe(0);
@@ -521,8 +509,7 @@ describe("dispatchResultEmails", () => {
   it("skips recipients whose email cannot be resolved", async () => {
     getUserByIdMock.mockResolvedValue({ data: { user: null }, error: null });
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { dispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary.skipped).toBe(1);
     expect(summary.emailed).toBe(0);
@@ -531,8 +518,7 @@ describe("dispatchResultEmails", () => {
 
   it("does nothing when every scored pair is already in the ledger", async () => {
     ledgerData = [{ match_id: "m1", user_id: "u1" }];
-    const { dispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary).toEqual({ emailed: 0, failed: 0, skipped: 0 });
     expect(batchSendMock).not.toHaveBeenCalled();
@@ -540,8 +526,7 @@ describe("dispatchResultEmails", () => {
 
   it("excludes a player who opted out of result emails", async () => {
     prefsData = [{ id: "u1", email_prefs: { result: false } }];
-    const { dispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary).toEqual({ emailed: 0, failed: 0, skipped: 0 });
     expect(batchSendMock).not.toHaveBeenCalled();
@@ -550,8 +535,7 @@ describe("dispatchResultEmails", () => {
   it("still emails a player with no explicit result preference", async () => {
     prefsData = [{ id: "u1", email_prefs: {} }];
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { dispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { dispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await dispatchResultEmails();
     expect(summary.emailed).toBe(1);
   });
@@ -566,8 +550,7 @@ describe("forceDispatchResultEmails", () => {
     // The same pair the cron path would suppress.
     ledgerData = [{ match_id: "m1", user_id: "u1" }];
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { forceDispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { forceDispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await forceDispatchResultEmails("m1");
     expect(summary.emailed).toBe(1);
     expect(batchSendMock).toHaveBeenCalledTimes(1);
@@ -575,8 +558,7 @@ describe("forceDispatchResultEmails", () => {
 
   it("scopes the scored query to the target match_id at the data layer", async () => {
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { forceDispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { forceDispatchResultEmails } = await import("@/lib/notifications/result-emails");
     await forceDispatchResultEmails("m1");
     expect(scoredEqCalls).toContainEqual({ col: "match_id", val: "m1" });
     expect(scoredEqCalls).toContainEqual({
@@ -609,8 +591,7 @@ describe("forceDispatchResultEmails", () => {
 
   it("no-ops without throwing when RESEND_API_KEY is unset", async () => {
     resendApiKey = null;
-    const { forceDispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { forceDispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await forceDispatchResultEmails("m1");
     expect(summary).toEqual({ emailed: 0, failed: 0, skipped: 0 });
     expect(batchSendMock).not.toHaveBeenCalled();
@@ -619,8 +600,7 @@ describe("forceDispatchResultEmails", () => {
   it("counts an unresolvable email as skipped, not failed", async () => {
     getUserByIdMock.mockResolvedValue({ data: { user: null }, error: null });
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { forceDispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { forceDispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await forceDispatchResultEmails("m1");
     expect(summary.skipped).toBe(1);
     expect(summary.emailed).toBe(0);
@@ -651,8 +631,7 @@ describe("forceDispatchResultEmails", () => {
       display_name: "Player",
     }));
     batchSendMock.mockResolvedValue({ data: { data: [] }, error: null });
-    const { forceDispatchResultEmails } =
-      await import("@/lib/notifications/result-emails");
+    const { forceDispatchResultEmails } = await import("@/lib/notifications/result-emails");
     const summary = await forceDispatchResultEmails("m1");
     expect(summary.emailed).toBe(150);
     expect(batchSendMock).toHaveBeenCalledTimes(2);

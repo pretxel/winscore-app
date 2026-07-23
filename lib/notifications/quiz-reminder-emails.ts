@@ -1,15 +1,15 @@
 import "server-only";
-import { Resend } from "resend";
 import { getTranslations } from "next-intl/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { Resend } from "resend";
+import { isOptedIn } from "@/lib/email-prefs";
 import { env } from "@/lib/env";
 import { DEFAULT_LOCALE, localePath } from "@/lib/i18n";
+import { filterRecipientsAtLocalHour } from "@/lib/match-utils";
 import { computeStreak } from "@/lib/quiz";
 import { loadConsumedFreezeDays } from "@/lib/streak-freeze";
-import { filterRecipientsAtLocalHour } from "@/lib/match-utils";
-import { isOptedIn } from "@/lib/email-prefs";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { checkEmailSenderConfig } from "./email-sender-config";
-import { renderQuizReminderEmail, type QuizReminderEmailStrings } from "./quiz-reminder-template";
+import { type QuizReminderEmailStrings, renderQuizReminderEmail } from "./quiz-reminder-template";
 
 // Resend caps a single batch.send call at 100 messages.
 const RESEND_BATCH_LIMIT = 100;
@@ -125,13 +125,18 @@ function withFromName(emailFrom: string, name?: string): string {
 // days so the reminder reflects the freeze-PROTECTED streak and never tells a
 // still-alive (frozen) user their streak is gone. The email never consumes a
 // freeze — consumption is owned by the page read paths; it only reads.
-async function loadStreaks(admin: AdminClient, userIds: string[]): Promise<Map<string, number>> {
+async function loadStreaks(
+  admin: AdminClient,
+  userIds: string[],
+  competitionId: string,
+): Promise<Map<string, number>> {
   const out = new Map<string, number>();
   if (userIds.length === 0) return out;
   try {
     const { data, error } = await admin
       .from("quiz_answers")
       .select("user_id, answered_at")
+      .eq("competition_id", competitionId)
       .in("user_id", userIds);
     if (error || !data) return out;
     const frozenByUser = await loadConsumedFreezeDays(admin, userIds, "quiz");
@@ -245,18 +250,38 @@ export async function dispatchQuizReminders(
 
   const admin = createAdminSupabaseClient(leagueSlug);
 
-  // Today's active question. None → nothing to remind about.
+  // Resolve the competition this run targets: the requested league, or the
+  // single active competition when no slug is given (manual/transition callers).
+  const compQuery = admin.from("competitions").select("id, slug");
+  const { data: competition, error: cErr } = await (leagueSlug
+    ? compQuery.eq("slug", leagueSlug)
+    : compQuery.eq("is_active", true)
+  ).maybeSingle();
+  if (cErr) {
+    throw new Error(`[quiz-reminders] resolve competition: ${cErr.message}`);
+  }
+  if (!competition) {
+    console.log(`[quiz-reminders] no competition for ${leagueSlug ?? "active"} — nothing to send`);
+    return { ...ZERO, ...flag };
+  }
+  const competitionId = competition.id as string;
+  const competitionSlug = competition.slug as string;
+
+  // This competition's active question for today. None → nothing to remind about.
   const today = todayUtcDate();
   const { data: question, error: qErr } = await admin
     .from("quiz_questions")
     .select("id")
+    .eq("competition_id", competitionId)
     .eq("active_on", today)
     .maybeSingle();
   if (qErr) {
     throw new Error(`[quiz-reminders] load active question: ${qErr.message}`);
   }
   if (!question) {
-    console.log(`[quiz-reminders] no active question for ${today} — nothing to send`);
+    console.log(
+      `[quiz-reminders] no active question for ${competitionSlug} on ${today} — nothing to send`,
+    );
     return { ...ZERO, ...flag };
   }
   const questionId = question.id as string;
@@ -287,13 +312,14 @@ export async function dispatchQuizReminders(
   const streaks = await loadStreaks(
     admin,
     pending.map((p) => p.userId),
+    competitionId,
   );
 
   const t = (await getTranslations({
     locale: DEFAULT_LOCALE,
     namespace: "quizEmail",
   })) as Translator;
-  const quizUrl = `${env.siteUrl}${localePath(DEFAULT_LOCALE, "/quiz")}`;
+  const quizUrl = `${env.siteUrl}${localePath(DEFAULT_LOCALE, `/${competitionSlug}/quiz`)}`;
   const fromAddress = withFromName(env.emailFrom, fromName);
   const resend = new Resend(env.resendApiKey);
 

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button";
 import { TriangleAlertIcon } from "lucide-react";
+import Link from "next/link";
+import { useEffect } from "react";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 // Locale-agnostic fallback. Localized version lives at
 // app/[locale]/error.tsx and handles errors within the i18n tree.

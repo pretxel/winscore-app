@@ -10,11 +10,11 @@ describe("nextScheduledRun", () => {
     // sync_matches fires at 09:00 UTC. At 08:00 the next run is today 09:00.
     const next = nextScheduledRun("sync_matches", new Date("2026-06-27T08:00:00Z"));
     expect(next).not.toBeNull();
-    expect(next!.toISOString()).toBe("2026-06-27T09:00:00.000Z");
+    expect(next?.toISOString()).toBe("2026-06-27T09:00:00.000Z");
   });
 
   it("rolls to tomorrow when today's hour has passed", () => {
     const next = nextScheduledRun("sync_matches", new Date("2026-06-27T10:00:00Z"));
-    expect(next!.toISOString()).toBe("2026-06-28T09:00:00.000Z");
+    expect(next?.toISOString()).toBe("2026-06-28T09:00:00.000Z");
   });
 });

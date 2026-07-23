@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { describe, expect, it } from "vitest";
 
 // Every transactional sender must set a Reply-To (deliverability: a no-reply /
 // reply-less From lowers inbox trust). Guard each sender module's Resend
@@ -20,10 +20,7 @@ const SENDERS = [
 describe("transactional senders set Reply-To", () => {
   for (const name of SENDERS) {
     it(`${name} includes replyTo: env.emailReplyTo`, () => {
-      const src = readFileSync(
-        join("lib", "notifications", `${name}.ts`),
-        "utf8",
-      );
+      const src = readFileSync(join("lib", "notifications", `${name}.ts`), "utf8");
       expect(src).toContain("replyTo: env.emailReplyTo");
     });
   }

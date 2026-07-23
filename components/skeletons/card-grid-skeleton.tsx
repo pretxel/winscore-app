@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 // Responsive grid of placeholder cards mirroring the Card primitive shell
 // (`rounded-xl bg-card ring-1 ring-foreground/10`). Covers the news article
@@ -34,9 +34,7 @@ export function CardGridSkeleton({
           key={i}
           className="flex flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10"
         >
-          {withImage ? (
-            <Skeleton className="aspect-video w-full rounded-none" />
-          ) : null}
+          {withImage ? <Skeleton className="aspect-video w-full rounded-none" /> : null}
           <div className="flex flex-col gap-3 p-4">
             <div className="space-y-1.5">
               <Skeleton className="h-5 w-3/4" />
@@ -44,10 +42,7 @@ export function CardGridSkeleton({
             </div>
             <div className="space-y-2">
               {Array.from({ length: bodyLines }).map((_, j) => (
-                <Skeleton
-                  key={j}
-                  className={cn("h-3 w-full", j === bodyLines - 1 && "w-2/3")}
-                />
+                <Skeleton key={j} className={cn("h-3 w-full", j === bodyLines - 1 && "w-2/3")} />
               ))}
             </div>
             {withFooter ? (

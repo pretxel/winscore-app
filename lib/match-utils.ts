@@ -193,7 +193,8 @@ type TeamPair = { home_team: string; away_team: string };
 // Seeded knockout slots are display labels, not confirmed participants. Keep
 // this name-based so club teams and future leagues are valid without a static
 // country registry.
-const PLACEHOLDER_PARTICIPANT = /^(?:Winner|Loser)\s+|^\d+(?:st|nd|rd|th)\s+|^Group\s+[A-Z]\b|^(?:TBD|TBC|To be determined)$/i;
+const PLACEHOLDER_PARTICIPANT =
+  /^(?:Winner|Loser)\s+|^\d+(?:st|nd|rd|th)\s+|^Group\s+[A-Z]\b|^(?:TBD|TBC|To be determined)$/i;
 
 export function isConfirmedParticipantName(name: string): boolean {
   const value = name.trim();
@@ -357,8 +358,5 @@ export function parseMatchesTab(
 // …); those stay unconfirmed until an admin sets the real teams. Drives public
 // visibility and pickability without requiring a country-only registry.
 export function isConfirmedMatch(match: TeamPair): boolean {
-  return (
-    isConfirmedParticipantName(match.home_team) &&
-    isConfirmedParticipantName(match.away_team)
-  );
+  return isConfirmedParticipantName(match.home_team) && isConfirmedParticipantName(match.away_team);
 }

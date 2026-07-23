@@ -12,9 +12,7 @@ type AdminClient = ReturnType<typeof createAdminSupabaseClient>;
 // per ranked player keyed (competition_id, user_id), so the table always holds
 // "the rank as of the previous run". Returns the number of rows snapshotted.
 export async function captureRankSnapshot(admin: AdminClient): Promise<number> {
-  const { data, error } = await admin
-    .from("v_leaderboard_overall")
-    .select("user_id, rank");
+  const { data, error } = await admin.from("v_leaderboard_overall").select("user_id, rank");
   if (error) {
     throw new Error(`[rank-snapshot] load leaderboard: ${error.message}`);
   }
@@ -31,10 +29,7 @@ export async function captureRankSnapshot(admin: AdminClient): Promise<number> {
   }
 
   const rows = (data ?? [])
-    .filter(
-      (r): r is { user_id: string; rank: number } =>
-        r.user_id != null && r.rank != null,
-    )
+    .filter((r): r is { user_id: string; rank: number } => r.user_id != null && r.rank != null)
     .map((r) => ({
       competition_id: compId as string,
       user_id: r.user_id,

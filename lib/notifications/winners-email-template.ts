@@ -15,10 +15,8 @@
 // ---------------------------------------------------------------------------
 import { C } from "./email-theme";
 
-const SANS =
-  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO =
-  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // One podium row. `isYou` marks the recipient's own row with the you-chip.
 export interface WinnersPodiumRow {
@@ -198,9 +196,7 @@ function renderFooter(s: WinnersEmailStrings): string {
 
 // --- entry points ----------------------------------------------------------
 
-export function renderWinnersEmail(
-  data: WinnersEmailData,
-): WinnersEmailRendered {
+export function renderWinnersEmail(data: WinnersEmailData): WinnersEmailRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>
@@ -242,9 +238,7 @@ function renderText(data: WinnersEmailData): string {
   lines.push(s.podiumLabel.toUpperCase());
   for (const r of data.podium) {
     const you = r.isYou ? ` (${s.youLabel})` : "";
-    lines.push(
-      ` ${r.rank}. ${r.displayName ?? "—"}${you} — ${r.totalPoints} ${s.pointsLabel}`,
-    );
+    lines.push(` ${r.rank}. ${r.displayName ?? "—"}${you} — ${r.totalPoints} ${s.pointsLabel}`);
   }
   lines.push("");
   lines.push(`${s.ctaLabel}: ${data.leaderboardUrl}`);

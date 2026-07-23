@@ -1,6 +1,6 @@
-import type { HitType } from "@/lib/db";
 import type { CompetitionFormat } from "@/lib/competition-schema";
 import { getStageConfig } from "@/lib/competition-schema";
+import type { HitType } from "@/lib/db";
 
 export interface ScoredPrediction {
   points: number;
@@ -30,10 +30,7 @@ export const STAGE_POINT_MULTIPLIER: Record<string, number> = {
 // Resolve the point multiplier for a stage, preferring the competition's
 // format_config.stages[].pointMultiplier when present, falling back to the
 // hardcoded STAGE_POINT_MULTIPLIER map, and ultimately ×1.
-export function resolveStageMultiplier(
-  stage: string,
-  format?: CompetitionFormat | null,
-): number {
+export function resolveStageMultiplier(stage: string, format?: CompetitionFormat | null): number {
   if (format) {
     const cfg = getStageConfig(format, stage);
     if (cfg?.pointMultiplier != null) return cfg.pointMultiplier;

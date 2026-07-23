@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
-  renderRecapDigest,
   type RecapDigestData,
   type RecapDigestStrings,
+  renderRecapDigest,
 } from "@/lib/notifications/recap-digest-template";
 
 // ---------------------------------------------------------------------------

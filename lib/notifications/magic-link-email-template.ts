@@ -16,21 +16,13 @@
 // ---------------------------------------------------------------------------
 import { C } from "./email-theme";
 
-const SANS =
-  "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const MONO =
-  "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 
 // Auth email types that carry an action link we render a branded email for.
 // GoTrue's Send Email Hook delivers many more types once enabled; the route
 // handler no-ops the rest. `magiclink` is the only one the app triggers today.
-export const LINK_ACTIONS = [
-  "magiclink",
-  "signup",
-  "recovery",
-  "invite",
-  "email_change",
-] as const;
+export const LINK_ACTIONS = ["magiclink", "signup", "recovery", "invite", "email_change"] as const;
 
 export type MagicLinkAction = (typeof LINK_ACTIONS)[number];
 
@@ -70,10 +62,7 @@ type Translator = (key: string, values?: Record<string, unknown>) => string;
 // Builds the resolved copy for one email from a next-intl translator scoped to
 // the `email.magicLink` namespace. Unknown/non-link action types fall back to
 // the `magiclink` copy so the caller always has sensible strings.
-export function buildMagicLinkEmailStrings(
-  t: Translator,
-  action: string,
-): MagicLinkEmailStrings {
+export function buildMagicLinkEmailStrings(t: Translator, action: string): MagicLinkEmailStrings {
   const a: MagicLinkAction = isLinkAction(action) ? action : "magiclink";
   return {
     subject: t(`actions.${a}.subject`),
@@ -190,9 +179,7 @@ function renderFooter(s: MagicLinkEmailStrings): string {
 
 // --- public renderer -------------------------------------------------------
 
-export function renderMagicLinkEmail(
-  data: MagicLinkEmailData,
-): MagicLinkEmailRendered {
+export function renderMagicLinkEmail(data: MagicLinkEmailData): MagicLinkEmailRendered {
   const s = data.strings;
 
   const html = `<!DOCTYPE html>

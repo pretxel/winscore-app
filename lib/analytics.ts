@@ -7,10 +7,7 @@
 // breaks the interaction it measures. Events are fire-and-forget; there is no
 // queue, so an event emitted before gtag loads is simply dropped.
 
-export function trackEvent(
-  name: string,
-  params?: Record<string, string | number | boolean>,
-): void {
+export function trackEvent(name: string, params?: Record<string, string | number | boolean>): void {
   if (typeof window === "undefined" || typeof window.gtag !== "function") {
     return;
   }

@@ -28,12 +28,20 @@ const PHASES: ScoreRulesPhaseRow[] = [
 
 describe("renderScoreRulesEmail", () => {
   it("returns the subject from strings", () => {
-    const out = renderScoreRulesEmail({ phases: PHASES, strings: STRINGS, ctaUrl: "https://x/#stage-scoring" });
+    const out = renderScoreRulesEmail({
+      phases: PHASES,
+      strings: STRINGS,
+      ctaUrl: "https://x/#stage-scoring",
+    });
     expect(out.subject).toBe("New scoring");
   });
 
   it("renders each phase label and its points in the HTML", () => {
-    const { html } = renderScoreRulesEmail({ phases: PHASES, strings: STRINGS, ctaUrl: "https://x/#stage-scoring" });
+    const { html } = renderScoreRulesEmail({
+      phases: PHASES,
+      strings: STRINGS,
+      ctaUrl: "https://x/#stage-scoring",
+    });
     expect(html).toContain("Group");
     expect(html).toContain("Final");
     expect(html).toContain("50"); // exact in the final
@@ -41,13 +49,21 @@ describe("renderScoreRulesEmail", () => {
   });
 
   it("includes the CTA url and label", () => {
-    const { html } = renderScoreRulesEmail({ phases: PHASES, strings: STRINGS, ctaUrl: "https://x/#stage-scoring" });
+    const { html } = renderScoreRulesEmail({
+      phases: PHASES,
+      strings: STRINGS,
+      ctaUrl: "https://x/#stage-scoring",
+    });
     expect(html).toContain("https://x/#stage-scoring");
     expect(html).toContain("See full scoring");
   });
 
   it("produces a plain-text part with a row per phase", () => {
-    const { text } = renderScoreRulesEmail({ phases: PHASES, strings: STRINGS, ctaUrl: "https://x/#stage-scoring" });
+    const { text } = renderScoreRulesEmail({
+      phases: PHASES,
+      strings: STRINGS,
+      ctaUrl: "https://x/#stage-scoring",
+    });
     expect(text).toContain("Group | 1× | 5 | 3 | 1");
     expect(text).toContain("Final | 10× | 50 | 30 | 10");
   });

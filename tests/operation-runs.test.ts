@@ -11,9 +11,9 @@ vi.mock("@/lib/env", () => ({
 
 import {
   deriveStatus,
-  recordRun,
   type RunRecord,
   type RunWriter,
+  recordRun,
 } from "@/lib/operations/record-run";
 
 // ---------------------------------------------------------------------------
@@ -81,9 +81,7 @@ describe("recordRun", () => {
       error: null,
     });
     expect(records[0].durationMs).toBeGreaterThanOrEqual(0);
-    expect(records[0].finishedAt.getTime()).toBeGreaterThanOrEqual(
-      records[0].startedAt.getTime(),
-    );
+    expect(records[0].finishedAt.getTime()).toBeGreaterThanOrEqual(records[0].startedAt.getTime());
   });
 
   it("records a partial run when the summary reports failures", async () => {
@@ -101,9 +99,14 @@ describe("recordRun", () => {
     const boom = new Error("provider exploded");
 
     await expect(
-      recordRun("sync_news", "cron", async () => {
-        throw boom;
-      }, writer),
+      recordRun(
+        "sync_news",
+        "cron",
+        async () => {
+          throw boom;
+        },
+        writer,
+      ),
     ).rejects.toThrow("provider exploded");
 
     // The failure is still recorded for observability.
@@ -134,9 +137,14 @@ describe("recordRun", () => {
     };
 
     await expect(
-      recordRun("prediction_reminders", "cron", async () => {
-        throw new Error("dispatch failed");
-      }, failingWriter),
+      recordRun(
+        "prediction_reminders",
+        "cron",
+        async () => {
+          throw new Error("dispatch failed");
+        },
+        failingWriter,
+      ),
     ).rejects.toThrow("dispatch failed");
   });
 });

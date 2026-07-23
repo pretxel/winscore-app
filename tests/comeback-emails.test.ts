@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  renderComebackEmail,
   type ComebackEmailData,
   type ComebackEmailStrings,
+  renderComebackEmail,
 } from "@/lib/notifications/comeback-email-template";
 
 // ---------------------------------------------------------------------------
@@ -73,9 +73,7 @@ describe("renderComebackEmail", () => {
   it("deep links the CTA to /matches?picks=needed and includes the unsubscribe link", () => {
     const out = renderComebackEmail(makeData());
     expect(out.html).toContain("https://example.com/en/matches?picks=needed");
-    expect(out.html).toContain(
-      "https://example.com/api/comeback-emails/unsubscribe?token=tok1",
-    );
+    expect(out.html).toContain("https://example.com/api/comeback-emails/unsubscribe?token=tok1");
     expect(out.text).toContain("https://example.com/en/matches?picks=needed");
     expect(out.text).toContain("unsubscribe?token=tok1");
   });
@@ -107,11 +105,11 @@ describe("renderComebackEmail", () => {
 
 import {
   buildComebackEmailStrings,
+  COOLDOWN_DAYS,
+  type ComebackProfile,
   computePendingComebackEmails,
   formatKickoffLabel,
   INACTIVITY_DAYS,
-  COOLDOWN_DAYS,
-  type ComebackProfile,
   type PickableMatch,
 } from "@/lib/notifications/comeback-emails";
 
@@ -369,7 +367,9 @@ describe("dispatchComebackEmails", () => {
   });
 
   it("excludes a recently-active player", async () => {
-    predictionData = [{ id: "p1", user_id: "u1", submitted_at: new Date(RUN_NOW.getTime() - DAY).toISOString() }];
+    predictionData = [
+      { id: "p1", user_id: "u1", submitted_at: new Date(RUN_NOW.getTime() - DAY).toISOString() },
+    ];
     const { dispatchComebackEmails } = await import("@/lib/notifications/comeback-emails");
     const summary = await dispatchComebackEmails();
     expect(summary).toEqual({ emailed: 0, failed: 0, skipped: 0 });
@@ -378,7 +378,12 @@ describe("dispatchComebackEmails", () => {
 
   it("excludes a player opted out of comeback emails", async () => {
     profileData = [
-      { id: "u1", display_name: "Alex", unsubscribe_token: "tok1", email_prefs: { comeback: false } },
+      {
+        id: "u1",
+        display_name: "Alex",
+        unsubscribe_token: "tok1",
+        email_prefs: { comeback: false },
+      },
     ];
     const { dispatchComebackEmails } = await import("@/lib/notifications/comeback-emails");
     const summary = await dispatchComebackEmails();

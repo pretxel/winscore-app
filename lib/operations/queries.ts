@@ -1,6 +1,6 @@
 import "server-only";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import type { OperationRunRow } from "@/lib/db";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { OPERATION_KINDS, type OperationKind, type OperationStatus } from "./record-run";
 
 type AdminClient = ReturnType<typeof createAdminSupabaseClient>;

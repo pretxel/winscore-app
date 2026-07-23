@@ -1,22 +1,17 @@
-import Link from "next/link";
+import { ArrowRightIcon, BrainIcon, NewspaperIcon, UsersIcon } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  ArrowRightIcon,
-  BrainIcon,
-  NewspaperIcon,
-  UsersIcon,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { isLocale, localePath, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
-import { Logotype } from "@/components/logotype";
-import { TournamentCountdown } from "@/components/tournament-countdown";
-import { ScoringExplainer } from "@/components/scoring-explainer";
 import { LeagueLane } from "@/components/league-lane";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { Logotype } from "@/components/logotype";
+import { ScoringExplainer } from "@/components/scoring-explainer";
+import { TournamentCountdown } from "@/components/tournament-countdown";
+import { buttonVariants } from "@/components/ui/button";
 import { listMyPoolsByLeague } from "@/lib/groups";
 import { getLeagueLaneFixtures } from "@/lib/home";
+import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -30,11 +25,7 @@ export async function generateMetadata({
 
 type T = Awaited<ReturnType<typeof getTranslations<"home">>>;
 
-export default async function HomePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
@@ -109,10 +100,7 @@ function EmptyGroupsHome({ locale, t }: { locale: Locale; t: T }) {
       </h1>
       <p className="text-muted-foreground mt-4 max-w-md">{t("emptyLede")}</p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <Link
-          href={localePath(locale, "/groups")}
-          className={cn(buttonVariants({ size: "lg" }))}
-        >
+        <Link href={localePath(locale, "/groups")} className={cn(buttonVariants({ size: "lg" }))}>
           {t("startGroup")}
         </Link>
         <Link
@@ -140,10 +128,8 @@ function Hero({ locale, t }: { locale: Locale; t: T }) {
         aria-hidden
         className="bg-pitch-stripes absolute -right-32 -top-24 h-[42rem] w-[42rem] -rotate-12 opacity-[0.08] dark:opacity-[0.18]"
         style={{
-          maskImage:
-            "radial-gradient(closest-side at 50% 50%, black 35%, transparent 75%)",
-          WebkitMaskImage:
-            "radial-gradient(closest-side at 50% 50%, black 35%, transparent 75%)",
+          maskImage: "radial-gradient(closest-side at 50% 50%, black 35%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(closest-side at 50% 50%, black 35%, transparent 75%)",
         }}
       />
       <div className="bg-grain pointer-events-none absolute inset-0" />
@@ -158,11 +144,7 @@ function Hero({ locale, t }: { locale: Locale; t: T }) {
           </div>
 
           <div className="mt-4">
-            <Logotype
-              size="xl"
-              className="text-foreground"
-              ariaLabel="Winscore"
-            />
+            <Logotype size="xl" className="text-foreground" ariaLabel="Winscore" />
           </div>
           <h1
             className="mt-6 font-heading text-[2.6rem] font-semibold leading-[1.02] tracking-[-0.03em] text-foreground sm:text-6xl lg:text-[5rem]"
@@ -181,8 +163,7 @@ function Hero({ locale, t }: { locale: Locale; t: T }) {
               href={localePath(locale, "/sign-in")}
               className={buttonVariants({
                 size: "lg",
-                className:
-                  "h-11 gap-2 px-5 text-sm font-semibold uppercase tracking-[0.16em]",
+                className: "h-11 gap-2 px-5 text-sm font-semibold uppercase tracking-[0.16em]",
               })}
             >
               {t("ctaSignIn")}
@@ -219,16 +200,8 @@ function Hero({ locale, t }: { locale: Locale; t: T }) {
 function Cadence({ t }: { t: T }) {
   const items: Array<{
     tag: string;
-    labelKey:
-      | "cadencePickLabel"
-      | "cadenceLockLabel"
-      | "cadenceScoreLabel"
-      | "cadenceClimbLabel";
-    copyKey:
-      | "cadencePickCopy"
-      | "cadenceLockCopy"
-      | "cadenceScoreCopy"
-      | "cadenceClimbCopy";
+    labelKey: "cadencePickLabel" | "cadenceLockLabel" | "cadenceScoreLabel" | "cadenceClimbLabel";
+    copyKey: "cadencePickCopy" | "cadenceLockCopy" | "cadenceScoreCopy" | "cadenceClimbCopy";
   }> = [
     { tag: "01", labelKey: "cadencePickLabel", copyKey: "cadencePickCopy" },
     { tag: "02", labelKey: "cadenceLockLabel", copyKey: "cadenceLockCopy" },
@@ -249,10 +222,7 @@ function Cadence({ t }: { t: T }) {
         </div>
         <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((step) => (
-            <li
-              key={step.tag}
-              className="rounded-lg border border-border bg-card p-4"
-            >
+            <li key={step.tag} className="rounded-lg border border-border bg-card p-4">
               <div className="flex items-center gap-2">
                 <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
                   {step.tag}
@@ -262,9 +232,7 @@ function Cadence({ t }: { t: T }) {
                   {t(step.labelKey)}
                 </span>
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                {t(step.copyKey)}
-              </p>
+              <p className="mt-3 text-sm text-muted-foreground">{t(step.copyKey)}</p>
             </li>
           ))}
         </ol>
@@ -330,9 +298,7 @@ function FeatureSections({ locale, t }: { locale: Locale; t: T }) {
             <h3 className="mt-5 font-heading text-lg font-semibold tracking-tight">
               {t(f.titleKey)}
             </h3>
-            <p className="mt-2 flex-1 text-sm text-muted-foreground">
-              {t(f.copyKey)}
-            </p>
+            <p className="mt-2 flex-1 text-sm text-muted-foreground">{t(f.copyKey)}</p>
             <Link
               href={localePath(locale, f.href)}
               className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-foreground underline-offset-4 hover:text-pitch hover:underline"

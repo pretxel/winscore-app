@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { ShareButtons } from "@/components/share-buttons";
-import { buildH2HPath } from "@/lib/share";
 import { trackEvent } from "@/lib/analytics";
 import type { Locale } from "@/lib/i18n";
+import { buildH2HPath } from "@/lib/share";
 
 type Opponent = { userId: string; name: string };
 

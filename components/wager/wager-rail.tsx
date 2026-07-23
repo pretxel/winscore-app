@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
-  CoinsIcon,
-  ClockIcon,
-  UsersIcon,
-  ShieldCheckIcon,
-  WalletIcon,
-  Loader2Icon,
   AlertTriangleIcon,
   CheckCircle2Icon,
+  ClockIcon,
+  CoinsIcon,
   ExternalLinkIcon,
+  Loader2Icon,
+  ShieldCheckIcon,
+  UsersIcon,
+  WalletIcon,
 } from "lucide-react";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 type WagerView = "overview" | "consent" | "confirming" | "confirmed" | "failed";
 
@@ -190,25 +190,19 @@ export function WagerRail({
               </div>
               <Separator />
               <p className="text-xs text-muted-foreground">
-                By confirming, your wallet will sign a transaction transferring
-                exactly {stakeDisplay} {tokenSymbol} to the escrow program on{" "}
-                <strong>Solana Devnet</strong>. Devnet tokens have no real
-                value. Winscore is the settlement oracle. Rules are final.
+                By confirming, your wallet will sign a transaction transferring exactly{" "}
+                {stakeDisplay} {tokenSymbol} to the escrow program on <strong>Solana Devnet</strong>
+                . Devnet tokens have no real value. Winscore is the settlement oracle. Rules are
+                final.
               </p>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setView("overview")}
-              >
+              <Button variant="outline" size="sm" onClick={() => setView("overview")}>
                 Back
               </Button>
               <Button size="sm" onClick={handleConfirm} disabled={loading}>
-                {loading ? (
-                  <Loader2Icon className="mr-2 size-4 animate-spin" />
-                ) : null}
-                I Understand — Sign Transaction
+                {loading ? <Loader2Icon className="mr-2 size-4 animate-spin" /> : null}I Understand
+                — Sign Transaction
               </Button>
             </div>
           </CardContent>
@@ -221,9 +215,7 @@ export function WagerRail({
           <CardContent className="flex flex-col items-center gap-3 py-8">
             <Loader2Icon className="size-8 animate-spin text-pitch" />
             <p className="text-sm font-medium">Awaiting signature…</p>
-            <p className="text-xs text-muted-foreground">
-              Confirm the transaction in your wallet.
-            </p>
+            <p className="text-xs text-muted-foreground">Confirm the transaction in your wallet.</p>
           </CardContent>
         </Card>
       );
@@ -252,8 +244,8 @@ export function WagerRail({
               </div>
             )}
             <p className="text-xs text-muted-foreground">
-              Your {stakeDisplay} {tokenSymbol} has been deposited. Results
-              will be settled after the round closes.
+              Your {stakeDisplay} {tokenSymbol} has been deposited. Results will be settled after
+              the round closes.
             </p>
           </CardContent>
         </Card>
@@ -267,9 +259,7 @@ export function WagerRail({
               <AlertTriangleIcon className="size-5 text-destructive" />
               <p className="text-sm font-medium">Entry Failed</p>
             </div>
-            {error && (
-              <p className="text-xs text-muted-foreground">{error}</p>
-            )}
+            {error && <p className="text-xs text-muted-foreground">{error}</p>}
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handleRetry}>
                 Try Again
@@ -286,10 +276,7 @@ export function WagerRail({
             <CardTitle className="flex items-center gap-2 text-base">
               <CoinsIcon className="size-4 text-flag" />
               Matchday Wager
-              <Badge
-                variant="outline"
-                className="ml-auto text-[10px] bg-blue-500/10 text-blue-500"
-              >
+              <Badge variant="outline" className="ml-auto text-[10px] bg-blue-500/10 text-blue-500">
                 Devnet
               </Badge>
             </CardTitle>
@@ -339,11 +326,7 @@ export function WagerRail({
 
             <Separator />
 
-            <Button
-              className="w-full"
-              size="sm"
-              onClick={handleConsent}
-            >
+            <Button className="w-full" size="sm" onClick={handleConsent}>
               Enter Wager — {stakeDisplay} {tokenSymbol}
             </Button>
           </CardContent>

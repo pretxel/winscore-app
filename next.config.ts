@@ -19,7 +19,14 @@ const nextConfig: NextConfig = {
   // source is exactly two path segments — the new `/[locale]/[league]/…` routes
   // carry an extra segment, so they never collide with these.
   async redirects() {
-    const legacy = ["matches", "matches/:matchId", "leaderboard", "standings", "bracket", "my-picks"];
+    const legacy = [
+      "matches",
+      "matches/:matchId",
+      "leaderboard",
+      "standings",
+      "bracket",
+      "my-picks",
+    ];
     return legacy.map((path) => ({
       source: `/:locale(en|es|fr|de)/${path}`,
       destination: "/:locale/catalog",

@@ -1,8 +1,8 @@
 "use server";
 
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { NewsArticleRow } from "@/lib/db";
 import { NEWS_PAGE_SIZE } from "@/lib/news";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type LoadMoreResult =
   | { ok: true; articles: NewsArticleRow[]; hasMore: boolean }

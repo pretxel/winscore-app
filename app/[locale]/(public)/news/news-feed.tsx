@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
 import { ArrowUpRightIcon, Loader2Icon } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { LocalTime } from "@/components/local-time";
 import type { NewsArticleRow } from "@/lib/db";
 import { isHttpUrl } from "@/lib/news";
@@ -83,19 +83,12 @@ export function NewsFeed({
   );
 }
 
-function ArticleCard({
-  article,
-  readMore,
-}: {
-  article: NewsArticleRow;
-  readMore: string;
-}) {
+function ArticleCard({ article, readMore }: { article: NewsArticleRow; readMore: string }) {
   // Defense-in-depth: the sync already rejects non-http(s) schemes, but guard
   // again at render so untrusted feed data can never produce a javascript:
   // href or an off-scheme image src.
   const href = isHttpUrl(article.source_url) ? article.source_url : undefined;
-  const imageSrc =
-    article.image_url && isHttpUrl(article.image_url) ? article.image_url : null;
+  const imageSrc = article.image_url && isHttpUrl(article.image_url) ? article.image_url : null;
 
   return (
     <a
@@ -122,18 +115,14 @@ function ArticleCard({
           {article.title}
         </h2>
         {article.summary ? (
-          <p className="line-clamp-3 text-sm text-muted-foreground">
-            {article.summary}
-          </p>
+          <p className="line-clamp-3 text-sm text-muted-foreground">{article.summary}</p>
         ) : null}
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-2 text-xs text-muted-foreground">
           <span className="flex min-w-0 items-center gap-1.5">
             {article.source ? (
               <>
-                <span className="truncate font-medium text-foreground">
-                  {article.source}
-                </span>
+                <span className="truncate font-medium text-foreground">{article.source}</span>
                 <span aria-hidden>·</span>
               </>
             ) : null}

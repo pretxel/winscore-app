@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 // Bars sit on the dark pitch-colored scoreboard, so they use a light tint
 // instead of the default `bg-muted` (cn/twMerge lets the later bg utility win).

@@ -61,10 +61,7 @@ export function recordRpcError(error: string): void {
   logWagerEvent({ metric: "rpc_error", error });
 }
 
-export function recordReconciliationMismatch(
-  intentId: string,
-  error: string,
-): void {
+export function recordReconciliationMismatch(intentId: string, error: string): void {
   logWagerEvent({
     metric: "reconciliation_mismatch",
     intentId,
@@ -72,10 +69,7 @@ export function recordReconciliationMismatch(
   });
 }
 
-export function recordAgedLiability(
-  roundId: string,
-  daysUnclaimed: number,
-): void {
+export function recordAgedLiability(roundId: string, daysUnclaimed: number): void {
   logWagerEvent({
     metric: "aged_liability",
     roundId,

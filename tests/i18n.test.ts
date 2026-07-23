@@ -1,13 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import {
-  SUPPORTED_LOCALES,
-  DEFAULT_LOCALE,
-  isLocale,
-  localePath,
-  LOCALE_LABELS,
-} from "@/lib/i18n";
+import { DEFAULT_LOCALE, isLocale, LOCALE_LABELS, localePath, SUPPORTED_LOCALES } from "@/lib/i18n";
 
 const MESSAGES_DIR = path.resolve(__dirname, "..", "messages");
 
@@ -27,7 +21,7 @@ function flattenKeys(obj: unknown, prefix = ""): string[] {
 
 describe("i18n constants", () => {
   it("DEFAULT_LOCALE is in SUPPORTED_LOCALES", () => {
-    expect((SUPPORTED_LOCALES as readonly string[])).toContain(DEFAULT_LOCALE);
+    expect(SUPPORTED_LOCALES as readonly string[]).toContain(DEFAULT_LOCALE);
   });
 
   it("every supported locale has a human-readable label", () => {
@@ -60,17 +54,13 @@ describe("message bundles", () => {
     const keysByLocale = SUPPORTED_LOCALES.map((loc) => ({
       loc,
       keys: flattenKeys(
-        JSON.parse(
-          fs.readFileSync(path.join(MESSAGES_DIR, `${loc}.json`), "utf8"),
-        ),
+        JSON.parse(fs.readFileSync(path.join(MESSAGES_DIR, `${loc}.json`), "utf8")),
       ),
     }));
 
-    const reference = keysByLocale[0]!.keys;
+    const reference = keysByLocale[0]?.keys;
     for (const { loc, keys } of keysByLocale.slice(1)) {
-      expect(keys, `${loc} keys differ from ${keysByLocale[0]!.loc}`).toEqual(
-        reference,
-      );
+      expect(keys, `${loc} keys differ from ${keysByLocale[0]?.loc}`).toEqual(reference);
     }
   });
 });

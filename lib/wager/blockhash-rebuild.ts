@@ -1,12 +1,12 @@
 "use server";
 
+import { base58 } from "@scure/base";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getWagerEnv } from "@/lib/wager/env";
-import { deriveEntryPda } from "@/lib/wager/pda";
 import { logWagerEvent } from "@/lib/wager/metrics";
-import { base58 } from "@scure/base";
+import { deriveEntryPda } from "@/lib/wager/pda";
 
-const BLOCKHASH_FRESHNESS_MS = 60_000; // 1 minute
+const _BLOCKHASH_FRESHNESS_MS = 60_000; // 1 minute
 
 /**
  * Rebuild an entry transaction after blockhash expiry.
@@ -39,13 +39,14 @@ export async function rebuildExpiredTransaction(
       .eq("id", intent.wallet_link_id)
       .single();
 
-    if (!link || !link.wallet_address) {
+    if (!link?.wallet_address) {
       return { rebuilt: false, error: "Wallet link not found" };
     }
 
-    walletBytes = typeof link.wallet_address === "string"
-      ? Buffer.from(link.wallet_address, "hex")
-      : new Uint8Array(link.wallet_address as unknown as ArrayBuffer);
+    walletBytes =
+      typeof link.wallet_address === "string"
+        ? Buffer.from(link.wallet_address, "hex")
+        : new Uint8Array(link.wallet_address as unknown as ArrayBuffer);
   } catch {
     return { rebuilt: false, error: "Failed to get wallet address" };
   }
@@ -66,10 +67,7 @@ export async function rebuildExpiredTransaction(
         jsonrpc: "2.0",
         id: 1,
         method: "getAccountInfo",
-        params: [
-          base58.encode(entryPda),
-          { commitment: env.commitment, encoding: "base64" },
-        ],
+        params: [base58.encode(entryPda), { commitment: env.commitment, encoding: "base64" }],
       }),
     });
 

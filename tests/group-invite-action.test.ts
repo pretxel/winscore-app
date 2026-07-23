@@ -36,8 +36,7 @@ const serverFrom = vi.fn((table: string) => {
     return {
       select: () => ({
         eq: () => ({
-          maybeSingle: () =>
-            Promise.resolve({ data: { display_name: "Alex" }, error: null }),
+          maybeSingle: () => Promise.resolve({ data: { display_name: "Alex" }, error: null }),
         }),
       }),
     };
@@ -85,11 +84,13 @@ vi.mock("@/lib/supabase/admin", () => ({
 
 // --- sender mock -----------------------------------------------------------
 const sendMock =
-  vi.fn<(opts: { recipients: string[] } & Record<string, unknown>) => Promise<{
-    sent: number;
-    failed: number;
-    skipped: number;
-  }>>();
+  vi.fn<
+    (opts: { recipients: string[] } & Record<string, unknown>) => Promise<{
+      sent: number;
+      failed: number;
+      skipped: number;
+    }>
+  >();
 vi.mock("@/lib/notifications/group-invite-email", () => ({
   sendGroupInviteEmails: sendMock,
 }));
@@ -168,9 +169,9 @@ describe("inviteToGroupByEmailAction", () => {
   it("rejects a signed-out caller", async () => {
     userId = null;
     const { inviteToGroupByEmailAction } = await importActions();
-    await expect(
-      inviteToGroupByEmailAction({}, fd({ recipients: "a@gmail.com" })),
-    ).rejects.toThrow("Not signed in");
+    await expect(inviteToGroupByEmailAction({}, fd({ recipients: "a@gmail.com" }))).rejects.toThrow(
+      "Not signed in",
+    );
     expect(sendMock).not.toHaveBeenCalled();
   });
 
@@ -189,10 +190,7 @@ describe("inviteToGroupByEmailAction", () => {
       fd({ recipients: "a@gmail.com, bad, b@gmail.com" }),
     );
     expect(sendMock).toHaveBeenCalledTimes(1);
-    expect(sendMock.mock.calls[0][0].recipients).toEqual([
-      "a@gmail.com",
-      "b@gmail.com",
-    ]);
+    expect(sendMock.mock.calls[0][0].recipients).toEqual(["a@gmail.com", "b@gmail.com"]);
     expect(res.sent).toBe(1);
     expect(res.invalid).toContain("bad");
   });

@@ -1,18 +1,18 @@
+import { ListTreeIcon } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ListTreeIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/admin/empty-state";
 import { LocalTime } from "@/components/local-time";
-import { localePath, type Locale } from "@/lib/i18n";
-import { parsePageParam } from "@/lib/pagination";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { type Locale, localePath } from "@/lib/i18n";
+import { getRunHistory } from "@/lib/operations/queries";
 import {
   OPERATION_KINDS,
   type OperationKind,
   type OperationStatus,
 } from "@/lib/operations/record-run";
-import { getRunHistory } from "@/lib/operations/queries";
+import { parsePageParam } from "@/lib/pagination";
+import { cn } from "@/lib/utils";
 import { StatusBadge } from "./status-badge";
 
 const PAGE_SIZE = 20;
@@ -77,11 +77,7 @@ export async function RunsView({
     return localePath(locale, `/admin/operations?${params.toString()}`);
   };
 
-  const filterChip = (
-    label: string,
-    chipHref: string,
-    active: boolean,
-  ) => (
+  const filterChip = (label: string, chipHref: string, active: boolean) => (
     <Link
       key={chipHref + label}
       href={chipHref}
@@ -116,11 +112,7 @@ export async function RunsView({
           </span>
           {filterChip(t("runs.all"), href({ status: undefined, page: "1" }), !status)}
           {STATUSES.map((s) =>
-            filterChip(
-              t(`status.${s}`),
-              href({ status: s, page: "1" }),
-              status === s,
-            ),
+            filterChip(t(`status.${s}`), href({ status: s, page: "1" }), status === s),
           )}
         </div>
       </div>
@@ -150,9 +142,7 @@ export async function RunsView({
                 <div className="min-w-0 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium">{t(`jobs.${run.kind}`)}</span>
-                    <Badge variant="outline">
-                      {t(`trigger.${run.trigger}`)}
-                    </Badge>
+                    <Badge variant="outline">{t(`trigger.${run.trigger}`)}</Badge>
                     <span className="font-mono text-xs text-muted-foreground">
                       {durationLabel(run.duration_ms, t)}
                     </span>
@@ -167,10 +157,7 @@ export async function RunsView({
                   ) : null}
                 </div>
                 <div>
-                  <StatusBadge
-                    status={run.status}
-                    label={t(`status.${run.status}`)}
-                  />
+                  <StatusBadge status={run.status} label={t(`status.${run.status}`)} />
                 </div>
               </li>
             ))}
