@@ -66,7 +66,11 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: "Failed to create challenge" }, { status: 500 });
+    console.error("wallet challenge insert error", error);
+    return NextResponse.json(
+      { error: `Failed to create challenge: ${error.message}` },
+      { status: 500 },
+    );
   }
 
   return NextResponse.json(
