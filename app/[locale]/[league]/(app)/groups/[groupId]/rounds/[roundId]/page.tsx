@@ -111,8 +111,40 @@ export default async function RoundSheetPage({
   let walletLinkId: string | undefined;
   let intentId: string | null = null;
   let intentState: string | null = null;
+  let wagerAvailable = false;
+  let stakeDisplay: string | undefined;
+  let potDisplay: string | undefined;
+  let participantCount: number | undefined;
+  let wagerClosesAt: string | undefined;
 
   if (user && isMember && !isAdmin) {
+    // Wagering is available only when this round has an initialized, open wager round.
+    const { data: wagerRound } = await supabase
+      .from("wager_rounds")
+      .select(
+        "state, closes_at, stake_base_units, verified_decimals, pot_total_base_units, participant_count",
+      )
+      .eq("group_id", groupId)
+      .eq("round_id", roundId)
+      .maybeSingle();
+
+    if (
+      wagerRound &&
+      wagerRound.state === "initialized" &&
+      new Date(wagerRound.closes_at) > new Date()
+    ) {
+      wagerAvailable = true;
+      const decimals = wagerRound.verified_decimals ?? 0;
+      const toDisplay = (base: number | string | null) =>
+        (Number(base ?? 0) / 10 ** decimals).toLocaleString(undefined, {
+          maximumFractionDigits: decimals,
+        });
+      stakeDisplay = toDisplay(wagerRound.stake_base_units);
+      potDisplay = toDisplay(wagerRound.pot_total_base_units);
+      participantCount = wagerRound.participant_count ?? 0;
+      wagerClosesAt = wagerRound.closes_at ?? undefined;
+    }
+
     const { data: link } = await supabase
       .from("wallet_links")
       .select("id, wallet_address")
@@ -133,7 +165,9 @@ export default async function RoundSheetPage({
         walletAddress = base58.encode(bytes);
       }
 
-      if (completePicks && fixtures?.length) {
+      // Only create an intent once wagering is actually available; the RPC
+      // re-validates and would otherwise raise.
+      if (wagerAvailable && completePicks && fixtures?.length) {
         const { createWagerIntent } = await import("./create-wager-intent");
         const picks = Array.from(predictionsMap.entries()).map(([matchId, goals]) => ({
           matchId,
@@ -248,9 +282,13 @@ export default async function RoundSheetPage({
             poolId={groupId}
             roundId={roundId}
             intentId={intentId}
-            wagerAvailable={true}
+            wagerAvailable={wagerAvailable}
             walletLinked={walletLinked}
             walletAddress={walletAddress}
+            stakeDisplay={stakeDisplay}
+            potDisplay={potDisplay}
+            participantCount={participantCount}
+            closesAt={wagerClosesAt}
             hasCompletePicks={completePicks}
             eligibilityOk
           />
