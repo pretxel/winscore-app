@@ -1,5 +1,6 @@
 "use client";
 
+import { useConnect, useSignMessage, useWallets } from "@solana/kit-plugin-wallet/react";
 import {
   AlertCircleIcon,
   CheckCircle2Icon,
@@ -31,25 +32,30 @@ export function WalletLinkButton({
   const [error, setError] = useState<string | null>(null);
   const [cluster, setCluster] = useState<string | undefined>(initialCluster);
 
-  const handleLink = useCallback(async () => {
-    setState("connecting");
-    setError(null);
+  const wallets = useWallets();
+  const connect = useConnect();
+  const signMessage = useSignMessage();
 
-    if (!walletAddress) {
-      setError("Wallet integration pending — install a Solana wallet extension");
+  const handleLink = useCallback(async () => {
+    const wallet = wallets[0];
+    if (!wallet) {
+      setError("No Solana wallet found. Install Phantom or Solflare.");
       setState("error");
       return;
     }
 
+    setState("connecting");
+    setError(null);
+
     try {
-      // Wallet Standard discovery and connection flow
-      // In production, use @solana/react ClientProvider + useWallets()
-      // For MVP: placeholder that shows the intended flow
+      const accounts = await connect.dispatchAsync(wallet);
+      const account = accounts[0];
+      const addr = account.address;
 
       const challengeResp = await fetch("/api/wallet/challenge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: walletAddress ?? "" }),
+        body: JSON.stringify({ walletAddress: addr }),
       });
 
       if (!challengeResp.ok) {
@@ -61,20 +67,35 @@ export function WalletLinkButton({
 
       const { challengeId, message } = await challengeResp.json();
 
-      // At this point, a Wallet Standard-compatible wallet would:
-      // 1. Present the message to the user
-      // 2. Request signature
-      // 3. Return the 64-byte Ed25519 signature as number[]
-      //
-      // Then call /api/wallet/verify with { challengeId, signature, walletAddress }
+      const sig = await signMessage.dispatchAsync(new TextEncoder().encode(message));
 
-      setError("Wallet integration pending — install a Solana wallet extension");
-      setState("error");
+      const verifyResp = await fetch("/api/wallet/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          challengeId,
+          signature: Array.from(sig),
+          walletAddress: addr,
+        }),
+      });
+
+      if (!verifyResp.ok) {
+        const data = await verifyResp.json();
+        setError(data.error ?? "Verification failed");
+        setState("error");
+        return;
+      }
+
+      const { linkId: newLinkId } = await verifyResp.json();
+      setWalletAddress(addr);
+      setLinkId(newLinkId);
+      setCluster("devnet");
+      setState("linked");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
       setState("error");
     }
-  }, [walletAddress]);
+  }, [wallets, connect, signMessage]);
 
   const handleUnlink = useCallback(async () => {
     if (!linkId) return;

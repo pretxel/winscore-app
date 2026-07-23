@@ -3,6 +3,7 @@ import { Archivo_Black, JetBrains_Mono, Manrope } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { getLocale } from "next-intl/server";
+import { SolanaProvider } from "@/components/solana-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { env } from "@/lib/env";
@@ -150,7 +151,7 @@ export default async function RootLayout({
           strategy="beforeInteractive"
         />
         <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
-          {children}
+          <SolanaProvider>{children}</SolanaProvider>
           <Toaster richColors closeButton />
         </ThemeProvider>
         <Script
