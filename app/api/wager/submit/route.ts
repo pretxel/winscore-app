@@ -1,10 +1,9 @@
 import { createSolanaRpc } from "@solana/kit";
 import { NextResponse } from "next/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { transitionIntentState } from "@/lib/wager/entry-saga";
 import { getWagerEnv } from "@/lib/wager/env";
-import { persistVerifiedEntry } from "@/lib/wager/verify-entry";
+import { persistVerifiedEntry, verifyEntryTransaction } from "@/lib/wager/verify-entry";
 
 export const dynamic = "force-dynamic";
 
@@ -28,25 +27,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Deposits are currently disabled" }, { status: 403 });
   }
 
-  let body: { intentId?: string; signature?: string; entryPda?: string };
+  // `entryPda` from the client is intentionally ignored: it is re-derived and
+  // proven against the on-chain transaction inside verifyEntryTransaction.
+  let body: { intentId?: string; signature?: string };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { intentId, signature, entryPda } = body;
-  if (!intentId || !signature || !entryPda) {
-    return NextResponse.json(
-      { error: "intentId, signature and entryPda are required" },
-      { status: 400 },
-    );
+  const { intentId, signature } = body;
+  if (!intentId || !signature) {
+    return NextResponse.json({ error: "intentId and signature are required" }, { status: 400 });
   }
 
   // Intent must belong to the caller and be awaiting its signature.
   const { data: intent } = await supabase
     .from("wager_intents")
-    .select("id, wager_round_id")
+    .select("id")
     .eq("id", intentId)
     .eq("user_id", user.id)
     .eq("state", "awaiting_signature")
@@ -60,13 +58,6 @@ export async function POST(request: Request) {
   }
 
   await transitionIntentState(intentId, "submitted");
-
-  const admin = createAdminSupabaseClient();
-  const { data: round } = await admin
-    .from("wager_rounds")
-    .select("stake_base_units")
-    .eq("id", intent.wager_round_id ?? "")
-    .single();
 
   const rpc = createSolanaRpc(env.rpcUrl);
 
@@ -89,15 +80,19 @@ export async function POST(request: Request) {
       const confirmed =
         status.confirmationStatus === "confirmed" || status.confirmationStatus === "finalized";
       if (confirmed) {
-        await persistVerifiedEntry(intentId, signature, {
-          entryPda,
-          stakeBaseUnits: String(round?.stake_base_units ?? 0),
-          walletAddress: "",
-          wagerRoundKey: "",
-          intentHash: "",
-          pickCommitment: "",
-          blockSlot: Number(status.slot ?? 0),
-        });
+        // Prove the confirmed transaction actually performed this deposit before
+        // recording the entry. A confirmed signature is necessary but not
+        // sufficient — the transaction must match the intent exactly.
+        const verification = await verifyEntryTransaction(signature, intentId);
+        if (!verification.verified || !verification.entry) {
+          await transitionIntentState(intentId, "failed");
+          return NextResponse.json(
+            { error: verification.error ?? "On-chain verification failed", state: "failed" },
+            { status: 422 },
+          );
+        }
+
+        await persistVerifiedEntry(intentId, signature, verification.entry);
         return NextResponse.json(
           { ok: true, state: "confirmed", signature },
           { headers: { "Cache-Control": "no-store" } },
