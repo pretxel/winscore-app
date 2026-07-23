@@ -35,7 +35,8 @@
     "save": "Speichern",
     "saved": "Name aktualisiert",
     "invalid": "Name muss 2–32 Zeichen lang sein.",
-    "error": "Name konnte nicht aktualisiert werden"
+    "error": "Name konnte nicht aktualisiert werden",
+    "profile": "Profil"
   },
   "emailPrefs": {
     "heading": "E-Mail-Einstellungen",
@@ -51,6 +52,13 @@
     "pushUnsupported": "Push wird von diesem Browser nicht unterstützt",
     "pushDenied": "Die Benachrichtigungsberechtigung wurde verweigert",
     "pushHint": "Füge diese Seite auf dem iPhone zum Startbildschirm hinzu, um Push zu aktivieren."
+  },
+  "profile": {
+    "title": "Profil",
+    "eyebrow": "Ihr Konto",
+    "walletTitle": "Wallet",
+    "walletEmpty": "Verknüpfen Sie Ihre Solana-Wallet, um Wetten zu platzieren und Ihre verknüpfte Adresse zu verwalten.",
+    "walletLinkedOn": "Verknüpft am {date}"
   },
   "pushNotifications": {
     "matchNeeded": {
@@ -160,9 +168,6 @@
     "newsTitle": "News",
     "newsCopy": "Die neuesten Fußball-Schlagzeilen, den ganzen Tag über aktualisiert. Tippe auf einen Beitrag, um ihn an der Quelle zu lesen.",
     "newsCta": "News lesen",
-    "quizTitle": "Tägliche Frage",
-    "quizCopy": "Eine Fußball-Quizfrage pro Tag. Antworte vor Mitternacht UTC, halte deine Serie am Leben und klettere in der Quiz-Rangliste nach oben.",
-    "quizCta": "Heutige Frage spielen",
     "standingEyebrow": "Dein Stand",
     "lanesEyebrow": "Deine Ligen",
     "startGroup": "Gruppe erstellen",

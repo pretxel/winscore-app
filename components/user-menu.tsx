@@ -2,7 +2,8 @@
 
 import { Popover } from "@base-ui/react/popover";
 import { Switch } from "@base-ui/react/switch";
-import { CheckIcon, LogOutIcon } from "lucide-react";
+import { CheckIcon, LogOutIcon, UserIcon } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import { toast } from "sonner";
@@ -21,6 +22,7 @@ import {
   type EmailPrefs,
   normalizeEmailPrefs,
 } from "@/lib/email-prefs";
+import { type Locale, localePath } from "@/lib/i18n";
 import { isPushSupported, subscribeToPush, unsubscribeFromPush } from "@/lib/push-client";
 import { cn } from "@/lib/utils";
 
@@ -36,11 +38,13 @@ export function UserMenu({
   email,
   emailPrefs,
   signOutPath,
+  locale,
 }: {
   displayName: string | null;
   email: string;
   emailPrefs: EmailPrefs;
   signOutPath: string;
+  locale: Locale;
 }) {
   const t = useTranslations("profileMenu");
   const tCommon = useTranslations("common");
@@ -188,6 +192,14 @@ export function UserMenu({
                 <p className="truncate text-xs text-muted-foreground">{email}</p>
               </div>
             </div>
+
+            <Link
+              href={localePath(locale, "/profile")}
+              className="mt-3 flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              <UserIcon className="size-4 text-muted-foreground" />
+              {t("profile")}
+            </Link>
 
             <form onSubmit={onSubmit} className="mt-3 space-y-2">
               <Label htmlFor={fieldId} className="text-xs text-muted-foreground">
