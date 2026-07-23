@@ -193,7 +193,10 @@ export async function buildSettlementManifest(
     awardBaseUnits: a.awardBaseUnits,
   }));
 
-  const { pda: wagerRoundPubkey } = deriveWagerRoundPda(wagerRound.group_id, wagerRound.round_id);
+  const { bytes: wagerRoundPubkey } = await deriveWagerRoundPda(
+    wagerRound.group_id,
+    wagerRound.round_id,
+  );
   const tree = buildMerkleTree(wagerRoundPubkey, merkleLeaves);
 
   const manifest: SettlementManifest = {

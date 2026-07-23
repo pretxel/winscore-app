@@ -1,84 +1,95 @@
-import { createHash } from "node:crypto";
-import { base58 } from "@scure/base";
+import {
+  type Address,
+  address,
+  getAddressDecoder,
+  getAddressEncoder,
+  getProgramDerivedAddress,
+  getUtf8Encoder,
+} from "@solana/kit";
+import { findAssociatedTokenPda } from "@solana-program/token";
 import { getWagerEnv } from "./env";
 
 const PROGRAM_VERSION = 1;
 
-export const WAGER_ROUND_SEED = Buffer.from("wager-round");
-export const ENTRY_SEED = Buffer.from("entry");
-export const CLAIM_SEED = Buffer.from("claim");
+const addressEncoder = getAddressEncoder();
+const addressDecoder = getAddressDecoder();
+const utf8Encoder = getUtf8Encoder();
 
-function toBuffer(data: Uint8Array): Buffer {
-  return Buffer.from(data.buffer, data.byteOffset, data.byteLength);
+export const WAGER_ROUND_SEED = "wager-round";
+export const ENTRY_SEED = "entry";
+export const CLAIM_SEED = "claim";
+
+/** A derived program address in both its base58 (`address`) and raw 32-byte (`bytes`) forms. */
+export interface DerivedPda {
+  address: Address;
+  bytes: Uint8Array;
+  bump: number;
 }
 
-function sha256(...chunks: Uint8Array[]): Buffer {
-  const h = createHash("sha256");
-  for (const chunk of chunks) {
-    h.update(toBuffer(chunk) as never);
-  }
-  return h.digest() as never;
+/** Convert a UUID string to its 16 raw bytes (dashes stripped). */
+function uuidToBytes(uuid: string): Uint8Array {
+  return Uint8Array.from(Buffer.from(uuid.replace(/-/g, ""), "hex"));
 }
 
-function sha256v(chunks: Uint8Array[]): Buffer {
-  const h = createHash("sha256");
-  for (const chunk of chunks) {
-    h.update(toBuffer(chunk) as never);
-  }
-  return h.digest() as never;
+/** 32-byte form of an address, for merkle hashing and `bytea` columns. */
+function toBytes(addr: Address): Uint8Array {
+  return new Uint8Array(addressEncoder.encode(addr));
 }
 
-export function deriveWagerRoundPda(
-  groupId: string,
-  roundId: string,
-): { pda: Uint8Array; bump: number } {
-  const groupBytes = Buffer.from(groupId.replace(/-/g, ""), "hex");
-  const roundBytes = Buffer.from(roundId.replace(/-/g, ""), "hex");
-  return findPda([WAGER_ROUND_SEED, Uint8Array.of(PROGRAM_VERSION), groupBytes, roundBytes]);
+/** Interpret 32 raw bytes as an address. */
+export function addressFromBytes(bytes: Uint8Array): Address {
+  return addressDecoder.decode(bytes);
 }
 
-export function deriveEntryPda(
-  wagerRoundPubkey: Uint8Array,
-  entrantWalletPubkey: Uint8Array,
-): { pda: Uint8Array; bump: number } {
-  return findPda([ENTRY_SEED, wagerRoundPubkey, entrantWalletPubkey]);
+function programAddress(): Address {
+  return address(getWagerEnv().programId);
 }
 
-export function deriveClaimPda(
-  wagerRoundPubkey: Uint8Array,
-  winnerWalletPubkey: Uint8Array,
-): { pda: Uint8Array; bump: number } {
-  return findPda([CLAIM_SEED, wagerRoundPubkey, winnerWalletPubkey]);
+export async function deriveWagerRoundPda(groupId: string, roundId: string): Promise<DerivedPda> {
+  const [addr, bump] = await getProgramDerivedAddress({
+    programAddress: programAddress(),
+    seeds: [
+      utf8Encoder.encode(WAGER_ROUND_SEED),
+      Uint8Array.of(PROGRAM_VERSION),
+      uuidToBytes(groupId),
+      uuidToBytes(roundId),
+    ],
+  });
+  return { address: addr, bytes: toBytes(addr), bump };
 }
 
-export function deriveVaultAta(
-  wagerRoundPubkey: Uint8Array,
-  mintPubkey: Uint8Array,
-  tokenProgramPubkey: Uint8Array,
-): Uint8Array {
-  const ataProgram = base58.decode("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
-  const programDerivedAddress = Buffer.from("ProgramDerivedAddress");
-
-  const baseHash = sha256(wagerRoundPubkey, tokenProgramPubkey, mintPubkey);
-  const baseHashWithAta = sha256(
-    new Uint8Array(baseHash.buffer, baseHash.byteOffset, baseHash.byteLength),
-    ataProgram,
-    programDerivedAddress,
-  );
-
-  // ATA always uses bump 255 (or find first valid)
-  return new Uint8Array(baseHashWithAta.buffer, baseHashWithAta.byteOffset, 32);
+export async function deriveEntryPda(
+  wagerRound: Address,
+  entrant: Address,
+): Promise<DerivedPda> {
+  const [addr, bump] = await getProgramDerivedAddress({
+    programAddress: programAddress(),
+    seeds: [utf8Encoder.encode(ENTRY_SEED), addressEncoder.encode(wagerRound), addressEncoder.encode(entrant)],
+  });
+  return { address: addr, bytes: toBytes(addr), bump };
 }
 
-function findPda(seeds: Uint8Array[]): { pda: Uint8Array; bump: number } {
-  const programId = base58.decode(getWagerEnv().programId);
-  const programDerivedAddress = Buffer.from("ProgramDerivedAddress");
+export async function deriveClaimPda(
+  wagerRound: Address,
+  winner: Address,
+): Promise<DerivedPda> {
+  const [addr, bump] = await getProgramDerivedAddress({
+    programAddress: programAddress(),
+    seeds: [utf8Encoder.encode(CLAIM_SEED), addressEncoder.encode(wagerRound), addressEncoder.encode(winner)],
+  });
+  return { address: addr, bytes: toBytes(addr), bump };
+}
 
-  for (let bump = 255; bump >= 0; bump--) {
-    const chunks = [...seeds, Uint8Array.of(bump), programId, programDerivedAddress];
-    const pda = sha256v(chunks);
-    return { pda: new Uint8Array(pda.buffer, pda.byteOffset, 32), bump };
-  }
-
-  throw new Error("Could not find valid PDA bump");
+/** The round's vault is the Associated Token Account owned by the wager-round PDA. */
+export async function deriveVaultAta(
+  wagerRound: Address,
+  mint: Address,
+  tokenProgram: Address,
+): Promise<DerivedPda> {
+  const [addr, bump] = await findAssociatedTokenPda({
+    owner: wagerRound,
+    mint,
+    tokenProgram,
+  });
+  return { address: addr, bytes: toBytes(addr), bump };
 }

@@ -1,10 +1,9 @@
 "use server";
 
-import { base58 } from "@scure/base";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getWagerEnv } from "@/lib/wager/env";
 import { logWagerEvent } from "@/lib/wager/metrics";
-import { deriveEntryPda } from "@/lib/wager/pda";
+import { addressFromBytes, deriveEntryPda, deriveWagerRoundPda } from "@/lib/wager/pda";
 
 const _BLOCKHASH_FRESHNESS_MS = 60_000; // 1 minute
 
@@ -51,9 +50,15 @@ export async function rebuildExpiredTransaction(
     return { rebuilt: false, error: "Failed to get wallet address" };
   }
 
-  // Derive entry PDA
-  const programId = base58.decode(getWagerEnv().programId);
-  const { pda: entryPda } = deriveEntryPda(programId, walletBytes);
+  // Derive entry PDA: seeds = [b"entry", wager_round_pda, entrant]
+  const { address: wagerRoundAddress } = await deriveWagerRoundPda(
+    intent.group_id,
+    intent.round_id,
+  );
+  const { address: entryPda } = await deriveEntryPda(
+    wagerRoundAddress,
+    addressFromBytes(walletBytes),
+  );
 
   // Check if entry account exists on-chain
   try {
@@ -67,7 +72,7 @@ export async function rebuildExpiredTransaction(
         jsonrpc: "2.0",
         id: 1,
         method: "getAccountInfo",
-        params: [base58.encode(entryPda), { commitment: env.commitment, encoding: "base64" }],
+        params: [entryPda, { commitment: env.commitment, encoding: "base64" }],
       }),
     });
 

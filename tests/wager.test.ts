@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { MerkleLeaf } from "@/lib/wager/merkle-tree";
 import { buildMerkleTree, verifyMerkleProof } from "@/lib/wager/merkle-tree";
-import { deriveWagerRoundPda } from "@/lib/wager/pda";
+import { deriveEntryPda, deriveVaultAta, deriveWagerRoundPda } from "@/lib/wager/pda";
 import { canonicalizePicks, computePickCommitmentSync } from "@/lib/wager/pick-commitment";
 
 describe("pickCommitment", () => {
@@ -142,22 +142,53 @@ describe("merkleTree", () => {
   // Regression: the settlement manifest must seed the tree with the real
   // wager-round PDA, not a zero placeholder. On-chain claim verification
   // derives the real PDA, so a zero seed makes every winner claim fail.
-  it("binds root to the wager-round pubkey seed", () => {
+  it("binds root to the wager-round pubkey seed", async () => {
     const leaves: MerkleLeaf[] = [{ winnerWalletBytes: makeWallet(1), awardBaseUnits: 100 }];
-    const { pda } = deriveWagerRoundPda(
+    const { bytes } = await deriveWagerRoundPda(
       "11111111-1111-1111-1111-111111111111",
       "22222222-2222-2222-2222-222222222222",
     );
 
     // Derived PDA is a non-zero 32-byte key.
-    expect(pda.length).toBe(32);
-    expect(Buffer.compare(Buffer.from(pda), Buffer.alloc(32))).not.toBe(0);
+    expect(bytes.length).toBe(32);
+    expect(Buffer.compare(Buffer.from(bytes), Buffer.alloc(32))).not.toBe(0);
 
     // Root under the real PDA differs from the zero-seed root — proving the
     // seed is part of the leaf hash and the placeholder would mismatch.
     const zeroSeedRoot = buildMerkleTree(new Uint8Array(32), leaves).root;
-    const realSeedRoot = buildMerkleTree(pda, leaves).root;
+    const realSeedRoot = buildMerkleTree(bytes, leaves).root;
     expect(Buffer.compare(Buffer.from(realSeedRoot), Buffer.from(zeroSeedRoot))).not.toBe(0);
+  });
+});
+
+describe("pdaConformance", () => {
+  // Fixtures independently derived with the Solana CLI
+  // (`solana find-program-derived-address`) against program id
+  // 9q5fBczvg3XYipRmxY5tt3axGgNQfYtGeaDpbMHMLkmi. These catch any regression to
+  // non-conformant derivation (e.g. the old single-SHA-256 with no off-curve check).
+  const GROUP = "11111111-1111-1111-1111-111111111111";
+  const ROUND = "22222222-2222-2222-2222-222222222222";
+
+  it("derives the canonical wager-round PDA (matches solana CLI)", async () => {
+    const { address, bump } = await deriveWagerRoundPda(GROUP, ROUND);
+    expect(address).toBe("HhS536q9hhiMn7hxTZg91sj1kdkPgrHqGJ9NChot6vkq");
+    expect(bump).toBe(248);
+  });
+
+  it("derives entry and vault PDAs as valid 32-byte on-curve-free addresses", async () => {
+    const { address: round } = await deriveWagerRoundPda(GROUP, ROUND);
+    const entrant = "5WReDH2phKadrF1f6jzx7ddscKZVbtoZsNgZ2Egt1NuB";
+    const mint = "So11111111111111111111111111111111111111112";
+    const tokenProgram = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+
+    const entry = await deriveEntryPda(round, entrant as never);
+    const vault = await deriveVaultAta(round, mint as never, tokenProgram as never);
+
+    expect(entry.bytes.length).toBe(32);
+    expect(vault.bytes.length).toBe(32);
+    // Distinct derivations must not collide.
+    expect(entry.address).not.toBe(vault.address);
+    expect(entry.address).not.toBe(round);
   });
 });
 
