@@ -1,7 +1,7 @@
 <!--
   Branded email-change confirmation for Supabase Auth (GoTrue) hosted template.
-  Mirrors supabase/templates/magic_link.html (pitch-green header, cream body,
-  WC·26·POOL wordmark). Email-safe: table layout, inline styles, fixed hex.
+  Mirrors supabase/templates/magic_link.html (blue header, cream body,
+  Winscore wordmark). Email-safe: table layout, inline styles, fixed hex.
   GoTrue substitutions: {{ .ConfirmationURL }} (confirm link), {{ .NewEmail }}
   (the address being moved to). With double_confirm_changes this is sent to both
   the current and the new address.
@@ -14,17 +14,16 @@
     <title>Confirm your new email</title>
   </head>
   <body style="margin:0;padding:0;background-color:#FAF9F4;">
-    <span style="display:none;max-height:0;overflow:hidden;opacity:0;">Confirm the email change for your World Cup pool account.</span>
+    <span style="display:none;max-height:0;overflow:hidden;opacity:0;">Confirm the email change for your Winscore account.</span>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#FAF9F4;">
       <tr>
         <td align="center" style="padding:24px 12px;">
           <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #E5E2D7;border-radius:16px;overflow:hidden;background-color:#FAF9F4;">
             <!-- header -->
             <tr>
-              <td style="background-color:#1B7A4D;padding:22px 28px;">
-                <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;color:#FAF9F4;">WC</span>
-                <span style="display:inline-block;margin:0 6px;padding:2px 8px;border-radius:7px;background-color:#FAF9F4;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:16px;font-weight:800;letter-spacing:-1px;color:#1B7A4D;vertical-align:middle;">26</span>
-                <span style="font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;font-weight:600;letter-spacing:0.3em;color:#FAF9F4;vertical-align:middle;">POOL</span>
+              <td style="background-color:#135FD1;padding:22px 28px;">
+                <span style="display:inline-block;width:30px;height:30px;line-height:30px;text-align:center;border-radius:8px;background-color:#FAF9F4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:20px;font-weight:800;color:#135FD1;vertical-align:middle;">W</span>
+                <span style="margin-left:8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;letter-spacing:1px;color:#FAF9F4;vertical-align:middle;">INSCORE</span>
               </td>
             </tr>
             <!-- intro -->
@@ -38,15 +37,15 @@
             <!-- cta -->
             <tr>
               <td style="padding:20px 28px 8px 28px;text-align:center;">
-                <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:13px 26px;border-radius:8px;background-color:#1B7A4D;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;color:#FAF9F4;text-decoration:none;">Confirm email</a>
+                <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:13px 26px;border-radius:8px;background-color:#135FD1;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;color:#FAF9F4;text-decoration:none;">Confirm email</a>
               </td>
             </tr>
             <!-- fallback link -->
             <tr>
               <td style="padding:14px 28px 4px 28px;">
                 <p style="margin:0 0 6px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:#6B7280;">Button not working? Copy and paste this link into your browser:</p>
-                <p style="margin:0;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;word-break:break-all;color:#1B7A4D;">
-                  <a href="{{ .ConfirmationURL }}" style="color:#1B7A4D;text-decoration:underline;">{{ .ConfirmationURL }}</a>
+                <p style="margin:0;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;word-break:break-all;color:#135FD1;">
+                  <a href="{{ .ConfirmationURL }}" style="color:#135FD1;text-decoration:underline;">{{ .ConfirmationURL }}</a>
                 </p>
               </td>
             </tr>
@@ -65,7 +64,7 @@
             <!-- footer -->
             <tr>
               <td style="padding:18px 28px 28px 28px;border-top:1px solid #E5E2D7;">
-                <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:#6B7280;">You're receiving this because an email change was requested for your World Cup pool account.</p>
+                <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:#6B7280;">You're receiving this because an email change was requested for your Winscore account.</p>
               </td>
             </tr>
           </table>

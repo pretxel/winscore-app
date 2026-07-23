@@ -35,7 +35,8 @@
     "save": "Save",
     "saved": "Display name updated",
     "invalid": "Name must be 2–32 characters.",
-    "error": "Couldn't update your name"
+    "error": "Couldn't update your name",
+    "profile": "Profile"
   },
   "emailPrefs": {
     "heading": "Email preferences",
@@ -51,6 +52,13 @@
     "pushUnsupported": "Push isn't supported on this browser",
     "pushDenied": "Notification permission was denied",
     "pushHint": "On iPhone, add this site to your Home Screen to enable push."
+  },
+  "profile": {
+    "title": "Profile",
+    "eyebrow": "Your Account",
+    "walletTitle": "Wallet",
+    "walletEmpty": "Link your Solana wallet to place wagers and manage your linked address.",
+    "walletLinkedOn": "Linked on {date}"
   },
   "pushNotifications": {
     "matchNeeded": {
@@ -160,9 +168,6 @@
     "newsTitle": "News",
     "newsCopy": "The latest football headlines, refreshed through the day. Tap any story to read it at the source.",
     "newsCta": "Read the news",
-    "quizTitle": "Daily Call",
-    "quizCopy": "One football trivia question a day. Answer before midnight UTC, keep your streak, and climb the quiz board.",
-    "quizCta": "Play today's question",
     "standingEyebrow": "Your standing",
     "lanesEyebrow": "Your leagues",
     "startGroup": "Start a group",

@@ -14,11 +14,22 @@ import { Card, CardContent } from "@/components/ui/card";
 
 type LinkState = "idle" | "connecting" | "linked" | "unlinking" | "error";
 
-export function WalletLinkButton() {
-  const [state, setState] = useState<LinkState>("idle");
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [linkId, setLinkId] = useState<string | null>(null);
+interface WalletLinkButtonProps {
+  initialWalletAddress?: string;
+  initialLinkId?: string;
+  initialCluster?: string;
+}
+
+export function WalletLinkButton({
+  initialWalletAddress,
+  initialLinkId,
+  initialCluster,
+}: WalletLinkButtonProps = {}) {
+  const [state, setState] = useState<LinkState>(initialWalletAddress ? "linked" : "idle");
+  const [walletAddress, setWalletAddress] = useState<string | null>(initialWalletAddress ?? null);
+  const [linkId, setLinkId] = useState<string | null>(initialLinkId ?? null);
   const [error, setError] = useState<string | null>(null);
+  const [cluster, setCluster] = useState<string | undefined>(initialCluster);
 
   const handleLink = useCallback(async () => {
     setState("connecting");
@@ -80,6 +91,7 @@ export function WalletLinkButton() {
 
       setWalletAddress(null);
       setLinkId(null);
+      setCluster(undefined);
       setState("idle");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unlink failed");
@@ -124,7 +136,7 @@ export function WalletLinkButton() {
             </p>
           </div>
           <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-500">
-            Devnet
+            {cluster || "Devnet"}
           </Badge>
           <Button variant="ghost" size="sm" onClick={handleUnlink} disabled={isUnlinking}>
             {isUnlinking ? (

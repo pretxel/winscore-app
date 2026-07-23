@@ -1,4 +1,4 @@
-import { ArrowRightIcon, BrainIcon, NewspaperIcon, UsersIcon } from "lucide-react";
+import { ArrowRightIcon, NewspaperIcon, UsersIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -243,9 +243,9 @@ function Cadence({ t }: { t: T }) {
 
 function FeatureSections({ locale, t }: { locale: Locale; t: T }) {
   const features: Array<{
-    titleKey: "groupsTitle" | "newsTitle" | "quizTitle";
-    copyKey: "groupsCopy" | "newsCopy" | "quizCopy";
-    ctaKey: "groupsCta" | "newsCta" | "quizCta";
+    titleKey: "groupsTitle" | "newsTitle";
+    copyKey: "groupsCopy" | "newsCopy";
+    ctaKey: "groupsCta" | "newsCta";
     href: string;
     Icon: React.ComponentType<{ className?: string }>;
   }> = [
@@ -262,13 +262,6 @@ function FeatureSections({ locale, t }: { locale: Locale; t: T }) {
       ctaKey: "newsCta",
       href: "/news",
       Icon: NewspaperIcon,
-    },
-    {
-      titleKey: "quizTitle",
-      copyKey: "quizCopy",
-      ctaKey: "quizCta",
-      href: "/quiz",
-      Icon: BrainIcon,
     },
   ];
 

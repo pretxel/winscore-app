@@ -72,6 +72,7 @@ export async function SiteNav() {
               email={user.email ?? ""}
               emailPrefs={emailPrefs}
               signOutPath={lp("/sign-out")}
+              locale={locale}
             />
           ) : (
             <Link
