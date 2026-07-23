@@ -35,6 +35,12 @@ export function WalletLinkButton({
     setState("connecting");
     setError(null);
 
+    if (!walletAddress) {
+      setError("Wallet integration pending — install a Solana wallet extension");
+      setState("error");
+      return;
+    }
+
     try {
       // Wallet Standard discovery and connection flow
       // In production, use @solana/react ClientProvider + useWallets()
