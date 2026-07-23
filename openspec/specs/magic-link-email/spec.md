@@ -31,12 +31,12 @@ The hook SHALL construct the verification URL from the hook payload's `email_dat
 
 ### Requirement: Branded, email-safe template matching the app
 
-The magic-link email SHALL be rendered with the app's visual language — pitch-green header band, cream body, the `WC·26·POOL` wordmark, and mono uppercase labels — consistent with the existing result-standing email. The renderer SHALL be a pure, dependency-free function returning subject, HTML, and plain-text parts.
+The magic-link email SHALL be rendered with the app's visual language — pitch-green header band, cream body, the **Winscore** wordmark (a "W" tile followed by `INSCORE`, mirroring the app logotype), and mono uppercase labels — consistent with the existing result-standing email. The renderer SHALL be a pure, dependency-free function returning subject, HTML, and plain-text parts.
 
 #### Scenario: Branded HTML is produced
 - **WHEN** the magic-link email is rendered
 - **THEN** the HTML uses a table layout with inline styles and fixed hex colors (no `oklch`, CSS variables, or external stylesheets)
-- **AND** it includes the `WC·26·POOL` wordmark header and a primary call-to-action button linking to the verification URL
+- **AND** it includes the Winscore wordmark header and a primary call-to-action button linking to the verification URL
 
 #### Scenario: Plain-text alternative is included
 - **WHEN** the magic-link email is sent

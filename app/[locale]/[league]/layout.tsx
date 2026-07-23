@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
+import { CompetitionSectionNav } from "@/components/competition-section-nav";
 import { getLeagueFromContext } from "@/lib/competition";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 
@@ -23,5 +24,10 @@ export default async function LeagueLayout({
     redirect(localePath(locale, "/catalog"));
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <CompetitionSectionNav locale={locale} league={league} competition={resolved} />
+      {children}
+    </>
+  );
 }

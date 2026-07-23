@@ -25,7 +25,8 @@
     "myPicks": "My picks",
     "groups": "Groups",
     "admin": "Admin",
-    "brandTag": "Pool"
+    "brandTag": "Pool",
+    "sections": "Competition sections"
   },
   "profileMenu": {
     "openMenu": "Open account menu",

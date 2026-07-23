@@ -30,10 +30,10 @@ describe("renderMagicLinkEmail", () => {
     });
 
     expect(subject).toBe("Your sign-in link");
-    // WIN·SCORE·POOL wordmark signature.
-    expect(html).toContain(">WIN<");
-    expect(html).toContain(">SCORE<");
-    expect(html).toContain(">POOL<");
+    // Winscore wordmark signature: the "W" tile + INSCORE.
+    expect(html).toContain(">W<");
+    expect(html).toContain(">INSCORE<");
+    expect(html).not.toContain(">POOL<");
     // Blue brand color, table layout, no oklch/var().
     expect(html).toContain("#135FD1");
     expect(html).toContain('role="presentation"');
