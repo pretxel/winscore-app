@@ -124,7 +124,7 @@ export async function buildSettlementManifest(
 
     const walletBytes =
       typeof entry.wallet_address === "string"
-        ? Buffer.from(entry.wallet_address, "hex")
+        ? Buffer.from((entry.wallet_address as string).replace(/^\\x/, ""), "hex")
         : Buffer.from(entry.wallet_address as unknown as ArrayBuffer);
 
     entryResults.push({

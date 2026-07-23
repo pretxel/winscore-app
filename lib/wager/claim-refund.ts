@@ -61,7 +61,7 @@ export async function prepareClaim(
 
   const _walletBytes =
     typeof entry.wallet_address === "string"
-      ? Buffer.from(entry.wallet_address, "hex")
+      ? Buffer.from((entry.wallet_address as string).replace(/^\\x/, ""), "hex")
       : Buffer.from(entry.wallet_address as unknown as ArrayBuffer);
 
   const wagerRoundPubkey = new Uint8Array(32); // Derive from wager_round PDA

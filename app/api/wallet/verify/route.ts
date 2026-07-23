@@ -81,8 +81,10 @@ export async function POST(request: Request) {
   }
 
   // Verify stored wallet matches provided wallet
-  const storedWallet = new Uint8Array(challenge.wallet_address as unknown as ArrayBuffer);
-  if (Buffer.from(walletBytes).compare(Buffer.from(storedWallet)) !== 0) {
+  // bytea columns are returned as \x<hex> strings by PostgREST
+  const storedHex = (challenge.wallet_address as unknown as string).replace(/^\\x/, "");
+  const storedBytes = new Uint8Array(Buffer.from(storedHex, "hex"));
+  if (Buffer.from(walletBytes).compare(Buffer.from(storedBytes)) !== 0) {
     return NextResponse.json({ error: "Wallet address mismatch" }, { status: 403 });
   }
 
@@ -119,7 +121,7 @@ export async function POST(request: Request) {
   const { data: existingLink } = await supabase
     .from("wallet_links")
     .select("id, user_id")
-    .eq("wallet_address", Buffer.from(walletBytes) as unknown as string)
+    .eq("wallet_address", `\\x${Buffer.from(walletBytes).toString("hex")}`)
     .eq("is_active", true)
     .maybeSingle();
 

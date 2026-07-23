@@ -156,7 +156,9 @@ export async function persistVerifiedEntry(
 
   const walletBytes = walletLink?.wallet_address
     ? typeof walletLink.wallet_address === "string"
-      ? base58.decode(walletLink.wallet_address)
+      ? new Uint8Array(
+          Buffer.from((walletLink.wallet_address as string).replace(/^\\x/, ""), "hex"),
+        )
       : new Uint8Array(walletLink.wallet_address as unknown as ArrayBuffer)
     : new Uint8Array(32);
 
@@ -169,9 +171,9 @@ export async function persistVerifiedEntry(
       group_id: intent.group_id,
       round_id: intent.round_id ?? "",
       wager_round_id: intent.wager_round_id ?? "",
-      wallet_address: Buffer.from(walletBytes) as unknown as string,
-      entry_pda: Buffer.from(base58.decode(entry.entryPda)) as unknown as string,
-      transaction_signature: Buffer.from(base58.decode(signature)) as unknown as string,
+      wallet_address: `\\x${Buffer.from(walletBytes).toString("hex")}`,
+      entry_pda: `\\x${Buffer.from(base58.decode(entry.entryPda)).toString("hex")}`,
+      transaction_signature: `\\x${Buffer.from(base58.decode(signature)).toString("hex")}`,
       stake_base_units: Number(entry.stakeBaseUnits),
       state: "confirmed",
       confirmed_at: new Date().toISOString(),

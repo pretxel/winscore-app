@@ -45,7 +45,7 @@ export async function rebuildExpiredTransaction(
 
     walletBytes =
       typeof link.wallet_address === "string"
-        ? Buffer.from(link.wallet_address, "hex")
+        ? Buffer.from((link.wallet_address as string).replace(/^\\x/, ""), "hex")
         : new Uint8Array(link.wallet_address as unknown as ArrayBuffer);
   } catch {
     return { rebuilt: false, error: "Failed to get wallet address" };
