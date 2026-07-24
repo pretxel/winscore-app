@@ -26,28 +26,20 @@ import {
   createSolanaRpc,
   createTransactionMessage,
   getBase64EncodedWireTransaction,
-  getProgramDerivedAddress,
   getSignatureFromTransaction,
-  getUtf8Encoder,
   pipe,
   setTransactionMessageFeePayerSigner,
   setTransactionMessageLifetimeUsingBlockhash,
   signTransactionMessageWithSigners,
 } from "@solana/kit";
-import { findAssociatedTokenPda } from "@solana-program/token";
-import { buildInitializeWagerRoundInstruction } from "@/lib/wager/instructions";
+import { buildInitRoundInstruction } from "@/lib/wager/init-round";
 
-const DEFAULT_PROGRAM_ID = "9q5fBczvg3XYipRmxY5tt3axGgNQfYtGeaDpbMHMLkmi";
 const DEFAULT_TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 const DEFAULT_RPC = "https://api.devnet.solana.com";
 
 function arg(name: string): string | undefined {
   const i = process.argv.indexOf(`--${name}`);
   return i >= 0 ? process.argv[i + 1] : undefined;
-}
-
-function uuidToBytes(uuid: string): Uint8Array {
-  return Uint8Array.from(Buffer.from(uuid.replace(/-/g, ""), "hex"));
 }
 
 async function main() {
@@ -63,7 +55,6 @@ async function main() {
   const mintStr = process.env.WAGER_APPROVED_MINT;
   if (!mintStr) throw new Error("WAGER_APPROVED_MINT is required");
 
-  const programId = address(process.env.WAGER_PROGRAM_ID ?? DEFAULT_PROGRAM_ID);
   const mint = address(mintStr);
   const tokenProgram = address(process.env.WAGER_TOKEN_PROGRAM ?? DEFAULT_TOKEN_PROGRAM);
   const rpcUrl = process.env.WAGER_RPC_URL ?? DEFAULT_RPC;
@@ -72,38 +63,19 @@ async function main() {
   const authority = await createKeyPairSignerFromBytes(secret);
   const settlementAuthority = address(arg("settlement") ?? authority.address);
 
-  const [wagerRound] = await getProgramDerivedAddress({
-    programAddress: programId,
-    seeds: [
-      getUtf8Encoder().encode("wager-round"),
-      Uint8Array.of(1),
-      uuidToBytes(groupId),
-      uuidToBytes(roundId),
-    ],
+  const {
+    instruction: ix,
+    wagerRound,
+    vault,
+  } = await buildInitRoundInstruction({
+    groupId,
+    roundId,
+    mint,
+    tokenProgram,
+    authority: authority.address,
+    settlementAuthority,
+    closesAt: BigInt(closesAt),
   });
-  const [vault] = await findAssociatedTokenPda({ owner: wagerRound, mint, tokenProgram });
-
-  const ix = buildInitializeWagerRoundInstruction(
-    programId,
-    {
-      authority: authority.address,
-      wagerRound,
-      approvedMint: mint,
-      vault,
-      rentRecipientA: authority.address,
-      rentRecipientB: authority.address,
-      tokenProgram,
-    },
-    {
-      groupId: uuidToBytes(groupId),
-      roundId: uuidToBytes(roundId),
-      closesAt: BigInt(closesAt),
-      refundTimeout: BigInt(172_800), // 48h
-      maxParticipants: 1000,
-      maxTotalStake: BigInt(1_000_000_000_000),
-      settlementAuthority,
-    },
-  );
 
   const rpc = createSolanaRpc(rpcUrl);
   const { value: blockhash } = await rpc.getLatestBlockhash({ commitment: "confirmed" }).send();
