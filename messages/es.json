@@ -1016,7 +1016,8 @@
       "rounds": "Rondas",
       "quiz": "Quiz",
       "sectionLabel": "Admin",
-      "operations": "Operaciones"
+      "operations": "Operaciones",
+      "wager": "Apuestas"
     },
     "context": {
       "divergedTitle": "Editando un borrador",

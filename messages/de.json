@@ -1016,7 +1016,8 @@
       "rounds": "Spieltage",
       "quiz": "Quiz",
       "sectionLabel": "Administration",
-      "operations": "Betrieb"
+      "operations": "Betrieb",
+      "wager": "Wetten"
     },
     "context": {
       "divergedTitle": "Entwurf bearbeiten",
