@@ -20,6 +20,11 @@ import { buildInitRoundInstruction } from "@/lib/wager/init-round";
 
 export const dynamic = "force-dynamic";
 
+const POLL_ATTEMPTS = 8;
+const POLL_INTERVAL_MS = 2000;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 function byteaToBase58(value: string): string {
   return base58.encode(new Uint8Array(Buffer.from(value.replace(/^\\x/, ""), "hex")));
 }
@@ -107,8 +112,36 @@ export async function POST(request: Request) {
         preflightCommitment: "confirmed",
       })
       .send();
+
+    // Poll the signature status until it confirms (or fails), mirroring
+    // app/api/wager/submit/route.ts.
+    for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt++) {
+      const { value } = await rpc
+        .getSignatureStatuses([signature], { searchTransactionHistory: true })
+        .send();
+      const status = value[0];
+
+      if (status) {
+        if (status.err) {
+          return NextResponse.json({ error: "On-chain init failed on-chain" }, { status: 502 });
+        }
+
+        const confirmed =
+          status.confirmationStatus === "confirmed" || status.confirmationStatus === "finalized";
+        if (confirmed) {
+          return NextResponse.json(
+            { ok: true, wagerRound, vault, signature, alreadyInitialized: false, confirmed: true },
+            { headers: { "Cache-Control": "no-store" } },
+          );
+        }
+      }
+
+      if (attempt < POLL_ATTEMPTS - 1) await sleep(POLL_INTERVAL_MS);
+    }
+
+    // Not confirmed within the window — submitted but caller should verify via status.
     return NextResponse.json(
-      { ok: true, wagerRound, vault, signature, alreadyInitialized: false },
+      { ok: true, wagerRound, vault, signature, alreadyInitialized: false, confirmed: false },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (err) {

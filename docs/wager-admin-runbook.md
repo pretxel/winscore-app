@@ -8,7 +8,7 @@ Server-only (never expose to the client):
 
 | Var | Required | Notes |
 | --- | --- | --- |
-| `WAGER_AUTHORITY_KEYPAIR` | yes | JSON byte array (Solana CLI keypair). Fee payer + authority for on-chain `initialize_wager_round`. Fund it with devnet SOL. |
+| `WAGER_AUTHORITY_KEYPAIR` | yes | Fee payer + authority for on-chain `initialize_wager_round`; fund with devnet SOL. The admin console requires an **inline JSON byte array**. The CLI script accepts **either** inline JSON or a path to a keypair JSON file. |
 | `WAGER_SETTLEMENT_AUTHORITY` | no | Base58 pubkey; defaults to the authority pubkey. |
 | `WAGER_APPROVED_MINT` | for the CLI script | Approved SPL mint (base58). The admin UI reads the mint per-request instead. |
 | `WAGER_RPC_URL` | no | Defaults to `https://api.devnet.solana.com`. |
@@ -45,6 +45,6 @@ approved SPL token in their associated token account to stake.
 ## CLI fallback
 
 `scripts/init-wager-round.ts` performs only the on-chain init (step 3) using
-`WAGER_AUTHORITY_KEYPAIR` + `WAGER_APPROVED_MINT`; the DB config/round rows still
+`WAGER_AUTHORITY_KEYPAIR` (inline JSON or file path) + `WAGER_APPROVED_MINT`; the DB config/round rows still
 come from steps 2–3 of the console (or the `configure_pool_wager` /
 `initialize_wager_round` RPCs).

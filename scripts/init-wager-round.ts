@@ -11,7 +11,8 @@
  *     --closes-at <unix-seconds> [--settlement <pubkey>]
  *
  * Env:
- *   WAGER_AUTHORITY_KEYPAIR  path to a devnet keypair JSON (fee payer + authority)
+ *   WAGER_AUTHORITY_KEYPAIR  devnet keypair as inline JSON byte array OR a path to a
+ *                            keypair JSON file (fee payer + authority)
  *   WAGER_PROGRAM_ID         defaults to the declared program id
  *   WAGER_APPROVED_MINT      required — the approved SPL mint
  *   WAGER_RPC_URL            defaults to devnet
@@ -50,8 +51,8 @@ async function main() {
     throw new Error("Required: --group <uuid> --round <uuid> --closes-at <unix-seconds>");
   }
 
-  const keypairPath = process.env.WAGER_AUTHORITY_KEYPAIR;
-  if (!keypairPath) throw new Error("WAGER_AUTHORITY_KEYPAIR is required");
+  const keypairEnv = process.env.WAGER_AUTHORITY_KEYPAIR;
+  if (!keypairEnv) throw new Error("WAGER_AUTHORITY_KEYPAIR is required");
   const mintStr = process.env.WAGER_APPROVED_MINT;
   if (!mintStr) throw new Error("WAGER_APPROVED_MINT is required");
 
@@ -59,7 +60,12 @@ async function main() {
   const tokenProgram = address(process.env.WAGER_TOKEN_PROGRAM ?? DEFAULT_TOKEN_PROGRAM);
   const rpcUrl = process.env.WAGER_RPC_URL ?? DEFAULT_RPC;
 
-  const secret = new Uint8Array(JSON.parse(readFileSync(keypairPath, "utf8")));
+  // Accept either inline JSON (a byte array) or a path to a keypair JSON file,
+  // matching how the admin route loads WAGER_AUTHORITY_KEYPAIR (inline JSON).
+  const keypairJson = keypairEnv.trimStart().startsWith("[")
+    ? keypairEnv
+    : readFileSync(keypairEnv, "utf8");
+  const secret = new Uint8Array(JSON.parse(keypairJson));
   const authority = await createKeyPairSignerFromBytes(secret);
   const settlementAuthority = address(arg("settlement") ?? authority.address);
 

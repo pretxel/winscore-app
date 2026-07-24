@@ -33,6 +33,7 @@ interface InitializeResult {
   vault: string;
   signature?: string;
   alreadyInitialized: boolean;
+  confirmed?: boolean;
 }
 
 interface StatusResult {
@@ -135,6 +136,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
         vault: data.vault,
         signature: data.signature,
         alreadyInitialized: !!data.alreadyInitialized,
+        confirmed: data.confirmed,
       });
       setInitState("success");
     } catch (err) {
@@ -290,7 +292,9 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
                 <CheckCircle2Icon className="size-4 shrink-0" />
                 {initResult.alreadyInitialized
                   ? "Round was already initialized."
-                  : "Round initialized on-chain."}
+                  : initResult.confirmed === false
+                    ? "Transaction submitted, not yet confirmed — refresh status to verify the vault."
+                    : "Round initialized and confirmed on-chain."}
               </p>
               {initResult.signature ? (
                 <a
