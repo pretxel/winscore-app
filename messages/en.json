@@ -1016,7 +1016,8 @@
       "rounds": "Rounds",
       "quiz": "Quiz",
       "sectionLabel": "Admin",
-      "operations": "Operations"
+      "operations": "Operations",
+      "wager": "Wager"
     },
     "context": {
       "divergedTitle": "Editing a draft",
