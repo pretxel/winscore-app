@@ -110,6 +110,10 @@ export const env = {
   wagerUiEnabled: process.env.WAGER_UI_ENABLED ?? null,
   wagerDepositsEnabled: process.env.WAGER_DEPOSITS_ENABLED ?? null,
   wagerSettlementEnabled: process.env.WAGER_SETTLEMENT_ENABLED ?? null,
+  // Server-only: authority keypair (JSON byte array) that signs on-chain
+  // initialize_wager_round, and its optional settlement authority pubkey.
+  wagerAuthorityKeypair: process.env.WAGER_AUTHORITY_KEYPAIR ?? null,
+  wagerSettlementAuthority: process.env.WAGER_SETTLEMENT_AUTHORITY ?? null,
 };
 
 export function requireServiceRoleKey(): string {
