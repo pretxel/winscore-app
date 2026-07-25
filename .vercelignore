@@ -1,0 +1,29 @@
+# Files excluded from the Vercel deployment upload.
+#
+# Vercel uploads the working directory, not the git tree, so build artifacts that
+# .gitignore keeps out of the repo are still sent unless they are listed here.
+#
+# solana/ is what forced this file to exist: `vercel --prod` failed with
+# "Unknown system error -102" on solana/winscore-wager/test-ledger/admin.rpc,
+# a Unix socket left behind by a local solana-test-validator. Sockets are not
+# regular files and cannot be packaged. The same tree also carries ~3 GB of Rust
+# build output that the Next.js build never reads — the one file it needs, the
+# program IDL, is committed under solana/winscore-wager/idl/ and re-included below.
+
+# Rust/Anchor workspace: local validator ledger (contains a Unix socket), Rust
+# build output, and Anchor caches.
+solana/winscore-wager/test-ledger
+solana/winscore-wager/target
+solana/winscore-wager/.anchor
+!solana/winscore-wager/idl
+
+# Container build context — Vercel builds from source, not the Dockerfile.
+docker
+
+# Specs and agent tooling: documentation, never imported at build or runtime.
+openspec
+.superpowers
+.agents
+.codex
+.opencode
+.qodo

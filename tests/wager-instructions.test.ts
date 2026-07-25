@@ -118,9 +118,12 @@ describe("IDL conformance", () => {
     discriminator: number[];
     accounts: Array<{ name: string; writable?: boolean; signer?: boolean }>;
   }
-  const idl = JSON.parse(
-    readFileSync("solana/winscore-wager/target/idl/winscore_wager.json", "utf8"),
-  ) as { instructions: IdlInstruction[] };
+  // Read the committed copy, not `target/idl/` — that path is gitignored, so
+  // this suite would silently depend on a local Anchor build and fail in CI or a
+  // fresh clone. Refresh it with `scripts/sync-wager-idl.sh` after rebuilding.
+  const idl = JSON.parse(readFileSync("solana/winscore-wager/idl/winscore_wager.json", "utf8")) as {
+    instructions: IdlInstruction[];
+  };
 
   const byName = (name: string) => {
     const ix = idl.instructions.find((i) => i.name === name);
