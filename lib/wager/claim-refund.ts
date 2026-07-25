@@ -1,100 +1,236 @@
-"use server";
+/**
+ * Winner claims and cancellation refunds.
+ *
+ * Both are non-custodial: the server prepares an unsigned transaction and the
+ * entrant's own wallet signs it, so a compromised server cannot move anyone's
+ * funds. Replay protection is on chain — the Claim PDA is one-shot, and `refund`
+ * flips the Entry to Refunded — with the database rows only mirroring it.
+ */
 
+import {
+  type Address,
+  address,
+  appendTransactionMessageInstructions,
+  compileTransaction,
+  createSolanaRpc,
+  createTransactionMessage,
+  getBase64EncodedWireTransaction,
+  type Instruction,
+  pipe,
+  setTransactionMessageFeePayer,
+  setTransactionMessageLifetimeUsingBlockhash,
+} from "@solana/kit";
+import { findAssociatedTokenPda } from "@solana-program/token";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { bytesToBytea, requireBytea } from "@/lib/wager/bytea";
 import { getWagerEnv } from "@/lib/wager/env";
+import { buildClaimInstruction, buildRefundInstruction } from "@/lib/wager/instructions";
+import { buildSettlementManifest } from "@/lib/wager/manifest";
+import { buildMerkleTree, verifyMerkleProof } from "@/lib/wager/merkle-tree";
+import {
+  addressFromBytes,
+  deriveClaimPda,
+  deriveEntryPda,
+  deriveVaultAta,
+  deriveWagerRoundPda,
+} from "@/lib/wager/pda";
+
+export interface PreparedTransaction {
+  transactionBase64: string;
+  blockhash: string;
+  lastValidBlockHeight: string;
+}
+
+export interface PrepareClaimResult extends PreparedTransaction {
+  claimId: string;
+  awardBaseUnits: number;
+  proofLength: number;
+}
 
 /**
- * Prepare a claim transaction for a winner.
- * Verifies Merkle proof, checks claim PDA, and builds the claim instruction.
+ * Prepare a winner's claim transaction.
+ *
+ * Rebuilds the Merkle tree from the settled manifest to derive this winner's
+ * proof, rather than storing proofs, so a proof can never drift from the root
+ * that was committed on chain. The proof is verified locally first: an invalid
+ * one means the manifest and the on-chain root disagree, which is an operator
+ * problem, not something to let the entrant discover as a failed transaction.
+ *
+ * @param userId The caller's own id. Callers must pass the authenticated user so
+ * one entrant cannot prepare a claim against another's award.
  */
 export async function prepareClaim(
   settlementId: string,
-  entryId: string,
-): Promise<{ claimable: boolean; claimSignature?: string; error?: string }> {
+  userId: string,
+): Promise<PrepareClaimResult> {
   const admin = createAdminSupabaseClient();
-  const _env = getWagerEnv();
+  const env = getWagerEnv();
 
-  // Fetch settlement with Merkle root
   const { data: settlement } = await admin
     .from("wager_settlements")
-    .select("*")
+    .select("id, wager_round_id, merkle_root, settled_at")
     .eq("id", settlementId)
     .single();
 
-  if (!settlement) {
-    return { claimable: false, error: "Settlement not found" };
-  }
+  if (!settlement) throw new Error("Settlement not found");
+  if (!settlement.settled_at) throw new Error("Round is not settled yet");
 
-  // Fetch entry
-  const { data: entry } = await admin
-    .from("wager_entries")
-    .select("*")
-    .eq("id", entryId)
-    .eq("state", "confirmed")
-    .single();
-
-  if (!entry) {
-    return { claimable: false, error: "Entry not found or not confirmed" };
-  }
-
-  // Check if already claimed
-  const { data: existingClaim } = await admin
+  const { data: claim } = await admin
     .from("wager_claims")
-    .select("id, state")
-    .eq("entry_id", entryId)
-    .eq("state", "claimed")
+    .select("id, state, award_base_units, wallet_address, entry_id")
+    .eq("settlement_id", settlementId)
+    .eq("user_id", userId)
     .maybeSingle();
 
-  if (existingClaim) {
-    return { claimable: false, error: "Already claimed" };
+  if (!claim) throw new Error("No award to claim for this round");
+  if (claim.state === "claimed") throw new Error("Already claimed");
+
+  const { data: round } = await admin
+    .from("wager_rounds")
+    .select("group_id, round_id, approved_mint, approved_token_program")
+    .eq("id", settlement.wager_round_id)
+    .single();
+  if (!round) throw new Error("Wager round not found");
+
+  const mint = addressFromBytes(requireBytea(round.approved_mint, 32, "approved_mint"));
+  const tokenProgram = addressFromBytes(
+    requireBytea(round.approved_token_program, 32, "approved_token_program"),
+  );
+  const wagerRoundPda = await deriveWagerRoundPda(round.group_id, round.round_id);
+  const vault = await deriveVaultAta(wagerRoundPda.address, mint, tokenProgram);
+
+  const walletBytes = requireBytea(claim.wallet_address, 32, "wallet_address");
+  const winner = addressFromBytes(walletBytes);
+  const award = Number(claim.award_base_units);
+
+  // Re-derive the tree the settlement committed to and pull this winner's proof.
+  const { merkleLeaves } = await buildSettlementManifest(settlement.wager_round_id);
+  const tree = buildMerkleTree(wagerRoundPda.bytes, merkleLeaves);
+  const proof = tree.proofs.get(Buffer.from(walletBytes).toString("hex"));
+  if (!proof) throw new Error("Winner is not present in the settlement tree");
+
+  const committedRoot = requireBytea(settlement.merkle_root, 32, "merkle_root");
+  if (Buffer.compare(Buffer.from(tree.root), Buffer.from(committedRoot)) !== 0) {
+    throw new Error("Rebuilt Merkle root does not match the settled root");
+  }
+  if (!verifyMerkleProof(committedRoot, wagerRoundPda.bytes, walletBytes, award, proof)) {
+    throw new Error("Merkle proof does not verify against the settled root");
   }
 
-  // Get winner allocation from settlement manifest
-  const _manifest = await admin
-    .from("wager_settlements")
-    .select("manifest_canonical_bytes")
-    .eq("id", settlementId)
-    .single();
+  const claimPda = await deriveClaimPda(wagerRoundPda.address, winner);
+  const [winnerAta] = await findAssociatedTokenPda({ owner: winner, mint, tokenProgram });
 
-  // For MVP: build the claim using the Merkle proof from the manifest
-  // In production: compute the proof dynamically from the Merkle tree
+  const instruction = buildClaimInstruction(
+    address(env.programId),
+    {
+      winner,
+      wagerRound: wagerRoundPda.address,
+      claim: claimPda.address,
+      vault: vault.address,
+      winnerTokenAccount: winnerAta,
+      tokenProgram,
+    },
+    { amount: BigInt(award), proof },
+  );
 
-  const _walletBytes =
-    typeof entry.wallet_address === "string"
-      ? Buffer.from((entry.wallet_address as string).replace(/^\\x/, ""), "hex")
-      : Buffer.from(entry.wallet_address as unknown as ArrayBuffer);
-
-  const wagerRoundPubkey = new Uint8Array(32); // Derive from wager_round PDA
-
-  // Create pending claim record
-  const { data: claim, error: claimError } = await admin
-    .from("wager_claims")
-    .insert({
-      wager_round_id: entry.wager_round_id,
-      settlement_id: settlementId,
-      user_id: entry.user_id,
-      entry_id: entryId,
-      wallet_address: entry.wallet_address,
-      claim_pda: Buffer.from(wagerRoundPubkey) as unknown as string,
-      award_base_units: entry.stake_base_units,
-      state: "pending",
-    })
-    .select("id")
-    .single();
-
-  if (claimError) {
-    return { claimable: false, error: claimError.message };
-  }
+  const prepared = await compileUnsignedTransaction(winner, [instruction]);
 
   return {
-    claimable: true,
-    claimSignature: `pending-${claim.id}`,
+    ...prepared,
+    claimId: claim.id,
+    awardBaseUnits: award,
+    proofLength: proof.length,
   };
 }
 
 /**
- * Activate cancellation and refund for a wager round.
- * Handles: admin cancellation, no scoreable fixtures, assignment change, safety timeout.
+ * Prepare an entrant's refund transaction for a cancelled round. The program
+ * reads the stake from the Entry account, so there is no amount to pass and
+ * nothing for the server to get wrong.
+ */
+export async function prepareRefund(
+  wagerRoundId: string,
+  userId: string,
+): Promise<PreparedTransaction & { entryId: string; stakeBaseUnits: number }> {
+  const admin = createAdminSupabaseClient();
+  const env = getWagerEnv();
+
+  const { data: round } = await admin
+    .from("wager_rounds")
+    .select("group_id, round_id, approved_mint, approved_token_program, state")
+    .eq("id", wagerRoundId)
+    .single();
+  if (!round) throw new Error("Wager round not found");
+  if (round.state !== "cancelled") {
+    throw new Error(`Round is ${round.state}, refunds require a cancelled round`);
+  }
+
+  const { data: entry } = await admin
+    .from("wager_entries")
+    .select("id, wallet_address, stake_base_units, state")
+    .eq("wager_round_id", wagerRoundId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (!entry) throw new Error("No entry to refund for this round");
+  if (entry.state === "refunded") throw new Error("Already refunded");
+
+  const mint = addressFromBytes(requireBytea(round.approved_mint, 32, "approved_mint"));
+  const tokenProgram = addressFromBytes(
+    requireBytea(round.approved_token_program, 32, "approved_token_program"),
+  );
+  const wagerRoundPda = await deriveWagerRoundPda(round.group_id, round.round_id);
+  const vault = await deriveVaultAta(wagerRoundPda.address, mint, tokenProgram);
+
+  const entrant = addressFromBytes(requireBytea(entry.wallet_address, 32, "wallet_address"));
+  const entryPda = await deriveEntryPda(wagerRoundPda.address, entrant);
+  const [entrantAta] = await findAssociatedTokenPda({ owner: entrant, mint, tokenProgram });
+
+  const instruction = buildRefundInstruction(address(env.programId), {
+    entrant,
+    wagerRound: wagerRoundPda.address,
+    entry: entryPda.address,
+    vault: vault.address,
+    entrantTokenAccount: entrantAta,
+    tokenProgram,
+  });
+
+  const prepared = await compileUnsignedTransaction(entrant, [instruction]);
+
+  return {
+    ...prepared,
+    entryId: entry.id,
+    stakeBaseUnits: Number(entry.stake_base_units),
+  };
+}
+
+async function compileUnsignedTransaction(
+  feePayer: Address,
+  instructions: Instruction[],
+): Promise<PreparedTransaction> {
+  const env = getWagerEnv();
+  const rpc = createSolanaRpc(env.rpcUrl);
+  const { value: blockhash } = await rpc.getLatestBlockhash({ commitment: env.commitment }).send();
+
+  const message = pipe(
+    createTransactionMessage({ version: 0 }),
+    (m) => setTransactionMessageFeePayer(feePayer, m),
+    (m) => setTransactionMessageLifetimeUsingBlockhash(blockhash, m),
+    (m) => appendTransactionMessageInstructions(instructions, m),
+  );
+
+  return {
+    transactionBase64: getBase64EncodedWireTransaction(compileTransaction(message)),
+    blockhash: blockhash.blockhash,
+    lastValidBlockHeight: blockhash.lastValidBlockHeight.toString(),
+  };
+}
+
+/**
+ * Move a round to Cancelled so entrants can refund.
+ *
+ * This only records the database side. The on-chain `cancel_and_refund` must be
+ * sent by the round authority (or by anyone once `closes_at + refund_timeout`
+ * passes); until it lands, `refund` will fail on chain regardless of this row.
  */
 export async function activateRefund(
   wagerRoundId: string,
@@ -104,16 +240,15 @@ export async function activateRefund(
 
   const { data: wagerRound } = await admin
     .from("wager_rounds")
-    .select("*")
+    .select("id, closes_at, state, group_id, round_id")
     .eq("id", wagerRoundId)
     .in("state", ["initialized", "locked"])
-    .single();
+    .maybeSingle();
 
   if (!wagerRound) {
     return { ok: false, error: "Wager round not found or not in cancellable state" };
   }
 
-  // Validate reason
   if (reason === "timeout") {
     const closeTime = new Date(wagerRound.closes_at).getTime();
     const timeoutMs = 7 * 24 * 3600_000; // 7 days
@@ -122,13 +257,17 @@ export async function activateRefund(
     }
   }
 
-  // Mark round as cancelled
   await admin.from("wager_rounds").update({ state: "cancelled" }).eq("id", wagerRoundId);
+  await admin
+    .from("wager_entries")
+    .update({ state: "cancelled" })
+    .eq("wager_round_id", wagerRoundId)
+    .in("state", ["confirmed", "locked"]);
 
-  // Apppend chain event
+  const wagerRoundPda = await deriveWagerRoundPda(wagerRound.group_id, wagerRound.round_id);
   await admin.from("wager_chain_events").insert({
     event_type: "cancel_requested",
-    wager_round_pda: Buffer.alloc(32) as unknown as string,
+    wager_round_pda: bytesToBytea(wagerRoundPda.bytes),
     parsed_data: { reason, cancelled_at: new Date().toISOString() },
     observed_at: new Date().toISOString(),
   });

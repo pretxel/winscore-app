@@ -1,6 +1,11 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5";
+  };
   graphql_public: {
     Tables: {
       [_ in never]: never;
@@ -653,11 +658,9 @@ export type Database = {
           home_team: string;
           id: string;
           kickoff_at: string;
-          leg: number | null;
           round_id: string | null;
           stage: string;
           status: string;
-          tie_key: string | null;
           updated_at: string;
           venue: string | null;
         };
@@ -671,11 +674,9 @@ export type Database = {
           home_team: string;
           id?: string;
           kickoff_at: string;
-          leg?: number | null;
           round_id?: string | null;
           stage: string;
           status?: string;
-          tie_key?: string | null;
           updated_at?: string;
           venue?: string | null;
         };
@@ -689,11 +690,9 @@ export type Database = {
           home_team?: string;
           id?: string;
           kickoff_at?: string;
-          leg?: number | null;
           round_id?: string | null;
           stage?: string;
           status?: string;
-          tie_key?: string | null;
           updated_at?: string;
           venue?: string | null;
         };
@@ -2383,6 +2382,20 @@ export type Database = {
         Returns: {
           hit_type: string;
           points: number;
+        }[];
+      };
+      score_wager_round_entries: {
+        Args: { p_wager_round_id: string };
+        Returns: {
+          entry_id: string;
+          exact_hits: number;
+          first_submit: string;
+          rank: number;
+          total_points: number;
+          user_id: string;
+          wallet_address: string;
+          winner_gd_hits: number;
+          winner_hits: number;
         }[];
       };
       set_league_live: {

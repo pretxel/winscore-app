@@ -57,9 +57,11 @@ export function buildMerkleTree(
   }
 
   if (leaves.length === 1) {
+    // A single winner's proof is empty, and the program's verifier starts from
+    // the leaf and only folds in proof elements. With no elements to fold, the
+    // root it compares against IS the leaf hash — do not pair it with itself.
     const leaf = leaves[0];
-    const leafHash = hashLeaf(wagerRoundPubkey, leaf.winnerWalletBytes, leaf.awardBaseUnits);
-    const root = hashPair(leafHash, leafHash); // convention: single leaf → hash(leaf, leaf)
+    const root = hashLeaf(wagerRoundPubkey, leaf.winnerWalletBytes, leaf.awardBaseUnits);
     const key = Buffer.from(leaf.winnerWalletBytes).toString("hex");
     const proofs = new Map<string, Uint8Array[]>();
     proofs.set(key, []);
@@ -133,15 +135,13 @@ export function verifyMerkleProof(
   amount: number,
   proof: Uint8Array[],
 ): boolean {
+  // Mirrors `handle_claim` exactly: fold each proof element into the running
+  // hash, then compare against the root. An empty proof means the leaf is the
+  // root (single winner).
   let hash = hashLeaf(wagerRoundPubkey, winnerWallet, amount);
 
-  if (proof.length === 0) {
-    hash = hashPair(hash, hash);
-  } else {
-    for (const p of proof) {
-      const proofBuf = Buffer.from(p);
-      hash = hashPair(hash, proofBuf);
-    }
+  for (const p of proof) {
+    hash = hashPair(hash, Buffer.from(p));
   }
 
   return Buffer.compare(hash, Buffer.from(root)) === 0;

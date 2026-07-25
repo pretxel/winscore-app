@@ -1153,7 +1153,8 @@
         "comeback_emails": "Comeback emails",
         "playoff_score_email": "Playoff score email",
         "score_rules_email": "Scoring-rules email",
-        "winners_email": "Winners email"
+        "winners_email": "Winners email",
+        "wager_reconcile": "Wager reconciliation"
       },
       "jobsDesc": {
         "sync_matches": "Pulls results and recomputes standings",
@@ -1165,7 +1166,8 @@
         "comeback_emails": "Wins back inactive players with a pickable match",
         "playoff_score_email": "Saturday email with the day's finished knockout scores",
         "score_rules_email": "One-off announcement of the stage-weighted scoring rules",
-        "winners_email": "Congratulates the final podium (top 3). Send once, after the final match is scored."
+        "winners_email": "Congratulates the final podium (top 3). Send once, after the final match is scored.",
+        "wager_reconcile": "Converges wagered entries whose on-chain confirmation was never observed, so a paid deposit cannot stay stuck."
       },
       "status": {
         "success": "Success",

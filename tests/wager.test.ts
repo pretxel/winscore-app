@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import type { MerkleLeaf } from "@/lib/wager/merkle-tree";
 import { buildMerkleTree, verifyMerkleProof } from "@/lib/wager/merkle-tree";
@@ -158,6 +159,73 @@ describe("merkleTree", () => {
     const zeroSeedRoot = buildMerkleTree(new Uint8Array(32), leaves).root;
     const realSeedRoot = buildMerkleTree(bytes, leaves).root;
     expect(Buffer.compare(Buffer.from(realSeedRoot), Buffer.from(zeroSeedRoot))).not.toBe(0);
+  });
+
+  // `verifyMerkleProof` cannot catch a root/verifier convention that drifts from
+  // the program, because both live in this file. So re-derive the expected value
+  // the way `handle_claim` does — leaf, then fold in each proof element — and
+  // assert the tree's root matches. Regression: a single winner's root used to be
+  // hash(leaf, leaf) while the program, given an empty proof, compares the bare
+  // leaf, so the only winner of a round could never claim.
+  function foldProofLikeProgram(
+    wagerRound: Uint8Array,
+    wallet: Uint8Array,
+    amount: number,
+    proof: Uint8Array[],
+  ): Buffer {
+    const amountBuf = Buffer.alloc(8);
+    amountBuf.writeBigUInt64LE(BigInt(amount));
+    let hash = createHash("sha256")
+      .update(Buffer.from("winscore-wager-claim-v1"))
+      .update(Buffer.from(wagerRound))
+      .update(Buffer.from(wallet))
+      .update(amountBuf)
+      .digest();
+    for (const element of proof) {
+      const sibling = Buffer.from(element);
+      const [a, b] = Buffer.compare(hash, sibling) <= 0 ? [hash, sibling] : [sibling, hash];
+      hash = createHash("sha256").update(a).update(b).digest();
+    }
+    return hash;
+  }
+
+  it("root matches the program's verifier for a lone winner", () => {
+    const leaves: MerkleLeaf[] = [{ winnerWalletBytes: makeWallet(7), awardBaseUnits: 100 }];
+    const { root, proofs } = buildMerkleTree(wagerRoundPubkey, leaves);
+    const proof = proofs.get(Buffer.from(makeWallet(7)).toString("hex")) ?? [];
+
+    expect(proof).toHaveLength(0);
+    expect(
+      Buffer.compare(
+        foldProofLikeProgram(wagerRoundPubkey, makeWallet(7), 100, proof),
+        Buffer.from(root),
+      ),
+    ).toBe(0);
+  });
+
+  it("root matches the program's verifier for every winner in a multi-leaf tree", () => {
+    // 3 leaves exercises the odd-node promotion path as well.
+    const leaves: MerkleLeaf[] = [
+      { winnerWalletBytes: makeWallet(1), awardBaseUnits: 50 },
+      { winnerWalletBytes: makeWallet(2), awardBaseUnits: 30 },
+      { winnerWalletBytes: makeWallet(3), awardBaseUnits: 20 },
+    ];
+    const { root, proofs } = buildMerkleTree(wagerRoundPubkey, leaves);
+
+    for (const leaf of leaves) {
+      const proof = proofs.get(Buffer.from(leaf.winnerWalletBytes).toString("hex")) ?? [];
+      expect(
+        Buffer.compare(
+          foldProofLikeProgram(
+            wagerRoundPubkey,
+            leaf.winnerWalletBytes,
+            leaf.awardBaseUnits,
+            proof,
+          ),
+          Buffer.from(root),
+        ),
+      ).toBe(0);
+    }
   });
 });
 

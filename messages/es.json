@@ -1148,7 +1148,8 @@
         "comeback_emails": "Correos de regreso",
         "playoff_score_email": "Correo de marcadores de playoffs",
         "score_rules_email": "Correo de puntuación",
-        "winners_email": "Correo de ganadores"
+        "winners_email": "Correo de ganadores",
+        "wager_reconcile": "Reconciliación de apuestas"
       },
       "jobsDesc": {
         "sync_matches": "Obtiene resultados y recalcula la tabla",
@@ -1160,7 +1161,8 @@
         "comeback_emails": "Recupera a jugadores inactivos con un partido por pronosticar",
         "playoff_score_email": "Correo del sábado con los marcadores de la fase eliminatoria del día",
         "score_rules_email": "Anuncio único de las reglas de puntuación por fase",
-        "winners_email": "Felicita al podio final (top 3). Enviar una sola vez, después de puntuar la final."
+        "winners_email": "Felicita al podio final (top 3). Enviar una sola vez, después de puntuar la final.",
+        "wager_reconcile": "Converge las entradas apostadas cuya confirmación on-chain no se observó, para que un depósito pagado no quede atascado."
       },
       "status": {
         "success": "Éxito",

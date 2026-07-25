@@ -1148,7 +1148,8 @@
         "comeback_emails": "Comeback-E-Mails",
         "playoff_score_email": "Playoff-Ergebnis-E-Mail",
         "score_rules_email": "Wertungs-E-Mail",
-        "winners_email": "Gewinner-E-Mail"
+        "winners_email": "Gewinner-E-Mail",
+        "wager_reconcile": "Wetten-Abgleich"
       },
       "jobsDesc": {
         "sync_matches": "Ruft Ergebnisse ab und berechnet die Tabelle neu",
@@ -1160,7 +1161,8 @@
         "comeback_emails": "Holt inaktive Spieler mit tippbarem Spiel zurück",
         "playoff_score_email": "Samstags-E-Mail mit den K.-o.-Ergebnissen des Tages",
         "score_rules_email": "Einmalige Ankündigung der phasengewichteten Wertung",
-        "winners_email": "Gratuliert dem finalen Podium (Top 3). Nur einmal senden, nachdem das Finale gewertet wurde."
+        "winners_email": "Gratuliert dem finalen Podium (Top 3). Nur einmal senden, nachdem das Finale gewertet wurde.",
+        "wager_reconcile": "Gleicht Wett-Einträge ab, deren On-Chain-Bestätigung nie beobachtet wurde, damit eine bezahlte Einzahlung nicht hängen bleibt."
       },
       "status": {
         "success": "Erfolgreich",

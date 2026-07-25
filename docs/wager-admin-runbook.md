@@ -21,8 +21,9 @@ Feature flags (gate the **user** deposit path, not the admin console):
 | --- | --- |
 | `WAGER_UI_ENABLED=true` | Renders the wager rail on the round page. |
 | `WAGER_DEPOSITS_ENABLED=true` | Allows `/api/wager/prepare` + `/api/wager/submit`. |
+| `WAGER_SETTLEMENT_ENABLED=true` | Allows settling a round and claiming awards. Refunds stay available regardless, so a cancelled round can always be unwound. |
 
-The admin console warns when either flag is off (the user path is not live yet).
+The admin console warns when either deposit flag is off (the user path is not live yet).
 
 ## Enable a round
 
@@ -36,6 +37,46 @@ The admin console warns when either flag is off (the user path is not live yet).
    PDA already exists it reports "already initialized" and sends nothing.
 4. **Refresh status**: confirm config enabled · round row present · vault on-chain.
 5. Set `WAGER_UI_ENABLED=true` and `WAGER_DEPOSITS_ENABLED=true` so the user path goes live.
+
+## Prerequisite: rounds must exist
+
+A pool round can only be wagered on if `competition_rounds` has the round and its
+fixtures carry `matches.round_id`. Rounds are populated from trusted provider
+round naming — see `supabase/migrations/20260722204537_round_backfill_template.sql`
+— and are **never** inferred from dates or ISO weeks. With no rounds, the console
+has nothing to initialize and settlement scores zero points.
+
+## Settle a round
+
+1. `GET /api/admin/wager/settle?wagerRoundId=…` reports readiness and the blocker
+   if any. A round must be closed, every fixture final or cancelled with scores,
+   past the 1-hour correction delay, and hold at least one confirmed entry.
+2. `POST /api/admin/wager/settle` with `{ "wagerRoundId": "…" }`. This scores the
+   entries via `score_wager_round_entries` (the canonical primitives, so wagered
+   and free standings cannot diverge), builds the manifest and Merkle tree, sends
+   `lock` + `settle` in one transaction, then writes `wager_settlements` and the
+   pending `wager_claims`.
+3. Winners claim through `POST /api/wager/claim` (returns an unsigned transaction
+   their wallet signs), then `POST /api/wager/claim/confirm` records it after
+   verifying the Claim PDA on chain.
+
+Settling is irreversible on chain. Re-running it is safe — it reports the round as
+already settled rather than settling twice.
+
+## Cancel and refund
+
+`activateRefund` (in `lib/wager/claim-refund.ts`) marks the round cancelled in the
+database. The on-chain `cancel_and_refund` still has to land — sent by the round
+authority, or by anyone once `closes_at + refund_timeout` (48h) elapses — before
+`POST /api/wager/refund` transactions will succeed.
+
+## Reconciliation
+
+`/api/cron/wager-reconcile` runs every 30 minutes and converges intents whose
+confirmation was never observed (lost callback, closed tab, timed-out submit). It
+is also runnable on demand from the operations console. It anchors on the
+deterministic Entry PDA and proves each candidate signature before recording an
+entry, so a retry cannot double-count a deposit.
 
 ## User prerequisites
 

@@ -18,6 +18,7 @@ import { OPERATION_KINDS, type OperationKind, recordRun } from "@/lib/operations
 import { setOperationEnabled } from "@/lib/operations/settings";
 import { runSync } from "@/lib/result-sync/core";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { reconcileWagerEntries } from "@/lib/wager/reconciler";
 
 async function assertAdmin() {
   const supabase = await createServerSupabaseClient();
@@ -90,6 +91,9 @@ const JOB: Record<OperationKind, () => Promise<object>> = {
     const { emailFromName } = await getActiveBranding();
     return dispatchWinnersEmail(emailFromName);
   },
+  // Converging a stuck deposit is the one job an operator may genuinely need to
+  // run on demand rather than wait out the half-hourly schedule.
+  wager_reconcile: async () => reconcileWagerEntries(),
 };
 
 // Shared trigger: assert admin, run the job under recordRun(kind, 'manual'), and
@@ -174,4 +178,7 @@ export async function runScoreRulesEmail(formData: FormData) {
 }
 export async function runWinnersEmail(formData: FormData) {
   await trigger("winners_email", formData);
+}
+export async function runWagerReconcile(formData: FormData) {
+  await trigger("wager_reconcile", formData);
 }

@@ -1148,7 +1148,8 @@
         "comeback_emails": "E-mails de retour",
         "playoff_score_email": "E-mail des scores des playoffs",
         "score_rules_email": "E-mail de barème",
-        "winners_email": "E-mail des vainqueurs"
+        "winners_email": "E-mail des vainqueurs",
+        "wager_reconcile": "Réconciliation des paris"
       },
       "jobsDesc": {
         "sync_matches": "Récupère les résultats et recalcule le classement",
@@ -1160,7 +1161,8 @@
         "comeback_emails": "Relance les joueurs inactifs ayant un match à pronostiquer",
         "playoff_score_email": "E-mail du samedi avec les scores des matchs à élimination directe du jour",
         "score_rules_email": "Annonce unique du barème pondéré par phase",
-        "winners_email": "Félicite le podium final (top 3). À envoyer une seule fois, après le score de la finale."
+        "winners_email": "Félicite le podium final (top 3). À envoyer une seule fois, après le score de la finale.",
+        "wager_reconcile": "Réconcilie les participations misées dont la confirmation on-chain n'a jamais été observée, pour qu'un dépôt payé ne reste pas bloqué."
       },
       "status": {
         "success": "Succès",

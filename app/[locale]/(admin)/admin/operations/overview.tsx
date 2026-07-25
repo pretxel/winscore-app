@@ -19,6 +19,7 @@ import {
   runScoreRulesEmail,
   runSyncMatches,
   runSyncNews,
+  runWagerReconcile,
   runWinnersEmail,
   toggleOperationEnabled,
 } from "./actions";
@@ -35,6 +36,7 @@ const RUN_ACTION: Record<OperationKind, (formData: FormData) => Promise<void>> =
   playoff_score_email: runPlayoffScoreEmail,
   score_rules_email: runScoreRulesEmail,
   winners_email: runWinnersEmail,
+  wager_reconcile: runWagerReconcile,
 };
 
 // Parses the "Run now" outcome the trigger action redirects back with. The
