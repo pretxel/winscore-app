@@ -43,7 +43,9 @@ function mk(
 }
 
 function find(bracket: ReturnType<typeof buildBracket>, stage: string, idx = 0) {
-  return bracket.rounds.find((r) => r.stage === stage)?.matches[idx];
+  const match = bracket.rounds.find((r) => r.stage === stage)?.matches[idx];
+  if (!match) throw new Error(`no match at ${stage}[${idx}]`);
+  return match;
 }
 
 describe("parseKnockoutSlot", () => {

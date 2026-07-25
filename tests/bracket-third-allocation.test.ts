@@ -8,6 +8,12 @@ import {
 } from "@/lib/bracket-third-allocation";
 import { THIRD_PLACE_ALLOCATION } from "@/lib/bracket-third-allocation.generated";
 
+function firstR32(bracket: ReturnType<typeof buildBracket>) {
+  const match = bracket.rounds.find((r) => r.stage === "r32")?.matches[0];
+  if (!match) throw new Error("no r32 match");
+  return match;
+}
+
 describe("third-place allocation table integrity", () => {
   const rows = Object.entries(THIRD_PLACE_ALLOCATION);
 
@@ -124,7 +130,7 @@ describe("buildBracket — best-third resolution", () => {
       venue: null,
     };
     const b = buildBracket([...groups, r32]);
-    const m = b.rounds.find((r) => r.stage === "r32")?.matches[0];
+    const m = firstR32(b);
     expect(m.home).toMatchObject({ team: "A1", status: "confirmed" });
     expect(m.away).toMatchObject({ team: "H3", status: "confirmed" });
   });
@@ -160,7 +166,7 @@ describe("buildBracket — best-third resolution", () => {
       venue: null,
     };
     const b = buildBracket([...groups, r32]);
-    const m = b.rounds.find((r) => r.stage === "r32")?.matches[0];
+    const m = firstR32(b);
     expect(m.away).toMatchObject({
       team: null,
       label: "3rd Group C/E/F/H/I",
@@ -185,7 +191,7 @@ describe("buildBracket — best-third resolution", () => {
       venue: null,
     };
     const b = buildBracket([...groups, r32]);
-    const m = b.rounds.find((r) => r.stage === "r32")?.matches[0];
+    const m = firstR32(b);
     expect(m.home).toMatchObject({ team: "A1", status: "provisional" });
     expect(m.away).toMatchObject({ team: "H3", status: "provisional" });
   });
@@ -221,7 +227,7 @@ describe("buildBracket — best-third resolution", () => {
       venue: null,
     };
     const b = buildBracket([...groups, r32]);
-    const m = b.rounds.find((r) => r.stage === "r32")?.matches[0];
+    const m = firstR32(b);
     expect(m.away).toMatchObject({
       team: null,
       label: "3rd Group C/E/F/H/I",
@@ -276,10 +282,10 @@ describe("buildBracket — best-third resolution", () => {
 
     // Drop I → best-8 = ABCDEFGH; allocation maps slot E (faces winner E) to C3.
     const ba = buildBracket([...build("I"), r32]);
-    const ma = ba.rounds.find((r) => r.stage === "r32")?.matches[0].away;
+    const ma = firstR32(ba).away;
     // Drop H → best-8 = ABCDEFGI; the same slot now maps to D3.
     const bb = buildBracket([...build("H"), r32]);
-    const mb = bb.rounds.find((r) => r.stage === "r32")?.matches[0].away;
+    const mb = firstR32(bb).away;
 
     // Both resolve to a real team, confirmed (all groups complete)…
     expect(ma).toMatchObject({ team: "C3", status: "confirmed" });
