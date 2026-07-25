@@ -1,19 +1,22 @@
-import type { Metadata } from "next";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getWagerEnv } from "@/lib/wager/env";
 import { WagerAdminPanel } from "./wager-admin-panel";
 
-export const metadata: Metadata = {
-  title: "Wager Config — Admin",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "admin.wager" });
+  return { title: t("metaTitle") };
+}
 
 export default async function WagerAdminPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
+
+  const t = await getTranslations("admin.wager");
 
   const admin = createAdminSupabaseClient();
 
@@ -34,7 +37,7 @@ export default async function WagerAdminPage({ params }: { params: Promise<{ loc
       .filter((r) => r.competition_id === g.competition_id)
       .map((r) => ({
         id: r.id,
-        label: r.round_number ? `Round ${r.round_number}` : "Round",
+        label: r.round_number ? t("roundOption", { number: r.round_number }) : t("roundFallback"),
       })),
   }));
 
@@ -43,10 +46,7 @@ export default async function WagerAdminPage({ params }: { params: Promise<{ loc
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader
-        title="Wager Config"
-        description="Configure pool wagering, initialize on-chain rounds, and check status."
-      />
+      <AdminPageHeader title={t("title")} description={t("description")} />
       <WagerAdminPanel groups={groups} flagsLive={flagsLive} />
     </div>
   );

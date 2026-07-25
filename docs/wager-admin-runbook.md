@@ -46,6 +46,13 @@ round naming — see `supabase/migrations/20260722204537_round_backfill_template
 — and are **never** inferred from dates or ISO weeks. With no rounds, the console
 has nothing to initialize and settlement scores zero points.
 
+Check both before trying to enable a round:
+
+```sql
+select count(*) from public.competition_rounds;
+select count(*) from public.matches where round_id is not null;
+```
+
 ## Settle a round
 
 1. `GET /api/admin/wager/settle?wagerRoundId=…` reports readiness and the blocker

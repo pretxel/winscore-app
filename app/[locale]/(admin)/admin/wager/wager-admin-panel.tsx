@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertCircleIcon, CheckCircle2Icon, Loader2Icon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,6 +49,7 @@ interface StatusResult {
 // status) behind one panel. Fetch + loading/error state mirrors
 // components/wallet/wallet-link-button.tsx.
 export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
+  const t = useTranslations("admin.wager");
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
   const selectedGroup = useMemo(() => groups.find((g) => g.id === groupId), [groups, groupId]);
 
@@ -98,7 +100,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
       });
       const data = await resp.json();
       if (!resp.ok || data.error) {
-        setConfigureError(data.error ?? "Configuration failed");
+        setConfigureError(data.error ?? t("configureFailed"));
         setConfigureState("error");
         return;
       }
@@ -109,7 +111,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
       });
       setConfigureState("success");
     } catch (err) {
-      setConfigureError(err instanceof Error ? err.message : "Configuration failed");
+      setConfigureError(err instanceof Error ? err.message : t("configureFailed"));
       setConfigureState("error");
     }
   };
@@ -127,7 +129,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
       });
       const data = await resp.json();
       if (!resp.ok || data.error) {
-        setInitError(data.error ?? "Initialization failed");
+        setInitError(data.error ?? t("initFailed"));
         setInitState("error");
         return;
       }
@@ -140,7 +142,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
       });
       setInitState("success");
     } catch (err) {
-      setInitError(err instanceof Error ? err.message : "Initialization failed");
+      setInitError(err instanceof Error ? err.message : t("initFailed"));
       setInitState("error");
     }
   };
@@ -155,14 +157,14 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
       );
       const data = await resp.json();
       if (!resp.ok || data.error) {
-        setStatusError(data.error ?? "Failed to load status");
+        setStatusError(data.error ?? t("statusFailed"));
         setStatusState("error");
         return;
       }
       setStatusResult(data);
       setStatusState("success");
     } catch (err) {
-      setStatusError(err instanceof Error ? err.message : "Failed to load status");
+      setStatusError(err instanceof Error ? err.message : t("statusFailed"));
       setStatusState("error");
     }
   };
@@ -171,7 +173,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
     return (
       <Card>
         <CardContent className="py-8 text-center text-sm text-muted-foreground">
-          No groups exist yet.
+          {t("noGroups")}
         </CardContent>
       </Card>
     );
@@ -183,23 +185,20 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
         <Card className="border-amber-500/40 bg-amber-500/5">
           <CardContent className="flex items-center gap-3 py-3">
             <AlertCircleIcon className="size-5 shrink-0 text-amber-500" />
-            <p className="text-sm text-muted-foreground">
-              Wagering UI and deposits are disabled by feature flag. Configuration and on-chain
-              initialization below still work, but the player-facing deposit path is not live yet.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("flagsOff")}</p>
           </CardContent>
         </Card>
       ) : null}
 
       <Card>
         <CardHeader>
-          <CardTitle>Group</CardTitle>
+          <CardTitle>{t("group")}</CardTitle>
         </CardHeader>
         <CardContent>
           <NativeSelect
             value={groupId}
             onChange={(e) => handleGroupChange(e.target.value)}
-            aria-label="Group"
+            aria-label={t("group")}
           >
             {groups.map((g) => (
               <option key={g.id} value={g.id}>
@@ -212,32 +211,32 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Configure wagering</CardTitle>
+          <CardTitle>{t("configureTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="mint">Mint address</Label>
+              <Label htmlFor="mint">{t("mintLabel")}</Label>
               <Input
                 id="mint"
                 value={mint}
                 onChange={(e) => setMint(e.target.value)}
-                placeholder="Devnet SPL mint address"
+                placeholder={t("mintPlaceholder")}
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="stakeAmount">Stake amount</Label>
+              <Label htmlFor="stakeAmount">{t("stakeLabel")}</Label>
               <Input
                 id="stakeAmount"
                 value={stakeAmount}
                 onChange={(e) => setStakeAmount(e.target.value)}
-                placeholder="e.g. 10"
+                placeholder={t("stakePlaceholder")}
               />
             </div>
           </div>
           <Button onClick={handleConfigure} disabled={configureState === "loading"}>
             {configureState === "loading" ? <Loader2Icon className="size-4 animate-spin" /> : null}
-            Configure wagering
+            {t("configureAction")}
           </Button>
           {configureState === "error" && configureError ? (
             <p className="flex items-center gap-2 text-sm text-destructive">
@@ -248,7 +247,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
           {configureState === "success" && configureResult ? (
             <p className="flex items-center gap-2 text-sm text-pitch">
               <CheckCircle2Icon className="size-4 shrink-0" />
-              Configured. Decimals: {configureResult.decimals}, token program:{" "}
+              {t("configureSuccess", { decimals: configureResult.decimals })}{" "}
               <span className="font-mono text-xs">{configureResult.tokenProgram}</span>
             </p>
           ) : null}
@@ -257,18 +256,18 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Initialize round</CardTitle>
+          <CardTitle>{t("initTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="round">Round</Label>
+            <Label htmlFor="round">{t("roundLabel")}</Label>
             <NativeSelect
               id="round"
               value={roundId}
               onChange={(e) => setRoundId(e.target.value)}
               disabled={!selectedGroup?.rounds.length}
             >
-              {!selectedGroup?.rounds.length ? <option value="">No rounds</option> : null}
+              {!selectedGroup?.rounds.length ? <option value="">{t("noRounds")}</option> : null}
               {selectedGroup?.rounds.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.label}
@@ -278,7 +277,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
           </div>
           <Button onClick={handleInitialize} disabled={initState === "loading" || !roundId}>
             {initState === "loading" ? <Loader2Icon className="size-4 animate-spin" /> : null}
-            Initialize round
+            {t("initAction")}
           </Button>
           {initState === "error" && initError ? (
             <p className="flex items-center gap-2 text-sm text-destructive">
@@ -291,10 +290,10 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
               <p className="flex items-center gap-2">
                 <CheckCircle2Icon className="size-4 shrink-0" />
                 {initResult.alreadyInitialized
-                  ? "Round was already initialized."
+                  ? t("initAlready")
                   : initResult.confirmed === false
-                    ? "Transaction submitted, not yet confirmed — refresh status to verify the vault."
-                    : "Round initialized and confirmed on-chain."}
+                    ? t("initUnconfirmed")
+                    : t("initConfirmed")}
               </p>
               {initResult.signature ? (
                 <a
@@ -303,7 +302,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
                   rel="noreferrer"
                   className="text-xs text-muted-foreground underline"
                 >
-                  View transaction on Solana Explorer
+                  {t("viewTransaction")}
                 </a>
               ) : null}
             </div>
@@ -313,7 +312,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Status</CardTitle>
+          <CardTitle>{t("statusTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button
@@ -322,7 +321,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
             disabled={statusState === "loading" || !roundId}
           >
             {statusState === "loading" ? <Loader2Icon className="size-4 animate-spin" /> : null}
-            Refresh status
+            {t("statusRefresh")}
           </Button>
           {statusState === "error" && statusError ? (
             <p className="flex items-center gap-2 text-sm text-destructive">
@@ -338,7 +337,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
                 ) : (
                   <AlertCircleIcon className="size-4 shrink-0 text-muted-foreground" />
                 )}
-                Config enabled: {statusResult.configEnabled ? "yes" : "no"}
+                {t("statusConfigEnabled")}: {statusResult.configEnabled ? t("yes") : t("no")}
               </li>
               <li className="flex items-center gap-2">
                 {statusResult.wagerRoundExists ? (
@@ -346,7 +345,7 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
                 ) : (
                   <AlertCircleIcon className="size-4 shrink-0 text-muted-foreground" />
                 )}
-                Round row exists: {statusResult.wagerRoundExists ? "yes" : "no"}
+                {t("statusRoundExists")}: {statusResult.wagerRoundExists ? t("yes") : t("no")}
               </li>
               <li className="flex items-center gap-2">
                 {statusResult.vaultExists ? (
@@ -354,11 +353,17 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
                 ) : (
                   <AlertCircleIcon className="size-4 shrink-0 text-muted-foreground" />
                 )}
-                Vault on-chain: {statusResult.vaultExists ? "yes" : "no"}
+                {t("statusVaultExists")}: {statusResult.vaultExists ? t("yes") : t("no")}
               </li>
-              {statusResult.stakeDisplay ? <li>Stake: {statusResult.stakeDisplay}</li> : null}
+              {statusResult.stakeDisplay ? (
+                <li>
+                  {t("statusStake")}: {statusResult.stakeDisplay}
+                </li>
+              ) : null}
               {statusResult.closesAt ? (
-                <li>Closes at: {new Date(statusResult.closesAt).toLocaleString()}</li>
+                <li>
+                  {t("statusClosesAt")}: {new Date(statusResult.closesAt).toLocaleString()}
+                </li>
               ) : null}
             </ul>
           ) : null}
