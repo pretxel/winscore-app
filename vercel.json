@@ -35,7 +35,7 @@
     },
     {
       "path": "/api/cron/wager-reconcile",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 10 * * *"
     }
   ]
 }

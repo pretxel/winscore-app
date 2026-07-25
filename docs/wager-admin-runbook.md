@@ -79,11 +79,18 @@ authority, or by anyone once `closes_at + refund_timeout` (48h) elapses — befo
 
 ## Reconciliation
 
-`/api/cron/wager-reconcile` runs every 30 minutes and converges intents whose
-confirmation was never observed (lost callback, closed tab, timed-out submit). It
-is also runnable on demand from the operations console. It anchors on the
+`/api/cron/wager-reconcile` converges intents whose confirmation was never
+observed (lost callback, closed tab, timed-out submit). It anchors on the
 deterministic Entry PDA and proves each candidate signature before recording an
 entry, so a retry cannot double-count a deposit.
+
+It is scheduled **daily at 10:00 UTC**, not every 30 minutes: Vercel Hobby
+accounts reject any cron running more than once a day. A user whose deposit
+landed but whose confirmation was lost therefore stays pending for up to 24h —
+so when someone reports a stuck entry, run it on demand from
+`/<locale>/admin/operations` ("Wager reconciliation" → Run now) rather than
+waiting for the schedule. Moving to the Pro plan is what unblocks a tighter
+interval.
 
 ## User prerequisites
 
