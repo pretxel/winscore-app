@@ -26,11 +26,17 @@ export const REMOTE_TO_LOCAL_TEAM: Record<string, string> = {
   Atlas: "Atlas",
   "Atlético San Luis": "Atlético San Luis",
   "Atletico San Luis": "Atlético San Luis",
+  // ESPN spells it with the article.
+  "Atlético de San Luis": "Atlético San Luis",
+  "Atletico de San Luis": "Atlético San Luis",
   "Cruz Azul": "Cruz Azul",
-  "FC Juárez": "FC Juárez",
-  "FC Juarez": "FC Juárez",
-  Juárez: "FC Juárez",
-  Juarez: "FC Juárez",
+  // The canonical name is "Juárez" — what the fixtures carry. These previously
+  // mapped to "FC Juárez", which matches no local fixture, so every Juárez
+  // result was logged as unmatched and its score never landed.
+  "FC Juárez": "Juárez",
+  "FC Juarez": "Juárez",
+  Juárez: "Juárez",
+  Juarez: "Juárez",
   Guadalajara: "Guadalajara",
   Chivas: "Guadalajara",
   "Club Deportivo Guadalajara": "Guadalajara",
@@ -52,14 +58,18 @@ export const REMOTE_TO_LOCAL_TEAM: Record<string, string> = {
   Queretaro: "Querétaro",
   "Santos Laguna": "Santos Laguna",
   "Club Santos Laguna": "Santos Laguna",
+  // ESPN shortens it to just "Santos".
+  Santos: "Santos Laguna",
   Tijuana: "Tijuana",
   "Club Tijuana": "Tijuana",
   Xolos: "Tijuana",
   Toluca: "Toluca",
   "Deportivo Toluca": "Toluca",
-  UANL: "UANL",
-  "Tigres UANL": "UANL",
-  Tigres: "UANL",
+  // The canonical name is "Tigres UANL". These previously collapsed to "UANL",
+  // which matches no local fixture, so Tigres results never landed.
+  UANL: "Tigres UANL",
+  "Tigres UANL": "Tigres UANL",
+  Tigres: "Tigres UANL",
   UNAM: "UNAM",
   "Pumas UNAM": "UNAM",
   Pumas: "UNAM",

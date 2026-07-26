@@ -131,6 +131,38 @@ database. The on-chain `cancel_and_refund` still has to land — sent by the rou
 authority, or by anyone once `closes_at + refund_timeout` (48h) elapses — before
 `POST /api/wager/refund` transactions will succeed.
 
+## Result sync (settlement depends on it)
+
+Settlement will not run until every fixture in the round is `final` with scores,
+so a wagered round is only settleable if result sync is actually reaching the
+competition. `/api/cron/sync-matches` runs daily at 09:00 UTC and tries providers
+in order, escalating to the next when one hard-fails, returns nothing, or leaves
+overdue fixtures unresolved.
+
+| Competition | football-data (primary) | ESPN (fallback) |
+| --- | --- | --- |
+| World Cup 2026 | `WC` — works | `fifa.world` — works |
+| Liga MX Apertura 2026 | `LMX` — **HTTP 403, not in the plan** | `mex.1` — works |
+
+Liga MX therefore depends on ESPN alone. That is handled — football-data's throw
+is caught and the run escalates, verified live: `source=espn fetched=9` for the
+Jornada 3 window — but it means Liga MX has no second source. If ESPN's
+`mex.1` feed changes shape, results stop updating and rounds stop being
+settleable. Widening football-data's plan to include Liga MX would restore a real
+fallback.
+
+Two failure modes here are silent by nature, so check for them when results look
+stale:
+
+- **Wrong `espn.leaguePath`.** `mex.liga` returned HTTP 400 on every call, which
+  meant Liga MX had no working provider at all. Fixed to `mex.1` in
+  `20260726000000`. Verify with:
+  `curl -s --compressed "https://site.api.espn.com/apis/site/v2/sports/soccer/mex.1/scoreboard?dates=20260801" | head -c 200`
+- **An alias pointing at a name no fixture uses.** result-sync normalizes the
+  remote name, finds no local match, logs `unmatched remote`, and writes nothing.
+  `tests/team-name-aliases.test.ts` now asserts every Liga MX alias target is a
+  real seeded team, and that the exact strings ESPN sends all resolve.
+
 ## Reconciliation
 
 `/api/cron/wager-reconcile` converges intents whose confirmation was never
