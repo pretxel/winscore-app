@@ -112,12 +112,16 @@ Current coverage:
 | Competition | Fixtures | Rounds | Wagerable |
 | --- | --- | --- | --- |
 | Liga MX Apertura 2026 | 153 | 17 Jornadas | yes |
-| La Liga 2026-27 | 380 | 38 Matchdays | yes, once `status='active'` |
+| La Liga 2026-27 | 380 | 38 Matchdays | yes |
 | World Cup 2026 | 104 | none | no |
 
-La Liga is seeded at `status='manage'`, so it is invisible to players until an
-admin activates it — flip it with `set_league_live()` or the admin console when
-you want pools on it. Its rounds are all `pending` for the same reason.
+All three are `status='active'`, so all three appear in the catalog, accept pools,
+and are synced by the crons. La Liga's Matchday 1 is `active` and the remaining 37
+are `pending` — round status is only a UI label, not a gate, so leaving future
+matchdays pending just avoids advertising 38 rounds as open at once. Change a
+competition's status from the admin console (`setStatus`), which is a plain
+`update` on `competitions.status`; there is no longer a `set_league_live()` RPC or
+`is_live` column.
 
 World Cup has no rounds because its 72 group fixtures carry no matchday: neither
 the seed nor `scripts/generate-fixtures-sql.mjs` captured one, and inferring
