@@ -25,6 +25,40 @@ Feature flags (gate the **user** deposit path, not the admin console):
 
 The admin console warns when either deposit flag is off (the user path is not live yet).
 
+## Program deployment
+
+The deployed devnet program is `9q5fBczvg3XYipRmxY5tt3axGgNQfYtGeaDpbMHMLkmi`, and
+its upgrade authority is the same keypair as `WAGER_AUTHORITY_KEYPAIR`
+(`5WReDH2phKadrF1f6jzx7ddscKZVbtoZsNgZ2Egt1NuB`).
+
+**The currently deployed binary predates the account-size fix**, so
+`initialize_wager_round` still fails with `AccountDidNotDeserialize` (3003) —
+`WAGER_ROUND_SIZE` was 15 bytes short of what `WagerRound` serializes to. Rebuild
+and redeploy before anything on-chain can work:
+
+```bash
+export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+cd solana/winscore-wager && anchor build
+solana program deploy target/deploy/winscore_wager.so \
+  --program-id 9q5fBczvg3XYipRmxY5tt3axGgNQfYtGeaDpbMHMLkmi \
+  --keypair ~/.config/solana/winscore-wager-authority-devnet.json \
+  --upgrade-authority ~/.config/solana/winscore-wager-authority-devnet.json \
+  --url devnet
+```
+
+A redeploy stages the new binary in a temporary buffer, so the authority needs
+roughly **twice** the program's rent on hand — about 2.65 SOL plus fees for a
+379 KB program, on top of whatever it already holds in the deployed account. Top
+it up first (`solana airdrop 2 <authority> --url devnet`; the public faucet
+rate-limits, so this may need retrying later or a different faucet). A deploy that
+runs out of funds aborts atomically and leaves nothing behind, but check for a
+stranded buffer afterwards and reclaim its rent if one exists:
+
+```bash
+solana program show --buffers --keypair ~/.config/solana/winscore-wager-authority-devnet.json --url devnet
+solana program close <buffer-address> --url devnet   # only if one is listed
+```
+
 ## Enable a round
 
 1. Open `/<locale>/admin/wager` (admin only).
@@ -37,6 +71,26 @@ The admin console warns when either deposit flag is off (the user path is not li
    PDA already exists it reports "already initialized" and sends nothing.
 4. **Refresh status**: confirm config enabled · round row present · vault on-chain.
 5. Set `WAGER_UI_ENABLED=true` and `WAGER_DEPOSITS_ENABLED=true` so the user path goes live.
+
+### Current devnet state
+
+Steps 2 and 3's **database** side is already done for the "Test group" pool on
+Liga MX Jornada 3, so re-running the console will report the config and round as
+existing rather than creating duplicates:
+
+| | |
+| --- | --- |
+| Pool | Test group (`b2f35633-c848-4ce4-a625-1a521b739be3`) |
+| Round | Liga MX Jornada 3 (`6a85d0cb-cc42-4f93-8b7e-0cc5a907653a`), closes 2026-08-01 01:00 UTC |
+| Stake | `1000000` base units = 1 token at 6 decimals |
+| Mint | `2iRUoo68otakZk8dTNyVJJVtvQAm7po62PFwRNQ7Dkjr` |
+| Round PDA | `GXjSTxecweLm5fvh4gKfnzQJF8NC61TW4GdgbC2K43yZ` (not yet created) |
+| Vault ATA | `FgUWReBnM2bhV2aEtFa3ueyGWSRhz4gv9CuNA7CYyu84` (not yet created) |
+
+The **on-chain** half of step 3 is outstanding, blocked on the redeploy above.
+Once the program carries the account-size fix, running Initialize for this round
+creates the PDA and vault; `WAGER_SETTLEMENT_ENABLED` is still unset, so
+settlement stays off until a round has entries worth settling.
 
 ## Prerequisite: rounds must exist
 
