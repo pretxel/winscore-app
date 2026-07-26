@@ -107,6 +107,23 @@ select count(*) from public.competition_rounds;
 select count(*) from public.matches where round_id is not null;
 ```
 
+Current coverage:
+
+| Competition | Fixtures | Rounds | Wagerable |
+| --- | --- | --- | --- |
+| Liga MX Apertura 2026 | 153 | 17 Jornadas | yes |
+| La Liga 2026-27 | 380 | 38 Matchdays | yes, once `status='active'` |
+| World Cup 2026 | 104 | none | no |
+
+La Liga is seeded at `status='manage'`, so it is invisible to players until an
+admin activates it — flip it with `set_league_live()` or the admin console when
+you want pools on it. Its rounds are all `pending` for the same reason.
+
+World Cup has no rounds because its 72 group fixtures carry no matchday: neither
+the seed nor `scripts/generate-fixtures-sql.mjs` captured one, and inferring
+rounds from dates is forbidden. Wagering on it needs the official FIFA matchday
+data first.
+
 ## Settle a round
 
 1. `GET /api/admin/wager/settle?wagerRoundId=…` reports readiness and the blocker
@@ -143,6 +160,7 @@ overdue fixtures unresolved.
 | --- | --- | --- |
 | World Cup 2026 | `WC` — works | `fifa.world` — works |
 | Liga MX Apertura 2026 | `LMX` — **HTTP 403, not in the plan** | `mex.1` — works |
+| La Liga 2026-27 | `PD` — works | `esp.1` — works |
 
 Liga MX therefore depends on ESPN alone. That is handled — football-data's throw
 is caught and the run escalates, verified live: `source=espn fetched=9` for the

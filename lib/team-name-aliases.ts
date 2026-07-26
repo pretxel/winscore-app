@@ -121,6 +121,27 @@ export const REMOTE_TO_LOCAL_TEAM: Record<string, string> = {
   "Real Valladolid": "Valladolid",
   Villarreal: "Villarreal",
   "Villarreal CF": "Villarreal",
+
+  // 2026-27 La Liga: promoted clubs, plus long forms football-data uses that had
+  // no alias. Canonical names follow the short forms already used above (and the
+  // ones ESPN's esp.1 feed sends), so the two providers agree.
+  Elche: "Elche",
+  "Elche CF": "Elche",
+  Levante: "Levante",
+  "Levante UD": "Levante",
+  "Deportivo La Coruña": "Deportivo La Coruña",
+  "RC Deportivo La Coruña": "Deportivo La Coruña",
+  Deportivo: "Deportivo La Coruña",
+  "Racing Santander": "Racing Santander",
+  "Real Racing Club de Santander": "Racing Santander",
+  Racing: "Racing Santander",
+  Málaga: "Málaga",
+  Malaga: "Málaga",
+  "Málaga CF": "Málaga",
+  "Malaga CF": "Málaga",
+  "RCD Espanyol de Barcelona": "Espanyol",
+  "Rayo Vallecano de Madrid": "Rayo Vallecano",
+  "Real Sociedad de Fútbol": "Real Sociedad",
 };
 
 export function normalizeTeamName(remote: string | null | undefined): string {
