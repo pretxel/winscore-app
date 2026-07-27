@@ -12,42 +12,53 @@ const intlMiddleware = createIntlMiddleware({
 });
 
 export async function middleware(request: NextRequest) {
-  // 1. Resolve locale first — may return a redirect for bare paths or
-  //    unsupported locale segments.
-  const intlResponse = intlMiddleware(request);
-  if (intlResponse.headers.get("location")) {
-    return intlResponse;
+  try {
+    // 1. Resolve locale first — may return a redirect for bare paths or
+    //    unsupported locale segments.
+    const intlResponse = intlMiddleware(request);
+    if (intlResponse.headers.get("location")) {
+      return intlResponse;
+    }
+
+    // 2. Refresh Supabase auth on the response from the i18n middleware so
+    //    cookies and rewrites set by next-intl are preserved.
+    let response = intlResponse;
+
+    const supabase = createServerClient(env.supabaseUrl, env.supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(toSet) {
+          for (const { name, value } of toSet) {
+            request.cookies.set(name, value);
+          }
+          const refreshed = NextResponse.next({ request });
+          // Carry over cookies set by intl middleware.
+          for (const c of intlResponse.cookies.getAll()) {
+            refreshed.cookies.set(c.name, c.value);
+          }
+          for (const { name, value, options } of toSet) {
+            refreshed.cookies.set(name, value, options);
+          }
+          response = refreshed;
+        },
+      },
+    });
+
+    // Touch the session so it refreshes if needed.
+    try {
+      await supabase.auth.getUser();
+    } catch {
+      // Auth refresh can fail (e.g. Supabase down, network issue) — don't let
+      // that crash every page render.
+    }
+    return response;
+  } catch {
+    // Middleware itself should never crash; if it does, let the request pass
+    // through so the page can still render.
+    return NextResponse.next();
   }
-
-  // 2. Refresh Supabase auth on the response from the i18n middleware so
-  //    cookies and rewrites set by next-intl are preserved.
-  let response = intlResponse;
-
-  const supabase = createServerClient(env.supabaseUrl, env.supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(toSet) {
-        for (const { name, value } of toSet) {
-          request.cookies.set(name, value);
-        }
-        const refreshed = NextResponse.next({ request });
-        // Carry over cookies set by intl middleware.
-        for (const c of intlResponse.cookies.getAll()) {
-          refreshed.cookies.set(c.name, c.value);
-        }
-        for (const { name, value, options } of toSet) {
-          refreshed.cookies.set(name, value, options);
-        }
-        response = refreshed;
-      },
-    },
-  });
-
-  // Touch the session so it refreshes if needed.
-  await supabase.auth.getUser();
-  return response;
 }
 
 export const config = {
