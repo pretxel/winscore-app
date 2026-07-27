@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BracketLiveRefresh } from "@/components/bracket-live-refresh";
 import { BracketView } from "@/components/bracket-view";
 import { getBracket } from "@/lib/bracket";
 import { KNOCKOUT_ORDER } from "@/lib/bracket-core";
 import { getLeagueFromContext } from "@/lib/competition";
-import { getStageLabel } from "@/lib/competition-schema";
+import { getStageLabel, hasKnockoutStage } from "@/lib/competition-schema";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
 
@@ -17,6 +18,7 @@ export async function generateMetadata({
   const { locale, league } = await params;
   const t = await getTranslations({ locale, namespace: "bracket" });
   const comp = await getLeagueFromContext({ slug: league });
+  if (comp && !hasKnockoutStage(comp.format)) notFound();
   return {
     title: comp ? `${t("title")} · ${comp.short_name}` : t("title"),
     description: t("description"),
@@ -41,6 +43,7 @@ export default async function BracketPage({
 
   const t = await getTranslations("bracket");
   const competition = await getLeagueFromContext({ slug: league });
+  if (competition && !hasKnockoutStage(competition.format)) notFound();
   const { rounds, matches, hasKnockout } = await getBracket(competition);
 
   // Cron-not-firing safety net: refresh overdue results after the response.

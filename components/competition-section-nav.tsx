@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { NavLinks } from "@/components/site-nav-client";
 import type { ResolvedCompetition } from "@/lib/competition";
-import { hasGroupStage, leagueStageKey } from "@/lib/competition-schema";
+import { hasGroupStage, hasKnockoutStage, leagueStageKey } from "@/lib/competition-schema";
 import { type Locale, localePath } from "@/lib/i18n";
 
 // Persistent, competition-scoped section nav rendered from `[league]/layout.tsx`,
@@ -25,7 +25,7 @@ export async function CompetitionSectionNav({
   const t = await getTranslations("nav");
   const format = competition?.format ?? null;
   const showStandings = format ? hasGroupStage(format) || leagueStageKey(format) !== null : false;
-  const showBracket = format ? format.stages.some((s) => s.kind === "knockout") : false;
+  const showBracket = format ? hasKnockoutStage(format) : false;
 
   const links = [
     { href: localePath(locale, `/${league}/matches`), label: t("matches") },

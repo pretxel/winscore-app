@@ -179,6 +179,10 @@ export function revealedKnockoutStageKeys(format: CompetitionFormat): Set<string
 // The stage key of the (first) group stage, e.g. "group" — or null when the
 // competition has no group stage. Used to query/group group-stage fixtures
 // without hardcoding the literal "group".
+export function hasKnockoutStage(format: CompetitionFormat): boolean {
+  return format.stages.some((s) => s.kind === "knockout");
+}
+
 export function groupStageKey(format: CompetitionFormat): string | null {
   return format.stages.find((s) => s.kind === "group")?.key ?? null;
 }

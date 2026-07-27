@@ -7,6 +7,7 @@ import {
   getStageOrder,
   groupCodePattern,
   hasGroupStage,
+  hasKnockoutStage,
   parseFormatConfig,
   revealedKnockoutStageKeys,
   sortedStages,
@@ -42,6 +43,34 @@ const LEAGUE_FORMAT = {
     { key: "final", kind: "knockout", order: 2, hasGroupCode: false, labels: { en: "Final" } },
   ],
   groups: { enabled: false },
+};
+
+// La Liga 2026–27 — pure league, no knockout.
+const LEAGUE_ONLY_FORMAT = {
+  stages: [
+    {
+      key: "league",
+      kind: "league",
+      order: 1,
+      hasGroupCode: false,
+      labels: { en: "League phase" },
+    },
+  ],
+  groups: { enabled: false },
+};
+
+// Group-only format — no knockout, no league.
+const GROUP_ONLY_FORMAT = {
+  stages: [
+    {
+      key: "group",
+      kind: "group",
+      order: 1,
+      hasGroupCode: true,
+      labels: { en: "Group stage" },
+    },
+  ],
+  groups: { enabled: true, pattern: "^[A-Z]$", count: 8 },
 };
 
 describe("formatConfigSchema", () => {
@@ -125,6 +154,38 @@ describe("format helpers", () => {
     const league = parseFormatConfig(LEAGUE_FORMAT);
     expect(hasGroupStage(league)).toBe(false);
     expect(groupCodePattern(league)).toBeNull();
+  });
+});
+
+describe("hasKnockoutStage", () => {
+  it("returns true for a format with knockout stages", () => {
+    expect(hasKnockoutStage(parseFormatConfig(WC_FORMAT))).toBe(true);
+  });
+
+  it("returns false for a league-only format", () => {
+    expect(hasKnockoutStage(parseFormatConfig(LEAGUE_ONLY_FORMAT))).toBe(false);
+  });
+
+  it("returns false for a group-only format", () => {
+    expect(hasKnockoutStage(parseFormatConfig(GROUP_ONLY_FORMAT))).toBe(false);
+  });
+
+  it("returns false for a format with no stages", () => {
+    const noStages: CompetitionFormat = { stages: [], groups: { enabled: false } };
+    expect(hasKnockoutStage(noStages)).toBe(false);
+  });
+});
+
+// Nav and route derive from the same shared predicate so they cannot drift.
+// When the nav shows the Bracket link the route must be reachable, and when the
+// nav hides it the route must 404.
+describe("nav / route agreement", () => {
+  it("league-only format: nav hides Bracket and route guard fires", () => {
+    expect(hasKnockoutStage(parseFormatConfig(LEAGUE_ONLY_FORMAT))).toBe(false);
+  });
+
+  it("knockout format: nav shows Bracket and route guard passes", () => {
+    expect(hasKnockoutStage(parseFormatConfig(WC_FORMAT))).toBe(true);
   });
 });
 
