@@ -255,7 +255,7 @@ host = "smtp.resend.com"
 port = 465
 user = "resend"
 pass = "env(RESEND_API_KEY)"
-admin_email = "no-reply@edselserrano.com"
+admin_email = "no-reply@winscore.me"
 sender_name = "World Cup Pools"
 
 # Branded magic-link sign-in email. Sent by Supabase's own mailer (GoTrue),
