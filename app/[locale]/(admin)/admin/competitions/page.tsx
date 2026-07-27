@@ -11,7 +11,13 @@ import { Button } from "@/components/ui/button";
 import { getManagedCompetitionId } from "@/lib/admin/managed-competition";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { deleteCompetition, finishLeague, restartLeague, setManagedCompetition } from "./actions";
+import {
+  deleteCompetition,
+  finishLeague,
+  restartLeague,
+  setManagedCompetition,
+  setStatus,
+} from "./actions";
 
 const WC_SEED_SLUG = "world-cup-2026";
 
@@ -87,6 +93,7 @@ export default async function AdminCompetitionsPage({
               const fixtures = fixtureCounts.get(c.id) ?? 0;
               const isActive = c.status === "active";
               const isFinished = c.status === "finished";
+              const isUpcoming = c.status === "upcoming";
               const isWcSeed = c.slug === WC_SEED_SLUG;
               const deletable = !isActive && !isWcSeed && fixtures === 0;
               return (
@@ -102,6 +109,14 @@ export default async function AdminCompetitionsPage({
                         ) : null}
                         {isManaged ? (
                           <Badge variant="outline">{t("competitions.badgeManaging")}</Badge>
+                        ) : null}
+                        {isUpcoming ? (
+                          <Badge
+                            variant="outline"
+                            className="border-sky-500/30 text-sky-600 dark:text-sky-400"
+                          >
+                            {t("competitions.badgeUpcoming")}
+                          </Badge>
                         ) : null}
                         {isFinished ? (
                           <Badge
@@ -129,6 +144,16 @@ export default async function AdminCompetitionsPage({
                             <input type="hidden" name="id" value={c.id} />
                             <SubmitButton size="sm" variant="outline">
                               {t("competitions.manage")}
+                            </SubmitButton>
+                          </form>
+                        ) : null}
+
+                        {c.status === "manage" ? (
+                          <form action={setStatus}>
+                            <input type="hidden" name="id" value={c.id} />
+                            <input type="hidden" name="status" value="upcoming" />
+                            <SubmitButton size="sm" variant="outline">
+                              {t("competitions.badgeUpcoming")}
                             </SubmitButton>
                           </form>
                         ) : null}

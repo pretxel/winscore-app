@@ -24,10 +24,25 @@ export default async function LeagueLayout({
     redirect(localePath(locale, "/catalog"));
   }
 
+  // Upcoming leagues show a placeholder page in the content area; render the
+  // layout shell (nav, etc.) but swap children for a coming-soon placeholder.
+  const isUpcoming = resolved.status === "upcoming";
+
   return (
     <>
       <CompetitionSectionNav locale={locale} league={league} competition={resolved} />
-      {children}
+      {isUpcoming ? (
+        <main className="mx-auto flex max-w-4xl flex-col items-center px-4 py-24 text-center">
+          <p className="font-heading text-foreground text-3xl font-semibold tracking-tight sm:text-4xl">
+            {resolved.name}
+          </p>
+          <p className="text-muted-foreground mt-3">
+            This league is coming soon. Check back when the season starts.
+          </p>
+        </main>
+      ) : (
+        children
+      )}
     </>
   );
 }

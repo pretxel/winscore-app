@@ -112,7 +112,7 @@ export async function updateCompetition(formData: FormData): Promise<void> {
 export async function setStatus(formData: FormData): Promise<void> {
   await assertAdmin();
   const id = z.string().uuid().parse(formData.get("id"));
-  const status = z.enum(["active", "manage", "finished"]).parse(formData.get("status"));
+  const status = z.enum(["active", "manage", "finished", "upcoming"]).parse(formData.get("status"));
 
   const admin = createAdminSupabaseClient();
   const { error } = await admin.from("competitions").update({ status }).eq("id", id);
