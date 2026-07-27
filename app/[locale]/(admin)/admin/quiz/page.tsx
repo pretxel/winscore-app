@@ -12,7 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import { listLiveLeagues } from "@/lib/competition";
+import { listCatalogLeagues } from "@/lib/competition";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import { localizeQuizQuestion } from "@/lib/quiz";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -78,7 +78,7 @@ export default async function AdminQuizPage({
 
   // Competitions a question can belong to, for the authoring selector and the
   // scheduled-list label.
-  const leagues = await listLiveLeagues();
+  const leagues = await listCatalogLeagues();
   const leagueName = new Map(leagues.map((l) => [l.id, l.shortName]));
 
   // Announced via the always-mounted live region; the visible panel mounts only

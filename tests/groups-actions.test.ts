@@ -74,6 +74,26 @@ describe("createGroupAction", () => {
       p_competition_id: COMPETITION_ID,
     });
   });
+
+  it("maps a 'league is not active' RPC error to errorLeagueNotActive", async () => {
+    rpcMock.mockResolvedValueOnce({
+      data: null,
+      error: { message: "league is not active" },
+    });
+    const { createGroupAction } = await importActions();
+    const result = await createGroupAction({}, fd({ name: "Pool", competitionId: COMPETITION_ID }));
+    expect(result).toEqual({ error: "errorLeagueNotActive" });
+  });
+
+  it("maps an unexpected RPC error to errorGeneric", async () => {
+    rpcMock.mockResolvedValueOnce({
+      data: null,
+      error: { message: "deadlock detected" },
+    });
+    const { createGroupAction } = await importActions();
+    const result = await createGroupAction({}, fd({ name: "Pool", competitionId: COMPETITION_ID }));
+    expect(result).toEqual({ error: "errorGeneric" });
+  });
 });
 
 describe("joinGroupAction", () => {

@@ -804,7 +804,8 @@
     "viewFixtures": "Ver partidos",
     "createLeaguePlaceholder": "Elige una liga",
     "noLiveLeagues": "Aún no hay ligas activas para crear un grupo.",
-    "errorNoLeague": "Elige una liga activa."
+    "errorNoLeague": "Elige una liga activa.",
+    "errorLeagueNotActive": "Esta liga ya no acepta nuevos grupos."
   },
   "groupInvite": {
     "subject": "{inviter} te invitó a unirte a {group}",
@@ -1327,6 +1328,7 @@
       }
     },
     "competitions.badgeFinished": "Terminada",
+    "competitions.badgeUpcoming": "Próximamente",
     "competitions.finish": "Terminar",
     "competitions.finishConfirm": "¿Marcar \"{name}\" como terminada? Los pronósticos se bloquearán.",
     "competitions.restart": "Reabrir",
@@ -1622,6 +1624,7 @@
     "empty": "Aún no hay ligas activas.",
     "start": "Crear un grupo",
     "fixtures": "Ver partidos",
-    "finished": "Finalizado"
+    "finished": "Finalizado",
+    "comingSoon": "Próximamente"
   }
 }

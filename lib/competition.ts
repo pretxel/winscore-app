@@ -116,7 +116,7 @@ export const getLeagueBySlug = cache(async (slug: string): Promise<ResolvedCompe
     .from("competitions")
     .select("*")
     .eq("slug", slug)
-    .neq("status", "manage")
+    .in("status", ["active", "finished", "upcoming"])
     .maybeSingle();
   return data ? resolveCompetition(data) : null;
 });
@@ -163,14 +163,39 @@ export type LeagueCatalogEntry = {
   status: string;
 };
 
-// Catalog of active and finished leagues, for the "start a pool" picker and
-// the public catalog page. Ordered by name.
-export const listLiveLeagues = cache(async (): Promise<LeagueCatalogEntry[]> => {
+// Startable leagues: only `status = 'active'`. The "start a group" picker and
+// per-league start controls use this. Ordered by name.
+export const listStartableLeagues = cache(async (): Promise<LeagueCatalogEntry[]> => {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
     .from("competitions")
     .select("*")
-    .in("status", ["active", "finished"])
+    .eq("status", "active")
+    .order("name", { ascending: true });
+  return (data ?? []).map((row) => {
+    const comp = resolveCompetition(row);
+    return {
+      id: comp.id,
+      slug: comp.slug,
+      name: comp.name,
+      shortName: comp.short_name,
+      brandCode: comp.brandingConfig.brandCode ?? FALLBACK_BRAND_CODE,
+      joinCodePrefix: comp.brandingConfig.joinCodePrefix ?? "WC",
+      status: comp.status,
+    } satisfies LeagueCatalogEntry;
+  });
+});
+
+// Catalog of active and finished leagues, for browsing. Finished leagues are
+// intentionally included so the catalog page, admin surfaces, cron jobs, and
+// "is any league live" check can see them. The "start a pool" picker uses
+// listStartableLeagues instead, which excludes finished. Ordered by name.
+export const listCatalogLeagues = cache(async (): Promise<LeagueCatalogEntry[]> => {
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase
+    .from("competitions")
+    .select("*")
+    .in("status", ["active", "finished", "upcoming"])
     .order("name", { ascending: true });
   return (data ?? []).map((row) => {
     const comp = resolveCompetition(row);

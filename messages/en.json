@@ -804,7 +804,8 @@
     "viewFixtures": "View fixtures",
     "createLeaguePlaceholder": "Choose a league",
     "noLiveLeagues": "No live leagues to create a group in yet.",
-    "errorNoLeague": "Choose a live league."
+    "errorNoLeague": "Choose a live league.",
+    "errorLeagueNotActive": "This league is no longer accepting new groups."
   },
   "groupInvite": {
     "subject": "{inviter} invited you to join {group}",
@@ -1057,6 +1058,7 @@
       "badgeActive": "Active",
       "badgeManaging": "Managing",
       "badgeFinished": "Finished",
+      "badgeUpcoming": "Upcoming",
       "fixtures": "{count, plural, =0 {No fixtures} one {# fixture} other {# fixtures}}",
       "season": "Season {season}",
       "manage": "Manage",
@@ -1622,6 +1624,7 @@
     "empty": "No live leagues yet.",
     "start": "Start a group",
     "fixtures": "View fixtures",
-    "finished": "Finished"
+    "finished": "Finished",
+    "comingSoon": "Coming soon"
   }
 }

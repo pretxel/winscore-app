@@ -1,7 +1,7 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { KickoffCountdown } from "@/components/kickoff-countdown";
 import { LiveMatchList } from "@/components/live-match-list";
-import { getActiveCompetition, listLiveLeagues } from "@/lib/competition";
+import { getActiveCompetition, listCatalogLeagues } from "@/lib/competition";
 import type { Locale } from "@/lib/i18n";
 import { isConfirmedMatch } from "@/lib/match-utils";
 import { getLiveAndNextUp } from "@/lib/matches/live";
@@ -48,7 +48,7 @@ export async function TournamentCountdown() {
   // finished) — picks are open across the bracket regardless of the countdown
   // clock. Fall back to the time gate so a single-competition opening still
   // flips the section live once kickoff passes.
-  const anyLeagueActive = (await listLiveLeagues()).length > 0;
+  const anyLeagueActive = (await listCatalogLeagues()).length > 0;
   // Request-time decision: do we render the live pill or the countdown tiles?
   // Date.now() is intentionally impure here — every server render checks the
   // current wall clock to pick the branch.

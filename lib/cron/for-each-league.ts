@@ -3,7 +3,7 @@ import {
   getActiveBranding,
   getBrandingForLeague,
   getLeagueBySlug,
-  listLiveLeagues,
+  listCatalogLeagues,
   type ResolvedBranding,
   resolveBranding,
 } from "@/lib/competition";
@@ -33,9 +33,9 @@ export async function forEachLiveLeague<T>(
   // (cookie) client. Real cron invocations run inside a request scope so this
   // succeeds; if it can't (no request scope, or a read failure) we degrade to a
   // single unscoped run rather than aborting the whole cron.
-  let leagues: Awaited<ReturnType<typeof listLiveLeagues>> = [];
+  let leagues: Awaited<ReturnType<typeof listCatalogLeagues>> = [];
   try {
-    leagues = await listLiveLeagues();
+    leagues = await listCatalogLeagues();
   } catch (err) {
     console.warn(
       "[cron] live-league resolution failed; falling back to a single unscoped run",

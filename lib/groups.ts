@@ -80,6 +80,7 @@ export type LeaguePools = {
   slug: string;
   name: string;
   shortName: string;
+  status: string;
   pools: PoolSummary[];
 };
 
@@ -117,7 +118,7 @@ export async function listMyPoolsByLeague(): Promise<LeaguePools[]> {
   );
   const { data: comps } = await supabase
     .from("competitions")
-    .select("id, slug, name, short_name")
+    .select("id, slug, name, short_name, status")
     .in("id", competitionIds);
   const compById = new Map((comps ?? []).map((c) => [c.id, c]));
 
@@ -134,6 +135,7 @@ export async function listMyPoolsByLeague(): Promise<LeaguePools[]> {
         slug: comp.slug,
         name: comp.name,
         shortName: comp.short_name,
+        status: comp.status,
         pools: [],
       };
       byLeague.set(comp.id, lane);

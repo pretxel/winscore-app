@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LeagueRail } from "@/components/league-rail";
 import { Badge } from "@/components/ui/badge";
-import { listLiveLeagues } from "@/lib/competition";
+import { listCatalogLeagues } from "@/lib/competition";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 
 export async function generateMetadata({
@@ -31,7 +31,7 @@ export default async function CatalogPage({ params }: { params: Promise<{ locale
   setRequestLocale(locale);
   const t = await getTranslations("catalog");
 
-  const leagues = await listLiveLeagues();
+  const leagues = await listCatalogLeagues();
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 sm:py-14">
@@ -56,6 +56,11 @@ export default async function CatalogPage({ params }: { params: Promise<{ locale
                   <div>
                     <h2 className="font-heading text-foreground inline-flex items-center gap-2 text-xl font-semibold tracking-tight">
                       {league.name}
+                      {league.status === "upcoming" ? (
+                        <Badge className="bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-500/30 align-middle">
+                          {t("comingSoon")}
+                        </Badge>
+                      ) : null}
                       {league.status === "finished" ? (
                         <Badge
                           variant="outline"
@@ -77,13 +82,15 @@ export default async function CatalogPage({ params }: { params: Promise<{ locale
                       {t("fixtures")}
                       <ArrowRightIcon className="size-4" />
                     </Link>
-                    <Link
-                      href={localePath(locale, "/groups")}
-                      className="bg-primary text-primary-foreground inline-flex min-h-10 items-center gap-1 rounded-md px-4 text-sm font-semibold"
-                    >
-                      <PlusIcon className="size-4" />
-                      {t("start")}
-                    </Link>
+                    {league.status === "active" ? (
+                      <Link
+                        href={localePath(locale, "/groups")}
+                        className="bg-primary text-primary-foreground inline-flex min-h-10 items-center gap-1 rounded-md px-4 text-sm font-semibold"
+                      >
+                        <PlusIcon className="size-4" />
+                        {t("start")}
+                      </Link>
+                    ) : null}
                   </div>
                 </div>
               </div>

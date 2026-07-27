@@ -804,7 +804,8 @@
     "viewFixtures": "Spiele ansehen",
     "createLeaguePlaceholder": "Liga wählen",
     "noLiveLeagues": "Noch keine aktiven Ligen für eine Gruppe.",
-    "errorNoLeague": "Wähle eine aktive Liga."
+    "errorNoLeague": "Wähle eine aktive Liga.",
+    "errorLeagueNotActive": "Diese Liga nimmt keine neuen Gruppen mehr an."
   },
   "groupInvite": {
     "subject": "{inviter} hat dich zu {group} eingeladen",
@@ -1327,6 +1328,7 @@
       }
     },
     "competitions.badgeFinished": "Beendet",
+    "competitions.badgeUpcoming": "Bevorstehend",
     "competitions.finish": "Beenden",
     "competitions.finishConfirm": "\"{name}\" als beendet markieren? Tipps werden gesperrt.",
     "competitions.restart": "Wieder öffnen",
@@ -1622,6 +1624,7 @@
     "empty": "Noch keine aktiven Ligen.",
     "start": "Gruppe erstellen",
     "fixtures": "Spiele ansehen",
-    "finished": "Beendet"
+    "finished": "Beendet",
+    "comingSoon": "Bald verfügbar"
   }
 }

@@ -7,6 +7,7 @@ import { Logotype } from "@/components/logotype";
 import { ScoringExplainer } from "@/components/scoring-explainer";
 import { TournamentCountdown } from "@/components/tournament-countdown";
 import { buttonVariants } from "@/components/ui/button";
+import { listStartableLeagues } from "@/lib/competition";
 import { listMyPoolsByLeague } from "@/lib/groups";
 import { getLeagueLaneFixtures } from "@/lib/home";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
@@ -76,7 +77,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </main>
       );
     }
-    return <EmptyGroupsHome locale={locale} t={t} />;
+    const startableLeagues = await listStartableLeagues();
+    return (
+      <EmptyGroupsHome locale={locale} t={t} hasStartableLeagues={startableLeagues.length > 0} />
+    );
   }
 
   return (
@@ -92,7 +96,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
 // Signed-in, but not in any group yet: point at group creation and the league
 // catalog. Uses the same matchday-board type scale as the lanes home.
-function EmptyGroupsHome({ locale, t }: { locale: Locale; t: T }) {
+function EmptyGroupsHome({
+  locale,
+  t,
+  hasStartableLeagues,
+}: {
+  locale: Locale;
+  t: T;
+  hasStartableLeagues: boolean;
+}) {
   return (
     <main className="mx-auto flex max-w-2xl flex-col items-center px-4 py-20 text-center">
       <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -100,9 +112,11 @@ function EmptyGroupsHome({ locale, t }: { locale: Locale; t: T }) {
       </h1>
       <p className="text-muted-foreground mt-4 max-w-md">{t("emptyLede")}</p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <Link href={localePath(locale, "/groups")} className={cn(buttonVariants({ size: "lg" }))}>
-          {t("startGroup")}
-        </Link>
+        {hasStartableLeagues ? (
+          <Link href={localePath(locale, "/groups")} className={cn(buttonVariants({ size: "lg" }))}>
+            {t("startGroup")}
+          </Link>
+        ) : null}
         <Link
           href={localePath(locale, "/catalog")}
           className={cn(buttonVariants({ variant: "outline", size: "lg" }))}

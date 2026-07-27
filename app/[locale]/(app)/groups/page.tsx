@@ -2,7 +2,7 @@ import { ChevronRightIcon, CrownIcon, UsersIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { listLiveLeagues } from "@/lib/competition";
+import { listStartableLeagues } from "@/lib/competition";
 import { listMyGroups } from "@/lib/groups";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { CreateGroupForm, JoinGroupForm } from "./group-forms";
@@ -28,7 +28,7 @@ export default async function GroupsPage({ params }: { params: Promise<{ locale:
 
   const t = await getTranslations("groups");
   const groups = await listMyGroups();
-  const leagues = await listLiveLeagues();
+  const leagues = await listStartableLeagues();
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">

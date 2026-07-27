@@ -47,13 +47,15 @@ export function LeagueLane({
                 {t("allFixtures")}
                 <ArrowRightIcon className="size-3.5" />
               </Link>
-              <Link
-                href={localePath(locale, "/groups")}
-                className="bg-primary text-primary-foreground inline-flex min-h-9 items-center gap-1 rounded-md px-3 text-xs font-semibold"
-              >
-                <PlusIcon className="size-3.5" />
-                {t("startGroup")}
-              </Link>
+              {lane.status === "active" ? (
+                <Link
+                  href={localePath(locale, "/groups")}
+                  className="bg-primary text-primary-foreground inline-flex min-h-9 items-center gap-1 rounded-md px-3 text-xs font-semibold"
+                >
+                  <PlusIcon className="size-3.5" />
+                  {t("startGroup")}
+                </Link>
+              ) : null}
             </div>
           </div>
 

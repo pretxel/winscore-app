@@ -66,7 +66,11 @@ export async function createGroupAction(
     p_name: parsed.data,
     p_competition_id: competition.data,
   });
-  if (error) return { error: "errorGeneric" };
+  if (error) {
+    return {
+      error: /league is not active/i.test(error.message) ? "errorLeagueNotActive" : "errorGeneric",
+    };
+  }
 
   revalidatePath("/groups");
   redirect(localePath(locale, `/groups/${groupId}`));
