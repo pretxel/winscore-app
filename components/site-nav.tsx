@@ -45,7 +45,6 @@ export async function SiteNav() {
   const links = [
     { href: lp("/catalog"), label: t("leagues") },
     { href: lp("/news"), label: t("news") },
-    { href: lp("/quiz"), label: t("quiz") },
     ...(user ? [{ href: lp("/groups"), label: t("groups") }] : []),
     ...(isAdmin ? [{ href: lp("/admin/matches"), label: t("admin") }] : []),
   ];
