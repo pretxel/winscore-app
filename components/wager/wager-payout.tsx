@@ -13,6 +13,7 @@ import {
   TrophyIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ function SignPayoutButton({
   onDone,
   onError,
 }: SignPayoutButtonProps) {
+  const t = useTranslations("wagerPayout");
   const signAndSend = useSignAndSendTransaction(account, "solana:devnet");
 
   const handleSign = useCallback(async () => {
@@ -64,7 +66,10 @@ function SignPayoutButton({
         body: JSON.stringify(prepareBody),
       });
       const prep = await prepResp.json();
-      if (!prepResp.ok) throw new Error(prep.error ?? `Failed to prepare ${kind}`);
+      if (!prepResp.ok)
+        throw new Error(
+          prep.error ?? (kind === "claim" ? t("errPrepareClaim") : t("errPrepareRefund")),
+        );
 
       const txBytes = Uint8Array.from(atob(prep.transactionBase64), (c) => c.charCodeAt(0));
       const { signature } = await signAndSend({ transaction: txBytes });
@@ -83,13 +88,21 @@ function SignPayoutButton({
       });
       const confirmed = await confirmResp.json();
       if (!confirmResp.ok) {
-        throw new Error(confirmed.error ?? `Failed to record the ${kind}`);
+        throw new Error(
+          confirmed.error ?? (kind === "claim" ? t("errRecordClaim") : t("errRecordRefund")),
+        );
       }
       onDone(signatureBase58);
     } catch (err) {
-      onError(err instanceof Error ? err.message : `${kind} failed`);
+      onError(
+        err instanceof Error
+          ? err.message
+          : kind === "claim"
+            ? t("errClaimFailed")
+            : t("errRefundFailed"),
+      );
     }
-  }, [kind, targetId, signAndSend, onSigning, onDone, onError]);
+  }, [kind, targetId, signAndSend, onSigning, onDone, onError, t]);
 
   return (
     <Button size="sm" onClick={handleSign} disabled={loading}>
@@ -130,19 +143,19 @@ export function WagerPayout({
   const [signature, setSignature] = useState<string | null>(existingSignature ?? null);
   const [account, setAccount] = useState<WalletAccount | null>(null);
 
+  const t = useTranslations("wagerPayout");
   const router = useRouter();
   const wallets = useWallets();
   const connect = useConnect();
 
   const isClaim = kind === "claim";
-  const title = isClaim ? "Claim Your Award" : "Refund Available";
 
   const handleConnect = useCallback(async () => {
     setError(null);
     if (account) return;
     const wallet = wallets[0];
     if (!wallet) {
-      setError("No Solana wallet found. Install Phantom or Solflare.");
+      setError(t("errNoWallet"));
       setView("failed");
       return;
     }
@@ -150,10 +163,10 @@ export function WagerPayout({
       const accounts = await connect.dispatchAsync(wallet);
       setAccount((accounts[0] as unknown as WalletAccount) ?? null);
     } catch {
-      setError("Could not connect your wallet.");
+      setError(t("errConnect"));
       setView("failed");
     }
-  }, [account, wallets, connect]);
+  }, [account, wallets, connect, t]);
 
   const handleDone = useCallback(
     (sig: string) => {
@@ -165,22 +178,25 @@ export function WagerPayout({
     [router],
   );
 
-  const handleError = useCallback((msg: string) => {
-    if (msg.includes("rejected") || msg.includes("denied") || msg.includes("User rejected")) {
-      setError("Transaction was rejected in your wallet.");
-    } else if (msg.includes("Blockhash") || msg.includes("expired")) {
-      setError("Transaction expired. Please try again.");
-    } else if (msg.includes("Already claimed") || msg.includes("Already refunded")) {
-      // The chain already has it; the row just had not caught up.
-      setView("done");
+  const handleError = useCallback(
+    (msg: string) => {
+      if (msg.includes("rejected") || msg.includes("denied") || msg.includes("User rejected")) {
+        setError(t("errRejected"));
+      } else if (msg.includes("Blockhash") || msg.includes("expired")) {
+        setError(t("errExpired"));
+      } else if (msg.includes("Already claimed") || msg.includes("Already refunded")) {
+        // The chain already has it; the row just had not caught up.
+        setView("done");
+        setLoading(false);
+        return;
+      } else {
+        setError(msg);
+      }
+      setView("failed");
       setLoading(false);
-      return;
-    } else {
-      setError(msg);
-    }
-    setView("failed");
-    setLoading(false);
-  }, []);
+    },
+    [t],
+  );
 
   if (view === "done") {
     return (
@@ -188,13 +204,14 @@ export function WagerPayout({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <CheckCircle2Icon className="size-4 text-emerald-500" />
-            {isClaim ? "Award Claimed" : "Stake Refunded"}
+            {isClaim ? t("claimedTitle") : t("refundedTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            {amountDisplay} {tokenSymbol}{" "}
-            {isClaim ? "sent to your wallet." : "returned to your wallet."}
+            {isClaim
+              ? t("claimedBody", { amount: amountDisplay, token: tokenSymbol })
+              : t("refundedBody", { amount: amountDisplay, token: tokenSymbol })}
           </p>
           {signature ? (
             <a
@@ -204,7 +221,7 @@ export function WagerPayout({
               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               <ExternalLinkIcon className="size-3" />
-              Explorer
+              {t("explorer")}
             </a>
           ) : null}
         </CardContent>
@@ -218,14 +235,12 @@ export function WagerPayout({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <AlertTriangleIcon className="size-4 text-destructive" />
-            {isClaim ? "Claim Failed" : "Refund Failed"}
+            {isClaim ? t("claimFailed") : t("refundFailed")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">{error}</p>
-          <p className="text-xs text-muted-foreground">
-            Your funds are still in the escrow program. You can try again.
-          </p>
+          <p className="text-xs text-muted-foreground">{t("fundsSafe")}</p>
           <Button
             size="sm"
             variant="outline"
@@ -235,7 +250,7 @@ export function WagerPayout({
             }}
           >
             <RotateCcwIcon className="mr-2 size-4" />
-            Try Again
+            {t("tryAgain")}
           </Button>
         </CardContent>
       </Card>
@@ -255,9 +270,9 @@ export function WagerPayout({
           ) : (
             <CoinsIcon className="size-4 text-amber-500" />
           )}
-          {title}
+          {isClaim ? t("claimTitle") : t("refundTitle")}
           <Badge variant="outline" className="ml-auto text-xs">
-            Devnet
+            {t("devnetBadge")}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -267,9 +282,7 @@ export function WagerPayout({
           <span className="text-sm text-muted-foreground">{tokenSymbol}</span>
         </div>
         <p className="text-sm text-muted-foreground">
-          {isClaim
-            ? "You placed first in this round. Sign to transfer your award from escrow to your wallet."
-            : "This round was cancelled. Sign to pull your stake back out of escrow."}
+          {isClaim ? t("claimBody") : t("refundBody")}
         </p>
 
         {account ? (
@@ -277,7 +290,7 @@ export function WagerPayout({
             account={account}
             kind={kind}
             targetId={targetId}
-            label={isClaim ? "Claim Award" : "Refund Stake"}
+            label={isClaim ? t("claimCta") : t("refundCta")}
             loading={loading}
             onSigning={() => {
               setLoading(true);
@@ -288,7 +301,7 @@ export function WagerPayout({
           />
         ) : (
           <Button size="sm" onClick={handleConnect}>
-            Connect Wallet
+            {t("connectWallet")}
           </Button>
         )}
       </CardContent>

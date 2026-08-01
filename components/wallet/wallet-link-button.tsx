@@ -8,6 +8,7 @@ import {
   UnlinkIcon,
   WalletIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ export function WalletLinkButton({
   const [error, setError] = useState<string | null>(null);
   const [cluster, setCluster] = useState<string | undefined>(initialCluster);
 
+  const t = useTranslations("wallet");
   const wallets = useWallets();
   const connect = useConnect();
   const signMessage = useSignMessage();
@@ -42,7 +44,7 @@ export function WalletLinkButton({
   const handleLink = useCallback(async () => {
     const wallet = wallets[0];
     if (!wallet) {
-      setError("No Solana wallet found. Install Phantom or Solflare.");
+      setError(t("errNoWallet"));
       setState("error");
       return;
     }
@@ -63,7 +65,7 @@ export function WalletLinkButton({
 
       if (!challengeResp.ok) {
         const data = await challengeResp.json();
-        setError(data.error ?? "Failed to create challenge");
+        setError(data.error ?? t("errChallenge"));
         setState("error");
         return;
       }
@@ -84,7 +86,7 @@ export function WalletLinkButton({
 
       if (!verifyResp.ok) {
         const data = await verifyResp.json();
-        setError(data.error ?? "Verification failed");
+        setError(data.error ?? t("errVerify"));
         setState("error");
         return;
       }
@@ -96,10 +98,10 @@ export function WalletLinkButton({
       setState("linked");
       onLinked?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : t("errUnknown"));
       setState("error");
     }
-  }, [wallets, connect, signMessage, onLinked]);
+  }, [wallets, connect, signMessage, onLinked, t]);
 
   const handleUnlink = useCallback(async () => {
     if (!linkId) return;
@@ -115,7 +117,7 @@ export function WalletLinkButton({
 
       const data = await resp.json();
       if (!resp.ok) {
-        setError(data.error ?? "Unlink failed");
+        setError(data.error ?? t("errUnlink"));
         setState("linked");
         return;
       }
@@ -125,10 +127,10 @@ export function WalletLinkButton({
       setCluster(undefined);
       setState("idle");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unlink failed");
+      setError(err instanceof Error ? err.message : t("errUnlink"));
       setState("linked");
     }
-  }, [linkId]);
+  }, [linkId, t]);
 
   if (state === "error") {
     return (
@@ -136,7 +138,7 @@ export function WalletLinkButton({
         <CardContent className="flex items-center gap-3 py-3">
           <AlertCircleIcon className="size-5 text-destructive shrink-0" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">Wallet Error</p>
+            <p className="text-sm font-medium">{t("errorTitle")}</p>
             <p className="text-xs text-muted-foreground truncate">{error}</p>
           </div>
           <Button
@@ -147,7 +149,7 @@ export function WalletLinkButton({
               setError(null);
             }}
           >
-            Retry
+            {t("retry")}
           </Button>
         </CardContent>
       </Card>
@@ -161,13 +163,13 @@ export function WalletLinkButton({
         <CardContent className="flex items-center gap-3 py-3">
           <CheckCircle2Icon className="size-5 text-pitch shrink-0" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">Wallet Linked</p>
+            <p className="text-sm font-medium">{t("linked")}</p>
             <p className="text-xs text-muted-foreground font-mono truncate">
               {walletAddress.slice(0, 8)}...{walletAddress.slice(-4)}
             </p>
           </div>
           <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-500">
-            {cluster || "Devnet"}
+            {cluster || t("devnetBadge")}
           </Badge>
           <Button variant="ghost" size="sm" onClick={handleUnlink} disabled={isUnlinking}>
             {isUnlinking ? (
@@ -190,7 +192,7 @@ export function WalletLinkButton({
       ) : (
         <WalletIcon className="size-4" />
       )}
-      {isLoading ? "Connecting…" : "Link Wallet"}
+      {isLoading ? t("connecting") : t("linkCta")}
     </Button>
   );
 }
