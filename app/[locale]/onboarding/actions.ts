@@ -41,5 +41,7 @@ export async function setDisplayName(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/matches");
+  // The welcome page redirects straight on to /matches when the tour is
+  // unnecessary (already seen, or wagering off), so this is safe either way.
+  redirect("/welcome");
 }
