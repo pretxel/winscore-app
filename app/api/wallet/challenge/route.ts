@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 import { buildChallengeParams, formatChallengeMessage } from "@/lib/wallet/challenge";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +32,9 @@ export async function POST(request: Request) {
   if (cluster !== "devnet") {
     return NextResponse.json({ error: "Only devnet is supported" }, { status: 400 });
   }
+
+  const limited = await rateLimitGuard(user.id, "wallet_challenge");
+  if (limited) return limited;
 
   const domain = request.headers.get("host") ?? "localhost";
 

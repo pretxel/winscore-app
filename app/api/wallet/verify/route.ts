@@ -1,6 +1,7 @@
 import { verifyAsync } from "@noble/ed25519";
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,9 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  const limited = await rateLimitGuard(user.id, "wallet_verify");
+  if (limited) return limited;
 
   // Convert signature array back to Uint8Array (64 bytes)
   const sigBytes = new Uint8Array(signature);

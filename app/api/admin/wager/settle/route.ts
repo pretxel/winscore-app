@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { assertAdmin } from "@/app/api/admin/wager/_admin";
+import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 import { checkSettlementReadiness, settleWagerRound } from "@/lib/wager/settlement";
 
 export const dynamic = "force-dynamic";
@@ -34,6 +35,11 @@ export async function POST(request: Request) {
   if (!body.wagerRoundId) {
     return NextResponse.json({ error: "wagerRoundId is required" }, { status: 400 });
   }
+
+  // Only the POST consumes budget; the GET readiness check above is read-only
+  // and an operator should be able to poll it freely.
+  const limited = await rateLimitGuard(auth.userId, "wager_settle");
+  if (limited) return limited;
 
   try {
     const result = await settleWagerRound(body.wagerRoundId);

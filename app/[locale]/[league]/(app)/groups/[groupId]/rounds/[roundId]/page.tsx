@@ -2,10 +2,18 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { WagerPayout } from "@/components/wager/wager-payout";
 import { WagerRail } from "@/components/wager/wager-rail";
+import { WagerResultsTable } from "@/components/wager/wager-results-table";
 import { isCurrentUserAdmin } from "@/lib/admin/current-user";
 import { isLocale, type Locale, localePath } from "@/lib/i18n";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import {
+  getPayoutStatus,
+  getWagerResults,
+  type PayoutStatus,
+  type WagerResults,
+} from "@/lib/wager/payout-status";
 import { MatchdayPredictionBoard } from "./prediction-board";
 
 export default async function RoundSheetPage({
@@ -116,8 +124,21 @@ export default async function RoundSheetPage({
   let potDisplay: string | undefined;
   let participantCount: number | undefined;
   let wagerClosesAt: string | undefined;
+  let payout: PayoutStatus | null = null;
+  let wagerResults: WagerResults | null = null;
+
+  // The settled standing is public to the pool — every member sees who won and
+  // on what evidence, including admins, who never hold an entry themselves.
+  if (user && isMember) {
+    wagerResults = await getWagerResults(groupId, roundId);
+  }
 
   if (user && isMember && !isAdmin) {
+    // Settled and cancelled rounds are terminal for entry but not for money:
+    // a winner still has an award to claim and a cancelled round a stake to
+    // refund, so this is resolved independently of `wagerAvailable`.
+    payout = await getPayoutStatus(groupId, roundId, user.id);
+
     // Wagering is available only when this round has an initialized, open wager round.
     const { data: wagerRound } = await supabase
       .from("wager_rounds")
@@ -271,6 +292,35 @@ export default async function RoundSheetPage({
                   remaining: (fixtures?.length ?? 0) - predictionsMap.size,
                 })}
           </p>
+        </>
+      )}
+
+      {/* Payout — award to claim, or stake to pull back out of a cancelled round.
+          Rendered above the rail and independently of it: the rail covers entry,
+          which is already closed by the time there is anything to withdraw. */}
+      {payout && (
+        <>
+          <Separator />
+          <WagerPayout
+            kind={payout.kind}
+            targetId={payout.targetId}
+            amountDisplay={payout.amountDisplay}
+            alreadySettled={payout.alreadySettled}
+          />
+        </>
+      )}
+
+      {/* Settled standing — ranking, awards, and the manifest/signature evidence. */}
+      {wagerResults && (
+        <>
+          <Separator />
+          <WagerResultsTable
+            entries={wagerResults.entries}
+            manifestHash={wagerResults.manifestHash}
+            settlementSignature={wagerResults.settlementSignature}
+            totalPot={wagerResults.totalPot}
+            tokenSymbol={wagerResults.tokenSymbol}
+          />
         </>
       )}
 

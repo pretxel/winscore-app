@@ -1368,7 +1368,20 @@
       "statusStake": "Einsatz",
       "statusClosesAt": "Schließt am",
       "yes": "ja",
-      "no": "nein"
+      "no": "nein",
+      "settleTitle": "Spieltag abrechnen",
+      "settleDescription": "Wertet den unveränderlichen Tipp-Snapshot aus, erstellt das Abrechnungsmanifest und schreibt die Merkle-Wurzel on-chain, damit Gewinner auszahlen können. Unwiderruflich.",
+      "settleNeedsStatus": "Zuerst den Status aktualisieren, damit der Spieltag identifiziert werden kann.",
+      "settleCheck": "Bereitschaft prüfen",
+      "settleReady": "Der Spieltag kann abgerechnet werden.",
+      "settleNotReady": "Der Spieltag kann noch nicht abgerechnet werden.",
+      "settleAction": "Spieltag abrechnen",
+      "settleWarning": "Dies signiert eine On-Chain-Transaktion, die Gewinner und Gewinne dauerhaft festschreibt. Ein danach korrigiertes Ergebnis lässt sich on-chain nicht rückgängig machen.",
+      "settleConfirm": "Ja, jetzt abrechnen",
+      "settleCancel": "Abbrechen",
+      "settleAlready": "Der Spieltag ist bereits abgerechnet.",
+      "settleFailed": "Abrechnung fehlgeschlagen",
+      "settleDone": "Abgerechnet — {winners} Gewinner können jetzt auszahlen."
     }
   },
   "error": {

@@ -1368,7 +1368,20 @@
       "statusStake": "Apuesta",
       "statusClosesAt": "Cierra el",
       "yes": "sí",
-      "no": "no"
+      "no": "no",
+      "settleTitle": "Liquidar jornada",
+      "settleDescription": "Puntúa la instantánea inmutable de pronósticos, construye el manifiesto de liquidación y registra la raíz Merkle on-chain para que los ganadores puedan reclamar. Irreversible.",
+      "settleNeedsStatus": "Actualiza el estado primero para identificar la jornada.",
+      "settleCheck": "Comprobar disponibilidad",
+      "settleReady": "La jornada está lista para liquidarse.",
+      "settleNotReady": "La jornada no está lista para liquidarse.",
+      "settleAction": "Liquidar jornada",
+      "settleWarning": "Esto firma una transacción on-chain que fija ganadores y premios de forma permanente. Un resultado corregido después no se puede deshacer on-chain.",
+      "settleConfirm": "Sí, liquidar ahora",
+      "settleCancel": "Cancelar",
+      "settleAlready": "La jornada ya está liquidada.",
+      "settleFailed": "La liquidación falló",
+      "settleDone": "Liquidada — {winners} ganador(es) ya pueden reclamar."
     }
   },
   "error": {

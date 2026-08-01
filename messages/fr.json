@@ -1368,7 +1368,20 @@
       "statusStake": "Mise",
       "statusClosesAt": "Clôture le",
       "yes": "oui",
-      "no": "non"
+      "no": "non",
+      "settleTitle": "Régler la journée",
+      "settleDescription": "Calcule les points de l'instantané immuable des pronostics, construit le manifeste de règlement et inscrit la racine de Merkle on-chain pour que les gagnants puissent réclamer. Irréversible.",
+      "settleNeedsStatus": "Actualisez d'abord le statut pour identifier la journée.",
+      "settleCheck": "Vérifier la disponibilité",
+      "settleReady": "La journée est prête à être réglée.",
+      "settleNotReady": "La journée n'est pas prête à être réglée.",
+      "settleAction": "Régler la journée",
+      "settleWarning": "Ceci signe une transaction on-chain qui fixe définitivement les gagnants et les gains. Un résultat corrigé ensuite ne peut pas être annulé on-chain.",
+      "settleConfirm": "Oui, régler maintenant",
+      "settleCancel": "Annuler",
+      "settleAlready": "La journée est déjà réglée.",
+      "settleFailed": "Le règlement a échoué",
+      "settleDone": "Réglée — {winners} gagnant(s) peuvent désormais réclamer."
     }
   },
   "error": {

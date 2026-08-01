@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { computePickCommitmentSync } from "@/lib/wager/pick-commitment";
+import { enforceRateLimit } from "@/lib/wager/rate-limits";
 
 interface CreateWagerIntentParams {
   groupId: string;
@@ -39,6 +40,14 @@ export async function createWagerIntent({
 
   if (existing) {
     return { intentId: existing.id, state: existing.state };
+  }
+
+  // Only the creating path is metered. This runs during page render, so
+  // charging the already-exists path above would let an ordinary reload burn
+  // the user's budget and eventually break their own round page.
+  const limit = await enforceRateLimit(userId, "wager_intent");
+  if (!limit.allowed) {
+    return { intentId: null, state: null };
   }
 
   const pickCommitmentBytes = computePickCommitmentSync({

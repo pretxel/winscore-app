@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { transitionIntentState } from "@/lib/wager/entry-saga";
 import { getWagerEnv } from "@/lib/wager/env";
+import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 import { persistVerifiedEntry, verifyEntryTransaction } from "@/lib/wager/verify-entry";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +27,9 @@ export async function POST(request: Request) {
   if (!env.depositsEnabled) {
     return NextResponse.json({ error: "Deposits are currently disabled" }, { status: 403 });
   }
+
+  const limited = await rateLimitGuard(user.id, "wager_submit");
+  if (limited) return limited;
 
   // `entryPda` from the client is intentionally ignored: it is re-derived and
   // proven against the on-chain transaction inside verifyEntryTransaction.

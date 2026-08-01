@@ -1368,7 +1368,20 @@
       "statusStake": "Stake",
       "statusClosesAt": "Closes at",
       "yes": "yes",
-      "no": "no"
+      "no": "no",
+      "settleTitle": "Settle round",
+      "settleDescription": "Scores the immutable pick snapshot, builds the settlement manifest, and commits the Merkle root on-chain so winners can claim. Irreversible.",
+      "settleNeedsStatus": "Refresh status first so the round can be identified.",
+      "settleCheck": "Check readiness",
+      "settleReady": "Round is ready to settle.",
+      "settleNotReady": "Round is not ready to settle.",
+      "settleAction": "Settle round",
+      "settleWarning": "This signs an on-chain transaction that fixes the winners and awards permanently. A result corrected afterwards cannot be undone on-chain.",
+      "settleConfirm": "Yes, settle now",
+      "settleCancel": "Cancel",
+      "settleAlready": "Round is already settled.",
+      "settleFailed": "Settlement failed",
+      "settleDone": "Settled — {winners} winner(s) can now claim."
     }
   },
   "error": {
