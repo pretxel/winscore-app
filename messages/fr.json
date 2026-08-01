@@ -1705,5 +1705,31 @@
     "stateClaimed": "Réclamé",
     "stateRefunded": "Remboursé",
     "oracleNote": "Résultats réglés par l'oracle Winscore sur Solana Devnet. Les jetons Devnet n'ont aucune valeur réelle. Le manifeste de règlement est immuable et publié on-chain."
+  },
+  "welcome": {
+    "title": "Bienvenue sur Winscore",
+    "eyebrow": "Premiers pas",
+    "progress": "{current} sur {total}",
+    "skip": "Passer",
+    "back": "Retour",
+    "next": "Suivant",
+    "finish": "Commencer à jouer",
+    "scoringTitle": "Comment fonctionne le score",
+    "scoringBody": "Pronostiquez le score exact de chaque match. Les points sont attribués par match, et le classement ordonne tous les membres de votre pool.",
+    "scoringExact": "5 points — score exact",
+    "scoringWinnerGd": "3 points — bon vainqueur et bonne différence de buts",
+    "scoringWinner": "1 point — bon vainqueur uniquement",
+    "poolsTitle": "Pools et journées",
+    "poolsBody": "Rejoignez un pool entre amis et pronostiquez une journée complète. Vos pronostics se verrouillent au coup d'envoi, une modification tardive est donc impossible.",
+    "wagersTitle": "Paris optionnels par journée",
+    "wagersBody": "Le propriétaire d'un pool peut activer les paris sur une journée. Chaque participant mise le même montant fixe, et celui qui finit premier remporte toute la cagnotte. Jouer gratuitement fonctionne exactement comme avant et ne nécessite aucun portefeuille.",
+    "walletTitle": "Liez un portefeuille Solana",
+    "walletBody": "Parier nécessite un portefeuille lié pour signer votre entrée. Vous pouvez le lier maintenant ou plus tard depuis n'importe quelle page de journée.",
+    "walletOptional": "Cette étape est optionnelle.",
+    "riskTitle": "Risque et règlement",
+    "riskBody": "Lisez ceci avant de placer un pari.",
+    "riskDevnet": "Les paris fonctionnent sur Solana Devnet. Les jetons Devnet n'ont aucune valeur monétaire réelle.",
+    "riskOracle": "Winscore calcule les points de la journée et règle la cagnotte. Les résultats proviennent de notre fournisseur de données, pas de la blockchain.",
+    "riskFinal": "Une entrée est irréversible une fois signée, et les règles de règlement sont définitives."
   }
 }

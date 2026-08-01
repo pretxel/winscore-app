@@ -1705,5 +1705,31 @@
     "stateClaimed": "Claimed",
     "stateRefunded": "Refunded",
     "oracleNote": "Results settled by the Winscore oracle on Solana Devnet. Devnet tokens have no real value. The settlement manifest is immutable and published on-chain."
+  },
+  "welcome": {
+    "title": "Welcome to Winscore",
+    "eyebrow": "Getting started",
+    "progress": "{current} of {total}",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Start playing",
+    "scoringTitle": "How scoring works",
+    "scoringBody": "Predict the exact score of every match. Points are awarded per match, and the leaderboard ranks everyone in your pool.",
+    "scoringExact": "5 points — exact score",
+    "scoringWinnerGd": "3 points — right winner and goal difference",
+    "scoringWinner": "1 point — right winner only",
+    "poolsTitle": "Pools and rounds",
+    "poolsBody": "Join a pool with friends and predict a full round of fixtures. Your picks lock at kickoff, so a late edit is never possible.",
+    "wagersTitle": "Optional matchday wagers",
+    "wagersBody": "A pool owner can enable wagering on a round. Everyone who joins stakes the same fixed amount, and whoever finishes first takes the whole pot. Playing for free works exactly as before and needs no wallet.",
+    "walletTitle": "Link a Solana wallet",
+    "walletBody": "Wagering needs a linked wallet to sign your entry. You can link one now or later from any round page.",
+    "walletOptional": "This step is optional.",
+    "riskTitle": "Risk and settlement",
+    "riskBody": "Read this before placing a wager.",
+    "riskDevnet": "Wagering runs on Solana Devnet. Devnet tokens have no real monetary value.",
+    "riskOracle": "Winscore scores the round and settles the pot. Results come from our data provider, not from the blockchain.",
+    "riskFinal": "An entry is irreversible once signed, and the settlement rules are final."
   }
 }
