@@ -1,0 +1,310 @@
+"use client";
+
+import { getBase58Decoder } from "@solana/kit";
+import { useConnect, useWallets } from "@solana/kit-plugin-wallet/react";
+import { useSignAndSendTransaction } from "@solana/react";
+import {
+  AlertTriangleIcon,
+  CheckCircle2Icon,
+  CoinsIcon,
+  ExternalLinkIcon,
+  Loader2Icon,
+  RotateCcwIcon,
+  TrophyIcon,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useCallback, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// The UiWalletAccount shape accepted by useSignAndSendTransaction.
+type WalletAccount = Parameters<typeof useSignAndSendTransaction>[0];
+
+type PayoutKind = "claim" | "refund";
+type PayoutView = "idle" | "signing" | "done" | "failed";
+
+interface SignPayoutButtonProps {
+  account: WalletAccount;
+  kind: PayoutKind;
+  /** Settlement id for a claim, wager round id for a refund. */
+  targetId: string;
+  label: string;
+  loading: boolean;
+  onSigning: () => void;
+  onDone: (signature: string) => void;
+  onError: (message: string) => void;
+}
+
+/**
+ * Runs prepare -> wallet sign+send -> confirm for both payout paths. Isolated in
+ * its own component so useSignAndSendTransaction can bind to the connected
+ * account, mirroring ConfirmDepositButton in the wager rail.
+ */
+function SignPayoutButton({
+  account,
+  kind,
+  targetId,
+  label,
+  loading,
+  onSigning,
+  onDone,
+  onError,
+}: SignPayoutButtonProps) {
+  const t = useTranslations("wagerPayout");
+  const signAndSend = useSignAndSendTransaction(account, "solana:devnet");
+
+  const handleSign = useCallback(async () => {
+    onSigning();
+    try {
+      const prepareBody =
+        kind === "claim" ? { settlementId: targetId } : { wagerRoundId: targetId };
+      const prepResp = await fetch(`/api/wager/${kind}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(prepareBody),
+      });
+      const prep = await prepResp.json();
+      if (!prepResp.ok)
+        throw new Error(
+          prep.error ?? (kind === "claim" ? t("errPrepareClaim") : t("errPrepareRefund")),
+        );
+
+      const txBytes = Uint8Array.from(atob(prep.transactionBase64), (c) => c.charCodeAt(0));
+      const { signature } = await signAndSend({ transaction: txBytes });
+      const signatureBase58 = getBase58Decoder().decode(signature);
+
+      // The on-chain PDA is authoritative, so a lost confirm call cannot strand
+      // funds — it only leaves the mirrored row behind until it is retried.
+      const confirmBody =
+        kind === "claim"
+          ? { claimId: prep.claimId, signature: signatureBase58 }
+          : { entryId: prep.entryId };
+      const confirmResp = await fetch(`/api/wager/${kind}/confirm`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(confirmBody),
+      });
+      const confirmed = await confirmResp.json();
+      if (!confirmResp.ok) {
+        throw new Error(
+          confirmed.error ?? (kind === "claim" ? t("errRecordClaim") : t("errRecordRefund")),
+        );
+      }
+      onDone(signatureBase58);
+    } catch (err) {
+      onError(
+        err instanceof Error
+          ? err.message
+          : kind === "claim"
+            ? t("errClaimFailed")
+            : t("errRefundFailed"),
+      );
+    }
+  }, [kind, targetId, signAndSend, onSigning, onDone, onError, t]);
+
+  return (
+    <Button size="sm" onClick={handleSign} disabled={loading}>
+      {loading ? <Loader2Icon className="mr-2 size-4 animate-spin" /> : null}
+      {label}
+    </Button>
+  );
+}
+
+export interface WagerPayoutProps {
+  kind: PayoutKind;
+  /** Settlement id for a claim, wager round id for a refund. */
+  targetId: string;
+  /** Award (claim) or stake (refund), already scaled for display. */
+  amountDisplay: string;
+  tokenSymbol?: string;
+  /** Set once the payout already landed, so the card renders its terminal state. */
+  alreadySettled?: boolean;
+  existingSignature?: string;
+}
+
+/**
+ * Lets a winner withdraw an award, or an entrant pull a stake back out of a
+ * cancelled round. Both are non-custodial: the server only prepares the
+ * transaction and the entrant's own wallet signs it.
+ */
+export function WagerPayout({
+  kind,
+  targetId,
+  amountDisplay,
+  tokenSymbol = "TOKEN",
+  alreadySettled = false,
+  existingSignature,
+}: WagerPayoutProps) {
+  const [view, setView] = useState<PayoutView>(alreadySettled ? "done" : "idle");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [signature, setSignature] = useState<string | null>(existingSignature ?? null);
+  const [account, setAccount] = useState<WalletAccount | null>(null);
+
+  const t = useTranslations("wagerPayout");
+  const router = useRouter();
+  const wallets = useWallets();
+  const connect = useConnect();
+
+  const isClaim = kind === "claim";
+
+  const handleConnect = useCallback(async () => {
+    setError(null);
+    if (account) return;
+    const wallet = wallets[0];
+    if (!wallet) {
+      setError(t("errNoWallet"));
+      setView("failed");
+      return;
+    }
+    try {
+      const accounts = await connect.dispatchAsync(wallet);
+      setAccount((accounts[0] as unknown as WalletAccount) ?? null);
+    } catch {
+      setError(t("errConnect"));
+      setView("failed");
+    }
+  }, [account, wallets, connect, t]);
+
+  const handleDone = useCallback(
+    (sig: string) => {
+      setSignature(sig);
+      setView("done");
+      setLoading(false);
+      router.refresh();
+    },
+    [router],
+  );
+
+  const handleError = useCallback(
+    (msg: string) => {
+      if (msg.includes("rejected") || msg.includes("denied") || msg.includes("User rejected")) {
+        setError(t("errRejected"));
+      } else if (msg.includes("Blockhash") || msg.includes("expired")) {
+        setError(t("errExpired"));
+      } else if (msg.includes("Already claimed") || msg.includes("Already refunded")) {
+        // The chain already has it; the row just had not caught up.
+        setView("done");
+        setLoading(false);
+        return;
+      } else {
+        setError(msg);
+      }
+      setView("failed");
+      setLoading(false);
+    },
+    [t],
+  );
+
+  if (view === "done") {
+    return (
+      <Card className="border-emerald-500/30 bg-emerald-500/5">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <CheckCircle2Icon className="size-4 text-emerald-500" />
+            {isClaim ? t("claimedTitle") : t("refundedTitle")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            {isClaim
+              ? t("claimedBody", { amount: amountDisplay, token: tokenSymbol })
+              : t("refundedBody", { amount: amountDisplay, token: tokenSymbol })}
+          </p>
+          {signature ? (
+            <a
+              href={`https://explorer.solana.com/tx/${signature}?cluster=devnet`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ExternalLinkIcon className="size-3" />
+              {t("explorer")}
+            </a>
+          ) : null}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (view === "failed") {
+    return (
+      <Card className="border-destructive/30 bg-destructive/5">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <AlertTriangleIcon className="size-4 text-destructive" />
+            {isClaim ? t("claimFailed") : t("refundFailed")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">{error}</p>
+          <p className="text-xs text-muted-foreground">{t("fundsSafe")}</p>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setView("idle");
+              setError(null);
+            }}
+          >
+            <RotateCcwIcon className="mr-2 size-4" />
+            {t("tryAgain")}
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card
+      className={
+        isClaim ? "border-emerald-500/30 bg-emerald-500/5" : "border-amber-500/30 bg-amber-500/5"
+      }
+    >
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          {isClaim ? (
+            <TrophyIcon className="size-4 text-emerald-500" />
+          ) : (
+            <CoinsIcon className="size-4 text-amber-500" />
+          )}
+          {isClaim ? t("claimTitle") : t("refundTitle")}
+          <Badge variant="outline" className="ml-auto text-xs">
+            {t("devnetBadge")}
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex items-baseline gap-2">
+          <span className="font-mono text-2xl font-bold">{amountDisplay}</span>
+          <span className="text-sm text-muted-foreground">{tokenSymbol}</span>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {isClaim ? t("claimBody") : t("refundBody")}
+        </p>
+
+        {account ? (
+          <SignPayoutButton
+            account={account}
+            kind={kind}
+            targetId={targetId}
+            label={isClaim ? t("claimCta") : t("refundCta")}
+            loading={loading}
+            onSigning={() => {
+              setLoading(true);
+              setView("signing");
+            }}
+            onDone={handleDone}
+            onError={handleError}
+          />
+        ) : (
+          <Button size="sm" onClick={handleConnect}>
+            {t("connectWallet")}
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

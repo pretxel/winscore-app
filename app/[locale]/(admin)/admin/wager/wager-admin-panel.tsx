@@ -43,6 +43,19 @@ interface StatusResult {
   vaultExists: boolean;
   closesAt?: string;
   stakeDisplay?: string;
+  wagerRoundId?: string;
+  state?: string;
+}
+
+interface SettleReadiness {
+  ready: boolean;
+  reason?: string;
+}
+
+interface SettleResult {
+  signature?: string;
+  winnerCount?: number;
+  totalDistributable?: string;
 }
 
 // Ties together the three admin wager API routes (configure / initialize /
@@ -68,6 +81,13 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
   const [statusError, setStatusError] = useState<string | null>(null);
   const [statusResult, setStatusResult] = useState<StatusResult | null>(null);
 
+  const [readinessState, setReadinessState] = useState<AsyncState>("idle");
+  const [readiness, setReadiness] = useState<SettleReadiness | null>(null);
+  const [settleState, setSettleState] = useState<AsyncState>("idle");
+  const [settleError, setSettleError] = useState<string | null>(null);
+  const [settleResult, setSettleResult] = useState<SettleResult | null>(null);
+  const [settleConfirming, setSettleConfirming] = useState(false);
+
   const resetResults = () => {
     setConfigureState("idle");
     setConfigureError(null);
@@ -78,6 +98,12 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
     setStatusState("idle");
     setStatusError(null);
     setStatusResult(null);
+    setReadinessState("idle");
+    setReadiness(null);
+    setSettleState("idle");
+    setSettleError(null);
+    setSettleResult(null);
+    setSettleConfirming(false);
   };
 
   const handleGroupChange = (value: string) => {
@@ -166,6 +192,71 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
     } catch (err) {
       setStatusError(err instanceof Error ? err.message : t("statusFailed"));
       setStatusState("error");
+    }
+  };
+
+  /**
+   * Ask the server whether the round can be settled. Read-only on purpose: the
+   * blockers (fixtures not final, correction delay, round still open) are shown
+   * before offering the irreversible on-chain write.
+   */
+  const handleCheckReadiness = async () => {
+    const wagerRoundId = statusResult?.wagerRoundId;
+    if (!wagerRoundId) return;
+    setReadinessState("loading");
+    setReadiness(null);
+    setSettleConfirming(false);
+    try {
+      const resp = await fetch(
+        `/api/admin/wager/settle?wagerRoundId=${encodeURIComponent(wagerRoundId)}`,
+      );
+      const data = await resp.json();
+      if (!resp.ok || data.error) {
+        setReadiness({ ready: false, reason: data.error ?? t("settleFailed") });
+        setReadinessState("error");
+        return;
+      }
+      setReadiness({ ready: !!data.ready, reason: data.reason });
+      setReadinessState("success");
+    } catch (err) {
+      setReadiness({
+        ready: false,
+        reason: err instanceof Error ? err.message : t("settleFailed"),
+      });
+      setReadinessState("error");
+    }
+  };
+
+  const handleSettle = async () => {
+    const wagerRoundId = statusResult?.wagerRoundId;
+    if (!wagerRoundId) return;
+    setSettleState("loading");
+    setSettleError(null);
+    setSettleResult(null);
+    try {
+      const resp = await fetch("/api/admin/wager/settle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wagerRoundId }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) {
+        setSettleError(data.error ?? t("settleFailed"));
+        setSettleState("error");
+        return;
+      }
+      setSettleResult({
+        signature: data.signature,
+        winnerCount: data.winnerCount,
+        totalDistributable: data.totalDistributable?.toString(),
+      });
+      setSettleState("success");
+      setSettleConfirming(false);
+      // The round has moved to settled — pull fresh status so the panel agrees.
+      await handleRefreshStatus();
+    } catch (err) {
+      setSettleError(err instanceof Error ? err.message : t("settleFailed"));
+      setSettleState("error");
     }
   };
 
@@ -366,6 +457,108 @@ export function WagerAdminPanel({ groups, flagsLive }: WagerAdminPanelProps) {
                 </li>
               ) : null}
             </ul>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      {/* Settle — only reachable once status has resolved the round, so the
+          panel always knows which round id it would be settling. */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("settleTitle")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">{t("settleDescription")}</p>
+
+          {!statusResult?.wagerRoundId ? (
+            <p className="text-sm text-muted-foreground">{t("settleNeedsStatus")}</p>
+          ) : statusResult.state === "settled" ? (
+            <p className="flex items-center gap-2 text-sm text-pitch">
+              <CheckCircle2Icon className="size-4 shrink-0" />
+              {t("settleAlready")}
+            </p>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                onClick={handleCheckReadiness}
+                disabled={readinessState === "loading"}
+              >
+                {readinessState === "loading" ? (
+                  <Loader2Icon className="size-4 animate-spin" />
+                ) : null}
+                {t("settleCheck")}
+              </Button>
+
+              {readiness && !readiness.ready ? (
+                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <AlertCircleIcon className="size-4 shrink-0 text-amber-500" />
+                  {readiness.reason ?? t("settleNotReady")}
+                </p>
+              ) : null}
+
+              {readiness?.ready && !settleConfirming && settleState !== "success" ? (
+                <div className="space-y-3">
+                  <p className="flex items-center gap-2 text-sm text-pitch">
+                    <CheckCircle2Icon className="size-4 shrink-0" />
+                    {t("settleReady")}
+                  </p>
+                  <Button variant="outline" onClick={() => setSettleConfirming(true)}>
+                    {t("settleAction")}
+                  </Button>
+                </div>
+              ) : null}
+
+              {settleConfirming ? (
+                <div className="space-y-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3">
+                  <p className="flex items-start gap-2 text-sm">
+                    <AlertCircleIcon className="mt-0.5 size-4 shrink-0 text-amber-500" />
+                    {t("settleWarning")}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button onClick={handleSettle} disabled={settleState === "loading"}>
+                      {settleState === "loading" ? (
+                        <Loader2Icon className="size-4 animate-spin" />
+                      ) : null}
+                      {t("settleConfirm")}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setSettleConfirming(false)}
+                      disabled={settleState === "loading"}
+                    >
+                      {t("settleCancel")}
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
+            </>
+          )}
+
+          {settleState === "error" && settleError ? (
+            <p className="flex items-center gap-2 text-sm text-destructive">
+              <AlertCircleIcon className="size-4 shrink-0" />
+              {settleError}
+            </p>
+          ) : null}
+
+          {settleState === "success" && settleResult ? (
+            <div className="space-y-1 text-sm text-pitch">
+              <p className="flex items-center gap-2">
+                <CheckCircle2Icon className="size-4 shrink-0" />
+                {t("settleDone", { winners: settleResult.winnerCount ?? 0 })}
+              </p>
+              {settleResult.signature ? (
+                <a
+                  href={`https://explorer.solana.com/tx/${settleResult.signature}?cluster=devnet`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-muted-foreground underline"
+                >
+                  {t("viewTransaction")}
+                </a>
+              ) : null}
+            </div>
           ) : null}
         </CardContent>
       </Card>

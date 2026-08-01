@@ -17,6 +17,7 @@ import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { loadWagerAuthoritySigner } from "@/lib/wager/authority";
 import { getWagerEnv } from "@/lib/wager/env";
 import { buildInitRoundInstruction } from "@/lib/wager/init-round";
+import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,9 @@ export async function POST(request: Request) {
   if (!groupId || !roundId) {
     return NextResponse.json({ error: "groupId and roundId are required" }, { status: 400 });
   }
+
+  const limited = await rateLimitGuard(auth.userId, "wager_init");
+  if (limited) return limited;
 
   // Create (or no-op) the DB wager_round row.
   const { error: rpcError } = await auth.supabase.rpc("initialize_wager_round", {

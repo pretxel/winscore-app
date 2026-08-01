@@ -15,6 +15,7 @@ import {
   WalletIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -48,11 +49,12 @@ function ConfirmDepositButton({
   onConfirmed,
   onError,
 }: ConfirmDepositButtonProps) {
+  const t = useTranslations("wager");
   const signAndSend = useSignAndSendTransaction(account, "solana:devnet");
 
   const handleConfirm = useCallback(async () => {
     if (!intentId) {
-      onError("No wager intent found. Try refreshing the page.");
+      onError(t("errNoIntent"));
       return;
     }
     onConfirming();
@@ -63,7 +65,7 @@ function ConfirmDepositButton({
         body: JSON.stringify({ intentId }),
       });
       const prep = await prepResp.json();
-      if (!prepResp.ok) throw new Error(prep.error ?? "Failed to prepare transaction");
+      if (!prepResp.ok) throw new Error(prep.error ?? t("errPrepare"));
 
       const txBytes = Uint8Array.from(atob(prep.transactionBase64), (c) => c.charCodeAt(0));
       const { signature } = await signAndSend({ transaction: txBytes });
@@ -77,18 +79,18 @@ function ConfirmDepositButton({
       const submit = await submitResp.json();
       // 202 = accepted for reconciliation (submitted but not yet confirmed).
       if (!submitResp.ok && submitResp.status !== 202) {
-        throw new Error(submit.error ?? "Failed to confirm transaction");
+        throw new Error(submit.error ?? t("errSubmit"));
       }
       onConfirmed(signatureBase58);
     } catch (err) {
-      onError(err instanceof Error ? err.message : "Transaction failed");
+      onError(err instanceof Error ? err.message : t("errGeneric"));
     }
-  }, [intentId, signAndSend, onConfirming, onConfirmed, onError]);
+  }, [intentId, signAndSend, onConfirming, onConfirmed, onError, t]);
 
   return (
     <Button size="sm" onClick={handleConfirm} disabled={loading}>
-      {loading ? <Loader2Icon className="mr-2 size-4 animate-spin" /> : null}I Understand — Sign
-      Transaction
+      {loading ? <Loader2Icon className="mr-2 size-4 animate-spin" /> : null}
+      {t("consentConfirm")}
     </Button>
   );
 }
@@ -130,6 +132,7 @@ export function WagerRail({
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const [account, setAccount] = useState<WalletAccount | null>(null);
 
+  const t = useTranslations("wager");
   const router = useRouter();
   const wallets = useWallets();
   const connect = useConnect();
@@ -142,7 +145,7 @@ export function WagerRail({
     if (account) return;
     const wallet = wallets[0];
     if (!wallet) {
-      setError("No Solana wallet found. Install Phantom or Solflare.");
+      setError(t("errNoWallet"));
       setView("failed");
       return;
     }
@@ -150,10 +153,10 @@ export function WagerRail({
       const accounts = await connect.dispatchAsync(wallet);
       setAccount((accounts[0] as unknown as WalletAccount) ?? null);
     } catch {
-      setError("Could not connect your wallet.");
+      setError(t("errConnect"));
       setView("failed");
     }
-  }, [account, wallets, connect]);
+  }, [account, wallets, connect, t]);
 
   const handleConfirmed = useCallback((sig: string) => {
     setTxSignature(sig);
@@ -161,17 +164,20 @@ export function WagerRail({
     setLoading(false);
   }, []);
 
-  const handleError = useCallback((msg: string) => {
-    if (msg.includes("rejected") || msg.includes("denied") || msg.includes("User rejected")) {
-      setError("Transaction was rejected in your wallet.");
-    } else if (msg.includes("Blockhash") || msg.includes("expired")) {
-      setError("Transaction expired. Please try again.");
-    } else {
-      setError(msg);
-    }
-    setView("failed");
-    setLoading(false);
-  }, []);
+  const handleError = useCallback(
+    (msg: string) => {
+      if (msg.includes("rejected") || msg.includes("denied") || msg.includes("User rejected")) {
+        setError(t("errRejected"));
+      } else if (msg.includes("Blockhash") || msg.includes("expired")) {
+        setError(t("errExpired"));
+      } else {
+        setError(msg);
+      }
+      setView("failed");
+      setLoading(false);
+    },
+    [t],
+  );
 
   const handleRetry = () => {
     setView("overview");
@@ -184,13 +190,11 @@ export function WagerRail({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <CoinsIcon className="size-4" />
-            Matchday Wager
+            {t("railTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Wagering is not available for this round. Free picks are always on.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("unavailable")}</p>
         </CardContent>
       </Card>
     );
@@ -201,9 +205,7 @@ export function WagerRail({
       <Card className="border-amber-500/30 bg-amber-500/5">
         <CardContent className="flex items-center gap-3 py-4">
           <AlertTriangleIcon className="size-5 text-amber-500 shrink-0" />
-          <p className="text-sm">
-            Complete all your free picks first, then the wager option will unlock.
-          </p>
+          <p className="text-sm">{t("needPicks")}</p>
         </CardContent>
       </Card>
     );
@@ -215,13 +217,11 @@ export function WagerRail({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <WalletIcon className="size-4" />
-            Matchday Wager
+            {t("railTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Link a Solana wallet to enable wagering for this round.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("linkWallet")}</p>
           <WalletLinkButton onLinked={() => router.refresh()} />
         </CardContent>
       </Card>
@@ -233,9 +233,7 @@ export function WagerRail({
       <Card className="border-destructive/30 bg-destructive/5">
         <CardContent className="flex items-center gap-3 py-4">
           <AlertTriangleIcon className="size-5 text-destructive shrink-0" />
-          <p className="text-sm text-muted-foreground">
-            Eligibility checks must pass before entering a wager. Check your profile settings.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("notEligible")}</p>
         </CardContent>
       </Card>
     );
@@ -250,37 +248,34 @@ export function WagerRail({
       return (
         <Card className="border-flag/30 bg-flag/5">
           <CardHeader>
-            <CardTitle className="text-base">Confirm Your Entry</CardTitle>
+            <CardTitle className="text-base">{t("consentTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Stake</span>
+                <span className="text-muted-foreground">{t("stake")}</span>
                 <span className="font-medium">
                   {stakeDisplay} {tokenSymbol}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Closes</span>
+                <span className="text-muted-foreground">{t("closes")}</span>
                 <span>{closeDate}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Current pot</span>
+                <span className="text-muted-foreground">{t("pot")}</span>
                 <span>
                   {potDisplay} {tokenSymbol}
                 </span>
               </div>
               <Separator />
               <p className="text-xs text-muted-foreground">
-                By confirming, your wallet will sign a transaction transferring exactly{" "}
-                {stakeDisplay} {tokenSymbol} to the escrow program on <strong>Solana Devnet</strong>
-                . Devnet tokens have no real value. Winscore is the settlement oracle. Rules are
-                final.
+                {t("consentBody", { stake: stakeDisplay, token: tokenSymbol })}
               </p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => setView("overview")}>
-                Back
+                {t("back")}
               </Button>
               {account ? (
                 <ConfirmDepositButton
@@ -298,7 +293,7 @@ export function WagerRail({
               ) : (
                 <Button size="sm" disabled>
                   <Loader2Icon className="mr-2 size-4 animate-spin" />
-                  Connecting wallet…
+                  {t("connectingWallet")}
                 </Button>
               )}
             </div>
@@ -311,8 +306,8 @@ export function WagerRail({
         <Card className="border-pitch/30 bg-pitch/5">
           <CardContent className="flex flex-col items-center gap-3 py-8">
             <Loader2Icon className="size-8 animate-spin text-pitch" />
-            <p className="text-sm font-medium">Awaiting signature…</p>
-            <p className="text-xs text-muted-foreground">Confirm the transaction in your wallet.</p>
+            <p className="text-sm font-medium">{t("awaitingSignature")}</p>
+            <p className="text-xs text-muted-foreground">{t("awaitingBody")}</p>
           </CardContent>
         </Card>
       );
@@ -323,7 +318,7 @@ export function WagerRail({
           <CardContent className="space-y-3 py-4">
             <div className="flex items-center gap-2">
               <CheckCircle2Icon className="size-5 text-pitch" />
-              <p className="text-sm font-medium">Entry Confirmed</p>
+              <p className="text-sm font-medium">{t("confirmed")}</p>
             </div>
             {txSignature && (
               <div className="flex items-center gap-2 text-xs">
@@ -336,13 +331,12 @@ export function WagerRail({
                   rel="noopener noreferrer"
                   className="text-pitch hover:underline inline-flex items-center gap-1"
                 >
-                  Explorer <ExternalLinkIcon className="size-3" />
+                  {t("explorer")} <ExternalLinkIcon className="size-3" />
                 </a>
               </div>
             )}
             <p className="text-xs text-muted-foreground">
-              Your {stakeDisplay} {tokenSymbol} has been deposited. Results will be settled after
-              the round closes.
+              {t("confirmedBody", { stake: stakeDisplay, token: tokenSymbol })}
             </p>
           </CardContent>
         </Card>
@@ -354,12 +348,12 @@ export function WagerRail({
           <CardContent className="space-y-3 py-4">
             <div className="flex items-center gap-2">
               <AlertTriangleIcon className="size-5 text-destructive" />
-              <p className="text-sm font-medium">Entry Failed</p>
+              <p className="text-sm font-medium">{t("failed")}</p>
             </div>
             {error && <p className="text-xs text-muted-foreground">{error}</p>}
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handleRetry}>
-                Try Again
+                {t("tryAgain")}
               </Button>
             </div>
           </CardContent>
@@ -372,35 +366,35 @@ export function WagerRail({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <CoinsIcon className="size-4 text-flag" />
-              Matchday Wager
+              {t("railTitle")}
               <Badge variant="outline" className="ml-auto text-[10px] bg-blue-500/10 text-blue-500">
-                Devnet
+                {t("devnetBadge")}
               </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Stake</p>
+                <p className="text-xs text-muted-foreground">{t("stake")}</p>
                 <p className="font-medium">
                   {stakeDisplay} {tokenSymbol}
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Pot</p>
+                <p className="text-xs text-muted-foreground">{t("pot")}</p>
                 <p className="font-medium">
                   {potDisplay} {tokenSymbol}
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Participants</p>
+                <p className="text-xs text-muted-foreground">{t("participants")}</p>
                 <p className="flex items-center gap-1 font-medium">
                   <UsersIcon className="size-3" />
                   {participantCount}
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Closes</p>
+                <p className="text-xs text-muted-foreground">{t("closes")}</p>
                 <p className="flex items-center gap-1 font-medium">
                   <ClockIcon className="size-3" />
                   {closeDate}
@@ -413,18 +407,18 @@ export function WagerRail({
                 <WalletIcon className="size-3" />
                 {walletAddress
                   ? `${walletAddress.slice(0, 8)}...${walletAddress.slice(-4)}`
-                  : "Wallet not linked"}
+                  : t("wallet")}
               </p>
               <p className="flex items-center gap-1">
                 <ShieldCheckIcon className="size-3" />
-                Winscore oracle · Immutable snapshot
+                {t("oracle")}
               </p>
             </div>
 
             <Separator />
 
             <Button className="w-full" size="sm" onClick={handleConsent}>
-              Enter Wager — {stakeDisplay} {tokenSymbol}
+              {t("enterWager", { stake: stakeDisplay, token: tokenSymbol })}
             </Button>
           </CardContent>
         </Card>

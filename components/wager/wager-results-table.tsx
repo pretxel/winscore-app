@@ -8,6 +8,7 @@ import {
   TrophyIcon,
   XCircleIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -39,6 +40,7 @@ export function WagerResultsTable({
   totalPot,
   tokenSymbol,
 }: Props) {
+  const t = useTranslations("wagerResults");
   const winners = entries.filter((e) => e.award !== "0");
 
   const claimBadge = (state: WagerResultEntry["claimState"]) => {
@@ -50,14 +52,18 @@ export function WagerResultsTable({
         variant: "default" | "secondary" | "destructive" | "outline";
       }
     > = {
-      pending: { label: "Pending", icon: <ClockIcon className="size-3" />, variant: "secondary" },
+      pending: {
+        label: t("statePending"),
+        icon: <ClockIcon className="size-3" />,
+        variant: "secondary",
+      },
       claimed: {
-        label: "Claimed",
+        label: t("stateClaimed"),
         icon: <CheckCircle2Icon className="size-3" />,
         variant: "default",
       },
       refunded: {
-        label: "Refunded",
+        label: t("stateRefunded"),
         icon: <XCircleIcon className="size-3" />,
         variant: "destructive",
       },
@@ -77,9 +83,9 @@ export function WagerResultsTable({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <TrophyIcon className="size-4 text-flag" />
-          Results
+          {t("title")}
           <span className="ml-auto text-sm font-normal text-muted-foreground">
-            Pot: {totalPot} {tokenSymbol}
+            {t("pot", { amount: totalPot, token: tokenSymbol })}
           </span>
         </CardTitle>
       </CardHeader>
@@ -87,10 +93,10 @@ export function WagerResultsTable({
         {/* Evidence */}
         {(manifestHash || settlementSignature) && (
           <div className="space-y-1 rounded-lg bg-muted/30 p-3 text-xs">
-            <p className="font-medium text-muted-foreground">Settlement Evidence</p>
+            <p className="font-medium text-muted-foreground">{t("evidence")}</p>
             {manifestHash && (
               <p className="font-mono text-muted-foreground">
-                Manifest: {manifestHash.slice(0, 12)}...
+                {t("manifest", { hash: manifestHash.slice(0, 12) })}
               </p>
             )}
             {settlementSignature && (
@@ -100,7 +106,7 @@ export function WagerResultsTable({
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-pitch hover:underline"
               >
-                Settlement tx <ExternalLinkIcon className="size-3" />
+                {t("settlementTx")} <ExternalLinkIcon className="size-3" />
               </a>
             )}
           </div>
@@ -111,9 +117,7 @@ export function WagerResultsTable({
           <div className="flex items-center gap-2 rounded-lg bg-flag/10 p-3">
             <MedalIcon className="size-5 text-flag" />
             <div>
-              <p className="text-sm font-medium">
-                {winners.length} winner{winners.length > 1 ? "s" : ""}
-              </p>
+              <p className="text-sm font-medium">{t("winners", { count: winners.length })}</p>
               <p className="text-xs text-muted-foreground">
                 {winners.map((w) => `${w.displayName}: ${w.award} ${tokenSymbol}`).join(", ")}
               </p>
@@ -147,9 +151,15 @@ export function WagerResultsTable({
                 <span className="font-medium truncate">{entry.displayName}</span>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <span className="font-mono text-xs tabular-nums">{entry.points} pts</span>
+                <span className="font-mono text-xs tabular-nums">
+                  {t("points", { points: entry.points })}
+                </span>
                 <span className="hidden sm:inline text-xs text-muted-foreground">
-                  {entry.exactHits}E {entry.winnerGdHits}G {entry.winnerHits}W
+                  {t("hits", {
+                    exact: entry.exactHits,
+                    gd: entry.winnerGdHits,
+                    winner: entry.winnerHits,
+                  })}
                 </span>
                 {entry.award !== "0" && (
                   <span className="font-mono text-xs font-medium">
@@ -157,7 +167,7 @@ export function WagerResultsTable({
                   </span>
                 )}
                 {entry.award === "0" && entry.claimState !== "not_winner" && (
-                  <span className="font-mono text-xs text-muted-foreground">Refunded</span>
+                  <span className="font-mono text-xs text-muted-foreground">{t("refunded")}</span>
                 )}
                 {claimBadge(entry.claimState)}
               </div>
@@ -166,10 +176,7 @@ export function WagerResultsTable({
         </div>
 
         {/* Oracle trust disclosure */}
-        <p className="text-center text-[11px] text-muted-foreground">
-          Results settled by the Winscore oracle on Solana Devnet. Devnet tokens have no real value.
-          The settlement manifest is immutable and published on-chain.
-        </p>
+        <p className="text-center text-[11px] text-muted-foreground">{t("oracleNote")}</p>
       </CardContent>
     </Card>
   );

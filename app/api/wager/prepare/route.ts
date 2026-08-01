@@ -26,6 +26,7 @@ import {
   deriveVaultAta,
   deriveWagerRoundPda,
 } from "@/lib/wager/pda";
+import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +51,9 @@ export async function POST(request: Request) {
   if (!env.depositsEnabled) {
     return NextResponse.json({ error: "Deposits are currently disabled" }, { status: 403 });
   }
+
+  const limited = await rateLimitGuard(user.id, "wager_prepare");
+  if (limited) return limited;
 
   let body: { intentId?: string };
   try {

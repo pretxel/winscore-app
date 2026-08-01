@@ -33,6 +33,29 @@ export type Database = {
   };
   public: {
     Tables: {
+      announcement_email_log: {
+        Row: {
+          sent_at: string;
+          user_id: string;
+        };
+        Insert: {
+          sent_at?: string;
+          user_id: string;
+        };
+        Update: {
+          sent_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "announcement_email_log_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       comeback_email_log: {
         Row: {
           sent_at: string;
@@ -1802,6 +1825,35 @@ export type Database = {
             columns: ["wallet_link_id"];
             isOneToOne: false;
             referencedRelation: "wallet_links";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      wager_rate_limit_events: {
+        Row: {
+          id: string;
+          observed_at: string;
+          operation: string;
+          user_id: string;
+        };
+        Insert: {
+          id?: string;
+          observed_at?: string;
+          operation: string;
+          user_id: string;
+        };
+        Update: {
+          id?: string;
+          observed_at?: string;
+          operation?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "wager_rate_limit_events_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];

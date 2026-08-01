@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   const { data: round } = await admin
     .from("wager_rounds")
     .select(
-      "state, closes_at, stake_base_units, verified_decimals, approved_mint, approved_token_program",
+      "id, state, closes_at, stake_base_units, verified_decimals, approved_mint, approved_token_program",
     )
     .eq("group_id", groupId)
     .eq("round_id", roundId)
@@ -63,7 +63,18 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json(
-    { configEnabled, wagerRoundExists, vaultExists, closesAt, stakeDisplay },
+    {
+      configEnabled,
+      wagerRoundExists,
+      vaultExists,
+      closesAt,
+      stakeDisplay,
+      // The settle panel keys off these: it needs the round's id to call
+      // /api/admin/wager/settle, and its state to know whether settling is even
+      // a possibility before asking the server for readiness.
+      wagerRoundId: round?.id,
+      state: round?.state,
+    },
     { headers: { "Cache-Control": "no-store" } },
   );
 }

@@ -51,7 +51,7 @@ describe("wager admin i18n", () => {
   // so a bad placeholder would ship and only break the page it renders on. Format
   // through next-intl's own translator, which is what the components use.
   it("formats every message through next-intl without an error", () => {
-    const args = { decimals: 6, number: 3 };
+    const args = { decimals: 6, number: 3, winners: 2 };
 
     for (const locale of SUPPORTED_LOCALES) {
       const messages = wagerMessages(locale);
@@ -79,6 +79,7 @@ describe("wager admin i18n", () => {
       const messages = wagerMessages(locale);
       expect(messages.configureSuccess, `${locale}.configureSuccess`).toContain("{decimals}");
       expect(messages.roundOption, `${locale}.roundOption`).toContain("{number}");
+      expect(messages.settleDone, `${locale}.settleDone`).toContain("{winners}");
     }
   });
 });
