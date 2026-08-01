@@ -7,7 +7,11 @@ import { recordWelcomeSeen } from "@/app/[locale]/welcome/actions";
  * record of when the player was actually shown the rules.
  */
 function makeSupabase(existing: string | null) {
-  const update = vi.fn(() => ({ eq: () => ({ is: () => Promise.resolve({ error: null }) }) }));
+  // Typed parameter so `update.mock.calls[0][0]` is reachable — an inferred
+  // zero-arg mock gives calls an empty-tuple type.
+  const update = vi.fn((_values: { welcome_seen_at: string }) => ({
+    eq: () => ({ is: () => Promise.resolve({ error: null }) }),
+  }));
   const client = {
     from: vi.fn(() => ({
       select: () => ({
@@ -26,8 +30,7 @@ describe("recordWelcomeSeen", () => {
     const { client, update } = makeSupabase(null);
     await recordWelcomeSeen(client as never, "user-1");
     expect(update).toHaveBeenCalledTimes(1);
-    const arg = update.mock.calls[0][0] as unknown as { welcome_seen_at: string };
-    expect(typeof arg.welcome_seen_at).toBe("string");
+    expect(typeof update.mock.calls[0][0].welcome_seen_at).toBe("string");
   });
 
   it("does not overwrite an existing timestamp", async () => {
