@@ -1,9 +1,7 @@
 import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
-import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
-import { resolveOnboardingRedirect } from "@/lib/onboarding/gate";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { isWagerUiEnabled } from "@/lib/wager/env";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
+import { checkOnboardingGate } from "@/lib/onboarding/gate-check";
 
 export default async function AppLayout({
   children,
@@ -16,27 +14,8 @@ export default async function AppLayout({
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect(localePath(locale, "/sign-in"));
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name, welcome_seen_at")
-    .eq("id", user.id)
-    .single();
-
-  const target = resolveOnboardingRedirect({
-    displayName: profile?.display_name ?? null,
-    welcomeSeenAt: profile?.welcome_seen_at ?? null,
-    wagerUiEnabled: isWagerUiEnabled(),
-  });
-  if (target) redirect(localePath(locale, target));
+  const gateRedirect = await checkOnboardingGate(locale);
+  if (gateRedirect) redirect(gateRedirect);
 
   return <>{children}</>;
 }
