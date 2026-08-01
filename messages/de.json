@@ -1705,5 +1705,31 @@
     "stateClaimed": "Ausgezahlt",
     "stateRefunded": "Erstattet",
     "oracleNote": "Ergebnisse vom Winscore-Orakel auf Solana Devnet abgerechnet. Devnet-Token haben keinen realen Wert. Das Abrechnungsmanifest ist unveränderlich und on-chain veröffentlicht."
+  },
+  "welcome": {
+    "title": "Willkommen bei Winscore",
+    "eyebrow": "Erste Schritte",
+    "progress": "{current} von {total}",
+    "skip": "Überspringen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "finish": "Loslegen",
+    "scoringTitle": "So wird gewertet",
+    "scoringBody": "Tippe das genaue Ergebnis jedes Spiels. Punkte gibt es pro Spiel, und die Rangliste ordnet alle in deinem Pool.",
+    "scoringExact": "5 Punkte — genaues Ergebnis",
+    "scoringWinnerGd": "3 Punkte — richtiger Sieger und richtige Tordifferenz",
+    "scoringWinner": "1 Punkt — nur richtiger Sieger",
+    "poolsTitle": "Pools und Spieltage",
+    "poolsBody": "Tritt einem Pool mit Freunden bei und tippe einen kompletten Spieltag. Deine Tipps werden zum Anpfiff gesperrt, eine spätere Änderung ist nie möglich.",
+    "wagersTitle": "Optionale Spieltagswetten",
+    "wagersBody": "Ein Pool-Besitzer kann Wetten für einen Spieltag aktivieren. Alle Teilnehmenden setzen denselben festen Betrag, und wer Erster wird, gewinnt den ganzen Topf. Kostenlos spielen funktioniert genau wie bisher und braucht keine Wallet.",
+    "walletTitle": "Solana-Wallet verknüpfen",
+    "walletBody": "Zum Wetten braucht es eine verknüpfte Wallet, die deine Teilnahme signiert. Du kannst sie jetzt oder später auf jeder Spieltagsseite verknüpfen.",
+    "walletOptional": "Dieser Schritt ist optional.",
+    "riskTitle": "Risiko und Abrechnung",
+    "riskBody": "Lies dies, bevor du wettest.",
+    "riskDevnet": "Wetten laufen auf Solana Devnet. Devnet-Token haben keinen realen Geldwert.",
+    "riskOracle": "Winscore wertet den Spieltag aus und rechnet den Topf ab. Die Ergebnisse stammen von unserem Datenanbieter, nicht von der Blockchain.",
+    "riskFinal": "Eine Teilnahme ist nach dem Signieren unwiderruflich, und die Abrechnungsregeln sind endgültig."
   }
 }

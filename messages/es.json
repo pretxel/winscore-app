@@ -1705,5 +1705,31 @@
     "stateClaimed": "Reclamado",
     "stateRefunded": "Reembolsado",
     "oracleNote": "Resultados liquidados por el oráculo de Winscore en Solana Devnet. Los tokens de Devnet no tienen valor real. El manifiesto de liquidación es inmutable y está publicado on-chain."
+  },
+  "welcome": {
+    "title": "Bienvenido a Winscore",
+    "eyebrow": "Primeros pasos",
+    "progress": "{current} de {total}",
+    "skip": "Saltar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "finish": "Empezar a jugar",
+    "scoringTitle": "Cómo se puntúa",
+    "scoringBody": "Pronostica el marcador exacto de cada partido. Los puntos se otorgan por partido y la clasificación ordena a todos los de tu pool.",
+    "scoringExact": "5 puntos — marcador exacto",
+    "scoringWinnerGd": "3 puntos — ganador y diferencia de goles correctos",
+    "scoringWinner": "1 punto — solo el ganador correcto",
+    "poolsTitle": "Pools y jornadas",
+    "poolsBody": "Únete a un pool con amigos y pronostica una jornada completa. Tus pronósticos se bloquean al pitido inicial, así que nunca se pueden editar tarde.",
+    "wagersTitle": "Apuestas opcionales por jornada",
+    "wagersBody": "El dueño de un pool puede habilitar apuestas en una jornada. Todos los que participan apuestan la misma cantidad fija, y quien quede primero se lleva todo el pozo. Jugar gratis funciona exactamente igual que antes y no necesita wallet.",
+    "walletTitle": "Vincula una wallet de Solana",
+    "walletBody": "Apostar requiere una wallet vinculada para firmar tu entrada. Puedes vincularla ahora o más tarde desde cualquier página de jornada.",
+    "walletOptional": "Este paso es opcional.",
+    "riskTitle": "Riesgo y liquidación",
+    "riskBody": "Lee esto antes de apostar.",
+    "riskDevnet": "Las apuestas funcionan en Solana Devnet. Los tokens de Devnet no tienen valor monetario real.",
+    "riskOracle": "Winscore puntúa la jornada y liquida el pozo. Los resultados vienen de nuestro proveedor de datos, no de la blockchain.",
+    "riskFinal": "Una entrada es irreversible una vez firmada, y las reglas de liquidación son finales."
   }
 }
