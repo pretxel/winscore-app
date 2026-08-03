@@ -160,12 +160,13 @@ enabled = true
 # in emails.
 site_url = "https://winscore.me"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
+# The preview entry is scoped to this project's deployment slug — a bare
+# "https://*.vercel.app/auth/callback" would let ANY Vercel deployment, on any
+# account, receive a magic-link code.
 additional_redirect_urls = [
   "https://winscore.me/auth/callback",
+  "https://winscore-*-edsels-projects-7227ff3c.vercel.app/auth/callback",
   "https://world-pool.edselserrano.com/auth/callback",
-  "https://world-cup-pool-sepia.vercel.app/auth/callback",
-  "https://world-cup-pool-edsels-projects-7227ff3c.vercel.app/auth/callback",
-  "https://*.vercel.app/auth/callback",
   "http://localhost:3000/auth/callback",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
