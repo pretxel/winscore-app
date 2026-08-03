@@ -275,17 +275,24 @@ commit;
 
 Gmail/Yahoo/Microsoft require a DMARC record and penalize `no-reply` senders.
 
-1. **DMARC** — publish a TXT record (monitor mode; safe, satisfies the requirement):
-   - Name: `_dmarc.edselserrano.com`
-   - Value: `v=DMARC1; p=none; rua=mailto:worldcup@edselserrano.com; fo=1`
-   - Verify: `dig +short TXT _dmarc.edselserrano.com`
-   - Tighten to `p=quarantine` later once `rua` reports confirm SPF/DKIM alignment.
+DNS for `winscore.me` is served by Vercel (`ns1/ns2.vercel-dns.com`), so records
+are managed with `vercel dns`, not at the registrar.
+
+1. **DMARC** — published 2026-08-03 in monitor mode:
+   - Record: `_dmarc.winscore.me TXT "v=DMARC1; p=none;"`
+   - Verify: `dig +short TXT _dmarc.winscore.me`
+   - No `rua=` yet on purpose: aggregate reports hard-bounce unless a mailbox
+     exists to receive them, and `winscore.me` has no inbound MX. Add
+     `rua=mailto:…` once a real inbox exists, then tighten to `p=quarantine`
+     after the reports confirm SPF/DKIM alignment.
+   - SPF (`v=spf1 include:amazonses.com ~all`) and the Resend DKIM key are on
+     `send.winscore.me` / `resend._domainkey.winscore.me`.
 2. **Sender (no `no-reply`)** — set Vercel **Production** env:
-   - `EMAIL_FROM=World Cup Pools <worldcup@edselserrano.com>`
-   - `EMAIL_REPLY_TO=worldcup@edselserrano.com` (defaults to the From address if unset)
+   - `EMAIL_FROM=Winscore <no-reply@winscore.me>` (matches `lib/env.ts`)
+   - `EMAIL_REPLY_TO=…` (defaults to the From address if unset)
    - Redeploy so the deployment snapshot picks up the new values.
-3. **Receiving** — the Resend domain has receiving disabled, so set up a mailbox or
-   forward for `worldcup@edselserrano.com` so replies and DMARC `rua` reports land
-   somewhere (otherwise they hard-bounce).
+3. **Receiving** — the Resend domain has receiving disabled, so a `no-reply`
+   From means replies hard-bounce. Set up a mailbox or forward before pointing
+   `EMAIL_REPLY_TO` at an address on this domain.
 
 All transactional sends already include the Reply-To via `env.emailReplyTo`.
