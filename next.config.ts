@@ -14,6 +14,35 @@ const nextConfig: NextConfig = {
     "/api/og/rank": ["./assets/og/*.ttf"],
     "/api/og/pick": ["./assets/og/*.ttf"],
   },
+  // Baseline security headers on every response. Vercel already sends HSTS for
+  // the apex domain, so this adds the ones it does not: clickjacking, MIME
+  // sniffing, referrer leakage, and unused browser capabilities.
+  //
+  // No Content-Security-Policy here on purpose — Next injects inline bootstrap
+  // scripts, so a CSP needs per-request nonces via proxy/middleware rather than
+  // a static header, and a wrong one takes the whole site down.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          // The app is never meant to be framed. The one <iframe> it renders
+          // (admin email preview) is same-origin and sandboxed, so DENY is safe.
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          // Send the full URL same-origin, bare origin cross-origin: share
+          // targets and OG scrapers still see the domain, never the path (which
+          // can carry pool and match IDs).
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          // No code path uses these; deny them so an injected script can't.
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+          },
+        ],
+      },
+    ];
+  },
   // Legacy single-competition paths (pre-`[league]` routing) 308-redirect to the
   // league catalog. The locale is constrained to the supported set, and every
   // source is exactly two path segments — the new `/[locale]/[league]/…` routes
