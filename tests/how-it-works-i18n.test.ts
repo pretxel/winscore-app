@@ -71,4 +71,17 @@ describe("how-it-works copy", () => {
       expect(howItWorks(locale).section5Risk1, `${locale}.section5Risk1`).toMatch(/devnet/i);
     }
   });
+
+  // The app runs several competitions at once, so rules copy naming one of them
+  // is wrong for everybody else reading it. This originally said "every World
+  // Cup 2026 match" long after Liga MX and La Liga went live.
+  it("keeps the rules competition-agnostic", () => {
+    const named = /world cup|mundial|coupe du monde|tournament|torneo|tournoi|turnier/i;
+    for (const locale of LOCALES) {
+      const offenders = Object.entries(howItWorks(locale))
+        .filter(([, value]) => named.test(value))
+        .map(([key]) => key);
+      expect(offenders, `${locale} names a specific competition`).toEqual([]);
+    }
+  });
 });
