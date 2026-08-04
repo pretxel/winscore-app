@@ -10,7 +10,14 @@ import { describe, expect, it } from "vitest";
  */
 
 const LOCALES = ["en", "es", "fr", "de"] as const;
-const NAMESPACES = ["wager", "wallet", "wagerPayout", "wagerResults", "welcome"] as const;
+const NAMESPACES = [
+  "wager",
+  "wallet",
+  "wagerPayout",
+  "wagerResults",
+  "welcome",
+  "roundList",
+] as const;
 
 const COMPONENTS = [
   "components/wager/wager-rail.tsx",
@@ -18,6 +25,7 @@ const COMPONENTS = [
   "components/wager/wager-results-table.tsx",
   "components/wallet/wallet-link-button.tsx",
   "app/[locale]/welcome/welcome-tour.tsx",
+  "components/groups/round-list.tsx",
 ];
 
 function bundle(locale: string): Record<string, Record<string, string>> {
@@ -30,6 +38,7 @@ const ARGS: Record<string, Record<string, unknown>> = {
   wallet: {},
   wagerPayout: { amount: "1", token: "TKN" },
   welcome: { current: 1, total: 5 },
+  roundList: { predicted: 3, total: 9, count: 2 },
   wagerResults: {
     amount: "1",
     token: "TKN",

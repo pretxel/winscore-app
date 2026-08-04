@@ -153,7 +153,11 @@ export async function getRoundProgress(
 
   const matchIds = (matches ?? []).map((m) => m.id);
   const { data: preds } = matchIds.length
-    ? await supabase.from("predictions").select("match_id").eq("user_id", userId).in("match_id", matchIds)
+    ? await supabase
+        .from("predictions")
+        .select("match_id")
+        .eq("user_id", userId)
+        .in("match_id", matchIds)
     : { data: [] };
 
   const { data: wagerRounds } = await supabase
