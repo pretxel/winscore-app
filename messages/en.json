@@ -1731,5 +1731,21 @@
     "riskDevnet": "Wagering runs on Solana Devnet. Devnet tokens have no real monetary value.",
     "riskOracle": "Winscore scores the round and settles the pot. Results come from our data provider, not from the blockchain.",
     "riskFinal": "An entry is irreversible once signed, and the settlement rules are final."
+  },
+  "roundList": {
+    "title": "Your rounds",
+    "progress": "{predicted} of {total} predictions",
+    "complete": "All predictions in",
+    "openRound": "Open round",
+    "showPast": "Show past rounds",
+    "hidePast": "Hide past rounds",
+    "pendingHeading": "Still to predict",
+    "noPending": "Nothing left to predict in this round.",
+    "lockedNote": "{count, plural, one {# fixture already kicked off and can no longer be predicted} other {# fixtures already kicked off and can no longer be predicted}}",
+    "wagerBadge": "Wager open",
+    "stateOpen": "Not started",
+    "stateInProgress": "In progress",
+    "statePast": "Finished",
+    "empty": "No rounds have fixtures assigned yet."
   }
 }

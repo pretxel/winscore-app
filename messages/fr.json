@@ -1731,5 +1731,21 @@
     "riskDevnet": "Les paris fonctionnent sur Solana Devnet. Les jetons Devnet n'ont aucune valeur monétaire réelle.",
     "riskOracle": "Winscore calcule les points de la journée et règle la cagnotte. Les résultats proviennent de notre fournisseur de données, pas de la blockchain.",
     "riskFinal": "Une entrée est irréversible une fois signée, et les règles de règlement sont définitives."
+  },
+  "roundList": {
+    "title": "Vos journées",
+    "progress": "{predicted} sur {total} pronostics",
+    "complete": "Tous les pronostics saisis",
+    "openRound": "Ouvrir la journée",
+    "showPast": "Voir les journées passées",
+    "hidePast": "Masquer les journées passées",
+    "pendingHeading": "À pronostiquer",
+    "noPending": "Plus rien à pronostiquer dans cette journée.",
+    "lockedNote": "{count, plural, one {# match a déjà commencé et ne peut plus être pronostiqué} other {# matchs ont déjà commencé et ne peuvent plus être pronostiqués}}",
+    "wagerBadge": "Pari ouvert",
+    "stateOpen": "Pas commencée",
+    "stateInProgress": "En cours",
+    "statePast": "Terminée",
+    "empty": "Aucune journée n'a encore de matchs assignés."
   }
 }

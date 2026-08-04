@@ -4,9 +4,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FixturesStrip } from "@/components/fixtures-strip";
+import { RoundList } from "@/components/groups/round-list";
 import { LeaderboardTable } from "@/components/leaderboard-table";
 import { getLeagueForPool } from "@/lib/competition";
 import { getGroup, getGroupBoard } from "@/lib/groups";
+import { getRoundProgress, selectRoundWindow } from "@/lib/groups/round-progress";
 import { getLeagueLaneFixtures } from "@/lib/home";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import {
@@ -56,6 +58,15 @@ export default async function GroupDetailPage({
   const myRow = group.currentUserId
     ? rows.find((r) => r.user_id === group.currentUserId)
     : undefined;
+
+  // Members only: someone who has not joined has no predictions to complete.
+  // `getGroup` only populates currentUserId for a signed-in member, so this is
+  // both the auth and the membership check. `league` can be null for a pool
+  // whose competition was removed, and the round link needs its slug.
+  const roundWindow =
+    group.currentUserId && league
+      ? selectRoundWindow(await getRoundProgress(id, group.currentUserId, locale))
+      : null;
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -107,6 +118,18 @@ export default async function GroupDetailPage({
               <FixturesStrip fixtures={fixtures} />
             </div>
           ) : null}
+        </section>
+      ) : null}
+
+      {roundWindow && league ? (
+        <section className="mt-8">
+          <RoundList
+            actionable={roundWindow.actionable}
+            past={roundWindow.past}
+            groupId={id}
+            league={league.slug}
+            locale={locale}
+          />
         </section>
       ) : null}
 
