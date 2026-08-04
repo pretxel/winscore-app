@@ -1731,5 +1731,21 @@
     "riskDevnet": "Las apuestas funcionan en Solana Devnet. Los tokens de Devnet no tienen valor monetario real.",
     "riskOracle": "Winscore puntúa la jornada y liquida el pozo. Los resultados vienen de nuestro proveedor de datos, no de la blockchain.",
     "riskFinal": "Una entrada es irreversible una vez firmada, y las reglas de liquidación son finales."
+  },
+  "roundList": {
+    "title": "Tus jornadas",
+    "progress": "{predicted} de {total} pronósticos",
+    "complete": "Pronósticos completos",
+    "openRound": "Abrir jornada",
+    "showPast": "Ver jornadas anteriores",
+    "hidePast": "Ocultar jornadas anteriores",
+    "pendingHeading": "Pendientes de pronosticar",
+    "noPending": "No queda nada por pronosticar en esta jornada.",
+    "lockedNote": "{count, plural, one {# partido ya empezó y no se puede pronosticar} other {# partidos ya empezaron y no se pueden pronosticar}}",
+    "wagerBadge": "Apuesta abierta",
+    "stateOpen": "Sin empezar",
+    "stateInProgress": "En curso",
+    "statePast": "Finalizada",
+    "empty": "Ninguna jornada tiene partidos asignados todavía."
   }
 }

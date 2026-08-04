@@ -1731,5 +1731,21 @@
     "riskDevnet": "Wetten laufen auf Solana Devnet. Devnet-Token haben keinen realen Geldwert.",
     "riskOracle": "Winscore wertet den Spieltag aus und rechnet den Topf ab. Die Ergebnisse stammen von unserem Datenanbieter, nicht von der Blockchain.",
     "riskFinal": "Eine Teilnahme ist nach dem Signieren unwiderruflich, und die Abrechnungsregeln sind endgültig."
+  },
+  "roundList": {
+    "title": "Deine Spieltage",
+    "progress": "{predicted} von {total} Tipps",
+    "complete": "Alle Tipps abgegeben",
+    "openRound": "Spieltag öffnen",
+    "showPast": "Vergangene Spieltage anzeigen",
+    "hidePast": "Vergangene Spieltage ausblenden",
+    "pendingHeading": "Noch zu tippen",
+    "noPending": "An diesem Spieltag gibt es nichts mehr zu tippen.",
+    "lockedNote": "{count, plural, one {# Spiel hat bereits angepfiffen und kann nicht mehr getippt werden} other {# Spiele haben bereits angepfiffen und können nicht mehr getippt werden}}",
+    "wagerBadge": "Wette offen",
+    "stateOpen": "Nicht begonnen",
+    "stateInProgress": "Läuft",
+    "statePast": "Beendet",
+    "empty": "Noch keinem Spieltag sind Spiele zugeordnet."
   }
 }
