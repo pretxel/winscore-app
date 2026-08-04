@@ -201,7 +201,18 @@
     "section3Item3": "Then the earlier most-recent submission timestamp.",
     "section4Title": "Global leaderboard",
     "section4P1": "One ranking across the whole tournament. Every player's total is the sum of points across every finished match — no daily windows, no timezone splits.",
-    "section4P2": "The board refreshes the moment an admin posts a final score, and ties break on the rules in Section 03."
+    "section4P2": "The board refreshes the moment an admin posts a final score, and ties break on the rules in Section 03.",
+    "section5Title": "Optional matchday wagers",
+    "section5P1": "A pool owner can turn on wagering for a round. Everyone who joins stakes the same fixed amount of the approved token, and whoever finishes first in that round takes the whole pot. There is no platform fee.",
+    "section5P2": "Wagering is entirely optional. Free predictions work exactly as described above and never need a wallet — no wallet error, rejected signature, or network problem can stop a valid free pick from being saved.",
+    "section5Item1": "Complete every prediction for the round, then link a Solana wallet.",
+    "section5Item2": "Review the stake, pot, close time, and rules, then sign the deposit.",
+    "section5Item3": "After the round is settled, winners sign once more to claim their award.",
+    "section5RiskTitle": "What you are trusting",
+    "section5Risk1": "Wagering runs on Solana Devnet. Devnet tokens have no real monetary value.",
+    "section5Risk2": "Winscore scores the round and settles the pot. Results come from our data provider, not from the blockchain, so this is not a fully trustless bet.",
+    "section5Risk3": "Your picks are snapshotted when you enter and cannot change afterwards. A deposit is irreversible once signed.",
+    "section5Risk4": "If a round is cancelled, every entrant can withdraw their exact stake instead."
   },
   "matches": {
     "title": "Matches",

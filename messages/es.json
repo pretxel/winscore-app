@@ -201,7 +201,18 @@
     "section3Item3": "Después, la marca de tiempo de envío más reciente más temprana.",
     "section4Title": "Clasificación global",
     "section4P1": "Una única clasificación a lo largo de todo el torneo. El total de cada jugador es la suma de puntos en todos los partidos terminados — sin ventanas diarias ni cortes por zona horaria.",
-    "section4P2": "El cuadro se refresca al instante en que un admin publica un resultado final, y los empates se rompen con las reglas de la Sección 03."
+    "section4P2": "El cuadro se refresca al instante en que un admin publica un resultado final, y los empates se rompen con las reglas de la Sección 03.",
+    "section5Title": "Apuestas opcionales por jornada",
+    "section5P1": "El dueño de un pool puede activar las apuestas en una jornada. Todos los que participan apuestan la misma cantidad fija del token aprobado, y quien quede primero en esa jornada se lleva todo el pozo. No hay comisión de la plataforma.",
+    "section5P2": "Apostar es totalmente opcional. Los pronósticos gratuitos funcionan exactamente como se describe arriba y nunca necesitan wallet: ningún error de wallet, firma rechazada o problema de red puede impedir que se guarde un pronóstico gratuito válido.",
+    "section5Item1": "Completa todos los pronósticos de la jornada y vincula una wallet de Solana.",
+    "section5Item2": "Revisa la cantidad, el pozo, la hora de cierre y las reglas, y firma el depósito.",
+    "section5Item3": "Tras liquidarse la jornada, los ganadores firman una vez más para reclamar su premio.",
+    "section5RiskTitle": "En qué estás confiando",
+    "section5Risk1": "Las apuestas funcionan en Solana Devnet. Los tokens de Devnet no tienen valor monetario real.",
+    "section5Risk2": "Winscore puntúa la jornada y liquida el pozo. Los resultados vienen de nuestro proveedor de datos, no de la blockchain, así que no es una apuesta totalmente trustless.",
+    "section5Risk3": "Tus pronósticos se congelan al entrar y no se pueden cambiar después. Un depósito es irreversible una vez firmado.",
+    "section5Risk4": "Si una jornada se cancela, cada participante puede retirar su apuesta exacta."
   },
   "matches": {
     "title": "Partidos",
