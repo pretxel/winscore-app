@@ -171,3 +171,25 @@ export async function getRoundProgress(
     now: new Date(),
   });
 }
+
+const WINDOW_SIZE = 3;
+
+/**
+ * Splits rounds into what the member can act on now and what is behind the
+ * disclosure. Past rounds come back newest-first, which is the order someone
+ * looking back wants.
+ */
+export function selectRoundWindow(rounds: RoundProgress[]): {
+  actionable: RoundProgress[];
+  past: RoundProgress[];
+} {
+  const live = rounds.filter((r) => r.state !== "past");
+  const past = rounds.filter((r) => r.state === "past").reverse();
+
+  if (live.length === 0) {
+    // Season over: show recent history rather than an empty section.
+    return { actionable: past.slice(0, WINDOW_SIZE), past: past.slice(WINDOW_SIZE) };
+  }
+
+  return { actionable: live.slice(0, WINDOW_SIZE), past };
+}

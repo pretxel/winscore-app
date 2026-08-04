@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildRoundProgress } from "@/lib/groups/round-progress";
+import {
+  buildRoundProgress,
+  type RoundProgress,
+  selectRoundWindow,
+} from "@/lib/groups/round-progress";
 
 const NOW = new Date("2026-08-02T12:00:00Z");
 
@@ -138,5 +142,54 @@ describe("buildRoundProgress", () => {
     });
 
     expect(round.openMatches.map((m) => m.id)).toEqual(["early", "late"]);
+  });
+});
+
+function progress(roundNumber: number, state: RoundProgress["state"]): RoundProgress {
+  return {
+    roundId: `r${roundNumber}`,
+    label: `Jornada ${roundNumber}`,
+    roundNumber,
+    startsAt: "2026-08-10T18:00:00Z",
+    endsAt: "2026-08-10T20:00:00Z",
+    total: 9,
+    predicted: 0,
+    openMatches: [],
+    lockedUnpredicted: 0,
+    state,
+    wagerAvailable: false,
+  };
+}
+
+describe("selectRoundWindow", () => {
+  it("shows in-progress and open rounds, capped at three", () => {
+    const { actionable, past } = selectRoundWindow([
+      progress(1, "past"),
+      progress(2, "past"),
+      progress(3, "in_progress"),
+      progress(4, "open"),
+      progress(5, "open"),
+      progress(6, "open"),
+    ]);
+
+    expect(actionable.map((r) => r.roundNumber)).toEqual([3, 4, 5]);
+    expect(past.map((r) => r.roundNumber)).toEqual([2, 1]);
+  });
+
+  // End of season: an empty section would read as a bug rather than as "done".
+  it("falls back to the three most recent past rounds when nothing is open", () => {
+    const { actionable, past } = selectRoundWindow([
+      progress(1, "past"),
+      progress(2, "past"),
+      progress(3, "past"),
+      progress(4, "past"),
+    ]);
+
+    expect(actionable.map((r) => r.roundNumber)).toEqual([4, 3, 2]);
+    expect(past.map((r) => r.roundNumber)).toEqual([1]);
+  });
+
+  it("returns nothing for a competition with no rounds", () => {
+    expect(selectRoundWindow([])).toEqual({ actionable: [], past: [] });
   });
 });
