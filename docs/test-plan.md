@@ -918,10 +918,10 @@ Covers spec: `leaderboard/spec.md`.
 - **Type:** manual
 
 ### TC-OP-02
-- **Area:** Regression — Middleware does not 500 anonymous traffic
+- **Area:** Regression — Proxy does not 500 anonymous traffic
 - **Steps:**
   1. `curl -i 'https://world-cup-pool-sepia.vercel.app/'` 3 times (no cookies).
-- **Expected result:** 200 each time. `middleware.ts` calls `supabase.auth.getUser()` even for anon — verify it doesn't blow up if cookies are missing.
+- **Expected result:** 200 each time. `proxy.ts` calls `supabase.auth.getUser()` even for anon — verify it doesn't blow up if cookies are missing.
 - **Type:** manual
 
 ### TC-OP-03
