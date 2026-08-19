@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { isWagerUiEnabled } from "@/lib/wager/env";
 
 export async function generateMetadata({
   params,
@@ -30,6 +31,7 @@ export default async function HowItWorksPage({ params }: { params: Promise<{ loc
   setRequestLocale(locale);
   const t = await getTranslations("howItWorks");
   const tCommon = await getTranslations("common");
+  const wagersEnabled = isWagerUiEnabled();
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-12">
@@ -101,6 +103,44 @@ export default async function HowItWorksPage({ params }: { params: Promise<{ loc
         <p>{t("section4P1")}</p>
         <p className="mt-3">{t("section4P2")}</p>
       </Section>
+
+      {/* Only rendered while wagering is switched on, so this public page never
+          documents a feature players cannot reach. */}
+      {wagersEnabled ? (
+        <Section index="05" title={t("section5Title")}>
+          <p>{t("section5P1")}</p>
+          <p className="mt-3">{t("section5P2")}</p>
+
+          <ol className="mt-4 grid gap-2">
+            {[t("section5Item1"), t("section5Item2"), t("section5Item3")].map((line, i) => (
+              <li
+                key={line}
+                className="flex items-start gap-3 rounded-lg border border-border bg-card px-4 py-3"
+              >
+                <span className="grid size-6 shrink-0 place-items-center rounded-md bg-pitch text-pitch-foreground font-mono text-[11px] font-bold tabular-nums">
+                  {i + 1}
+                </span>
+                <span className="text-sm">{line}</span>
+              </li>
+            ))}
+          </ol>
+
+          {/* The trust model is stated plainly rather than buried: Winscore is
+              the settlement oracle, and that is not a trustless arrangement. */}
+          <div className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3">
+            <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+              {t("section5RiskTitle")}
+            </p>
+            <ul className="mt-2 grid gap-1.5 text-sm">
+              {[t("section5Risk1"), t("section5Risk2"), t("section5Risk3"), t("section5Risk4")].map(
+                (line) => (
+                  <li key={line}>{line}</li>
+                ),
+              )}
+            </ul>
+          </div>
+        </Section>
+      ) : null}
     </main>
   );
 }
