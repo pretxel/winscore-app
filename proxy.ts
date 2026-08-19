@@ -11,7 +11,7 @@ const intlMiddleware = createIntlMiddleware({
   localeDetection: true,
 });
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   try {
     // 1. Resolve locale first — may return a redirect for bare paths or
     //    unsupported locale segments.
@@ -55,7 +55,7 @@ export async function middleware(request: NextRequest) {
     }
     return response;
   } catch {
-    // Middleware itself should never crash; if it does, let the request pass
+    // The proxy itself should never crash; if it does, let the request pass
     // through so the page can still render.
     return NextResponse.next();
   }

@@ -30,7 +30,7 @@ For the original design rationale see
                                                |
 +----------------+   request   +----------------------------+
 |  Browser       |------------>|  Next.js (Vercel)           |
-|  (RSC payload, |             |   middleware.ts (cookie     |
+|  (RSC payload, |             |   proxy.ts (cookie          |
 |   server-action|<------------|     refresh)                |
 |   results)     |             |   RSC pages (anon/user JWT) |
 +----------------+             |   server actions (admin =   |
@@ -49,7 +49,7 @@ For the original design rationale see
   - `lib/supabase/admin.ts` ([`lib/supabase/admin.ts:6`](../lib/supabase/admin.ts))
     — service-role key, bypasses RLS. Tagged `import "server-only"` and only
     imported by admin server actions in `app/(admin)/admin/matches/actions.ts`.
-- **`middleware.ts`** ([`middleware.ts:5`](../middleware.ts)) refreshes the
+- **`proxy.ts`** ([`proxy.ts:5`](../proxy.ts)) refreshes the
   Supabase session cookie on every non-static request. It does not enforce
   authorization — that is the job of layouts and RLS.
 
@@ -87,7 +87,7 @@ HTML stream / RSC payload
 ```
 
 Cookie state arrives via `next/headers.cookies()`; the cookie is refreshed by
-`middleware.ts` so the Supabase session never expires mid-request.
+`proxy.ts` so the Supabase session never expires mid-request.
 
 ## Data flow: write path
 

@@ -8,7 +8,7 @@ Rules governing locale routing, detection, persistence, formatting, and the lang
 
 ### Requirement: Supported locales are exactly en, es, and fr
 
-The system SHALL support exactly three locales — `en` (English, default), `es` (Spanish), `fr` (French) — and SHALL reject or redirect requests for any other locale. The list of supported locales SHALL be defined in a single module imported by middleware, the sitemap, the message loader, and the language switcher.
+The system SHALL support exactly three locales — `en` (English, default), `es` (Spanish), `fr` (French) — and SHALL reject or redirect requests for any other locale. The list of supported locales SHALL be defined in a single module imported by the proxy, the sitemap, the message loader, and the language switcher.
 
 #### Scenario: Recognized locale
 - **WHEN** a visitor opens `/es/matches`
@@ -24,11 +24,11 @@ All user-facing routes SHALL exist under the `/[locale]/` segment. Bare (unprefi
 
 #### Scenario: Bare root
 - **WHEN** a visitor opens `/`
-- **THEN** middleware redirects to `/<resolved-locale>/`
+- **THEN** the proxy redirects to `/<resolved-locale>/`
 
 #### Scenario: Bare matches path
 - **WHEN** a visitor opens `/matches`
-- **THEN** middleware redirects to `/<resolved-locale>/matches`
+- **THEN** the proxy redirects to `/<resolved-locale>/matches`
 
 #### Scenario: Localized routes for every existing surface
 - **WHEN** a visitor opens any of `/en/`, `/en/matches`, `/en/matches/<id>`, `/en/my-picks`, `/en/leaderboard`, `/en/how-it-works`, `/en/admin/matches`, `/en/sign-in`, `/en/onboarding`

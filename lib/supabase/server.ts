@@ -23,7 +23,7 @@ export async function createServerSupabaseClient(leagueSlug?: string) {
             cookieStore.set(name, value, options as CookieOptions);
           }
         } catch {
-          // Server Components can't set cookies; middleware refreshes them.
+          // Server Components can't set cookies; the proxy refreshes them.
         }
       },
     },

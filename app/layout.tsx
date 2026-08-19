@@ -130,7 +130,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Tag <html> with the request's resolved locale (middleware sets it) so es/fr
+  // Tag <html> with the request's resolved locale (the proxy sets it) so es/fr
   // pages aren't announced as English to assistive tech and search engines.
   const raw = await getLocale();
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;

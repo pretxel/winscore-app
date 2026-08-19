@@ -30,7 +30,7 @@ services:
     ports:
       - ${APP_PORT:-3000}:3000
     environment:
-      # Server-side (RSC, route handlers, middleware, admin) reach Supabase over
+      # Server-side (RSC, route handlers, proxy, admin) reach Supabase over
       # the compose network. SUPABASE_URL is NOT a NEXT_PUBLIC_ var, so it is NOT
       # baked at build — it's read at runtime, and lib/env.ts prefers it on the
       # server. The browser still uses the build-time-baked NEXT_PUBLIC value

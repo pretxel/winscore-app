@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
   // sniffing, referrer leakage, and unused browser capabilities.
   //
   // No Content-Security-Policy here on purpose — Next injects inline bootstrap
-  // scripts, so a CSP needs per-request nonces via proxy/middleware rather than
+  // scripts, so a CSP needs per-request nonces via the proxy rather than
   // a static header, and a wrong one takes the whole site down.
   async headers() {
     return [

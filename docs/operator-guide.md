@@ -255,9 +255,9 @@ commit;
 
 ## Operational notes
 
-- The middleware refreshes Supabase session cookies on every non-static
-  request ([`middleware.ts:5`](../middleware.ts)). If a user reports being
-  signed out mid-session, check the Vercel function logs for `middleware`
+- The proxy refreshes Supabase session cookies on every non-static
+  request ([`proxy.ts:5`](../proxy.ts)). If a user reports being
+  signed out mid-session, check the Vercel function logs for `proxy`
   errors.
 - The matches list and match detail pages render dynamically — every request
   hits Postgres. This is fine at the expected scale (low thousands of users),
