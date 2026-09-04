@@ -15,6 +15,7 @@ function fixtureTeamsFrom(migration: string): Set<string> {
 
 const ligaMxFixtureTeams = () => fixtureTeamsFrom("20260723010000_liga_mx_official_fixtures.sql");
 const laLigaFixtureTeams = () => fixtureTeamsFrom("20260726010000_la_liga_2026_27.sql");
+const championsFixtureTeams = () => fixtureTeamsFrom("20260904000000_champions_league_2026_27.sql");
 
 describe("normalizeTeamName", () => {
   it("maps every alias to its local name", () => {
@@ -168,5 +169,117 @@ describe("La Liga aliases resolve to real fixture names", () => {
       .map((name) => ({ name, local: normalizeTeamName(name) }))
       .filter(({ local }) => !fixtureTeams.has(local));
     expect(unresolved, "ESPN names that would be unmatched").toEqual([]);
+  });
+});
+
+// The Champions League league phase was seeded straight from football-data, so
+// like La Liga both feeds have to agree with the seed. Five clubs (Barcelona,
+// Real Madrid, Atlético Madrid, Betis, Villarreal) are shared with La Liga and
+// must keep resolving to the same canonical name in both competitions.
+describe("Champions League aliases resolve to real fixture names", () => {
+  const fixtureTeams = championsFixtureTeams();
+
+  it("parsed the fixtures", () => {
+    expect(fixtureTeams.size).toBe(36);
+  });
+
+  it("normalizes the long forms football-data sends", () => {
+    // Exactly what CL season=2026 returns, captured live.
+    const footballDataNames = [
+      "AS Roma",
+      "Arsenal FC",
+      "Aston Villa FC",
+      "Borussia Dortmund",
+      "Club Atlético de Madrid",
+      "Club Brugge KV",
+      "Como 1907",
+      "FC Barcelona",
+      "FC Bayern München",
+      "FC Internazionale Milano",
+      "FC Porto",
+      "FK Bodø/Glimt",
+      "FK Shakhtar Donetsk",
+      "Fenerbahçe SK",
+      "Feyenoord Rotterdam",
+      "Galatasaray SK",
+      "LASK Linz",
+      "Lille OSC",
+      "Liverpool FC",
+      "Manchester City FC",
+      "Manchester United FC",
+      "PAE AEK",
+      "PSV",
+      "Paris Saint-Germain FC",
+      "RB Leipzig",
+      "Racing Club de Lens",
+      "Real Betis Balompié",
+      "Real Madrid CF",
+      "SK Slavia Praha",
+      "SSC Napoli",
+      "Sabah FK",
+      "Sporting Clube de Portugal",
+      "VfB Stuttgart",
+      "Viking FK",
+      "Villarreal CF",
+      "ŠK Slovan Bratislava",
+    ];
+
+    expect(footballDataNames).toHaveLength(36);
+    const unresolved = footballDataNames
+      .map((name) => ({ name, local: normalizeTeamName(name) }))
+      .filter(({ local }) => !fixtureTeams.has(local));
+    expect(unresolved, "football-data names that would be unmatched").toEqual([]);
+
+    // All 36 clubs must be reachable, not just 36 names collapsing onto fewer.
+    expect(new Set(footballDataNames.map(normalizeTeamName)).size).toBe(36);
+  });
+
+  it("normalizes the display names ESPN sends", () => {
+    // uefa.champions team display names, captured live.
+    const espnNames = [
+      "AEK Athens",
+      "AS Roma",
+      "Arsenal",
+      "Aston Villa",
+      "Atlético Madrid",
+      "Barcelona",
+      "Bayern Munich",
+      "Bodo/Glimt",
+      "Borussia Dortmund",
+      "Club Brugge",
+      "Como",
+      "FC Porto",
+      "Fenerbahce",
+      "Feyenoord Rotterdam",
+      "Galatasaray",
+      "Internazionale",
+      "LASK Linz",
+      "Lens",
+      "Lille",
+      "Liverpool",
+      "Manchester City",
+      "Manchester United",
+      "Napoli",
+      "PSV Eindhoven",
+      "Paris Saint-Germain",
+      "RB Leipzig",
+      "Real Betis",
+      "Real Madrid",
+      "Sabah FK",
+      "Shakhtar Donetsk",
+      "Slavia Prague",
+      "Slovan Bratislava",
+      "Sporting CP",
+      "VfB Stuttgart",
+      "Viking FK",
+      "Villarreal",
+    ];
+
+    expect(espnNames).toHaveLength(36);
+    const unresolved = espnNames
+      .map((name) => ({ name, local: normalizeTeamName(name) }))
+      .filter(({ local }) => !fixtureTeams.has(local));
+    expect(unresolved, "ESPN names that would be unmatched").toEqual([]);
+    expect(new Set(espnNames.map(normalizeTeamName)).size).toBe(36);
   });
 });
