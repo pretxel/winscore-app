@@ -11,6 +11,7 @@ import { MatchStateBadge } from "@/components/match-state-badge";
 import { RecapReactions } from "@/components/recap-reactions";
 import { ShareButtons } from "@/components/share-buttons";
 import { StageIcon } from "@/components/stage-icon";
+import { TeamCrest } from "@/components/team-crest";
 import { buttonVariants } from "@/components/ui/button";
 import { VenueImage } from "@/components/venue-image";
 import { isCurrentUserAdmin } from "@/lib/admin/current-user";
@@ -392,6 +393,7 @@ export default async function MatchDetailPage({
               {t("home")}
             </div>
             <div className="mt-1 flex items-center gap-2 sm:gap-3">
+              <TeamCrest team={match.home_team} size="lg" className="ring-white/30" />
               <span
                 className="min-w-0 truncate font-heading text-2xl font-semibold leading-tight sm:text-4xl"
                 style={{ fontStretch: "condensed" }}
@@ -431,6 +433,7 @@ export default async function MatchDetailPage({
               >
                 {match.away_team}
               </span>
+              <TeamCrest team={match.away_team} size="lg" className="ring-white/30" />
             </div>
           </div>
         </div>
