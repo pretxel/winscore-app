@@ -1642,12 +1642,15 @@
   },
   "catalog": {
     "title": "Leagues",
-    "lede": "Every live league — start a group in any of them.",
+    "lede": "Pick a league, start a group, and play every matchday with your friends.",
     "empty": "No live leagues yet.",
     "start": "Start a group",
     "fixtures": "View fixtures",
     "finished": "Finished",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "facts": "{teams, plural, one {# team} other {# teams}}, {matches, plural, one {# match} other {# matches}}",
+    "liveNow": "{count, plural, one {# live now} other {# live now}}",
+    "moreTeams": "+{count} more"
   },
   "wallet": {
     "errNoWallet": "No Solana wallet found. Install Phantom or Solflare.",

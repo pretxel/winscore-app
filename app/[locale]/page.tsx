@@ -47,7 +47,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       const lanes = await Promise.all(
         leagues.map(async (lane) => ({
           lane,
-          fixtures: await getLeagueLaneFixtures(lane.slug),
+          fixtures: await getLeagueLaneFixtures(lane.slug, lane.competitionId),
         })),
       );
       return (

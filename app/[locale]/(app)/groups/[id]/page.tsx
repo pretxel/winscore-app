@@ -52,7 +52,7 @@ export default async function GroupDetailPage({
   // no longer live) and its live/next fixtures, so members jump straight to
   // predicting in the right league.
   const league = await getLeagueForPool(id);
-  const fixtures = league ? await getLeagueLaneFixtures(league.slug) : [];
+  const fixtures = league ? await getLeagueLaneFixtures(league.slug, league.id) : [];
 
   const { rows } = await getGroupBoard(id);
   const myRow = group.currentUserId

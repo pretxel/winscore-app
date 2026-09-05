@@ -1642,12 +1642,15 @@
   },
   "catalog": {
     "title": "Ligues",
-    "lede": "Toutes les ligues actives — créez un groupe dans l'une d'elles.",
+    "lede": "Choisissez une ligue, créez un groupe et jouez chaque journée avec vos amis.",
     "empty": "Aucune ligue active pour l'instant.",
     "start": "Créer un groupe",
     "fixtures": "Voir les matchs",
     "finished": "Terminé",
-    "comingSoon": "Bientôt"
+    "comingSoon": "Bientôt",
+    "facts": "{teams, plural, one {# équipe} other {# équipes}}, {matches, plural, one {# match} other {# matchs}}",
+    "liveNow": "{count, plural, one {# en direct} other {# en direct}}",
+    "moreTeams": "+{count} de plus"
   },
   "wallet": {
     "errNoWallet": "Aucun portefeuille Solana trouvé. Installez Phantom ou Solflare.",
