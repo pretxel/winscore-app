@@ -46,6 +46,8 @@ export type RunSummary = {
   source: SyncSource | "none";
   stale: number;
   staleResolved: number;
+  // Local kickoffs corrected to the provider's schedule this run.
+  rescheduled: number;
 };
 
 /** Round review state surfaced when provider round data conflicts with existing assignments. */
@@ -73,5 +75,7 @@ export interface ResultProvider {
   // providers that always return the full competition may ignore it. `config`
   // carries the active competition's provider settings (endpoint codes/paths);
   // providers fall back to the World Cup 2026 defaults when it is absent.
-  fetchMatches(dates?: string[], config?: ProviderConfig): Promise<RemoteMatch[]>;
+  // `now` lets date-ranged providers extend the fetch window to today, so a
+  // fixture that moved past its seeded date is still seen once it is played.
+  fetchMatches(dates?: string[], config?: ProviderConfig, now?: Date): Promise<RemoteMatch[]>;
 }

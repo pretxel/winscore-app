@@ -55,6 +55,7 @@ function parseSyncSummaryParams(params: {
       final: count("syncFinal"),
       stale: count("syncStale"),
       staleResolved: count("syncStaleResolved"),
+      rescheduled: count("syncRescheduled"),
       errors: count("syncErrors"),
     },
   };
@@ -196,6 +197,10 @@ export default async function AdminMatchesPage({
                         value={syncSummary.counts.staleResolved}
                       />
                       <SyncStat label={t("syncStale")} value={syncSummary.counts.stale} />
+                      <SyncStat
+                        label={t("syncRescheduled")}
+                        value={syncSummary.counts.rescheduled}
+                      />
                       <SyncStat label={t("syncErrors")} value={syncSummary.counts.errors} />
                     </dl>
                   </ActionStatus>

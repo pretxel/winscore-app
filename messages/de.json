@@ -924,6 +924,7 @@
     "syncMatched": "Zugeordnet",
     "syncFinalized": "Abgeschlossen",
     "syncStaleResolved": "Überfällige aufgelöst",
+    "syncRescheduled": "Anstoßzeiten korrigiert",
     "syncStale": "Weiterhin überfällig",
     "syncErrors": "Fehler",
     "staleBadge": "Ergebnis überfällig",

@@ -924,6 +924,7 @@
     "syncMatched": "Emparejados",
     "syncFinalized": "Finalizados",
     "syncStaleResolved": "Atrasados resueltos",
+    "syncRescheduled": "Horarios corregidos",
     "syncStale": "Aún atrasados",
     "syncErrors": "Errores",
     "staleBadge": "Resultado atrasado",

@@ -84,7 +84,11 @@ export const espnProvider: ResultProvider = {
     return true;
   },
 
-  async fetchMatches(dates: string[] = [], config?: ProviderConfig): Promise<RemoteMatch[]> {
+  async fetchMatches(
+    dates: string[] = [],
+    config?: ProviderConfig,
+    now: Date = new Date(),
+  ): Promise<RemoteMatch[]> {
     if (dates.length === 0) return [];
     // ESPN buckets days by US Eastern time, not UTC: a UTC date D's
     // late-night kickoffs (00:00–04:00Z) live under Eastern day D-1
@@ -92,9 +96,14 @@ export const espnProvider: ResultProvider = {
     // 20260613). Widen the range one day back so UTC-dated targets are
     // always covered; extra events are matched by their own utcDate or
     // logged as unmatched.
+    // The range runs up to today, not just the latest candidate date: the
+    // candidates come from seeded kickoffs, and a fixture that was moved later
+    // than its seed is only found by asking about the days after it.
     const sorted = [...dates].sort();
+    const today = now.toISOString().slice(0, 10);
     const from = compactDate(addUtcDays(sorted[0], -1));
-    const to = compactDate(sorted[sorted.length - 1]);
+    const last = sorted[sorted.length - 1];
+    const to = compactDate(last > today ? last : today);
     const range = from === to ? from : `${from}-${to}`;
     const resp = await fetch(`${espnScoreboardUrl(config)}?dates=${range}`, {
       cache: "no-store",

@@ -271,6 +271,7 @@ export async function syncNow(formData: FormData): Promise<void> {
     syncFinal: String(summary.final),
     syncStale: String(summary.stale),
     syncStaleResolved: String(summary.staleResolved),
+    syncRescheduled: String(summary.rescheduled),
     syncErrors: String(summary.errors),
   });
   redirect(localePath(locale, `/admin/matches?${params.toString()}`));

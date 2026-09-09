@@ -924,6 +924,7 @@
     "syncMatched": "Matched",
     "syncFinalized": "Finalized",
     "syncStaleResolved": "Overdue resolved",
+    "syncRescheduled": "Kickoffs corrected",
     "syncStale": "Still overdue",
     "syncErrors": "Errors",
     "staleBadge": "Result overdue",

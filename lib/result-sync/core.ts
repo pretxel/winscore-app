@@ -63,12 +63,92 @@ function candidateDates(locals: LocalMatch[], now: Date): string[] {
 
 type AdminClient = ReturnType<typeof createAdminSupabaseClient>;
 
+// How far a provider's kickoff may sit from the seeded one and still be the
+// same fixture. Seeds carry provisional dates and league games get moved by
+// international breaks and TV picks, so this is generous; a team pair only
+// repeats within a season for two-legged ties months apart, which the
+// nearest-kickoff rule below still keeps apart.
+const RESCHEDULE_WINDOW_MS = 120 * 24 * 60 * 60 * 1000;
+
+function pairKey(home: string, away: string): string {
+  return `${home}|${away}`;
+}
+
+// Resolve the local row a remote row refers to: the exact (home, away, day)
+// key first, else the nearest same-pair fixture inside the reschedule window.
+// The date-keyed index alone missed every fixture whose seeded day differed
+// from the real one, which left whole matchdays permanently stale.
+function findLocal(
+  byKey: Map<string, LocalMatch>,
+  byPair: Map<string, LocalMatch[]>,
+  home: string,
+  away: string,
+  remoteUtc: string,
+): LocalMatch | undefined {
+  const exact = byKey.get(`${home}|${away}|${remoteUtc.slice(0, 10)}`);
+  if (exact) return exact;
+  const candidates = byPair.get(pairKey(home, away));
+  if (!candidates || candidates.length === 0) return undefined;
+  const remoteMs = Date.parse(remoteUtc);
+  if (Number.isNaN(remoteMs)) return undefined;
+  let best: LocalMatch | undefined;
+  let bestDelta = Number.POSITIVE_INFINITY;
+  for (const c of candidates) {
+    const delta = Math.abs(Date.parse(c.kickoff_at) - remoteMs);
+    if (delta < bestDelta) {
+      best = c;
+      bestDelta = delta;
+    }
+  }
+  return bestDelta <= RESCHEDULE_WINDOW_MS ? best : undefined;
+}
+
+// Bring the local kickoff in line with the provider's. Finals and
+// cancellations are left alone (their date no longer matters and a final is
+// immutable to feeds); everything else follows the feed, which moves the lock
+// time and the fixture list with it. Returns false when the write failed.
+async function reconcileKickoff(
+  admin: AdminClient,
+  local: LocalMatch,
+  remoteUtc: string,
+  providerName: string,
+  summary: RunSummary,
+): Promise<boolean> {
+  if (local.status === "final" || local.status === "cancelled") return true;
+  const remoteMs = Date.parse(remoteUtc);
+  const localMs = Date.parse(local.kickoff_at);
+  if (Number.isNaN(remoteMs) || Number.isNaN(localMs)) return true;
+  if (Math.abs(remoteMs - localMs) < 60 * 1000) return true;
+
+  const iso = new Date(remoteMs).toISOString();
+  const { error } = await admin
+    .from("matches")
+    .update({ kickoff_at: iso })
+    .eq("id", local.id)
+    .neq("status", "final");
+  if (error) {
+    summary.errors++;
+    console.error(
+      `[result-sync:${providerName}] kickoff update failed for ${local.id}:`,
+      error.message,
+    );
+    return false;
+  }
+  console.log(
+    `[result-sync:${providerName}] rescheduled ${local.home_team} vs ${local.away_team}: ${local.kickoff_at} -> ${iso}`,
+  );
+  local.kickoff_at = iso;
+  summary.rescheduled++;
+  return true;
+}
+
 // Mirror one batch of remote rows into the matched local rows. Mutates
 // `summary` and the in-memory `locals` (via byKey) so staleness re-checks and
 // later batches see what this batch wrote. Returns how many rows were written.
 async function applyRemote(
   admin: AdminClient,
   byKey: Map<string, LocalMatch>,
+  byPair: Map<string, LocalMatch[]>,
   remote: RemoteMatch[],
   providerName: string,
   summary: RunSummary,
@@ -78,16 +158,21 @@ async function applyRemote(
   for (const r of remote) {
     const home = normalizeTeamName(r.homeTeam?.name ?? null);
     const away = normalizeTeamName(r.awayTeam?.name ?? null);
-    const date = (r.utcDate ?? "").slice(0, 10);
+    const utc = r.utcDate ?? "";
+    const date = utc.slice(0, 10);
     if (!home || !away || !date) continue;
 
-    const local = byKey.get(`${home}|${away}|${date}`);
+    const local = findLocal(byKey, byPair, home, away, utc);
     if (!local) {
       summary.unmatched++;
       console.warn(`[result-sync:${providerName}] unmatched remote: ${home} vs ${away} @ ${date}`);
       continue;
     }
     summary.matched++;
+
+    // Schedule first, result second: a moved fixture must carry its real
+    // kickoff even when its result is not in yet.
+    if (!(await reconcileKickoff(admin, local, utc, providerName, summary))) continue;
 
     const status = (r.status ?? "").toUpperCase();
     const fullTime = r.score?.fullTime;
@@ -213,6 +298,7 @@ export async function runSync(opts: RunSyncOptions = {}): Promise<RunSummary> {
     source: "none",
     stale: 0,
     staleResolved: 0,
+    rescheduled: 0,
   };
 
   const admin = createAdminSupabaseClient(opts.leagueSlug);
@@ -240,8 +326,13 @@ export async function runSync(opts: RunSyncOptions = {}): Promise<RunSummary> {
   // Index local matches by (home|away|YYYY-MM-DD) for O(1) lookup. The set is
   // already competition-scoped by the query above, so this key is unambiguous.
   const byKey = new Map<string, LocalMatch>();
+  const byPair = new Map<string, LocalMatch[]>();
   for (const m of locals) {
     byKey.set(`${m.home_team}|${m.away_team}|${m.kickoff_at.slice(0, 10)}`, m);
+    const pair = pairKey(m.home_team, m.away_team);
+    const list = byPair.get(pair);
+    if (list) list.push(m);
+    else byPair.set(pair, [m]);
   }
 
   const staleAtStart = findStaleMatches(locals, now);
@@ -254,7 +345,7 @@ export async function runSync(opts: RunSyncOptions = {}): Promise<RunSummary> {
   let remote: RemoteMatch[] = [];
   if (primary) {
     try {
-      remote = await primary.fetchMatches(dates, providerConfig);
+      remote = await primary.fetchMatches(dates, providerConfig, now);
       if (remote.length > 0) {
         summary.source = primary.name;
       } else {
@@ -267,7 +358,7 @@ export async function runSync(opts: RunSyncOptions = {}): Promise<RunSummary> {
   }
   if (summary.source === "none" && fallback) {
     try {
-      remote = await fallback.fetchMatches(dates, providerConfig);
+      remote = await fallback.fetchMatches(dates, providerConfig, now);
       // `source` means "whose data was applied" — an empty fallback payload
       // applied nothing, so the run stays source: "none".
       if (remote.length > 0) {
@@ -284,7 +375,7 @@ export async function runSync(opts: RunSyncOptions = {}): Promise<RunSummary> {
 
   if (summary.source !== "none") {
     summary.fetched += remote.length;
-    await applyRemote(admin, byKey, remote, summary.source, summary);
+    await applyRemote(admin, byKey, byPair, remote, summary.source, summary);
   }
 
   // Targeted escalation: the primary "succeeded" but left overdue matches
@@ -294,9 +385,9 @@ export async function runSync(opts: RunSyncOptions = {}): Promise<RunSummary> {
     if (staleAfterMain.length > 0) {
       const staleDates = [...new Set(staleAfterMain.map((m) => m.kickoff_at.slice(0, 10)))];
       try {
-        const extra = await fallback.fetchMatches(staleDates, providerConfig);
+        const extra = await fallback.fetchMatches(staleDates, providerConfig, now);
         summary.fetched += extra.length;
-        const written = await applyRemote(admin, byKey, extra, fallback.name, summary);
+        const written = await applyRemote(admin, byKey, byPair, extra, fallback.name, summary);
         if (written > 0) summary.source = fallback.name;
       } catch (err) {
         summary.errors++;
@@ -374,6 +465,9 @@ export async function runMatchSync(
 
   const byKey = new Map<string, LocalMatch>();
   byKey.set(`${local.home_team}|${local.away_team}|${local.kickoff_at.slice(0, 10)}`, local);
+  const byPair = new Map<string, LocalMatch[]>([
+    [pairKey(local.home_team, local.away_team), [local]],
+  ]);
 
   // 1) Score/status via ESPN scoreboard. Isolated.
   const scoreSummary: RunSummary = {
@@ -387,11 +481,12 @@ export async function runMatchSync(
     source: "espn",
     stale: 0,
     staleResolved: 0,
+    rescheduled: 0,
   };
   try {
     const date = local.kickoff_at.slice(0, 10);
     const remote = await espnProvider.fetchMatches([date], providerConfig);
-    await applyRemote(admin, byKey, remote, "espn", scoreSummary);
+    await applyRemote(admin, byKey, byPair, remote, "espn", scoreSummary);
     out.applied = scoreSummary.live > 0 || scoreSummary.final > 0;
     out.status = local.status; // applyRemote mutated `local` in place
   } catch (err) {

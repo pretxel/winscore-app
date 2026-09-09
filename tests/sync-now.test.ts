@@ -67,6 +67,7 @@ function summary(overrides: Partial<RunSummary> = {}): RunSummary {
     source: "football-data",
     stale: 0,
     staleResolved: 1,
+    rescheduled: 0,
     ...overrides,
   };
 }

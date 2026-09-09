@@ -473,7 +473,7 @@ describe("espn provider", () => {
 
     // A 01:00Z kickoff on the 12th lives under ESPN's June-11 Eastern day,
     // so the range must start one day before the earliest UTC date.
-    await espnProvider.fetchMatches(["2026-06-12", "2026-06-11"]);
+    await espnProvider.fetchMatches(["2026-06-12", "2026-06-11"], undefined, NOW);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(String(fetchMock.mock.calls[0][0])).toContain("dates=20260610-20260612");
 
@@ -486,7 +486,9 @@ describe("espn provider", () => {
       "fetch",
       vi.fn(async () => new Response("nope", { status: 503 })),
     );
-    await expect(espnProvider.fetchMatches(["2026-06-11"])).rejects.toThrow(/ESPN fetch failed/);
+    await expect(espnProvider.fetchMatches(["2026-06-11"], undefined, NOW)).rejects.toThrow(
+      /ESPN fetch failed/,
+    );
     vi.unstubAllGlobals();
   });
 
@@ -538,5 +540,146 @@ describe("espn provider", () => {
     expect(remote[0].score).toBeNull();
     expect(remote[1].status).toBe("FINISHED");
     expect(remote[1].score?.fullTime).toEqual({ home: null, away: 2 });
+  });
+});
+
+describe("runSync schedule reconciliation", () => {
+  // Seeded fixtures carry provisional kickoffs; providers carry the real ones.
+  // A remote row must still find its local row when the day differs, and the
+  // local kickoff must be corrected so the fixture list, lock time, and the
+  // next run's staleness scan all follow the real schedule.
+  const kickoffUpdates = () =>
+    updateMock.mock.calls
+      .map((c) => c[0] as Record<string, unknown>)
+      .filter((payload) => "kickoff_at" in payload);
+
+  it("matches a remote result to a local fixture seeded on a different day and fixes its kickoff", async () => {
+    setupLocalMatches([localMatch({ kickoff_at: "2026-06-11T15:00:00+00:00" })]);
+    const primary = provider("football-data", async () => [
+      finishedRemote({ utcDate: "2026-06-12T07:00:00Z" }),
+    ]);
+
+    const { runSync } = await import("@/lib/result-sync/core");
+    const summary = await runSync({ providers: [primary], now: NOW });
+
+    expect(summary.unmatched).toBe(0);
+    expect(summary.matched).toBe(1);
+    expect(summary.final).toBe(1);
+    expect(summary.rescheduled).toBe(1);
+    expect(kickoffUpdates()).toEqual([{ kickoff_at: "2026-06-12T07:00:00.000Z" }]);
+  });
+
+  it("moves an unplayed fixture to the provider's new date instead of leaving it stale", async () => {
+    // Locally "kicked off" 5h ago (stale); the provider says it was postponed
+    // to next week. After the run it is no longer overdue.
+    setupLocalMatches([localMatch()]);
+    const primary = provider("football-data", async () => [
+      finishedRemote({
+        utcDate: "2026-06-19T19:00:00Z",
+        status: "SCHEDULED",
+        score: { fullTime: { home: null, away: null } },
+      }),
+    ]);
+
+    const { runSync } = await import("@/lib/result-sync/core");
+    const summary = await runSync({ providers: [primary], now: NOW });
+
+    expect(summary.rescheduled).toBe(1);
+    expect(summary.final).toBe(0);
+    expect(summary.stale).toBe(0);
+    expect(summary.staleResolved).toBe(1);
+    expect(kickoffUpdates()).toEqual([{ kickoff_at: "2026-06-19T19:00:00.000Z" }]);
+  });
+
+  it("corrects the kickoff time when the day matches but the hour does not", async () => {
+    setupLocalMatches([
+      localMatch({ kickoff_at: "2026-06-12T15:00:00+00:00", status: "scheduled" }),
+    ]);
+    const primary = provider("football-data", async () => [
+      finishedRemote({
+        utcDate: "2026-06-12T19:30:00Z",
+        status: "TIMED",
+        score: { fullTime: { home: null, away: null } },
+      }),
+    ]);
+
+    const { runSync } = await import("@/lib/result-sync/core");
+    const summary = await runSync({ providers: [primary], now: NOW });
+
+    expect(summary.rescheduled).toBe(1);
+    expect(kickoffUpdates()).toEqual([{ kickoff_at: "2026-06-12T19:30:00.000Z" }]);
+  });
+
+  it("leaves the kickoff alone when it already matches, and never touches a final's", async () => {
+    setupLocalMatches([
+      localMatch(),
+      localMatch({
+        id: MATCH_B,
+        home_team: "Spain",
+        away_team: "Japan",
+        kickoff_at: "2026-06-10T15:00:00+00:00",
+        status: "final",
+        home_score: 1,
+        away_score: 0,
+      }),
+    ]);
+    const primary = provider("football-data", async () => [
+      finishedRemote(),
+      finishedRemote({
+        id: 2,
+        utcDate: "2026-06-10T19:00:00Z",
+        homeTeam: { name: "Spain" },
+        awayTeam: { name: "Japan" },
+        score: { fullTime: { home: 1, away: 0 } },
+      }),
+    ]);
+
+    const { runSync } = await import("@/lib/result-sync/core");
+    const summary = await runSync({ providers: [primary], now: NOW });
+
+    expect(summary.rescheduled).toBe(0);
+    expect(kickoffUpdates()).toEqual([]);
+  });
+
+  it("does not pair a remote row with a local fixture more than 120 days away", async () => {
+    setupLocalMatches([localMatch({ kickoff_at: "2026-01-01T15:00:00+00:00" })]);
+    const primary = provider("football-data", async () => [finishedRemote()]);
+
+    const { runSync } = await import("@/lib/result-sync/core");
+    const summary = await runSync({ providers: [primary], now: NOW });
+
+    expect(summary.unmatched).toBe(1);
+    expect(summary.matched).toBe(0);
+    expect(summary.rescheduled).toBe(0);
+  });
+
+  it("picks the nearest local fixture when a team pair repeats", async () => {
+    // Two legs seeded on the wrong days; the remote row for the second leg
+    // must land on the second-leg row, not the first.
+    setupLocalMatches([
+      localMatch({ kickoff_at: "2026-05-20T15:00:00+00:00" }),
+      localMatch({ id: MATCH_B, kickoff_at: "2026-06-10T15:00:00+00:00" }),
+    ]);
+    const primary = provider("football-data", async () => [
+      finishedRemote({ utcDate: "2026-06-11T19:00:00Z" }),
+    ]);
+
+    const { runSync } = await import("@/lib/result-sync/core");
+    await runSync({ providers: [primary], now: NOW });
+
+    const finalWrite = eqMock.mock.calls.find((c) => c[0] === "id");
+    expect(finalWrite?.[1]).toBe(MATCH_B);
+  });
+
+  it("asks ESPN for the range up to today so rescheduled results are seen", async () => {
+    const fetchMock = vi.fn<(input: RequestInfo | URL) => Promise<Response>>(
+      async () => new Response(JSON.stringify({ events: [] }), { status: 200 }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const { espnProvider } = await import("@/lib/result-sync/providers/espn");
+
+    await espnProvider.fetchMatches(["2026-06-05"], undefined, NOW);
+    expect(String(fetchMock.mock.calls[0][0])).toContain("dates=20260604-20260612");
+    vi.unstubAllGlobals();
   });
 });

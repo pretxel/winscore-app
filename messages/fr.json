@@ -924,6 +924,7 @@
     "syncMatched": "Appariés",
     "syncFinalized": "Finalisés",
     "syncStaleResolved": "En retard résolus",
+    "syncRescheduled": "Coups d'envoi corrigés",
     "syncStale": "Toujours en retard",
     "syncErrors": "Erreurs",
     "staleBadge": "Résultat en retard",
