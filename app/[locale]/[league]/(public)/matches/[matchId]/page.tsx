@@ -387,7 +387,7 @@ export default async function MatchDetailPage({
           </div>
         </div>
 
-        <div className="relative flex flex-col gap-3 px-6 pt-3 pb-6 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6 sm:px-8">
+        <div className="@container relative flex flex-col gap-3 px-6 pt-3 pb-6 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6 sm:px-8">
           <div className="min-w-0">
             <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-pitch-foreground/90">
               {t("home")}
@@ -395,7 +395,7 @@ export default async function MatchDetailPage({
             <div className="mt-1 flex items-center gap-2 sm:gap-3">
               <TeamCrest team={match.home_team} size="lg" className="ring-white/30" />
               <span
-                className="min-w-0 truncate font-heading text-2xl font-semibold leading-tight sm:text-4xl"
+                className="min-w-0 text-balance font-heading text-[clamp(1.5rem,3.6cqw,2.25rem)] font-semibold leading-[1.05] break-words"
                 style={{ fontStretch: "condensed" }}
               >
                 {match.home_team}
@@ -428,7 +428,7 @@ export default async function MatchDetailPage({
             </div>
             <div className="mt-1 flex items-center justify-end gap-2 sm:gap-3">
               <span
-                className="min-w-0 truncate font-heading text-2xl font-semibold leading-tight sm:text-4xl"
+                className="min-w-0 text-balance font-heading text-[clamp(1.5rem,3.6cqw,2.25rem)] font-semibold leading-[1.05] break-words"
                 style={{ fontStretch: "condensed" }}
               >
                 {match.away_team}
