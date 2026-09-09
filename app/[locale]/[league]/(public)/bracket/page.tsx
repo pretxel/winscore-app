@@ -18,14 +18,16 @@ export async function generateMetadata({
   const { locale, league } = await params;
   const t = await getTranslations({ locale, namespace: "bracket" });
   const comp = await getLeagueFromContext({ slug: league });
+  const tCommon = await getTranslations({ locale, namespace: "common" });
+  const leagueName = comp?.name ?? tCommon("thisLeague");
   if (comp && !hasKnockoutStage(comp.format)) notFound();
   return {
     title: comp ? `${t("title")} · ${comp.short_name}` : t("title"),
-    description: t("description"),
+    description: t("description", { league: leagueName }),
     alternates: { canonical: `/${league}/bracket` },
     openGraph: {
       title: t("ogTitle"),
-      description: t("ogDescription"),
+      description: t("ogDescription", { league: leagueName }),
       url: `/${league}/bracket`,
       type: "website",
     },
