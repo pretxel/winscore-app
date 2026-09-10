@@ -1,6 +1,7 @@
 import { CheckCircle2Icon, ChevronRightIcon, MapPinIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { after } from "next/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { LocalTime } from "@/components/local-time";
@@ -9,7 +10,6 @@ import { MatchLockCountdown } from "@/components/match-lock-countdown";
 import { MatchRoundFilter } from "@/components/match-round-filter";
 import { MatchStateBadge } from "@/components/match-state-badge";
 import { MatchStatusFilter } from "@/components/match-status-filter";
-
 import { NeedsPickToggle } from "@/components/needs-pick-toggle";
 import { PendingPicksNudge } from "@/components/pending-picks-nudge";
 import { TeamCrest } from "@/components/team-crest";
@@ -25,12 +25,14 @@ import {
   isConfirmedMatch,
   isLocked,
   needsPick,
+  parseDaysParam,
   parsePicksParam,
   parseRoundParam,
   parseStatusParam,
   soonestPickableMatch,
   stagesPresent,
   statusBucket,
+  windowDayEntries,
 } from "@/lib/match-utils";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -81,24 +83,39 @@ export default async function MatchesPage({
     status?: string | string[];
     picks?: string | string[];
     round?: string | string[];
+    days?: string | string[];
   }>;
 }) {
   const { locale: raw, league } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
-  const { status: statusParam, picks: picksParam, round: roundParam } = await searchParams;
+  const {
+    status: statusParam,
+    picks: picksParam,
+    round: roundParam,
+    days: daysParam,
+  } = await searchParams;
 
-  const t = await getTranslations("matches");
-  const activeCompetition = await getLeagueFromContext({ slug: league });
-  const format = activeCompetition?.format ?? null;
-
+  // These four are independent, so they overlap rather than queue up.
   // League-scoped client: the x-league header resolves active_competition_id()
   // so every competition-scoped read below targets this route's league.
-  const supabase = await createServerSupabaseClient(league);
+  const [t, activeCompetition, supabase, timeZone] = await Promise.all([
+    getTranslations("matches"),
+    getLeagueFromContext({ slug: league }),
+    createServerSupabaseClient(league),
+    readTimeZoneCookie(),
+  ]);
+  const format = activeCompetition?.format ?? null;
+
+  // Explicit column list rather than `*`: a season's fixture list is hundreds
+  // of rows, and the audit/provider columns the page never reads are pure
+  // transfer cost between Postgres and the render.
   const { data: matches, error } = await supabase
     .from("matches")
-    .select("*")
+    .select(
+      "id, stage, group_code, home_team, away_team, kickoff_at, venue, home_score, away_score, status, competition_id, round_id, tie_key, leg",
+    )
     .eq("competition_id", activeCompetition?.id ?? "")
     .order("kickoff_at", { ascending: true });
 
@@ -220,10 +237,11 @@ export default async function MatchesPage({
   // cookie (set client-side by <TimezoneSync/>); until it's known we key by UTC
   // for a deterministic first render. Source order is kickoff_at ASC, so the
   // Map's insertion order keeps the day sections chronological.
-  const timeZone = await readTimeZoneCookie();
   // Best-effort: mirror the detected zone onto the signed-in user's profile so
-  // the reminder crons can bucket them to ~7am local. Never blocks the render.
-  await persistTimeZoneForCurrentUser(timeZone);
+  // the reminder crons can bucket them to ~7am local. It is a read plus a write
+  // that nothing on this page depends on, so it runs after the response is
+  // sent rather than in front of it.
+  if (user) after(() => persistTimeZoneForCurrentUser(timeZone));
   const dayKey = dayKeyForTimeZone(timeZone);
   const byDay = new Map<string, MatchRow[]>();
   for (const m of filtered) {
@@ -233,7 +251,14 @@ export default async function MatchesPage({
     byDay.set(key, arr);
   }
 
-  const dayEntries = [...byDay.entries()];
+  // Render a leading window of whole days by default; `?days=all` opts into the
+  // rest. Filters and counts above still span every fixture, so this only
+  // bounds how much markup one response carries.
+  const daysView = parseDaysParam(daysParam);
+  const allDayEntries = [...byDay.entries()];
+  const windowed = windowDayEntries(allDayEntries);
+  const dayEntries = daysView === "all" ? allDayEntries : windowed.entries;
+  const hiddenMatches = daysView === "all" ? 0 : windowed.hiddenMatches;
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
@@ -391,6 +416,22 @@ export default async function MatchesPage({
             </MatchDaySection>
           );
         })}
+
+        {hiddenMatches > 0 ? (
+          <div className="text-center">
+            <Link
+              href={`${localePath(locale, `/${league}/matches`)}?${new URLSearchParams({
+                ...(statusFilter ? { status: statusFilter } : {}),
+                ...(selectedRound ? { round: selectedRound } : {}),
+                ...(picksNeeded ? { picks: "needed" } : {}),
+                days: "all",
+              }).toString()}`}
+              className="border-border bg-card font-heading text-foreground hover:bg-muted/50 focus-visible:ring-ring inline-flex min-h-10 items-center rounded-full border px-5 text-sm font-medium tracking-tight transition-colors focus-visible:ring-2 focus-visible:outline-none"
+            >
+              {t("showAllRemaining", { count: hiddenMatches })}
+            </Link>
+          </div>
+        ) : null}
 
         {filtered.length === 0 ? (
           <div className="border-border bg-muted/30 rounded-xl border border-dashed p-10 text-center">

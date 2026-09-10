@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { LOCK_LEAD_WINDOW_MS } from "@/lib/match-utils";
+import { countdownTickDelayMs, LOCK_LEAD_WINDOW_MS } from "@/lib/match-utils";
 import { cn } from "@/lib/utils";
 
 // Closing-soon urgency badge for a still-pickable /matches row. It reuses the
@@ -43,14 +43,26 @@ export function MatchLockCountdown({
     Math.max(0, new Date(kickoffAt).getTime() - Date.now()),
   );
 
+  // Self-rescheduling timer instead of a blanket 1s interval: a row only wakes
+  // when its label could actually change. Far from kickoff that is a single
+  // long sleep, so a season's worth of open fixtures costs no per-second work.
   React.useEffect(() => {
     const target = new Date(kickoffAt).getTime();
-    const tick = () => setRemaining(Math.max(0, target - Date.now()));
-    tick();
-    if (target - Date.now() <= 0) return;
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [kickoffAt]);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const schedule = () => {
+      const left = Math.max(0, target - Date.now());
+      setRemaining(left);
+      const delay = countdownTickDelayMs(left, leadWindowMs);
+      if (delay === null) return;
+      timer = setTimeout(schedule, delay);
+    };
+
+    schedule();
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [kickoffAt, leadWindowMs]);
 
   if (remaining <= 0) {
     return <>{lockedNode}</>;

@@ -218,6 +218,7 @@
     "filterStatusLabel": "Filtrer par statut",
     "filterNeedsPick": "À pronostiquer",
     "matchday": "Journée {n}",
+    "showAllRemaining": "Voir les {count} matchs restants",
     "matchCount": "{count, plural, =0 {0 match} one {# match} other {# matchs}}",
     "dayExpand": "Afficher les matchs",
     "dayCollapse": "Masquer les matchs",

@@ -430,3 +430,94 @@ describe("filterRecipientsAtLocalHour", () => {
     ]);
   });
 });
+
+describe("parseDaysParam", () => {
+  it("defaults to the windowed view", async () => {
+    const { parseDaysParam } = await import("@/lib/match-utils");
+    expect(parseDaysParam(undefined)).toBe("window");
+    expect(parseDaysParam("")).toBe("window");
+    expect(parseDaysParam("bogus")).toBe("window");
+  });
+
+  it("recognizes the show-all opt-in, case-insensitively", async () => {
+    const { parseDaysParam } = await import("@/lib/match-utils");
+    expect(parseDaysParam("all")).toBe("all");
+    expect(parseDaysParam(" ALL ")).toBe("all");
+    expect(parseDaysParam(["all", "window"])).toBe("all");
+  });
+});
+
+describe("windowDayEntries", () => {
+  // Day entries as the page builds them: [dayKey, matches[]], chronological.
+  const day = (key: string, n: number): [string, { id: string }[]] => [
+    key,
+    Array.from({ length: n }, (_, i) => ({ id: `${key}-${i}` })),
+  ];
+
+  it("keeps whole days and stops once the cap would be exceeded", async () => {
+    const { windowDayEntries } = await import("@/lib/match-utils");
+    const entries = [day("d1", 10), day("d2", 10), day("d3", 10), day("d4", 10)];
+    const out = windowDayEntries(entries, 25);
+    // Three days is 30, over the cap, so it stops at two whole days.
+    expect(out.entries.map(([k]) => k)).toEqual(["d1", "d2"]);
+    expect(out.hiddenMatches).toBe(20);
+    expect(out.truncated).toBe(true);
+  });
+
+  it("never renders a partial day, even when the first day alone exceeds the cap", async () => {
+    const { windowDayEntries } = await import("@/lib/match-utils");
+    const entries = [day("d1", 50), day("d2", 5)];
+    const out = windowDayEntries(entries, 25);
+    expect(out.entries.map(([k]) => k)).toEqual(["d1"]);
+    expect(out.entries[0][1]).toHaveLength(50);
+    expect(out.hiddenMatches).toBe(5);
+  });
+
+  it("returns everything untouched when the whole list fits", async () => {
+    const { windowDayEntries } = await import("@/lib/match-utils");
+    const entries = [day("d1", 5), day("d2", 5)];
+    const out = windowDayEntries(entries, 25);
+    expect(out.entries).toHaveLength(2);
+    expect(out.hiddenMatches).toBe(0);
+    expect(out.truncated).toBe(false);
+  });
+
+  it("handles an empty list", async () => {
+    const { windowDayEntries } = await import("@/lib/match-utils");
+    const out = windowDayEntries([], 25);
+    expect(out.entries).toEqual([]);
+    expect(out.truncated).toBe(false);
+    expect(out.hiddenMatches).toBe(0);
+  });
+});
+
+describe("countdownTickDelayMs", () => {
+  const LEAD = 15 * 60_000;
+
+  it("needs no timer once kickoff has passed", async () => {
+    const { countdownTickDelayMs } = await import("@/lib/match-utils");
+    expect(countdownTickDelayMs(0, LEAD)).toBeNull();
+    expect(countdownTickDelayMs(-5_000, LEAD)).toBeNull();
+  });
+
+  it("ticks every second inside the urgency window", async () => {
+    const { countdownTickDelayMs } = await import("@/lib/match-utils");
+    expect(countdownTickDelayMs(LEAD, LEAD)).toBe(1000);
+    expect(countdownTickDelayMs(30_000, LEAD)).toBe(1000);
+  });
+
+  // A fixture months away used to re-render every second to conclude nothing
+  // had changed; it should instead sleep until the window is actually entered.
+  it("sleeps until the urgency window starts when kickoff is far off", async () => {
+    const { countdownTickDelayMs } = await import("@/lib/match-utils");
+    const oneHour = 60 * 60_000;
+    expect(countdownTickDelayMs(oneHour, LEAD)).toBe(oneHour - LEAD);
+  });
+
+  it("caps a very distant kickoff so the timer stays re-armable", async () => {
+    const { countdownTickDelayMs, MAX_COUNTDOWN_SLEEP_MS } = await import("@/lib/match-utils");
+    const sixMonths = 180 * 24 * 60 * 60_000;
+    expect(countdownTickDelayMs(sixMonths, LEAD)).toBe(MAX_COUNTDOWN_SLEEP_MS);
+    expect(MAX_COUNTDOWN_SLEEP_MS).toBeLessThan(2 ** 31 - 1);
+  });
+});

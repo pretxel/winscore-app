@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { teamCrestPath } from "@/lib/team-crests";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +34,20 @@ export function TeamCrest({
       )}
     >
       {src ? (
-        <Image src={src} alt="" width={px} height={px} className="size-full object-contain" />
+        // Plain <img>, not next/image: these are our own pre-rasterized 128px
+        // PNGs drawn at 24-56px, so the optimizer has nothing to gain. Routing
+        // them through /_next/image cost one server round-trip per crest —
+        // ~80 on a fixture list — plus a srcset in the markup for every row.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
+          alt=""
+          width={px}
+          height={px}
+          loading="lazy"
+          decoding="async"
+          className="size-full object-contain"
+        />
       ) : null}
     </span>
   );

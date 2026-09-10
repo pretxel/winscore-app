@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { teamCrestPath } from "@/lib/team-crests";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +35,18 @@ export function TeamCrestCluster({
           style={{ zIndex: shown.length - i }}
           title={t.name}
         >
-          <Image src={t.src} alt="" width={36} height={36} className="size-full object-contain" />
+          {/* Plain <img> for the same reason as TeamCrest: own static PNGs at a
+              fixed small size, so the optimizer only adds round-trips. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={t.src}
+            alt=""
+            width={36}
+            height={36}
+            loading="lazy"
+            decoding="async"
+            className="size-full object-contain"
+          />
         </li>
       ))}
       {overflow > 0 ? (

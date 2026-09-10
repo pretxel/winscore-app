@@ -323,3 +323,66 @@ export function parseMatchesTab(
 export function isConfirmedMatch(match: TeamPair): boolean {
   return isConfirmedParticipantName(match.home_team) && isConfirmedParticipantName(match.away_team);
 }
+
+// --- Fixture-list windowing -------------------------------------------------
+// A season-long league renders every upcoming fixture: La Liga alone is ~339
+// rows, which serialize to megabytes of HTML plus an equally large RSC payload.
+// The list is therefore capped to a leading window of whole days, with an
+// explicit opt-in to render the rest. Nothing is hidden from the user: the
+// remaining fixtures are one link away, and every filter still spans the full
+// set so the counts stay honest.
+
+export type DaysView = "window" | "all";
+
+// Roughly two matchweeks of a big league. Chosen so the default page stays
+// well under a megabyte while still covering everything a visitor is likely to
+// act on in one sitting.
+export const DEFAULT_DAY_WINDOW_MATCHES = 40;
+
+// Normalize a `?days=` value. Anything but an explicit "all" keeps the default
+// window, matching how the other list filters drop unknown values.
+export function parseDaysParam(raw: string | string[] | undefined): DaysView {
+  if (!raw) return "window";
+  for (const value of Array.isArray(raw) ? raw : [raw]) {
+    if (value.trim().toLowerCase() === "all") return "all";
+  }
+  return "window";
+}
+
+// Take whole day sections from the front of the list until adding the next one
+// would pass `maxMatches`. A day is never split — half a matchday reads as a
+// bug — so the first day is always kept even when it alone exceeds the cap.
+export function windowDayEntries<T>(
+  entries: [string, T[]][],
+  maxMatches: number = DEFAULT_DAY_WINDOW_MATCHES,
+): { entries: [string, T[]][]; truncated: boolean; hiddenMatches: number } {
+  let taken = 0;
+  let count = 0;
+  for (const [, matches] of entries) {
+    if (taken > 0 && count + matches.length > maxMatches) break;
+    count += matches.length;
+    taken++;
+  }
+  const kept = entries.slice(0, taken);
+  const hiddenMatches = entries.slice(taken).reduce((sum, [, m]) => sum + m.length, 0);
+  return { entries: kept, truncated: taken < entries.length, hiddenMatches };
+}
+
+// --- Countdown scheduling ---------------------------------------------------
+// A fixture list holds dozens of still-pickable rows, each with a countdown.
+// Ticking all of them once a second re-renders the whole list every second even
+// though nothing changes until a kickoff is imminent — on a season-long league
+// that is dozens of timers running for months. Instead, each countdown sleeps
+// until it has something to say.
+
+// Upper bound on a single sleep. Well under setTimeout's ~24.8 day ceiling, so
+// a distant fixture just re-arms a few times instead of overflowing to 1ms.
+export const MAX_COUNTDOWN_SLEEP_MS = 6 * 60 * 60_000;
+
+// How long until this countdown's display could next change, or null when it
+// never will again (kickoff has passed and the row is locked for good).
+export function countdownTickDelayMs(remaining: number, leadWindowMs: number): number | null {
+  if (remaining <= 0) return null;
+  if (remaining <= leadWindowMs) return 1000;
+  return Math.min(remaining - leadWindowMs, MAX_COUNTDOWN_SLEEP_MS);
+}
