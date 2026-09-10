@@ -9,7 +9,6 @@ import { loadDisplayNameFallback, loadOgFonts, OG_FONT_FAMILY } from "@/lib/og-f
 
 // Node runtime (no `runtime = "edge"`): lib/og-fonts.ts reads font binaries via
 // node:fs/promises, and the @vercel/og Edge bundle cap does not apply.
-export const dynamic = "force-dynamic";
 
 const WIDTH = 1200;
 const HEIGHT = 630;

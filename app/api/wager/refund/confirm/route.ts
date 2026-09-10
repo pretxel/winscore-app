@@ -5,8 +5,6 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { requireBytea } from "@/lib/wager/bytea";
 import { verifyRefundOnChain } from "@/lib/wager/claim-verification";
 
-export const dynamic = "force-dynamic";
-
 /**
  * Records an entry as refunded after proving it on chain. Like the claim
  * confirmation, the Entry PDA is authoritative, so this is idempotent and safe

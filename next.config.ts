@@ -4,6 +4,11 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./i18n.ts");
 
 const nextConfig: NextConfig = {
+  // Partial Prerendering: each route ships a static shell, cached sections are
+  // included in it, and request-bound content streams behind Suspense. Reading
+  // cookies inside a Suspense boundary no longer makes a whole route dynamic,
+  // which is what kept every public page rendering per request.
+  cacheComponents: true,
   // Emit .next/standalone (server.js + traced node_modules) for a slim Docker
   // runtime image. Off on Vercel: since Next 16.3 the Vercel build adapter owns
   // file tracing and no longer writes .next/next-server.js.nft.json, which the

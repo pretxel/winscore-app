@@ -18,6 +18,10 @@ import { localizeQuizQuestion } from "@/lib/quiz";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { deleteQuestion, saveQuestion } from "./actions";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 // The resendQuizReminder action reports back via query params (server-rendered
 // page, no client state). `resendQuiz=1` marks a completed run; `noQuestion`
 // distinguishes a true no-op from a run that emailed zero pending recipients.

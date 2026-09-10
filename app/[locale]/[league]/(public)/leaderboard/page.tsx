@@ -25,6 +25,10 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { LeaderboardChallenge } from "./leaderboard-challenge";
 import { LeaderboardViewTracker } from "./leaderboard-view-tracker";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export async function generateMetadata({
   params,
 }: {
@@ -194,7 +198,6 @@ export default async function LeaderboardPage({
           </div>
         ) : null}
       </header>
-
       <LeaderboardSegmentSwitcher
         basePath={localePath(locale, `/${league}/leaderboard`)}
         activeSegment={segment}
@@ -210,7 +213,6 @@ export default async function LeaderboardPage({
           phase: t("segmentPhase"),
         }}
       />
-
       {selectedPhase ? (
         <p className="text-muted-foreground -mt-4 mb-6 text-sm">
           <span className="font-medium text-foreground">{selectedPhase.label}</span>
@@ -226,7 +228,6 @@ export default async function LeaderboardPage({
           {t("phaseWindowNote")}
         </p>
       ) : null}
-
       {loadError ? (
         <div
           role="alert"
@@ -262,7 +263,6 @@ export default async function LeaderboardPage({
       ) : (
         <LeaderboardTable rows={topRows} currentUserId={user?.id} labels={boardLabels} />
       )}
-
       {myRow ? (
         <section className="mt-6">
           <p className="text-muted-foreground mb-3 font-mono text-[11px] tracking-[0.2em] uppercase">
@@ -310,7 +310,6 @@ export default async function LeaderboardPage({
           />
         </section>
       ) : null}
-
       {user && !myRow && rows.length > 0 ? (
         <div className="border-border bg-card mt-6 flex flex-col items-start gap-3 rounded-xl border border-dashed p-5 text-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -325,7 +324,6 @@ export default async function LeaderboardPage({
           </Link>
         </div>
       ) : null}
-
       {user ? (
         <div className="border-border bg-card mt-6 flex flex-col items-start gap-3 rounded-xl border border-dashed p-5 text-sm sm:flex-row sm:items-center sm:justify-between">
           <div>

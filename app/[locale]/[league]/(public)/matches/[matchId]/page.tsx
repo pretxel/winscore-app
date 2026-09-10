@@ -38,6 +38,10 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { PredictionForm } from "./prediction-form";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const RECAP_BUCKET = "match-recap-images";
 
 // Public Storage URL for a stored recap comic image. Uses the PUBLIC Supabase
@@ -394,7 +398,6 @@ export default async function MatchDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(sportsEventJsonLd) }}
       />
-
       <Link
         href={localePath(locale, `/${league}/matches`)}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -402,7 +405,6 @@ export default async function MatchDetailPage({
         <ArrowLeftIcon className="size-3.5" />
         {t("back")}
       </Link>
-
       <section
         aria-label={t("scoreboardLabel")}
         className="bg-scoreboard relative mt-5 overflow-hidden rounded-2xl text-pitch-foreground ring-1 ring-pitch/30 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.45)] motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-500 motion-safe:ease-out"
@@ -499,7 +501,6 @@ export default async function MatchDetailPage({
           ) : null}
         </div>
       </section>
-
       {liveFeedData ? (
         <LiveEventsFeed
           matchId={match.id}
@@ -509,7 +510,6 @@ export default async function MatchDetailPage({
           labels={liveFeedLabels}
         />
       ) : null}
-
       {matchSummary ? (
         <section className="mt-8" aria-label={t("summaryHeading")}>
           <h2
@@ -567,7 +567,6 @@ export default async function MatchDetailPage({
           ) : null}
         </section>
       ) : null}
-
       <section className="mt-8">
         <div className="mb-3 flex items-baseline justify-between">
           <h2
@@ -680,7 +679,6 @@ export default async function MatchDetailPage({
           />
         )}
       </section>
-
       {user && locked && confirmed ? (
         <section className="mt-8" aria-labelledby="all-picks-heading">
           <div className="mb-3 flex items-baseline justify-between gap-3">
@@ -720,7 +718,6 @@ export default async function MatchDetailPage({
           )}
         </section>
       ) : null}
-
       {myPrediction ? (
         <section className="mt-8">
           <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -745,7 +742,6 @@ export default async function MatchDetailPage({
           />
         </section>
       ) : null}
-
       {groupSim ? (
         <section className="mt-8">
           <div className="mb-3 flex items-baseline justify-between gap-3">

@@ -3,8 +3,6 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 import { buildChallengeParams, formatChallengeMessage } from "@/lib/wallet/challenge";
 
-export const dynamic = "force-dynamic";
-
 export async function POST(request: Request) {
   const supabase = await createServerSupabaseClient();
   const {

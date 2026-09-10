@@ -5,8 +5,6 @@ import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getWagerEnv } from "@/lib/wager/env";
 import { addressFromBytes, deriveVaultAta, deriveWagerRoundPda } from "@/lib/wager/pda";
 
-export const dynamic = "force-dynamic";
-
 function byteaToBytes(value: string): Uint8Array {
   return new Uint8Array(Buffer.from(value.replace(/^\\x/, ""), "hex"));
 }

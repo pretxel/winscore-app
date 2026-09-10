@@ -5,8 +5,6 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { bytesToBytea, requireBytea } from "@/lib/wager/bytea";
 import { verifyClaimOnChain } from "@/lib/wager/claim-verification";
 
-export const dynamic = "force-dynamic";
-
 /**
  * Records a claim as claimed after proving it on chain.
  *

@@ -19,8 +19,6 @@ import { getWagerEnv } from "@/lib/wager/env";
 import { buildInitRoundInstruction } from "@/lib/wager/init-round";
 import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 
-export const dynamic = "force-dynamic";
-
 const POLL_ATTEMPTS = 8;
 const POLL_INTERVAL_MS = 2000;
 

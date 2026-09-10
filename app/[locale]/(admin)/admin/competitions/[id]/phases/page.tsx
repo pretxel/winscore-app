@@ -19,6 +19,10 @@ import {
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { closePhase, createPhase, createScheme, setDefaultScheme, updatePhase } from "./actions";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const RESCHEDULE_LOOKBACK_MS = 14 * 24 * 60 * 60 * 1000;
 
 function toLocalInput(iso: string): string {

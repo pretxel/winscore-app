@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { prepareRefund } from "@/lib/wager/claim-refund";
 
-export const dynamic = "force-dynamic";
-
 /**
  * Returns an unsigned refund transaction for the authenticated entrant of a
  * cancelled round.

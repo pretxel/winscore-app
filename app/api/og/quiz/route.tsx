@@ -10,7 +10,6 @@ import { loadQuizStanding } from "@/lib/quiz-standing";
 
 // Node runtime (no `runtime = "edge"`): lib/og-fonts.ts reads font binaries via
 // node:fs/promises, and the @vercel/og Edge bundle cap does not apply.
-export const dynamic = "force-dynamic";
 
 // Bumped independently of the rank card via the ETag version part below.
 const QUIZ_CARD_VERSION = "quiz-1";

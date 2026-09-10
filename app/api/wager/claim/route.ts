@@ -3,8 +3,6 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { prepareClaim } from "@/lib/wager/claim-refund";
 import { getWagerEnv } from "@/lib/wager/env";
 
-export const dynamic = "force-dynamic";
-
 /**
  * Returns an unsigned claim transaction for the authenticated winner to sign.
  * The award and proof are derived server-side from the settled manifest; the

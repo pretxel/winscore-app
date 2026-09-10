@@ -6,8 +6,6 @@ import { getWagerEnv } from "@/lib/wager/env";
 import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 import { persistVerifiedEntry, verifyEntryTransaction } from "@/lib/wager/verify-entry";
 
-export const dynamic = "force-dynamic";
-
 const POLL_ATTEMPTS = 8;
 const POLL_INTERVAL_MS = 2000;
 

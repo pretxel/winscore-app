@@ -28,8 +28,6 @@ import {
 } from "@/lib/wager/pda";
 import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 
-export const dynamic = "force-dynamic";
-
 /** Decode a Postgres `bytea` (`\x…` hex string) to raw bytes. */
 function byteaToBytes(value: unknown): Uint8Array | null {
   if (typeof value !== "string") return null;

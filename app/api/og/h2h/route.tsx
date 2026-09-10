@@ -10,7 +10,6 @@ import { loadDisplayNameFallback, loadOgFonts, OG_FONT_FAMILY } from "@/lib/og-f
 
 // Node runtime (no `runtime = "edge"`): lib/og-fonts.ts reads font binaries via
 // node:fs/promises, and the @vercel/og Edge bundle cap does not apply.
-export const dynamic = "force-dynamic";
 
 // Namespaces this card's ETag independently of the rank card's CARD_VERSION;
 // bump when the head-to-head layout/composition changes.

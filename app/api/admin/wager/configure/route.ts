@@ -5,8 +5,6 @@ import { assertAdmin } from "@/app/api/admin/wager/_admin";
 import { getWagerEnv } from "@/lib/wager/env";
 import { parseMintAccount, stakeToBaseUnits } from "@/lib/wager/mint-account";
 
-export const dynamic = "force-dynamic";
-
 export async function POST(request: Request) {
   const auth = await assertAdmin();
   if (!auth.ok) return auth.response;

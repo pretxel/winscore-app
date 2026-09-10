@@ -5,6 +5,10 @@ import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getWagerEnv } from "@/lib/wager/env";
 import { WagerAdminPanel } from "./wager-admin-panel";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "admin.wager" });

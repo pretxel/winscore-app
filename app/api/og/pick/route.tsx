@@ -10,7 +10,6 @@ import { clampGoals } from "@/lib/share";
 // Node runtime (no `runtime = "edge"`): lib/og-fonts.ts reads font binaries via
 // node:fs/promises. The pick card is deterministic from its URL params, so its
 // cache stays immutable — unlike the rank card it does not use ETag/SWR.
-export const dynamic = "force-dynamic";
 
 const WIDTH = 1200;
 const HEIGHT = 630;

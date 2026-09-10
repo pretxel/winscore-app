@@ -3,8 +3,6 @@ import { assertAdmin } from "@/app/api/admin/wager/_admin";
 import { rateLimitGuard } from "@/lib/wager/rate-limit-guard";
 import { checkSettlementReadiness, settleWagerRound } from "@/lib/wager/settlement";
 
-export const dynamic = "force-dynamic";
-
 /**
  * GET reports whether a round can be settled and why not, so the console can
  * show the blocker without attempting an irreversible on-chain write.

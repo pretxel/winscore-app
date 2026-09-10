@@ -39,6 +39,10 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { persistTimeZoneForCurrentUser, readTimeZoneCookie } from "@/lib/timezone";
 import { cn } from "@/lib/utils";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const ROW_STAGGER_MS = 20;
 const ROW_STAGGER_CAP_MS = 800;
 
@@ -544,9 +548,7 @@ function MatchRowCard({
           <LocalTime iso={match.kickoff_at} format="time" />
         </span>
       </div>
-
       <div aria-hidden className="bg-border hidden h-10 w-px sm:block" />
-
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="border-border bg-secondary text-muted-foreground rounded-sm border px-1.5 py-0.5 font-mono text-[10px] tracking-[0.16em] uppercase">
@@ -581,7 +583,6 @@ function MatchRowCard({
           </div>
         ) : null}
       </div>
-
       <div className="flex shrink-0 items-center gap-1.5 text-right">
         {!confirmed ? (
           <div className="text-muted-foreground hidden font-mono text-[10px] tracking-[0.2em] uppercase sm:block">

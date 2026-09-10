@@ -3,6 +3,10 @@ import { WalletLinkButton } from "@/components/wallet/wallet-link-button";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export default async function ProfilePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
