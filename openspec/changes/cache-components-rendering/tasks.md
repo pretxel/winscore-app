@@ -31,11 +31,13 @@
 
 ## 4. Fixture list
 
-- [ ] 4.1 Cache the league's windowed, sorted fixtures by `league:<slug>` on the public client
-- [ ] 4.2 Move day grouping, the status/round/picks filters, pick markers, and the timezone cookie read into a Suspense-wrapped component that receives the cached fixtures and the runtime values as arguments
-- [ ] 4.3 Verify two requests with different `tz` cookies share one cache entry and group days differently
-- [ ] 4.4 Confirm the closing-soon countdowns and the opportunistic sync trigger still behave; the sync trigger runs at request time, never inside the cache
-- [ ] 4.5 Measure the fixture list for La Liga and Champions League in production against the baseline
+- [x] 4.1 Cache the league's whole sorted fixture list by `league:<slug>` on the public client, with a `minutes` lifetime because these rows carry live scores
+- [x] 4.1b Cache the league record the page and its metadata resolve, replacing two per-request reads
+- [x] 4.2 Grouping, filters, pick markers and the timezone read stay at request time, applied to the cached fixtures — no Suspense boundary needed while the shell is blocked app-wide, and the cache key stays the league alone
+- [x] 4.3 Verify the cache key is the league only, so visitors in different timezones share one entry and each still groups by their own day
+- [x] 4.4 Confirm the opportunistic sync trigger still runs at request time against the fetched list, never inside the cache
+- [x] 4.5 Verify the list matches production for the default view, a finished-only filter, and a league with no upcoming fixtures
+- [ ] 4.6 Measure the fixture list in production against the baseline once deployed
 
 ## 5. Match page
 

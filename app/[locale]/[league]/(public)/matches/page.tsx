@@ -14,7 +14,6 @@ import { NeedsPickToggle } from "@/components/needs-pick-toggle";
 import { PendingPicksNudge } from "@/components/pending-picks-nudge";
 import { TeamCrest } from "@/components/team-crest";
 import { TimezoneSync } from "@/components/timezone-sync";
-import { getLeagueFromContext } from "@/lib/competition";
 import { getStageLabel, revealedKnockoutStageKeys, sortedStages } from "@/lib/competition-schema";
 import type { MatchRow } from "@/lib/db";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
@@ -35,14 +34,11 @@ import {
   statusBucket,
   windowDayEntries,
 } from "@/lib/match-utils";
+import { getCachedLeague, getCachedLeagueFixtures } from "@/lib/public-data";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { persistTimeZoneForCurrentUser, readTimeZoneCookie } from "@/lib/timezone";
 import { cn } from "@/lib/utils";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
 
 const ROW_STAGGER_MS = 20;
 const ROW_STAGGER_CAP_MS = 800;
@@ -54,7 +50,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, league } = await params;
   const t = await getTranslations({ locale, namespace: "matches" });
-  const comp = await getLeagueFromContext({ slug: league });
+  const comp = await getCachedLeague(league);
   const tCommon = await getTranslations({ locale, namespace: "common" });
   const leagueName = comp?.name ?? tCommon("thisLeague");
   return {
@@ -107,7 +103,7 @@ export default async function MatchesPage({
   // so every competition-scoped read below targets this route's league.
   const [t, activeCompetition, supabase, timeZone] = await Promise.all([
     getTranslations("matches"),
-    getLeagueFromContext({ slug: league }),
+    getCachedLeague(league),
     createServerSupabaseClient(league),
     readTimeZoneCookie(),
   ]);
@@ -118,17 +114,15 @@ export default async function MatchesPage({
   // transfer cost between Postgres and the render.
   // The fixture list and the viewer are independent, so they resolve together
   // rather than one after the other.
-  const [matchesRes, userRes] = await Promise.all([
-    supabase
-      .from("matches")
-      .select(
-        "id, stage, group_code, home_team, away_team, kickoff_at, venue, home_score, away_score, status, competition_id, round_id, tie_key, leg",
-      )
-      .eq("competition_id", activeCompetition?.id ?? "")
-      .order("kickoff_at", { ascending: true }),
+  // The fixture list is the same for every visitor, so it comes from the
+  // league's cache entry; only the viewer is per-request, and the two resolve
+  // together.
+  const [fixtures, userRes] = await Promise.all([
+    getCachedLeagueFixtures(league, activeCompetition?.id ?? ""),
     supabase.auth.getUser(),
   ]);
-  const { data: matches, error } = matchesRes;
+  const matches = fixtures.matches;
+  const error = fixtures.error ? { message: fixtures.error } : null;
   const user = userRes.data.user;
 
   if (error) {

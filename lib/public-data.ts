@@ -9,7 +9,7 @@ import {
   type ResolvedCompetition,
 } from "@/lib/competition";
 import { groupStageKey, leagueStageKey } from "@/lib/competition-schema";
-import type { LeaderboardRow, NewsArticleRow } from "@/lib/db";
+import type { LeaderboardRow, MatchRow, NewsArticleRow } from "@/lib/db";
 import {
   fetchGroupTables,
   fetchLeagueTable,
@@ -222,4 +222,34 @@ export async function getCachedPhases(
   cacheLife("hours");
   cacheTag(leagueTag(slug));
   return listPhases(schemeId, locale, createPublicSupabaseClient(slug));
+}
+
+// --- Fixtures ---------------------------------------------------------------
+
+/**
+ * A league's whole fixture list, ordered by kickoff.
+ *
+ * Minutes rather than hours: these rows carry live scores and statuses, and an
+ * hour-stale scoreline on the page people watch during a match is worse than a
+ * few extra queries. The result sync also invalidates the league tag on every
+ * write, so in practice a score reaches this list on the next request.
+ */
+export async function getCachedLeagueFixtures(
+  slug: string,
+  competitionId: string,
+): Promise<{ matches: MatchRow[]; error: string | null }> {
+  "use cache: remote";
+  cacheLife("minutes");
+  cacheTag(leagueTag(slug));
+  // Explicit column list rather than `*`: a season's fixture list is hundreds
+  // of rows, and the audit/provider columns the page never reads are pure
+  // transfer cost between Postgres and the render.
+  const { data, error } = await createPublicSupabaseClient(slug)
+    .from("matches")
+    .select(
+      "id, stage, group_code, home_team, away_team, kickoff_at, venue, home_score, away_score, status, competition_id, round_id, tie_key, leg",
+    )
+    .eq("competition_id", competitionId)
+    .order("kickoff_at", { ascending: true });
+  return { matches: (data ?? []) as MatchRow[], error: error?.message ?? null };
 }
