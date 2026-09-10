@@ -219,6 +219,7 @@
     "filterNeedsPick": "Zu tippen",
     "matchday": "Spieltag {n}",
     "showAllRemaining": "Die restlichen {count} Spiele anzeigen",
+    "showEarlier": "{count} frühere Spiele anzeigen",
     "matchCount": "{count, plural, =0 {0 Spiele} one {# Spiel} other {# Spiele}}",
     "dayExpand": "Spiele anzeigen",
     "dayCollapse": "Spiele ausblenden",

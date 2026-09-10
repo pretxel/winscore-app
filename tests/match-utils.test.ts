@@ -447,6 +447,96 @@ describe("parseDaysParam", () => {
   });
 });
 
+describe("windowDayEntries anchored on today", () => {
+  const day = (key: string, n: number): [string, { id: string }[]] => [
+    key,
+    Array.from({ length: n }, (_, i) => ({ id: `${key}-${i}` })),
+  ];
+
+  // The list shows played fixtures as well as upcoming ones, so a window that
+  // simply took the first days would open on the season's opening weekend.
+  it("opens around today rather than at the start of the season", async () => {
+    const { windowDayEntries } = await import("@/lib/match-utils");
+    const entries = [
+      day("2026-08-01", 5),
+      day("2026-08-08", 5),
+      day("2026-09-05", 5),
+      day("2026-09-12", 5),
+      day("2026-09-19", 5),
+      day("2026-09-26", 5),
+    ];
+    const out = windowDayEntries(entries, 25, "2026-09-12");
+    expect(out.entries.map(([k]) => k)).toContain("2026-09-12");
+    expect(out.entries.map(([k]) => k)).not.toContain("2026-08-01");
+    expect(out.hiddenBefore).toBeGreaterThan(0);
+  });
+
+  // The look-back guarantees a matchweek of results; anything older is only
+  // shown when there is budget left over, which a tight cap denies.
+  it("reaches back one matchweek for played fixtures when the cap binds", async () => {
+    const { windowDayEntries } = await import("@/lib/match-utils");
+    const entries = [
+      day("2026-09-01", 2),
+      day("2026-09-02", 2),
+      day("2026-09-05", 2),
+      day("2026-09-10", 2),
+      day("2026-09-17", 2),
+      day("2026-09-24", 2),
+    ];
+    const out = windowDayEntries(entries, 8, "2026-09-10");
+    // 09-05 is within seven days of today, 09-02 and 09-01 are not.
+    expect(out.entries.map(([k]) => k)).toEqual([
+      "2026-09-05",
+      "2026-09-10",
+      "2026-09-17",
+      "2026-09-24",
+    ]);
+    expect(out.hiddenBefore).toBe(4);
+  });
+
+  // A finished competition has no upcoming day to anchor on. Showing only its
+  // last day would leave a page with one fixture on it, so the leftover budget
+  // is spent going backwards.
+  it("fills backwards when every fixture is in the past", async () => {
+    const { windowDayEntries } = await import("@/lib/match-utils");
+    const entries = [day("2026-01-01", 5), day("2026-01-02", 5), day("2026-01-03", 5)];
+    const out = windowDayEntries(entries, 25, "2026-09-10");
+    expect(out.entries.map(([k]) => k)).toEqual(["2026-01-01", "2026-01-02", "2026-01-03"]);
+    expect(out.hiddenBefore).toBe(0);
+  });
+
+  it("spends leftover budget backwards once the list runs out ahead", async () => {
+    const { windowDayEntries } = await import("@/lib/match-utils");
+    const entries = [
+      day("2026-01-01", 5),
+      day("2026-01-02", 5),
+      day("2026-01-03", 5),
+      day("2026-09-10", 5),
+    ];
+    // Cap of 12 fits two days; the anchor day plus one earlier.
+    const out = windowDayEntries(entries, 12, "2026-09-10");
+    expect(out.entries.map(([k]) => k)).toEqual(["2026-01-03", "2026-09-10"]);
+    expect(out.hiddenBefore).toBe(10);
+  });
+
+  it("reports what it hid on each side", async () => {
+    const { windowDayEntries } = await import("@/lib/match-utils");
+    const entries = [
+      day("2026-01-01", 4),
+      day("2026-01-02", 4),
+      day("2026-01-03", 4),
+      day("2026-01-04", 4),
+      day("2026-09-10", 4),
+      day("2026-09-11", 4),
+      day("2026-09-12", 4),
+    ];
+    const out = windowDayEntries(entries, 12, "2026-09-10");
+    expect(out.hiddenBefore + out.hiddenMatches).toBe(
+      28 - out.entries.reduce((n, [, m]) => n + m.length, 0),
+    );
+  });
+});
+
 describe("windowDayEntries", () => {
   // Day entries as the page builds them: [dayKey, matches[]], chronological.
   const day = (key: string, n: number): [string, { id: string }[]] => [

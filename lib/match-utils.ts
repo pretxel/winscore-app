@@ -349,23 +349,83 @@ export function parseDaysParam(raw: string | string[] | undefined): DaysView {
   return "window";
 }
 
-// Take whole day sections from the front of the list until adding the next one
-// would pass `maxMatches`. A day is never split — half a matchday reads as a
-// bug — so the first day is always kept even when it alone exceeds the cap.
+// How far back the window reaches for already-played fixtures: one matchweek.
+// Counted in calendar days rather than day sections, because fixtures cluster
+// weekly — "the last three days with matches" would reach back a month in a
+// league that plays once a week.
+export const DAY_WINDOW_PAST_DAYS = 7;
+
+// Shift a `YYYY-MM-DD` key by whole days, staying in the same string shape so
+// the result compares directly against the other keys.
+function shiftDayKey(key: string, days: number): string {
+  const ms = Date.parse(`${key}T00:00:00Z`) + days * 86_400_000;
+  return new Date(ms).toISOString().slice(0, 10);
+}
+
+// Take whole day sections around today until adding the next would pass
+// `maxMatches`. A day is never split — half a matchday reads as a bug — so the
+// anchor day is always kept even when it alone exceeds the cap.
+//
+// The window is anchored rather than taken from the front because the list
+// includes played fixtures: starting at index zero would open the page on the
+// season's first weekend. `todayKey` is the visitor's local day, in the same
+// `YYYY-MM-DD` shape the day keys use, so string comparison orders them.
 export function windowDayEntries<T>(
   entries: [string, T[]][],
   maxMatches: number = DEFAULT_DAY_WINDOW_MATCHES,
-): { entries: [string, T[]][]; truncated: boolean; hiddenMatches: number } {
-  let taken = 0;
-  let count = 0;
-  for (const [, matches] of entries) {
-    if (taken > 0 && count + matches.length > maxMatches) break;
-    count += matches.length;
-    taken++;
+  todayKey?: string,
+): {
+  entries: [string, T[]][];
+  truncated: boolean;
+  hiddenMatches: number;
+  hiddenBefore: number;
+} {
+  if (entries.length === 0) {
+    return { entries: [], truncated: false, hiddenMatches: 0, hiddenBefore: 0 };
   }
-  const kept = entries.slice(0, taken);
-  const hiddenMatches = entries.slice(taken).reduce((sum, [, m]) => sum + m.length, 0);
-  return { entries: kept, truncated: taken < entries.length, hiddenMatches };
+
+  // First day that is not in the past. With every fixture played, anchor near
+  // the end so the page opens on the most recent results.
+  let anchor = todayKey ? entries.findIndex(([key]) => key >= todayKey) : 0;
+  if (anchor === -1) anchor = entries.length - 1;
+
+  let start = anchor;
+  if (todayKey) {
+    const cutoff = shiftDayKey(todayKey, -DAY_WINDOW_PAST_DAYS);
+    const firstRecent = entries.findIndex(([key]) => key >= cutoff);
+    if (firstRecent !== -1 && firstRecent < start) start = firstRecent;
+  }
+
+  let end = start;
+  let count = 0;
+  for (let i = start; i < entries.length; i++) {
+    const size = entries[i][1].length;
+    if (end > start && count + size > maxMatches) break;
+    count += size;
+    end = i + 1;
+  }
+
+  // Ran out of days ahead with budget to spare — a finished competition, or a
+  // league near its end. Spend the rest going backwards so the page shows a
+  // matchday's worth of results rather than the last fixture alone.
+  if (end === entries.length) {
+    while (start > 0) {
+      const size = entries[start - 1][1].length;
+      if (count + size > maxMatches) break;
+      count += size;
+      start--;
+    }
+  }
+
+  const kept = entries.slice(start, end);
+  const hiddenBefore = entries.slice(0, start).reduce((sum, [, m]) => sum + m.length, 0);
+  const hiddenMatches = entries.slice(end).reduce((sum, [, m]) => sum + m.length, 0);
+  return {
+    entries: kept,
+    truncated: hiddenBefore + hiddenMatches > 0,
+    hiddenMatches,
+    hiddenBefore,
+  };
 }
 
 // --- Countdown scheduling ---------------------------------------------------

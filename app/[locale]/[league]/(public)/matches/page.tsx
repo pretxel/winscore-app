@@ -19,6 +19,7 @@ import { getStageLabel, revealedKnockoutStageKeys, sortedStages } from "@/lib/co
 import type { MatchRow } from "@/lib/db";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import {
+  DEFAULT_DAY_WINDOW_MATCHES,
   dayKeyForTimeZone,
   formatDayKeyLabel,
   isClosingSoon,
@@ -210,14 +211,13 @@ export default async function MatchesPage({
   };
 
   const statusFilter = parseStatusParam(statusParam);
-  // Default (no status filter): hide finished fixtures (final/cancelled) so the
-  // list leads with what's still actionable; the `final` card opts them back in.
+  // Default (no status filter): every fixture, played ones included. The list is
+  // a season calendar, so hiding results made it impossible to look back at a
+  // matchday from the page that lists it. The window below opens on today, so
+  // the played fixtures sit above the fold rather than in front of it.
   const statusFiltered = statusFilter
     ? scoped.filter((m) => statusBucket(m) === statusFilter)
-    : scoped.filter((m) => {
-        const bucket = statusBucket(m);
-        return bucket !== "final" && bucket !== "cancelled";
-      });
+    : scoped;
 
   // The picks filter exists only for signed-in users; an anonymous request
   // carrying `?picks=needed` is silently ignored.
@@ -229,9 +229,9 @@ export default async function MatchesPage({
 
   const isFiltered = statusFilter !== null || picksNeeded || selectedRound !== null;
 
-  // Default view is empty only because every in-scope fixture is finished:
-  // guide to the Final filter instead of the generic "no matches" state.
-  const allFinishedDefault = !isFiltered && filtered.length === 0 && stats.final > 0;
+  // The default view now includes finished fixtures, so it can only be empty
+  // when the league has no fixtures at all.
+  const allFinishedDefault = false;
 
   // First-pick lead state (QW8): a signed-in user who has made zero picks and
   // has no filter active gets an inviting nudge toward the soonest still-open
@@ -264,9 +264,22 @@ export default async function MatchesPage({
   // bounds how much markup one response carries.
   const daysView = parseDaysParam(daysParam);
   const allDayEntries = [...byDay.entries()];
-  const windowed = windowDayEntries(allDayEntries);
+  // Anchored on the visitor's today, so the page opens on the current matchday
+  // with the last week of results above it, not on the season's opening day.
+  const windowed = windowDayEntries(
+    allDayEntries,
+    DEFAULT_DAY_WINDOW_MATCHES,
+    dayKey(new Date().toISOString()),
+  );
   const dayEntries = daysView === "all" ? allDayEntries : windowed.entries;
   const hiddenMatches = daysView === "all" ? 0 : windowed.hiddenMatches;
+  const hiddenBefore = daysView === "all" ? 0 : windowed.hiddenBefore;
+  const showAllHref = `${localePath(locale, `/${league}/matches`)}?${new URLSearchParams({
+    ...(statusFilter ? { status: statusFilter } : {}),
+    ...(selectedRound ? { round: selectedRound } : {}),
+    ...(picksNeeded ? { picks: "needed" } : {}),
+    days: "all",
+  }).toString()}`;
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
@@ -371,17 +384,26 @@ export default async function MatchesPage({
       ) : null}
 
       <div className="space-y-12">
+        {hiddenBefore > 0 ? (
+          <div className="text-center">
+            <Link
+              href={showAllHref}
+              className="border-border bg-card font-heading text-muted-foreground hover:bg-muted/50 hover:text-foreground focus-visible:ring-ring inline-flex min-h-10 items-center rounded-full border px-5 text-sm font-medium tracking-tight transition-colors focus-visible:ring-2 focus-visible:outline-none"
+            >
+              {t("showEarlier", { count: hiddenBefore })}
+            </Link>
+          </div>
+        ) : null}
         {dayEntries.map(([day, dayMatches], idx) => {
-          // A day defaults to collapsed only once every fixture in it is done
-          // (final or cancelled); any day still holding a scheduled, locked, or
-          // live match defaults to expanded. The client shell overrides this
-          // with the user's stored per-day choice after mount.
-          const dayDone = dayMatches.every((m) => m.status === "final" || m.status === "cancelled");
+          // Every day opens by default, played ones included: the list is a
+          // season calendar, and a collapsed matchday is a hidden result. The
+          // section stays collapsible, and the client shell still restores the
+          // visitor's own per-day choice after mount.
           return (
             <MatchDaySection
               key={day}
               dayKey={day}
-              defaultOpen={!dayDone}
+              defaultOpen
               matchday={t("matchday", { n: String(idx + 1).padStart(2, "0") })}
               dateNode={formatDayKeyLabel(day, locale)}
               countLabel={t("matchCount", { count: dayMatches.length })}
@@ -428,12 +450,7 @@ export default async function MatchesPage({
         {hiddenMatches > 0 ? (
           <div className="text-center">
             <Link
-              href={`${localePath(locale, `/${league}/matches`)}?${new URLSearchParams({
-                ...(statusFilter ? { status: statusFilter } : {}),
-                ...(selectedRound ? { round: selectedRound } : {}),
-                ...(picksNeeded ? { picks: "needed" } : {}),
-                days: "all",
-              }).toString()}`}
+              href={showAllHref}
               className="border-border bg-card font-heading text-foreground hover:bg-muted/50 focus-visible:ring-ring inline-flex min-h-10 items-center rounded-full border px-5 text-sm font-medium tracking-tight transition-colors focus-visible:ring-2 focus-visible:outline-none"
             >
               {t("showAllRemaining", { count: hiddenMatches })}
