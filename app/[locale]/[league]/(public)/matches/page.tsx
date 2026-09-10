@@ -111,13 +111,20 @@ export default async function MatchesPage({
   // Explicit column list rather than `*`: a season's fixture list is hundreds
   // of rows, and the audit/provider columns the page never reads are pure
   // transfer cost between Postgres and the render.
-  const { data: matches, error } = await supabase
-    .from("matches")
-    .select(
-      "id, stage, group_code, home_team, away_team, kickoff_at, venue, home_score, away_score, status, competition_id, round_id, tie_key, leg",
-    )
-    .eq("competition_id", activeCompetition?.id ?? "")
-    .order("kickoff_at", { ascending: true });
+  // The fixture list and the viewer are independent, so they resolve together
+  // rather than one after the other.
+  const [matchesRes, userRes] = await Promise.all([
+    supabase
+      .from("matches")
+      .select(
+        "id, stage, group_code, home_team, away_team, kickoff_at, venue, home_score, away_score, status, competition_id, round_id, tie_key, leg",
+      )
+      .eq("competition_id", activeCompetition?.id ?? "")
+      .order("kickoff_at", { ascending: true }),
+    supabase.auth.getUser(),
+  ]);
+  const { data: matches, error } = matchesRes;
+  const user = userRes.data.user;
 
   if (error) {
     // Log the raw cause server-side for diagnostics; never surface exception
@@ -161,9 +168,6 @@ export default async function MatchesPage({
   // Only signed-in requests pay for the per-user pick lookup; anonymous
   // visitors get the list unchanged. RLS (predictions_select_own) scopes the
   // read to the current user.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
   let pickedIds = new Set<string>();
   if (user) {
     const { data: picks } = await supabase

@@ -131,89 +131,157 @@ export default async function MatchDetailPage({
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
-  const t = await getTranslations("matchDetail");
-  const tForm = await getTranslations("predictionForm");
-  const tGroupSim = await getTranslations("groupSimulation");
-  const tShare = await getTranslations("sharePick");
-  const tShareRecap = await getTranslations("shareRecap");
+  // Level 1: nothing here depends on the match, so the locale strings, the
+  // league-scoped client, and the league record resolve together.
+  const [t, tForm, tGroupSim, tShare, tShareRecap, tLiveFeed, supabase, activeComp] =
+    await Promise.all([
+      getTranslations("matchDetail"),
+      getTranslations("predictionForm"),
+      getTranslations("groupSimulation"),
+      getTranslations("sharePick"),
+      getTranslations("shareRecap"),
+      getTranslations("liveFeed"),
+      createServerSupabaseClient(league),
+      getLeagueFromContext({ slug: league }),
+    ]);
 
-  const supabase = await createServerSupabaseClient(league);
-
-  const { data: match, error } = await supabase
-    .from("matches")
-    .select("*")
-    .eq("id", matchId)
-    .single();
+  // Level 2: the match and the viewer. Every remaining read needs one or both,
+  // and neither needs the other.
+  const [matchRes, userRes] = await Promise.all([
+    supabase.from("matches").select("*").eq("id", matchId).single(),
+    supabase.auth.getUser(),
+  ]);
+  const { data: match, error } = matchRes;
   if (error || !match) notFound();
+  const user = userRes.data.user;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Admins are operators, not contestants — the form renders but its submit is
-  // blocked (and the server action rejects them too).
-  const isAdmin = user ? await isCurrentUserAdmin(supabase) : false;
-
-  let myPrediction: { home_goals: number; away_goals: number } | null = null;
-  if (user) {
-    const { data } = await supabase
-      .from("predictions")
-      .select("home_goals, away_goals")
-      .eq("user_id", user.id)
-      .eq("match_id", matchId)
-      .maybeSingle();
-    myPrediction = data;
-  }
-
-  // Check if the league is finished
-  const { data: comp } = match.competition_id
-    ? await supabase
-        .from("competitions")
-        .select("finished_at")
-        .eq("id", match.competition_id)
-        .maybeSingle()
-    : { data: null };
-  const isFinished = Boolean(comp?.finished_at);
-
-  // Personal, prediction-only group table for this match's group. Built from
-  // the viewer's own picks across the group's fixtures (real results are never
-  // folded in). Only signed-in, group-stage matches get the section.
-  let groupSim: GroupTeamRow[] | null = null;
-  const activeComp = await getLeagueFromContext({ slug: league });
-  const groupKey = activeComp ? groupStageKey(activeComp.format) : null;
-  if (user && groupKey && match.stage === groupKey && match.group_code) {
-    const { data: fixtures } = await supabase
-      .from("matches")
-      .select("id, home_team, away_team")
-      .eq("competition_id", match.competition_id)
-      .eq("stage", groupKey)
-      .eq("group_code", match.group_code);
-    const groupFixtures = fixtures ?? [];
-    const predictionsByMatchId = new Map<string, { home_goals: number; away_goals: number }>();
-    if (groupFixtures.length > 0) {
-      const { data: groupPicks } = await supabase
-        .from("predictions")
-        .select("match_id, home_goals, away_goals")
-        .eq("user_id", user.id)
-        .in(
-          "match_id",
-          groupFixtures.map((f) => f.id),
-        );
-      for (const p of groupPicks ?? []) {
-        predictionsByMatchId.set(p.match_id, {
-          home_goals: p.home_goals,
-          away_goals: p.away_goals,
-        });
-      }
-    }
-    groupSim = simulateGroup(groupFixtures, predictionsByMatchId);
-  }
-
+  // Lock state is a pure function of the match, so it gates the reads below
+  // without costing a round trip of its own.
   const reason = lockReason(match);
   const locked = reason !== null;
   // Knockout fixtures stay unconfirmed (placeholder teams) until an admin sets
   // the real teams; an unconfirmed match is shown but not pickable.
   const confirmed = isConfirmedMatch(match);
+  const isTerminalMatch = match.status === "final" || match.status === "cancelled";
+  const groupKey = activeComp ? groupStageKey(activeComp.format) : null;
+  const wantsGroupSim = Boolean(user && groupKey && match.stage === groupKey && match.group_code);
+
+  // Level 3: every remaining read at once. This page used to walk them one at a
+  // time — on a finished World Cup match that was eleven serial round trips to
+  // Supabase, which is most of the page's time to first byte.
+  const [
+    isAdmin,
+    myPrediction,
+    comp,
+    groupFixtures,
+    allPicks,
+    nextMatch,
+    eventRows,
+    summaryRow,
+    renderRow,
+  ] = await Promise.all([
+    // Admins are operators, not contestants — the form renders but its submit
+    // is blocked (and the server action rejects them too).
+    user ? isCurrentUserAdmin(supabase) : Promise.resolve(false),
+    user
+      ? supabase
+          .from("predictions")
+          .select("home_goals, away_goals")
+          .eq("user_id", user.id)
+          .eq("match_id", matchId)
+          .maybeSingle()
+          .then((r) => r.data)
+      : Promise.resolve(null),
+    match.competition_id
+      ? supabase
+          .from("competitions")
+          .select("finished_at")
+          .eq("id", match.competition_id)
+          .maybeSingle()
+          .then((r) => r.data)
+      : Promise.resolve(null),
+    wantsGroupSim
+      ? supabase
+          .from("matches")
+          .select("id, home_team, away_team")
+          .eq("competition_id", match.competition_id)
+          .eq("stage", groupKey as string)
+          .eq("group_code", match.group_code as string)
+          .then((r) => r.data ?? [])
+      : Promise.resolve([]),
+    // Everyone's picks open up the moment the match locks (live, final, or
+    // kickoff passed). The SQL function re-checks the lock, so this is only a
+    // guard against a pointless round trip.
+    user && locked && confirmed ? getMatchPicks(match.id, league) : Promise.resolve([]),
+    // Suggestion offered after a pick saves. Only worth resolving while the
+    // match is still pickable — a locked match shows no form.
+    user && !locked && confirmed && match.competition_id
+      ? getNextPickableMatch(league, match.competition_id, user.id, match.id)
+      : Promise.resolve(null),
+    // Live feed events: mounted for non-terminal matches only.
+    isTerminalMatch
+      ? Promise.resolve([])
+      : supabase
+          .from("match_events")
+          .select("id, type, team, minute, extra_minute, sequence, player, detail")
+          .eq("match_id", match.id)
+          .order("sequence", { ascending: true })
+          .then((r) => r.data ?? []),
+    // AI recap: only finished matches ever have one.
+    match.status === "final"
+      ? supabase
+          .from("match_summaries")
+          .select("id, content")
+          .eq("match_id", match.id)
+          .eq("is_active", true)
+          .maybeSingle()
+          .then((r) => r.data)
+      : Promise.resolve(null),
+    // The active version's completed comic render (active-only RLS scopes this).
+    match.status === "final"
+      ? supabase
+          .from("match_summary_images")
+          .select("storage_path")
+          .eq("match_id", match.id)
+          .eq("status", "complete")
+          .maybeSingle()
+          .then((r) => r.data)
+      : Promise.resolve(null),
+  ]);
+
+  const isFinished = Boolean(comp?.finished_at);
+
+  // Level 4: the two reads that genuinely depend on level 3's results.
+  const [groupPicks, reactionSummary] = await Promise.all([
+    user && groupFixtures.length > 0
+      ? supabase
+          .from("predictions")
+          .select("match_id, home_goals, away_goals")
+          .eq("user_id", user.id)
+          .in(
+            "match_id",
+            groupFixtures.map((f) => f.id),
+          )
+          .then((r) => r.data ?? [])
+      : Promise.resolve([]),
+    summaryRow ? getRecapReactionSummary(summaryRow.id, user?.id ?? null) : Promise.resolve(null),
+  ]);
+
+  // Personal, prediction-only group table for this match's group. Built from
+  // the viewer's own picks across the group's fixtures (real results are never
+  // folded in). Only signed-in, group-stage matches get the section.
+  let groupSim: GroupTeamRow[] | null = null;
+  if (wantsGroupSim) {
+    const predictionsByMatchId = new Map<string, { home_goals: number; away_goals: number }>();
+    for (const pick of groupPicks) {
+      predictionsByMatchId.set(pick.match_id, {
+        home_goals: pick.home_goals,
+        away_goals: pick.away_goals,
+      });
+    }
+    groupSim = simulateGroup(groupFixtures, predictionsByMatchId);
+  }
+
   const uiStatus: "scheduled" | "locked" | "live" | "final" | "cancelled" =
     match.status === "live"
       ? "live"
@@ -227,18 +295,6 @@ export default async function MatchDetailPage({
 
   const isFinal = match.status === "final" && match.home_score != null && match.away_score != null;
 
-  // Everyone's picks open up the moment the match locks (live, final, or
-  // kickoff passed). The SQL function re-checks the lock, so this is only a
-  // guard against a pointless round trip.
-  const allPicks = user && locked && confirmed ? await getMatchPicks(match.id, league) : [];
-
-  // Suggestion offered after a pick saves. Only worth resolving while the
-  // match is still pickable — a locked match shows no form.
-  const nextMatch =
-    user && !locked && confirmed && match.competition_id
-      ? await getNextPickableMatch(league, match.competition_id, user.id, match.id)
-      : null;
-
   const stageLabelLocalized = activeComp
     ? getStageLabel(activeComp.format, match.stage, locale)
     : match.stage;
@@ -246,15 +302,9 @@ export default async function MatchDetailPage({
   // Live feed: mounted for non-terminal matches, seeded with the current
   // score/status + any already-ingested events. Final/cancelled matches render
   // the result statically with no feed/poll.
-  const isTerminalMatch = match.status === "final" || match.status === "cancelled";
   let liveFeedData: LiveFeedPayload | null = null;
   if (!isTerminalMatch) {
-    const { data: eventRows } = await supabase
-      .from("match_events")
-      .select("id, type, team, minute, extra_minute, sequence, player, detail")
-      .eq("match_id", match.id)
-      .order("sequence", { ascending: true });
-    const events: MatchEvent[] = (eventRows ?? []).map((r) => ({
+    const events: MatchEvent[] = eventRows.map((r) => ({
       id: r.id,
       type: r.type as MatchEventType,
       team: r.team as MatchEventTeam,
@@ -276,40 +326,15 @@ export default async function MatchDetailPage({
     };
   }
   // AI recap: only finished matches ever have one. Read-only; the body is the
-  // English summary, the surrounding labels are localized.
-  let matchSummary: { content: string; id: string } | null = null;
-  let recapImageUrl: string | null = null;
-  // Recap reaction bar state (seeded server-side so the first paint is correct
-  // without client JS). Only populated for a final match with an active recap.
-  let reactionCounts: Record<ReactionType, number> = emptyCounts();
-  let reactionMine: ReactionType[] = [];
-  if (match.status === "final") {
-    const { data: summaryRow } = await supabase
-      .from("match_summaries")
-      .select("id, content")
-      .eq("match_id", match.id)
-      .eq("is_active", true)
-      .maybeSingle();
-    if (summaryRow) {
-      matchSummary = { content: summaryRow.content, id: summaryRow.id };
-      const summary = await getRecapReactionSummary(summaryRow.id, user?.id ?? null);
-      reactionCounts = summary.counts;
-      reactionMine = summary.mine;
-    }
+  // English summary, the surrounding labels are localized. Reaction bar state is
+  // seeded server-side so the first paint is correct without client JS.
+  const matchSummary = summaryRow ? { content: summaryRow.content, id: summaryRow.id } : null;
+  const recapImageUrl = renderRow?.storage_path
+    ? recapImagePublicUrl(renderRow.storage_path)
+    : null;
+  const reactionCounts: Record<ReactionType, number> = reactionSummary?.counts ?? emptyCounts();
+  const reactionMine: ReactionType[] = reactionSummary?.mine ?? [];
 
-    // The active version's completed comic render (active-only RLS scopes this).
-    const { data: renderRow } = await supabase
-      .from("match_summary_images")
-      .select("storage_path")
-      .eq("match_id", match.id)
-      .eq("status", "complete")
-      .maybeSingle();
-    if (renderRow?.storage_path) {
-      recapImageUrl = recapImagePublicUrl(renderRow.storage_path);
-    }
-  }
-
-  const tLiveFeed = await getTranslations("liveFeed");
   const liveFeedLabels: LiveFeedLabels = {
     heading: tLiveFeed("heading"),
     live: tLiveFeed("live"),
