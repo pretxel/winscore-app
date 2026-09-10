@@ -30,6 +30,7 @@ import type {
   MatchEventTeam,
   MatchEventType,
 } from "@/lib/matches/match-events";
+import { getNextPickableMatch } from "@/lib/next-pick";
 import { emptyCounts, type ReactionType } from "@/lib/recap-reactions";
 import { getRecapReactionSummary } from "@/lib/recap-reactions-server";
 import { buildPickSharePath } from "@/lib/share";
@@ -230,6 +231,13 @@ export default async function MatchDetailPage({
   // kickoff passed). The SQL function re-checks the lock, so this is only a
   // guard against a pointless round trip.
   const allPicks = user && locked && confirmed ? await getMatchPicks(match.id, league) : [];
+
+  // Suggestion offered after a pick saves. Only worth resolving while the
+  // match is still pickable — a locked match shows no form.
+  const nextMatch =
+    user && !locked && confirmed && match.competition_id
+      ? await getNextPickableMatch(league, match.competition_id, user.id, match.id)
+      : null;
 
   const stageLabelLocalized = activeComp
     ? getStageLabel(activeComp.format, match.stage, locale)
@@ -643,6 +651,7 @@ export default async function MatchDetailPage({
             isAdmin={isAdmin}
             locale={locale}
             shareBaseUrl={env.siteUrl}
+            nextMatch={nextMatch}
           />
         )}
       </section>

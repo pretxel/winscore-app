@@ -474,6 +474,11 @@
     "copyLink": "Copier le lien",
     "copied": "Lien copié"
   },
+  "nextPick": {
+    "eyebrow": "Au suivant",
+    "matchup": "{home} vs {away}",
+    "cta": "Pronostiquer celui-ci"
+  },
   "sharePick": {
     "heading": "Partagez votre prono",
     "shareText": "Mon prono : {home} {h}–{a} {away} · Winscore",

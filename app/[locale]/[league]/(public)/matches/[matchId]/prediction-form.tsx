@@ -1,6 +1,7 @@
 "use client";
 
-import { CheckIcon, Loader2Icon, MinusIcon, PlusIcon } from "lucide-react";
+import { ArrowRightIcon, CheckIcon, Loader2Icon, MinusIcon, PlusIcon } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -9,6 +10,7 @@ import { ShareButtons } from "@/components/share-buttons";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
 import type { Locale } from "@/lib/i18n";
+import { localePath } from "@/lib/i18n";
 import { buildPickSharePath } from "@/lib/share";
 import { cn } from "@/lib/utils";
 import { submitPrediction } from "./actions";
@@ -25,6 +27,7 @@ export function PredictionForm({
   isAdmin = false,
   locale,
   shareBaseUrl,
+  nextMatch = null,
 }: {
   matchId: string;
   league: string;
@@ -35,9 +38,17 @@ export function PredictionForm({
   isAdmin?: boolean;
   locale: Locale;
   shareBaseUrl: string;
+  /**
+   * The soonest other fixture this user could still predict, resolved on the
+   * server. Offered as a next step once a pick saves, so a player can work
+   * through a matchday without going back to the list. Null when there is
+   * nothing left to suggest.
+   */
+  nextMatch?: { id: string; homeTeam: string; awayTeam: string; kickoffAt: string } | null;
 }) {
   const t = useTranslations("predictionForm");
   const tShare = useTranslations("sharePick");
+  const tNext = useTranslations("nextPick");
   const [home, setHome] = useState<number>(initial?.home_goals ?? 0);
   const [away, setAway] = useState<number>(initial?.away_goals ?? 0);
   const [touched, setTouched] = useState(false);
@@ -171,6 +182,28 @@ export function PredictionForm({
           </Button>
         </div>
       </form>
+
+      {/* Offered only after a save, so it reads as "what next" rather than a
+          distraction from the pick the player came here to make. */}
+      {sharedPick && nextMatch ? (
+        <section className="border-pitch/40 bg-pitch/[0.07] motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-5">
+          <div className="min-w-0">
+            <p className="text-muted-foreground font-mono text-[11px] tracking-[0.2em] uppercase">
+              {tNext("eyebrow")}
+            </p>
+            <p className="font-heading text-foreground mt-1 text-base font-semibold tracking-tight">
+              {tNext("matchup", { home: nextMatch.homeTeam, away: nextMatch.awayTeam })}
+            </p>
+          </div>
+          <Link
+            href={localePath(locale, `/${league}/matches/${nextMatch.id}`)}
+            className="bg-pitch text-pitch-foreground focus-visible:ring-ring inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full px-5 font-heading text-sm font-semibold tracking-tight focus-visible:ring-2 focus-visible:outline-none"
+          >
+            {tNext("cta")}
+            <ArrowRightIcon className="size-4" aria-hidden />
+          </Link>
+        </section>
+      ) : null}
 
       {sharedPick ? (
         <section className="mt-4 rounded-xl border border-border bg-card p-5 shadow-sm motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300">
