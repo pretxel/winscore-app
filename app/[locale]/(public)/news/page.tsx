@@ -3,12 +3,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { NewsArticleRow } from "@/lib/db";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import { NEWS_PAGE_SIZE } from "@/lib/news";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCachedNewsPage } from "@/lib/public-data";
 import { NewsFeed } from "./news-feed";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
 
 export async function generateMetadata({
   params,
@@ -39,25 +35,19 @@ export default async function NewsPage({ params }: { params: Promise<{ locale: s
 
   // Server-render the first page for fast paint + SEO; the rest streams in via
   // infinite scroll (NewsFeed → loadMoreNews). Ordering must match the action.
-  const supabase = await createServerSupabaseClient();
-  const { data: articles, error } = await supabase
-    .from("news_articles")
-    .select("*")
-    .order("published_at", { ascending: false })
-    .order("id", { ascending: false })
-    .range(0, NEWS_PAGE_SIZE - 1);
+  const { articles, error } = await getCachedNewsPage(NEWS_PAGE_SIZE);
 
   if (error) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-10">
         <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-          {t("loadFailed", { message: error.message })}
+          {t("loadFailed", { message: error })}
         </div>
       </main>
     );
   }
 
-  const list = (articles ?? []) as NewsArticleRow[];
+  const list = articles;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">

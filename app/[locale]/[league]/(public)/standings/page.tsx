@@ -6,11 +6,8 @@ import { getLeagueFromContext } from "@/lib/competition";
 import { hasGroupStage, leagueStageKey } from "@/lib/competition-schema";
 import { getGroupTables, getLeagueTable } from "@/lib/group-table";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
+import { getCachedGroupTables, getCachedLeague, getCachedLeagueTable } from "@/lib/public-data";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
 
 export async function generateMetadata({
   params,
@@ -45,14 +42,20 @@ export default async function StandingsPage({
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
-  const competition = await getLeagueFromContext({ slug: league });
+  // Cached read: the table is the same for every visitor, so it comes from the
+  // league's cache entry rather than a per-request query.
+  const competition = await getCachedLeague(league);
   const hasGroups = competition ? hasGroupStage(competition.format) : false;
   const hasLeague = competition ? leagueStageKey(competition.format) !== null : false;
 
   // Group format: render group standings grid
   if (hasGroups) {
     const t = await getTranslations("groupStandings");
-    const { groups, matches } = await getGroupTables(competition);
+    const { groups, matches } = await getCachedGroupTables(
+      league,
+      competition?.id ?? "",
+      competition?.format ?? null,
+    );
 
     maybeScheduleOpportunisticSync(matches);
 
@@ -97,7 +100,7 @@ export default async function StandingsPage({
   // League format: render single league table
   if (hasLeague) {
     const t = await getTranslations("leagueStandings");
-    const result = await getLeagueTable(competition);
+    const result = competition ? await getCachedLeagueTable(league, competition) : null;
     const matches = result?.matches ?? [];
 
     maybeScheduleOpportunisticSync(matches);

@@ -7,14 +7,13 @@ import { FixturesStrip } from "@/components/fixtures-strip";
 import { LeagueRail } from "@/components/league-rail";
 import { TeamCrestCluster } from "@/components/team-crest-cluster";
 import { Badge } from "@/components/ui/badge";
-import { listCatalogLeagues } from "@/lib/competition";
-import { getLeagueLaneFixtures, getLeagueRoster } from "@/lib/home";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import { leagueMark } from "@/lib/league-marks";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
+import {
+  getCachedCatalogLeagues,
+  getCachedLaneFixtures,
+  getCachedLeagueRoster,
+} from "@/lib/public-data";
 
 export async function generateMetadata({
   params,
@@ -43,12 +42,12 @@ export default async function CatalogPage({ params }: { params: Promise<{ locale
   setRequestLocale(locale);
   const t = await getTranslations("catalog");
 
-  const leagues = await listCatalogLeagues();
+  const leagues = await getCachedCatalogLeagues();
   const cards = await Promise.all(
     leagues.map(async (league) => {
       const [roster, fixtures] = await Promise.all([
-        getLeagueRoster(league.slug, league.id),
-        getLeagueLaneFixtures(league.slug, league.id),
+        getCachedLeagueRoster(league.slug, league.id),
+        getCachedLaneFixtures(league.slug, league.id),
       ]);
       return { league, roster, fixtures, mark: leagueMark(league.slug) };
     }),

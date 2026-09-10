@@ -1,4 +1,5 @@
 import "server-only";
+import type { ReadClient } from "@/lib/supabase/read-client";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type LaneFixture = {
@@ -19,8 +20,9 @@ export type LaneFixture = {
 export async function getLeagueLaneFixtures(
   slug: string,
   competitionId: string,
+  client?: ReadClient,
 ): Promise<LaneFixture[]> {
-  const supabase = await createServerSupabaseClient(slug);
+  const supabase = client ?? (await createServerSupabaseClient(slug));
   const { data } = await supabase
     .from("matches")
     .select("id, home_team, away_team, home_score, away_score, status, kickoff_at")
@@ -60,8 +62,12 @@ export type LeagueRoster = {
 // Who plays in a league and how much of it there is — the catalog card's
 // substance. One scoped query per league; the catalog has a handful, so this
 // stays cheap. Filtered by competition id for the same reason as above.
-export async function getLeagueRoster(slug: string, competitionId: string): Promise<LeagueRoster> {
-  const supabase = await createServerSupabaseClient(slug);
+export async function getLeagueRoster(
+  slug: string,
+  competitionId: string,
+  client?: ReadClient,
+): Promise<LeagueRoster> {
+  const supabase = client ?? (await createServerSupabaseClient(slug));
   const { data } = await supabase
     .from("matches")
     .select("home_team, away_team, status")

@@ -1,6 +1,7 @@
 import "server-only";
 import { type Bracket, type BracketMatchInput, buildBracket } from "@/lib/bracket-core";
 import { getActiveCompetition, type ResolvedCompetition } from "@/lib/competition";
+import type { ReadClient } from "@/lib/supabase/read-client";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type BracketResult = Bracket & {
@@ -16,8 +17,15 @@ export type BracketResult = Bracket & {
 export async function getBracket(competition?: ResolvedCompetition | null): Promise<BracketResult> {
   const comp = competition ?? (await getActiveCompetition());
   if (!comp) return { rounds: [], hasKnockout: false, matches: [] };
+  return fetchBracket(await createServerSupabaseClient(), comp);
+}
 
-  const supabase = await createServerSupabaseClient();
+// Client-parameterised body, so a cached reader can run the same query through
+// the public client.
+export async function fetchBracket(
+  supabase: ReadClient,
+  comp: ResolvedCompetition,
+): Promise<BracketResult> {
   const { data } = await supabase
     .from("matches")
     .select(

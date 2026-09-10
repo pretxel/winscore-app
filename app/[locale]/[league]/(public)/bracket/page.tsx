@@ -8,11 +8,8 @@ import { KNOCKOUT_ORDER } from "@/lib/bracket-core";
 import { getLeagueFromContext } from "@/lib/competition";
 import { getStageLabel, hasKnockoutStage } from "@/lib/competition-schema";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
+import { getCachedBracket, getCachedLeague } from "@/lib/public-data";
 import { maybeScheduleOpportunisticSync } from "@/lib/result-sync/opportunistic";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
 
 export async function generateMetadata({
   params,
@@ -48,9 +45,11 @@ export default async function BracketPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("bracket");
-  const competition = await getLeagueFromContext({ slug: league });
+  const competition = await getCachedLeague(league);
   if (competition && !hasKnockoutStage(competition.format)) notFound();
-  const { rounds, matches, hasKnockout } = await getBracket(competition);
+  const { rounds, matches, hasKnockout } = competition
+    ? await getCachedBracket(league, competition)
+    : { rounds: [], matches: [], hasKnockout: false };
 
   // Cron-not-firing safety net: refresh overdue results after the response.
   maybeScheduleOpportunisticSync(matches);

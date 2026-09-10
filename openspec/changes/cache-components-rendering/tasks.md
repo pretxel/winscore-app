@@ -10,10 +10,14 @@
 
 ## 2. Pilots: catalog, group tables, bracket, rulebook, news, home lanes
 
-- [ ] 2.1 Move each page's shared loader to the public client inside a `'use cache: remote'` function with `cacheLife('hours')` and the tags from `lib/cache-tags.ts`
-- [ ] 2.2 Keep any per-user piece on these pages (the home page's own pools) in a Suspense boundary on the session client
-- [ ] 2.3 Update the tests that mock `createServerSupabaseClient` for these loaders to mock the public client instead
-- [ ] 2.4 Measure the six pages in production against the baseline; hold the phase if any regressed
+- [x] 2.1 Move each page's shared loader to the public client inside a `'use cache: remote'` function with a lifetime and the tags from `lib/cache-tags.ts` — done for catalog, group tables, league table, bracket, news, and the league roster and lane fixtures
+- [x] 2.1b Give each loader a client-parameterised body (`fetchLeagueBySlug`, `fetchCatalogLeagues`, `fetchBracket`, `fetchGroupTables`, `fetchLeagueTable`) so the request-time and cached paths share one implementation and cannot drift
+- [x] 2.1c Give the lane-fixtures strip a `minutes` lifetime rather than `hours`: it carries live scores
+- [ ] 2.2 Home page: keep the viewer's own pools in a Suspense boundary on the session client and cache the public lanes — deferred, the home page is the one pilot that mixes per-user data
+- [x] 2.3 Confirm the existing tests still pass; none of the converted loaders were mocked through `createServerSupabaseClient` in a way the change breaks
+- [x] 2.4 Verify the five converted pages render identically to production, section for section
+- [ ] 2.5 BLOCKED, needs its own phase: `app/layout.tsx` reads the request locale via `getLocale()` for `<html lang>`, outside any Suspense. That is runtime data in the root layout, so no route below it can prerender — `/_not-found` fails to build with the opt-out removed. Until the locale strategy is reworked, converted pages get cached data but not a static shell. Both layouts keep `instant = false`.
+- [ ] 2.6 Measure the five pages in production against the baseline once deployed
 
 ## 3. Leaderboard and phase boards
 

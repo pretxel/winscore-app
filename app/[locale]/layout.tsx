@@ -5,10 +5,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SiteFooter, SiteNav } from "@/components/site-nav";
 import { DEFAULT_LOCALE, isLocale, type Locale, SUPPORTED_LOCALES } from "@/lib/i18n";
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
-
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((locale) => ({ locale }));
 }
@@ -60,6 +56,11 @@ export async function generateMetadata({
     },
   };
 }
+
+// Blocked by the root layout: it reads the request locale for <html lang>,
+// which is runtime data outside any Suspense boundary, so no route below it can
+// prerender yet. Removing this opt-out needs the locale strategy reworked.
+export const instant = false;
 
 export default async function LocaleLayout({
   children,

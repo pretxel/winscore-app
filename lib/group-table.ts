@@ -8,6 +8,7 @@ import {
   type SimulatedGroup,
   type Tiebreaker,
 } from "@/lib/group-standings";
+import type { ReadClient } from "@/lib/supabase/read-client";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type { GroupTableMatch } from "@/lib/group-standings";
@@ -35,11 +36,18 @@ export async function getGroupTables(
     return { groups: [], matches: [], hasGroupStage: false };
   }
 
-  const supabase = await createServerSupabaseClient();
+  return fetchGroupTables(await createServerSupabaseClient(), comp.id, groupKey);
+}
+
+export async function fetchGroupTables(
+  supabase: ReadClient,
+  competitionId: string,
+  groupKey: string,
+): Promise<GroupTablesResult> {
   const { data } = await supabase
     .from("matches")
     .select("id, home_team, away_team, group_code, home_score, away_score, status, kickoff_at")
-    .eq("competition_id", comp.id)
+    .eq("competition_id", competitionId)
     .eq("stage", groupKey);
 
   const matches = (data ?? []) as GroupTableMatch[];
@@ -56,7 +64,14 @@ export async function getLeagueTable(
   const leagueKey = comp ? leagueStageKey(comp.format) : null;
   if (!comp || !leagueKey) return null;
 
-  const supabase = await createServerSupabaseClient();
+  return fetchLeagueTable(await createServerSupabaseClient(), comp, leagueKey);
+}
+
+export async function fetchLeagueTable(
+  supabase: ReadClient,
+  comp: ResolvedCompetition,
+  leagueKey: string,
+): Promise<{ group: SimulatedGroup; matches: GroupTableMatch[] } | null> {
   const { data } = await supabase
     .from("matches")
     .select("id, home_team, away_team, group_code, home_score, away_score, status, kickoff_at")
@@ -69,3 +84,7 @@ export async function getLeagueTable(
   const matches = (data ?? []) as GroupTableMatch[];
   return { group: buildLeagueTable(matches, tiebreaker), matches };
 }
+
+// Re-exported so cached readers can type their return without reaching past
+// this module into the standings engine.
+export type { SimulatedGroup } from "@/lib/group-standings";

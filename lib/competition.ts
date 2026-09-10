@@ -11,6 +11,7 @@ import {
 } from "@/lib/competition-schema";
 import type { CompetitionRow } from "@/lib/db";
 import type { Locale } from "@/lib/i18n";
+import type { ReadClient } from "@/lib/supabase/read-client";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 // A competition row with its JSONB columns parsed into typed objects.
@@ -110,8 +111,13 @@ export function getBrandingForLeague(comp: ResolvedCompetition | null): Resolved
 // Resolve a league by slug. Returns null when the slug does not exist or the
 // league is in `manage` status (hidden from public). Active and finished leagues
 // are both accessible — finished leagues show results but predictions are closed.
-export const getLeagueBySlug = cache(async (slug: string): Promise<ResolvedCompetition | null> => {
-  const supabase = await createServerSupabaseClient();
+// The query itself, independent of which client runs it: the session client for
+// a request-time read, the cookie-free public client for a cached one. One
+// implementation so the two paths cannot drift.
+export async function fetchLeagueBySlug(
+  supabase: ReadClient,
+  slug: string,
+): Promise<ResolvedCompetition | null> {
   const { data } = await supabase
     .from("competitions")
     .select("*")
@@ -119,7 +125,12 @@ export const getLeagueBySlug = cache(async (slug: string): Promise<ResolvedCompe
     .in("status", ["active", "finished", "upcoming"])
     .maybeSingle();
   return data ? resolveCompetition(data) : null;
-});
+}
+
+export const getLeagueBySlug = cache(
+  async (slug: string): Promise<ResolvedCompetition | null> =>
+    fetchLeagueBySlug(await createServerSupabaseClient(), slug),
+);
 
 // Resolve the league a pool belongs to, from the pool's competition_id. The
 // pool's league resolves even if it is no longer live (the pool still exists).
@@ -190,8 +201,7 @@ export const listStartableLeagues = cache(async (): Promise<LeagueCatalogEntry[]
 // intentionally included so the catalog page, admin surfaces, cron jobs, and
 // "is any league live" check can see them. The "start a pool" picker uses
 // listStartableLeagues instead, which excludes finished. Ordered by name.
-export const listCatalogLeagues = cache(async (): Promise<LeagueCatalogEntry[]> => {
-  const supabase = await createServerSupabaseClient();
+export async function fetchCatalogLeagues(supabase: ReadClient): Promise<LeagueCatalogEntry[]> {
   const { data } = await supabase
     .from("competitions")
     .select("*")
@@ -209,4 +219,9 @@ export const listCatalogLeagues = cache(async (): Promise<LeagueCatalogEntry[]> 
       status: comp.status,
     } satisfies LeagueCatalogEntry;
   });
-});
+}
+
+export const listCatalogLeagues = cache(
+  async (): Promise<LeagueCatalogEntry[]> =>
+    fetchCatalogLeagues(await createServerSupabaseClient()),
+);
