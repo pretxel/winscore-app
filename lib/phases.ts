@@ -1,5 +1,6 @@
 import "server-only";
 import type { Locale } from "@/lib/i18n";
+import type { ReadClient } from "@/lib/supabase/read-client";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type PhaseStatus = "pending" | "active" | "closed";
@@ -82,8 +83,12 @@ export function defaultPhase<T extends { status: PhaseStatus; displayOrder: numb
   return closed.reduce((a, b) => (b.displayOrder > a.displayOrder ? b : a));
 }
 
-export async function listSchemes(competitionId: string, locale: Locale): Promise<PhaseScheme[]> {
-  const supabase = await createServerSupabaseClient();
+export async function listSchemes(
+  competitionId: string,
+  locale: Locale,
+  client?: ReadClient,
+): Promise<PhaseScheme[]> {
+  const supabase = client ?? (await createServerSupabaseClient());
   const { data } = await supabase
     .from("competition_phase_schemes")
     .select("id, competition_id, scheme_key, labels, is_default")
@@ -102,8 +107,9 @@ export async function listSchemes(competitionId: string, locale: Locale): Promis
 export async function getDefaultScheme(
   competitionId: string,
   locale: Locale,
+  client?: ReadClient,
 ): Promise<PhaseScheme | null> {
-  const schemes = await listSchemes(competitionId, locale);
+  const schemes = await listSchemes(competitionId, locale, client);
   return schemes.find((s) => s.isDefault) ?? null;
 }
 
@@ -125,8 +131,12 @@ export async function getScheme(schemeId: string, locale: Locale): Promise<Phase
 }
 
 // A scheme's phases in display order, with derived ends.
-export async function listPhases(schemeId: string, locale: Locale): Promise<Phase[]> {
-  const supabase = await createServerSupabaseClient();
+export async function listPhases(
+  schemeId: string,
+  locale: Locale,
+  client?: ReadClient,
+): Promise<Phase[]> {
+  const supabase = client ?? (await createServerSupabaseClient());
   const { data } = await supabase
     .from("competition_phases")
     .select("id, scheme_id, phase_key, labels, display_order, starts_at, status")

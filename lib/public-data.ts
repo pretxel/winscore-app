@@ -9,7 +9,7 @@ import {
   type ResolvedCompetition,
 } from "@/lib/competition";
 import { groupStageKey, leagueStageKey } from "@/lib/competition-schema";
-import type { NewsArticleRow } from "@/lib/db";
+import type { LeaderboardRow, NewsArticleRow } from "@/lib/db";
 import {
   fetchGroupTables,
   fetchLeagueTable,
@@ -23,6 +23,8 @@ import {
   type LaneFixture,
   type LeagueRoster,
 } from "@/lib/home";
+import type { Locale } from "@/lib/i18n";
+import { getDefaultScheme, listPhases, type Phase, type PhaseScheme } from "@/lib/phases";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
 
 // Every cached read of shared content lives here.
@@ -129,4 +131,95 @@ export async function getCachedNewsPage(
     .order("id", { ascending: false })
     .range(0, pageSize - 1);
   return { articles: (data ?? []) as NewsArticleRow[], error: error?.message ?? null };
+}
+
+// --- Rankings ---------------------------------------------------------------
+// A read failure is carried alongside the rows rather than swallowed, so the
+// page can still tell "nobody has scored" from "the board could not load".
+export type BoardResult = { rows: LeaderboardRow[]; error: string | null };
+
+// All four leaderboard variants are shared: the same ordering for every
+// visitor. Only the "you" highlight is personal, and that is derived from the
+// viewer's id against these rows, not from another query.
+
+/** The all-time board for a league. */
+export async function getCachedOverallBoard(slug: string): Promise<BoardResult> {
+  "use cache: remote";
+  cacheLife("hours");
+  cacheTag(leagueTag(slug));
+  const { data, error } = await createPublicSupabaseClient(slug)
+    .from("v_leaderboard_overall")
+    .select("*")
+    .order("rank", { ascending: true });
+  return { rows: (data ?? []) as LeaderboardRow[], error: error?.message ?? null };
+}
+
+/**
+ * The board for one time window. The bounds are arguments rather than computed
+ * here: `use cache` evaluates the clock once, so a week resolved inside would
+ * freeze. Passing them in also makes each week its own cache entry.
+ */
+export async function getCachedWindowBoard(
+  slug: string,
+  fromTs: string,
+  toTs: string,
+): Promise<BoardResult> {
+  "use cache: remote";
+  cacheLife("hours");
+  cacheTag(leagueTag(slug));
+  const { data, error } = await createPublicSupabaseClient(slug).rpc("leaderboard_for_window", {
+    from_ts: fromTs,
+    to_ts: toTs,
+  });
+  return { rows: (data ?? []) as LeaderboardRow[], error: error?.message ?? null };
+}
+
+/** The board for one tournament stage. */
+export async function getCachedStageBoard(slug: string, stageKey: string): Promise<BoardResult> {
+  "use cache: remote";
+  cacheLife("hours");
+  cacheTag(leagueTag(slug));
+  const { data, error } = await createPublicSupabaseClient(slug).rpc("leaderboard_for_stage", {
+    stage_key: stageKey,
+  });
+  return { rows: (data ?? []) as LeaderboardRow[], error: error?.message ?? null };
+}
+
+/** The board for one phase of a scheme. */
+export async function getCachedPhaseBoard(slug: string, phaseId: string): Promise<BoardResult> {
+  "use cache: remote";
+  cacheLife("hours");
+  cacheTag(leagueTag(slug));
+  const { data, error } = await createPublicSupabaseClient(slug).rpc("leaderboard_for_phase", {
+    p_phase_id: phaseId,
+  });
+  return { rows: (data ?? []) as LeaderboardRow[], error: error?.message ?? null };
+}
+
+// --- Phase schemes ----------------------------------------------------------
+// The scheme and its phases are competition-level facts: same for everyone,
+// changed only by an admin.
+
+/** The competition's default phase scheme, or null when it has none. */
+export async function getCachedDefaultScheme(
+  slug: string,
+  competitionId: string,
+  locale: Locale,
+): Promise<PhaseScheme | null> {
+  "use cache: remote";
+  cacheLife("hours");
+  cacheTag(leagueTag(slug));
+  return getDefaultScheme(competitionId, locale, createPublicSupabaseClient(slug));
+}
+
+/** A scheme's phases, in display order, with their derived ends. */
+export async function getCachedPhases(
+  slug: string,
+  schemeId: string,
+  locale: Locale,
+): Promise<Phase[]> {
+  "use cache: remote";
+  cacheLife("hours");
+  cacheTag(leagueTag(slug));
+  return listPhases(schemeId, locale, createPublicSupabaseClient(slug));
 }

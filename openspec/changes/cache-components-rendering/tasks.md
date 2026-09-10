@@ -21,9 +21,13 @@
 
 ## 3. Leaderboard and phase boards
 
-- [ ] 3.1 Cache the overall, week, stage, and phase rankings by league with `league:<slug>`; the "you" row highlight resolves on the session client inside Suspense
-- [ ] 3.2 Keep the realtime refetch on the overall board working against the cached initial rows
-- [ ] 3.3 Measure the leaderboard and a phase board in production against the baseline
+- [x] 3.1 Cache the overall, week, stage, and phase rankings by league with `league:<slug>`; the "you" highlight is this viewer's id matched against the cached rows, so it needs no second query
+- [x] 3.1b Compute the week's bounds outside the cached reader and pass them as arguments: a clock read inside `use cache` is evaluated once, and each week becomes its own cache entry
+- [x] 3.1c Carry a read failure alongside the rows so the page can still tell "nobody has scored" from "the board could not load"
+- [x] 3.1d Cache the default phase scheme and its phases, which the segment switcher reads on every visit
+- [x] 3.2 Keep the realtime refetch on the overall board working against the cached initial rows
+- [x] 3.3 Verify all four segments render identically to production
+- [ ] 3.4 Measure the leaderboard and a phase board in production against the baseline once deployed
 
 ## 4. Fixture list
 

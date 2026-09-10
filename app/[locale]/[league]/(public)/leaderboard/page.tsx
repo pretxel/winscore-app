@@ -19,15 +19,19 @@ import {
   reconcileStageParam,
   resolveSegment,
 } from "@/lib/leaderboard-segment";
-import { defaultPhase, getDefaultScheme, listPhases } from "@/lib/phases";
+import { defaultPhase } from "@/lib/phases";
+import {
+  getCachedDefaultScheme,
+  getCachedOverallBoard,
+  getCachedPhaseBoard,
+  getCachedPhases,
+  getCachedStageBoard,
+  getCachedWindowBoard,
+} from "@/lib/public-data";
 import { buildRankSharePath } from "@/lib/share";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { LeaderboardChallenge } from "./leaderboard-challenge";
 import { LeaderboardViewTracker } from "./leaderboard-view-tracker";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
 
 export async function generateMetadata({
   params,
@@ -88,9 +92,9 @@ export default async function LeaderboardPage({
   // Phases come from the competition's default scheme (none for most leagues).
   // `?phase=` without a value means the active phase, else the last closed one.
   const defaultScheme = activeCompetition
-    ? await getDefaultScheme(activeCompetition.id, locale)
+    ? await getCachedDefaultScheme(league, activeCompetition.id, locale)
     : null;
-  const phases = defaultScheme ? await listPhases(defaultScheme.id, locale) : [];
+  const phases = defaultScheme ? await getCachedPhases(league, defaultScheme.id, locale) : [];
   const phaseFallback = defaultPhase(phases)?.id ?? null;
 
   const requestedSegment = parseSegmentParam(segmentParam);
@@ -104,46 +108,29 @@ export default async function LeaderboardPage({
   const selectedPhase =
     segment === "phase" ? (phases.find((p) => p.id === activePhase) ?? null) : null;
 
+  // The ranking is the same for every visitor, so it comes from the league's
+  // cache entry. Only the "you" highlight is personal, and that is this
+  // viewer's id matched against those rows — no second query.
   const supabase = await createServerSupabaseClient(league);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Branch the data source by segment. All three return the LeaderboardRow
-  // shape (same columns and tie-breakers), so the rendering below is identical.
-  let data: LeaderboardRow[] | null = null;
-  let error: { message: string } | null = null;
-  if (segment === "week") {
-    const { fromTs, toTs } = currentWeekBoundsUtc();
-    const res = await supabase.rpc("leaderboard_for_window", {
-      from_ts: fromTs,
-      to_ts: toTs,
-    });
-    data = res.data as LeaderboardRow[] | null;
-    error = res.error;
-  } else if (segment === "stage" && activeStage) {
-    const res = await supabase.rpc("leaderboard_for_stage", {
-      stage_key: activeStage,
-    });
-    data = res.data as LeaderboardRow[] | null;
-    error = res.error;
-  } else if (segment === "phase" && activePhase) {
-    const res = await supabase.rpc("leaderboard_for_phase", { p_phase_id: activePhase });
-    data = res.data as LeaderboardRow[] | null;
-    error = res.error;
-  } else {
-    const res = await supabase
-      .from("v_leaderboard_overall")
-      .select("*")
-      .order("rank", { ascending: true });
-    data = res.data as LeaderboardRow[] | null;
-    error = res.error;
-  }
-
-  const loadError = error?.message ?? null;
+  const [board, userRes] = await Promise.all([
+    (async () => {
+      if (segment === "week") {
+        // The bounds are computed here rather than inside the cached reader:
+        // a clock read inside `use cache` would be frozen at first evaluation.
+        const { fromTs, toTs } = currentWeekBoundsUtc();
+        return getCachedWindowBoard(league, fromTs, toTs);
+      }
+      if (segment === "stage" && activeStage) return getCachedStageBoard(league, activeStage);
+      if (segment === "phase" && activePhase) return getCachedPhaseBoard(league, activePhase);
+      return getCachedOverallBoard(league);
+    })(),
+    supabase.auth.getUser(),
+  ]);
+  const user = userRes.data.user;
+  const rows = board.rows;
+  const loadError = board.error;
   // Log the raw cause server-side; never render exception text to the user.
   if (loadError) console.error("[leaderboard] load failed:", loadError);
-  const rows: LeaderboardRow[] = (data ?? []) as LeaderboardRow[];
 
   const myRow = user ? rows.find((r) => r.user_id === user.id) : undefined;
   const players = rows.length;
