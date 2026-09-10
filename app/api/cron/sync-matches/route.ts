@@ -107,10 +107,18 @@ export async function GET(request: NextRequest) {
       // steps above: score/match writes have already committed, and any failure
       // is logged, never thrown. No-ops when OPENROUTER_API_KEY is unset.
       let summaries = 0;
+      let summaryErrors = 0;
       try {
-        const pass = await generatePendingSummaries(scoped());
+        const pass = await generatePendingSummaries(scoped(), {
+          competitionId: ctx.competitionId,
+        });
         summaries = pass.generated;
+        // Surfaced so a pass that generates nothing is distinguishable from one
+        // with nothing to generate: a dead OpenRouter key errors on every
+        // candidate, which used to be invisible here.
+        summaryErrors = pass.errors;
       } catch (err) {
+        summaryErrors++;
         console.error("[cron:sync-matches] summary generation failed:", err);
       }
 
@@ -137,7 +145,16 @@ export async function GET(request: NextRequest) {
         console.error("[cron:sync-matches] image render request failed:", err);
       }
 
-      return { ...summary, events, emailed, pushed, summaries, imagePrompts, renders };
+      return {
+        ...summary,
+        events,
+        emailed,
+        pushed,
+        summaries,
+        summaryErrors,
+        imagePrompts,
+        renders,
+      };
     });
     leaguesProcessed = n;
 
@@ -160,6 +177,7 @@ export async function GET(request: NextRequest) {
         emailed: a.emailed + r.emailed,
         pushed: a.pushed + r.pushed,
         summaries: a.summaries + r.summaries,
+        summaryErrors: a.summaryErrors + r.summaryErrors,
         imagePrompts: a.imagePrompts + r.imagePrompts,
         renders: a.renders + r.renders,
       }),
@@ -178,6 +196,7 @@ export async function GET(request: NextRequest) {
         emailed: 0,
         pushed: 0,
         summaries: 0,
+        summaryErrors: 0,
         imagePrompts: 0,
         renders: 0,
       },

@@ -194,6 +194,7 @@ describe("GET /api/cron/sync-matches", () => {
       "stale",
       "staleResolved",
       "rescheduled",
+      "summaryErrors",
     ]) {
       expect(body[key], key).toBeTypeOf("number");
       expect(body[key] as number).toBeGreaterThanOrEqual(0);

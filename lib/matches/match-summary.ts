@@ -274,6 +274,11 @@ export type PendingSummary = {
   generated: number;
   skipped: number;
   errors: number;
+  // How the pass ended for each candidate, keyed by the skip reason
+  // ("no-events", "not-final", "exists", ...) plus "error". A pass that
+  // generates nothing is otherwise indistinguishable from one with nothing to
+  // do, which is how a dead API key stayed invisible for weeks.
+  reasons: Record<string, number>;
 };
 
 /**
@@ -283,17 +288,28 @@ export type PendingSummary = {
  */
 export async function generatePendingSummaries(
   admin: AdminClient,
-  opts: { limit?: number } = {},
+  opts: { limit?: number; competitionId?: string } = {},
 ): Promise<PendingSummary> {
-  const out: PendingSummary = { candidates: 0, generated: 0, skipped: 0, errors: 0 };
+  const out: PendingSummary = {
+    candidates: 0,
+    generated: 0,
+    skipped: 0,
+    errors: 0,
+    reasons: {},
+  };
   if (!env.openrouterApiKey) return out;
 
   const limit = opts.limit ?? DEFAULT_BATCH_LIMIT;
 
-  const { data: finals, error } = await admin
-    .from("matches")
-    .select("id")
-    .eq("status", "final")
+  // Scope the window to one competition when the caller names one. The cron
+  // runs this once per live league, and an unscoped window is a single global
+  // top-N over every league's finals: whichever league played most recently
+  // fills it, and the others never reach the front of the queue.
+  let finalsQuery = admin.from("matches").select("id").eq("status", "final");
+  if (opts.competitionId) {
+    finalsQuery = finalsQuery.eq("competition_id", opts.competitionId);
+  }
+  const { data: finals, error } = await finalsQuery
     .order("kickoff_at", { ascending: false })
     .limit(limit);
   if (error) {
@@ -318,12 +334,33 @@ export async function generatePendingSummaries(
   for (const id of pending) {
     try {
       const result = await generateMatchSummary(admin, id);
-      if (result.generated) out.generated++;
-      else out.skipped++;
+      if (result.generated) {
+        out.generated++;
+      } else {
+        out.skipped++;
+        const reason = result.reason ?? "unknown";
+        out.reasons[reason] = (out.reasons[reason] ?? 0) + 1;
+      }
     } catch (err) {
       out.errors++;
+      out.reasons.error = (out.reasons.error ?? 0) + 1;
       console.error(`[match-summary] generation failed for ${id}:`, err);
     }
+  }
+
+  // One line per pass with the full breakdown: a silent pass is a bug report
+  // without it (see PendingSummary.reasons).
+  if (out.candidates > 0) {
+    console.log(
+      `[match-summary] pass: ${JSON.stringify({
+        competitionId: opts.competitionId ?? "all",
+        candidates: out.candidates,
+        generated: out.generated,
+        skipped: out.skipped,
+        errors: out.errors,
+        reasons: out.reasons,
+      })}`,
+    );
   }
 
   return out;

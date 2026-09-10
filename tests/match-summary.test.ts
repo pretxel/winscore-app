@@ -382,11 +382,138 @@ describe("buildSummaryPrompt", () => {
 });
 
 describe("generatePendingSummaries", () => {
+  // Records the filters applied to the `matches` query so the batch's scope is
+  // assertable, and serves a fixed set of finals + existing summaries.
+  // Serves both the batch queries (finals window, existing-summaries anti-join)
+  // and the per-match reads generateMatchSummary makes for each candidate.
+  function makeBatchAdmin(opts: {
+    finals: { id: string }[];
+    existingSummaries?: { match_id: string }[];
+    match?: Record<string, unknown> | null;
+    events?: unknown[];
+  }) {
+    const matchFilters: Record<string, unknown> = {};
+    const matchRow = opts.match ?? {
+      home_team: "Mexico",
+      away_team: "Poland",
+      home_score: 2,
+      away_score: 1,
+      status: "final",
+      stage: "group",
+      group_code: "A",
+    };
+    const from = vi.fn((table: string) => {
+      if (table === "matches") {
+        const chain: Record<string, unknown> = {
+          select: () => chain,
+          eq: (col: string, val: unknown) => {
+            matchFilters[col] = val;
+            return chain;
+          },
+          order: () => chain,
+          limit: async () => ({ data: opts.finals, error: null }),
+          // Per-match read inside generateMatchSummary.
+          maybeSingle: async () => ({ data: matchRow, error: null }),
+        };
+        return chain;
+      }
+      if (table === "match_summaries") {
+        const chain: Record<string, unknown> = {
+          select: () => chain,
+          // Batch anti-join.
+          in: async () => ({ data: opts.existingSummaries ?? [], error: null }),
+          // Per-match existence check: .eq(...).limit(1) — always empty here,
+          // since the batch already filtered out matches that have a summary.
+          eq: () => ({ limit: async () => ({ data: [], error: null }) }),
+          insert: () => ({
+            select: () => ({ single: async () => ({ data: { id: "s-new" }, error: null }) }),
+          }),
+        };
+        return chain;
+      }
+      if (table === "match_events") {
+        return {
+          select: () => ({
+            eq: () => ({ order: async () => ({ data: opts.events ?? [GOAL], error: null }) }),
+          }),
+        };
+      }
+      throw new Error(`unexpected from(${table})`);
+    });
+    return { from, matchFilters };
+  }
+
   it("no-ops without DB access when the key is unset", async () => {
     envMock.openrouterApiKey = null;
     const admin = makeAdmin({});
     const result = await generatePendingSummaries(admin as never);
-    expect(result).toEqual({ candidates: 0, generated: 0, skipped: 0, errors: 0 });
+    expect(result).toEqual({
+      candidates: 0,
+      generated: 0,
+      skipped: 0,
+      errors: 0,
+      reasons: {},
+    });
     expect(admin.from).not.toHaveBeenCalled();
+  });
+
+  // Without this the batch is one global window over every league's finals, so
+  // a league whose fixtures kicked off most recently starves the others: the
+  // older leagues' recaps are never even considered.
+  it("scopes the batch to one competition when given one", async () => {
+    const admin = makeBatchAdmin({ finals: [] });
+    await generatePendingSummaries(admin as never, { competitionId: "comp-1" });
+    expect(admin.matchFilters.competition_id).toBe("comp-1");
+    expect(admin.matchFilters.status).toBe("final");
+  });
+
+  it("leaves the batch global when no competition is given", async () => {
+    const admin = makeBatchAdmin({ finals: [] });
+    await generatePendingSummaries(admin as never);
+    expect(admin.matchFilters.competition_id).toBeUndefined();
+  });
+
+  // A failing OpenRouter key made every match error, but the cron only ever
+  // read `generated`, so a dead integration looked exactly like "nothing to do".
+  it("counts a per-match failure as an error and keeps going", async () => {
+    const admin = makeBatchAdmin({ finals: [{ id: "m1" }, { id: "m2" }] });
+    chatMock.mockRejectedValueOnce(new Error("OpenRouter 401: no credit"));
+    chatMock.mockResolvedValueOnce({
+      content: "Recap.",
+      model: "test/model",
+      promptTokens: 1,
+      completionTokens: 2,
+    });
+
+    const result = await generatePendingSummaries(admin as never);
+
+    expect(result.candidates).toBe(2);
+    expect(result.errors).toBe(1);
+    expect(result.reasons.error).toBe(1);
+  });
+
+  // The reason breakdown is what makes a silent pass diagnosable: "20 candidates,
+  // 0 generated" says nothing; "18 no-events, 2 errors" says where to look.
+  it("tallies why each match was skipped", async () => {
+    // No ingested events -> the recap is not worth generating, and the pass
+    // should say so rather than reporting a bare zero.
+    const admin = makeBatchAdmin({ finals: [{ id: "m1" }], events: [] });
+
+    const result = await generatePendingSummaries(admin as never);
+
+    expect(result.generated).toBe(0);
+    expect(result.skipped).toBe(1);
+    expect(result.reasons["no-events"]).toBe(1);
+  });
+
+  it("does not consider a match that already has a summary", async () => {
+    const admin = makeBatchAdmin({
+      finals: [{ id: "m1" }, { id: "m2" }],
+      existingSummaries: [{ match_id: "m1" }],
+    });
+
+    const result = await generatePendingSummaries(admin as never);
+
+    expect(result.candidates).toBe(1);
   });
 });
