@@ -7,6 +7,7 @@ import { GroupStandingsTable } from "@/components/group-standings-table";
 import { KickoffCountdown } from "@/components/kickoff-countdown";
 import { LiveEventsFeed, type LiveFeedLabels } from "@/components/live-events-feed";
 import { LocalTime } from "@/components/local-time";
+import { MatchPicks } from "@/components/match-picks";
 import { MatchStateBadge } from "@/components/match-state-badge";
 import { RecapReactions } from "@/components/recap-reactions";
 import { ShareButtons } from "@/components/share-buttons";
@@ -20,6 +21,7 @@ import { getStageLabel, groupStageKey } from "@/lib/competition-schema";
 import { env } from "@/lib/env";
 import { type GroupTeamRow, simulateGroup } from "@/lib/group-standings";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { getMatchPicks } from "@/lib/match-picks";
 import { isConfirmedMatch, lockReason } from "@/lib/match-utils";
 import { isLiveNow } from "@/lib/matches/live";
 import type {
@@ -223,6 +225,11 @@ export default async function MatchDetailPage({
             : "scheduled";
 
   const isFinal = match.status === "final" && match.home_score != null && match.away_score != null;
+
+  // Everyone's picks open up the moment the match locks (live, final, or
+  // kickoff passed). The SQL function re-checks the lock, so this is only a
+  // guard against a pointless round trip.
+  const allPicks = user && locked && confirmed ? await getMatchPicks(match.id, league) : [];
 
   const stageLabelLocalized = activeComp
     ? getStageLabel(activeComp.format, match.stage, locale)
@@ -639,6 +646,46 @@ export default async function MatchDetailPage({
           />
         )}
       </section>
+
+      {user && locked && confirmed ? (
+        <section className="mt-8" aria-labelledby="all-picks-heading">
+          <div className="mb-3 flex items-baseline justify-between gap-3">
+            <h2
+              id="all-picks-heading"
+              className="font-heading text-xl font-semibold tracking-tight"
+              style={{ fontStretch: "condensed" }}
+            >
+              {t("allPicksHeading")}
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+              {t("allPicksCount", { count: allPicks.length })}
+            </span>
+          </div>
+          {allPicks.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-border px-5 py-6 text-center text-sm text-muted-foreground">
+              {t("allPicksEmpty")}
+            </p>
+          ) : (
+            <MatchPicks
+              picks={allPicks}
+              currentUserId={user.id}
+              homeTeam={match.home_team}
+              awayTeam={match.away_team}
+              labels={{
+                you: t("allPicksYou"),
+                noName: t("allPicksNoName"),
+                points: (points) => t("allPicksPoints", { points }),
+                hit: {
+                  exact: t("allPicksHitExact"),
+                  winner_gd: t("allPicksHitWinnerGd"),
+                  winner: t("allPicksHitWinner"),
+                  miss: t("allPicksHitMiss"),
+                },
+              }}
+            />
+          )}
+        </section>
+      ) : null}
 
       {myPrediction ? (
         <section className="mt-8">

@@ -2409,6 +2409,17 @@ export type Database = {
         Args: { p_provider_review_status?: string; p_round_id: string };
         Returns: undefined;
       };
+      match_picks: {
+        Args: { p_match_id: string };
+        Returns: {
+          away_goals: number;
+          display_name: string;
+          hit_type: string;
+          home_goals: number;
+          points: number;
+          user_id: string;
+        }[];
+      };
       remove_group_member: {
         Args: { p_group_id: string; p_user_id: string };
         Returns: undefined;
