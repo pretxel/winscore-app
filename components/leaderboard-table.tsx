@@ -78,10 +78,14 @@ export function LeaderboardTable({
   rows,
   currentUserId,
   labels,
+  rowMarker,
 }: {
   rows: BoardRow[];
   currentUserId?: string | null;
   labels: LeaderboardLabels;
+  // Optional per-row annotation next to the name (e.g. a late-join marker on
+  // a phase board). Returns null for rows with nothing to say.
+  rowMarker?: (row: BoardRow) => React.ReactNode;
 }) {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
@@ -134,6 +138,7 @@ export function LeaderboardTable({
                         {labels.you}
                       </span>
                     ) : null}
+                    {rowMarker?.(r)}
                   </div>
                 </TableCell>
                 <TableCell className="text-right">

@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LeaderboardLive } from "@/components/leaderboard-live";
 import { LeaderboardSegmentSwitcher } from "@/components/leaderboard-segment-switcher";
 import { LeaderboardTable } from "@/components/leaderboard-table";
+import { LocalTime } from "@/components/local-time";
 import { ShareButtons } from "@/components/share-buttons";
 import { getLeagueFromContext } from "@/lib/competition";
 import { getStageLabel, sortedStages } from "@/lib/competition-schema";
@@ -14,9 +15,11 @@ import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
 import {
   currentWeekBoundsUtc,
   parseSegmentParam,
+  reconcilePhaseParam,
   reconcileStageParam,
   resolveSegment,
 } from "@/lib/leaderboard-segment";
+import { defaultPhase, getDefaultScheme, listPhases } from "@/lib/phases";
 import { buildRankSharePath } from "@/lib/share";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { LeaderboardChallenge } from "./leaderboard-challenge";
@@ -48,13 +51,17 @@ export default async function LeaderboardPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; league: string }>;
-  searchParams: Promise<{ segment?: string | string[]; stage?: string | string[] }>;
+  searchParams: Promise<{
+    segment?: string | string[];
+    stage?: string | string[];
+    phase?: string | string[];
+  }>;
 }) {
   const { locale: raw, league } = await params;
   const locale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   setRequestLocale(locale);
 
-  const { segment: segmentParam, stage: stageParam } = await searchParams;
+  const { segment: segmentParam, stage: stageParam, phase: phaseParam } = await searchParams;
 
   const t = await getTranslations("leaderboard");
   const tShare = await getTranslations("shareRank");
@@ -74,9 +81,24 @@ export default async function LeaderboardPage({
 
   // Parse the URL switch, then reconcile against the available stages. A
   // `stage` segment with no valid stage falls back to overall (no redirect/404).
+  // Phases come from the competition's default scheme (none for most leagues).
+  // `?phase=` without a value means the active phase, else the last closed one.
+  const defaultScheme = activeCompetition
+    ? await getDefaultScheme(activeCompetition.id, locale)
+    : null;
+  const phases = defaultScheme ? await listPhases(defaultScheme.id, locale) : [];
+  const phaseFallback = defaultPhase(phases)?.id ?? null;
+
   const requestedSegment = parseSegmentParam(segmentParam);
   const activeStage = reconcileStageParam(stageParam, stageKeys);
-  const segment = resolveSegment(requestedSegment, activeStage);
+  const activePhase = reconcilePhaseParam(
+    phaseParam,
+    phases.map((p) => p.id),
+    phaseFallback,
+  );
+  const segment = resolveSegment(requestedSegment, activeStage, activePhase);
+  const selectedPhase =
+    segment === "phase" ? (phases.find((p) => p.id === activePhase) ?? null) : null;
 
   const supabase = await createServerSupabaseClient(league);
   const {
@@ -99,6 +121,10 @@ export default async function LeaderboardPage({
     const res = await supabase.rpc("leaderboard_for_stage", {
       stage_key: activeStage,
     });
+    data = res.data as LeaderboardRow[] | null;
+    error = res.error;
+  } else if (segment === "phase" && activePhase) {
+    const res = await supabase.rpc("leaderboard_for_phase", { p_phase_id: activePhase });
     data = res.data as LeaderboardRow[] | null;
     error = res.error;
   } else {
@@ -174,13 +200,32 @@ export default async function LeaderboardPage({
         activeSegment={segment}
         activeStage={activeStage}
         stages={stageOptions}
+        phases={phases.map((p) => ({ id: p.id, label: p.label }))}
+        activePhase={activePhase}
         labels={{
           group: t("segmentGroup"),
           overall: t("segmentOverall"),
           week: t("segmentWeek"),
           stage: t("segmentStage"),
+          phase: t("segmentPhase"),
         }}
       />
+
+      {selectedPhase ? (
+        <p className="text-muted-foreground -mt-4 mb-6 text-sm">
+          <span className="font-medium text-foreground">{selectedPhase.label}</span>
+          {": "}
+          {selectedPhase.endsAt
+            ? t.rich("phaseWindow", {
+                from: () => <LocalTime iso={selectedPhase.startsAt} format="date" />,
+                to: () => <LocalTime iso={selectedPhase.endsAt as string} format="date" />,
+              })
+            : t.rich("phaseWindowOpen", {
+                from: () => <LocalTime iso={selectedPhase.startsAt} format="date" />,
+              })}{" "}
+          {t("phaseWindowNote")}
+        </p>
+      ) : null}
 
       {loadError ? (
         <div

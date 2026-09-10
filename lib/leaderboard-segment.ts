@@ -3,9 +3,9 @@
 // same drop-unknown defense as the /matches filters: any bad/missing value
 // falls back to the default ("overall") instead of erroring or redirecting.
 
-export type LeaderboardSegment = "overall" | "week" | "stage";
+export type LeaderboardSegment = "overall" | "week" | "stage" | "phase";
 
-const SEGMENTS: readonly LeaderboardSegment[] = ["overall", "week", "stage"];
+const SEGMENTS: readonly LeaderboardSegment[] = ["overall", "week", "stage", "phase"];
 
 // Normalize a `?segment=` value into a known segment. A repeated param keeps the
 // first recognized value; anything unknown/missing yields "overall".
@@ -44,9 +44,29 @@ export function reconcileStageParam(
 export function resolveSegment(
   segment: LeaderboardSegment,
   stage: string | null,
+  phase: string | null = null,
 ): LeaderboardSegment {
   if (segment === "stage" && !stage) return "overall";
+  if (segment === "phase" && !phase) return "overall";
   return segment;
+}
+
+// Resolve a `?phase=` value against the default scheme's phase ids. A missing
+// value yields the fallback the caller computed (the active phase, else the
+// most recently closed one); an unknown id yields null so the segment collapses
+// to "overall". Mirrors reconcileStageParam.
+export function reconcilePhaseParam(
+  raw: string | string[] | undefined,
+  phaseIds: readonly string[],
+  fallback: string | null,
+): string | null {
+  if (!raw) return fallback;
+  const known = new Set(phaseIds);
+  for (const value of Array.isArray(raw) ? raw : [raw]) {
+    const key = value.trim();
+    if (known.has(key)) return key;
+  }
+  return null;
 }
 
 // The current week's half-open bounds [from, to) as ISO instants, with the week

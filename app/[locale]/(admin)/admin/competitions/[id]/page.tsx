@@ -53,16 +53,24 @@ export default async function EditCompetitionPage({
           <AdminPageHeader
             title={row.name}
             actions={
-              row.status === "active" ? (
-                <Badge>{t("competitions.badgeActive")}</Badge>
-              ) : (
-                <SetActiveDialog
-                  id={row.id}
-                  name={row.name}
-                  currentActiveName={activeName}
-                  hasFixtures={hasFixtures}
-                />
-              )
+              <>
+                <Link
+                  href={localePath(locale, `/admin/competitions/${row.id}/phases`)}
+                  className="border-border hover:bg-secondary inline-flex min-h-9 items-center gap-1 rounded-md border px-3 text-sm font-medium transition-colors"
+                >
+                  {t("phases.openPhases")}
+                </Link>
+                {row.status === "active" ? (
+                  <Badge>{t("competitions.badgeActive")}</Badge>
+                ) : (
+                  <SetActiveDialog
+                    id={row.id}
+                    name={row.name}
+                    currentActiveName={activeName}
+                    hasFixtures={hasFixtures}
+                  />
+                )}
+              </>
             }
           />
         </div>

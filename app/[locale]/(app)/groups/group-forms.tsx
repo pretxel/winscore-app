@@ -2,7 +2,7 @@
 
 import { Loader2Icon, PlusIcon, TicketIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,12 +15,17 @@ const INITIAL: GroupActionState = {};
 export function CreateGroupForm({
   locale,
   leagues,
+  schemesByLeague = {},
 }: {
   locale: string;
   leagues: { id: string; name: string }[];
+  // Phase schemes offered per league id. A league with none shows no picker.
+  schemesByLeague?: Record<string, { id: string; label: string }[]>;
 }) {
   const t = useTranslations("groups");
   const [state, formAction, pending] = useActionState(createGroupAction, INITIAL);
+  const [leagueId, setLeagueId] = useState("");
+  const schemes = schemesByLeague[leagueId] ?? [];
 
   useEffect(() => {
     if (state.error) toast.error(t(state.error));
@@ -44,6 +49,7 @@ export function CreateGroupForm({
         name="competitionId"
         required
         defaultValue=""
+        onChange={(e) => setLeagueId(e.target.value)}
         className="border-input bg-background focus-visible:ring-ring h-11 rounded-md border px-3 text-sm focus-visible:ring-2 focus-visible:outline-none"
       >
         <option value="" disabled>
@@ -55,6 +61,31 @@ export function CreateGroupForm({
           </option>
         ))}
       </select>
+      {schemes.length > 0 ? (
+        <>
+          <Label
+            htmlFor="group-scheme"
+            className="text-muted-foreground font-mono text-[10px] tracking-[0.2em] uppercase"
+          >
+            {t("createSchemeLabel")}
+          </Label>
+          {/* "No phases" is preselected; the choice is locked once the group exists. */}
+          <select
+            id="group-scheme"
+            name="phaseSchemeId"
+            defaultValue=""
+            className="border-input bg-background focus-visible:ring-ring h-11 rounded-md border px-3 text-sm focus-visible:ring-2 focus-visible:outline-none"
+          >
+            <option value="">{t("createSchemeNone")}</option>
+            {schemes.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+          <p className="text-muted-foreground text-xs">{t("createSchemeHint")}</p>
+        </>
+      ) : null}
       <Label
         htmlFor="group-name"
         className="text-muted-foreground font-mono text-[10px] tracking-[0.2em] uppercase"

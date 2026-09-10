@@ -79,6 +79,143 @@ export type Database = {
           },
         ];
       };
+      competition_phase_schemes: {
+        Row: {
+          competition_id: string;
+          created_at: string;
+          id: string;
+          is_default: boolean;
+          labels: Json;
+          scheme_key: string;
+          updated_at: string;
+        };
+        Insert: {
+          competition_id: string;
+          created_at?: string;
+          id?: string;
+          is_default?: boolean;
+          labels?: Json;
+          scheme_key: string;
+          updated_at?: string;
+        };
+        Update: {
+          competition_id?: string;
+          created_at?: string;
+          id?: string;
+          is_default?: boolean;
+          labels?: Json;
+          scheme_key?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "competition_phase_schemes_competition_id_fkey";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "competitions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      competition_phase_winners: {
+        Row: {
+          decided_at: string;
+          exact_hits: number;
+          group_id: string;
+          phase_id: string;
+          total_points: number;
+          user_id: string;
+          winner_gd_hits: number;
+          winner_hits: number;
+        };
+        Insert: {
+          decided_at?: string;
+          exact_hits: number;
+          group_id: string;
+          phase_id: string;
+          total_points: number;
+          user_id: string;
+          winner_gd_hits: number;
+          winner_hits: number;
+        };
+        Update: {
+          decided_at?: string;
+          exact_hits?: number;
+          group_id?: string;
+          phase_id?: string;
+          total_points?: number;
+          user_id?: string;
+          winner_gd_hits?: number;
+          winner_hits?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "competition_phase_winners_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "competition_phase_winners_phase_id_fkey";
+            columns: ["phase_id"];
+            isOneToOne: false;
+            referencedRelation: "competition_phases";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "competition_phase_winners_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      competition_phases: {
+        Row: {
+          created_at: string;
+          display_order: number;
+          id: string;
+          labels: Json;
+          phase_key: string;
+          scheme_id: string;
+          starts_at: string;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          display_order: number;
+          id?: string;
+          labels?: Json;
+          phase_key: string;
+          scheme_id: string;
+          starts_at: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          display_order?: number;
+          id?: string;
+          labels?: Json;
+          phase_key?: string;
+          scheme_id?: string;
+          starts_at?: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "competition_phases_scheme_id_fkey";
+            columns: ["scheme_id"];
+            isOneToOne: false;
+            referencedRelation: "competition_phase_schemes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       competition_rounds: {
         Row: {
           admin_closes_at: string | null;
@@ -393,6 +530,7 @@ export type Database = {
           join_code: string;
           name: string;
           owner_id: string;
+          phase_scheme_id: string | null;
           updated_at: string;
         };
         Insert: {
@@ -402,6 +540,7 @@ export type Database = {
           join_code: string;
           name: string;
           owner_id: string;
+          phase_scheme_id?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -411,6 +550,7 @@ export type Database = {
           join_code?: string;
           name?: string;
           owner_id?: string;
+          phase_scheme_id?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -426,6 +566,13 @@ export type Database = {
             columns: ["owner_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "groups_phase_scheme_id_fkey";
+            columns: ["phase_scheme_id"];
+            isOneToOne: false;
+            referencedRelation: "competition_phase_schemes";
             referencedColumns: ["id"];
           },
         ];
@@ -2274,6 +2421,7 @@ export type Database = {
         Args: { p_match_id: string };
         Returns: string;
       };
+      close_phase: { Args: { p_phase_id: string }; Returns: number };
       close_round: { Args: { p_round_id: string }; Returns: undefined };
       compute_match_scores: { Args: { p_match_id: string }; Returns: undefined };
       configure_pool_wager: {
@@ -2309,7 +2457,11 @@ export type Database = {
       create_group:
         | { Args: { p_name: string }; Returns: string }
         | {
-            Args: { p_competition_id?: string; p_name: string };
+            Args: {
+              p_competition_id?: string;
+              p_name: string;
+              p_phase_scheme_id?: string;
+            };
             Returns: string;
           };
       create_wager_intent_and_snapshot: {
@@ -2332,6 +2484,20 @@ export type Database = {
       grant_streak_freeze: {
         Args: { p_amount: number; p_kind: string };
         Returns: number;
+      };
+      group_phase_standing: {
+        Args: { p_group_id: string; p_phase_id: string };
+        Returns: {
+          display_name: string;
+          exact_hits: number;
+          first_submit: string;
+          joined_mid_phase: boolean;
+          rank: number;
+          total_points: number;
+          user_id: string;
+          winner_gd_hits: number;
+          winner_hits: number;
+        }[];
       };
       group_preview: {
         Args: { p_code: string };
@@ -2366,6 +2532,33 @@ export type Database = {
       };
       leaderboard_for_group: {
         Args: { p_group_id: string };
+        Returns: {
+          display_name: string;
+          exact_hits: number;
+          first_submit: string;
+          rank: number;
+          total_points: number;
+          user_id: string;
+          winner_gd_hits: number;
+          winner_hits: number;
+        }[];
+      };
+      leaderboard_for_group_phase: {
+        Args: { p_group_id: string; p_phase_id: string };
+        Returns: {
+          display_name: string;
+          exact_hits: number;
+          first_submit: string;
+          joined_mid_phase: boolean;
+          rank: number;
+          total_points: number;
+          user_id: string;
+          winner_gd_hits: number;
+          winner_hits: number;
+        }[];
+      };
+      leaderboard_for_phase: {
+        Args: { p_phase_id: string };
         Returns: {
           display_name: string;
           exact_hits: number;
@@ -2418,6 +2611,16 @@ export type Database = {
           home_goals: number;
           points: number;
           user_id: string;
+        }[];
+      };
+      phase_bounds: {
+        Args: { p_phase_id: string };
+        Returns: {
+          competition_id: string;
+          ends_at: string;
+          phase_id: string;
+          scheme_id: string;
+          starts_at: string;
         }[];
       };
       remove_group_member: {

@@ -25,6 +25,9 @@ export type GroupDetail = {
   joinCode: string;
   isOwner: boolean;
   currentUserId: string | null;
+  createdAt: string;
+  // Phase scheme chosen at creation; null means the group plays no phases.
+  phaseSchemeId: string | null;
   members: GroupMemberView[];
 };
 
@@ -169,7 +172,7 @@ export async function getGroup(groupId: string): Promise<GroupDetail | null> {
 
   const { data: group } = await supabase
     .from("groups")
-    .select("id, name, owner_id, join_code")
+    .select("id, name, owner_id, join_code, created_at, phase_scheme_id")
     .eq("id", groupId)
     .maybeSingle();
 
@@ -190,6 +193,8 @@ export async function getGroup(groupId: string): Promise<GroupDetail | null> {
     joinCode: group.join_code,
     isOwner: group.owner_id === user?.id,
     currentUserId: user?.id ?? null,
+    createdAt: group.created_at,
+    phaseSchemeId: group.phase_scheme_id,
     members: (members ?? []).map((m) => ({
       userId: m.user_id,
       displayName: m.profiles?.display_name ?? null,
@@ -209,6 +214,24 @@ export async function getGroupBoard(
     p_group_id: groupId,
   });
   return { rows: (data ?? []) as GroupBoardRow[], error: error?.message ?? null };
+}
+
+export type GroupPhaseBoardRow = GroupBoardRow & { joined_mid_phase: boolean };
+
+// The group's board over one phase of its own scheme. Returns [] for
+// non-members and for a phase from another scheme (the SQL function guards
+// both). Rows carry the same columns as the all-time board plus a late-join
+// flag for members who joined after the phase began.
+export async function getGroupPhaseBoard(
+  groupId: string,
+  phaseId: string,
+): Promise<{ rows: GroupPhaseBoardRow[]; error: string | null }> {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.rpc("leaderboard_for_group_phase", {
+    p_group_id: groupId,
+    p_phase_id: phaseId,
+  });
+  return { rows: (data ?? []) as GroupPhaseBoardRow[], error: error?.message ?? null };
 }
 
 // Name-only lookup by invite code, for the join-confirm screen.

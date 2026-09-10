@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { listStartableLeagues } from "@/lib/competition";
 import { listMyGroups } from "@/lib/groups";
 import { DEFAULT_LOCALE, isLocale, type Locale, localePath } from "@/lib/i18n";
+import { listSchemes } from "@/lib/phases";
 import { CreateGroupForm, JoinGroupForm } from "./group-forms";
 
 export async function generateMetadata({
@@ -29,6 +30,16 @@ export default async function GroupsPage({ params }: { params: Promise<{ locale:
   const t = await getTranslations("groups");
   const groups = await listMyGroups();
   const leagues = await listStartableLeagues();
+  // Phase schemes per league, for the create form's scheme picker. Most leagues
+  // have none, in which case the picker never renders for them.
+  const schemesByLeague = Object.fromEntries(
+    await Promise.all(
+      leagues.map(async (l) => [
+        l.id,
+        (await listSchemes(l.id, locale)).map((s) => ({ id: s.id, label: s.label })),
+      ]),
+    ),
+  ) as Record<string, { id: string; label: string }[]>;
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -48,7 +59,7 @@ export default async function GroupsPage({ params }: { params: Promise<{ locale:
       <div className="grid gap-4 sm:grid-cols-2">
         <section className="rounded-xl border border-border bg-card p-4">
           <h2 className="mb-3 font-heading text-base font-semibold">{t("createTitle")}</h2>
-          <CreateGroupForm locale={locale} leagues={leagues} />
+          <CreateGroupForm locale={locale} leagues={leagues} schemesByLeague={schemesByLeague} />
         </section>
         <section className="rounded-xl border border-border bg-card p-4">
           <h2 className="mb-3 font-heading text-base font-semibold">{t("joinTitle")}</h2>

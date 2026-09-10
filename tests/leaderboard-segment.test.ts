@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   currentWeekBoundsUtc,
   parseSegmentParam,
+  reconcilePhaseParam,
   reconcileStageParam,
   resolveSegment,
 } from "@/lib/leaderboard-segment";
@@ -86,5 +87,29 @@ describe("currentWeekBoundsUtc", () => {
     const { fromTs, toTs } = currentWeekBoundsUtc(new Date("2026-06-21T23:59:59.000Z"));
     expect(fromTs).toBe("2026-06-15T00:00:00.000Z");
     expect(toTs).toBe("2026-06-22T00:00:00.000Z");
+  });
+});
+
+describe("phase segment", () => {
+  const IDS = ["p1", "p2", "p3"] as const;
+
+  it("parses the phase segment", () => {
+    expect(parseSegmentParam("phase")).toBe("phase");
+  });
+
+  it("collapses a phase segment with no resolvable phase to overall", () => {
+    expect(resolveSegment("phase", null, null)).toBe("overall");
+    expect(resolveSegment("phase", null, "p2")).toBe("phase");
+  });
+
+  it("uses the fallback when no phase is named", () => {
+    expect(reconcilePhaseParam(undefined, IDS, "p2")).toBe("p2");
+    expect(reconcilePhaseParam(undefined, IDS, null)).toBeNull();
+  });
+
+  it("keeps a known id and drops an unknown one", () => {
+    expect(reconcilePhaseParam("p3", IDS, "p2")).toBe("p3");
+    expect(reconcilePhaseParam("nope", IDS, "p2")).toBeNull();
+    expect(reconcilePhaseParam(["nope", "p1"], IDS, "p2")).toBe("p1");
   });
 });

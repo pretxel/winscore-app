@@ -60,11 +60,17 @@ export async function createGroupAction(
   // competition exists and is live.
   const competition = idSchema.safeParse(formData.get("competitionId"));
   if (!competition.success) return { error: "errorNoLeague" };
+  // Optional phase scheme, chosen at creation and locked afterwards. An empty
+  // value is "no phases". The RPC re-checks the scheme belongs to the league.
+  const schemeRaw = formData.get("phaseSchemeId");
+  const scheme = typeof schemeRaw === "string" && schemeRaw ? idSchema.safeParse(schemeRaw) : null;
+  if (scheme && !scheme.success) return { error: "errorGeneric" };
 
   const { supabase } = await requireUserClient();
   const { data: groupId, error } = await supabase.rpc("create_group", {
     p_name: parsed.data,
     p_competition_id: competition.data,
+    p_phase_scheme_id: scheme?.success ? scheme.data : undefined,
   });
   if (error) {
     return {

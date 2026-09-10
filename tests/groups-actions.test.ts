@@ -57,6 +57,44 @@ async function importActions() {
 }
 
 describe("createGroupAction", () => {
+  it("passes the chosen phase scheme to the RPC and omits it when none is chosen", async () => {
+    const SCHEME = "44444444-4444-4444-8444-444444444444";
+    const { createGroupAction } = await importActions();
+    await expect(
+      createGroupAction(
+        {},
+        fd({ name: "Phased", competitionId: COMPETITION_ID, phaseSchemeId: SCHEME }),
+      ),
+    ).rejects.toThrow(/REDIRECT:/);
+    expect(rpcMock).toHaveBeenLastCalledWith("create_group", {
+      p_name: "Phased",
+      p_competition_id: COMPETITION_ID,
+      p_phase_scheme_id: SCHEME,
+    });
+
+    await expect(
+      createGroupAction(
+        {},
+        fd({ name: "Plain", competitionId: COMPETITION_ID, phaseSchemeId: "" }),
+      ),
+    ).rejects.toThrow(/REDIRECT:/);
+    expect(rpcMock).toHaveBeenLastCalledWith("create_group", {
+      p_name: "Plain",
+      p_competition_id: COMPETITION_ID,
+      p_phase_scheme_id: undefined,
+    });
+  });
+
+  it("rejects a malformed phase scheme id without calling the RPC", async () => {
+    const { createGroupAction } = await importActions();
+    const result = await createGroupAction(
+      {},
+      fd({ name: "Phased", competitionId: COMPETITION_ID, phaseSchemeId: "nope" }),
+    );
+    expect(result).toEqual({ error: "errorGeneric" });
+    expect(rpcMock).not.toHaveBeenCalled();
+  });
+
   it("rejects a too-short name without calling the RPC", async () => {
     const { createGroupAction } = await importActions();
     const result = await createGroupAction({}, fd({ name: "x" }));

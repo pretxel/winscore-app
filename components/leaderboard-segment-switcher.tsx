@@ -3,12 +3,14 @@ import type { LeaderboardSegment } from "@/lib/leaderboard-segment";
 import { cn } from "@/lib/utils";
 
 export type StageOption = { key: string; label: string };
+export type PhaseOption = { id: string; label: string };
 
 export type SegmentSwitcherLabels = {
   group: string;
   overall: string;
   week: string;
   stage: string;
+  phase: string;
 };
 
 // Server-rendered segment switcher for /leaderboard. Like the /matches filters,
@@ -22,12 +24,17 @@ export function LeaderboardSegmentSwitcher({
   activeSegment,
   activeStage,
   stages,
+  phases = [],
+  activePhase = null,
   labels,
 }: {
   basePath: string;
   activeSegment: LeaderboardSegment;
   activeStage: string | null;
   stages: StageOption[];
+  // Phases of the competition's default scheme; empty when it has none.
+  phases?: PhaseOption[];
+  activePhase?: string | null;
   labels: SegmentSwitcherLabels;
 }) {
   return (
@@ -54,6 +61,20 @@ export function LeaderboardSegmentSwitcher({
             active={activeSegment === "stage" && activeStage === stage.key}
           >
             {stage.label}
+          </Chip>
+        ))}
+        {phases.length > 0 ? (
+          <span className="mx-1 hidden self-center font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground sm:inline">
+            {labels.phase}
+          </span>
+        ) : null}
+        {phases.map((phase) => (
+          <Chip
+            key={phase.id}
+            href={`${basePath}?segment=phase&phase=${encodeURIComponent(phase.id)}`}
+            active={activeSegment === "phase" && activePhase === phase.id}
+          >
+            {phase.label}
           </Chip>
         ))}
       </div>
