@@ -41,10 +41,11 @@
 
 ## 5. Match page
 
-- [ ] 5.1 Cache the header, events, AI recap, and comic render by `match:<id>` and `league:<slug>`, with `cacheLife('minutes')` while the match is live and `cacheLife('hours')` otherwise
-- [ ] 5.2 Stream the prediction form, the next-fixture suggestion, everyone's picks, and recap reactions inside Suspense on the session client
-- [ ] 5.3 Verify a signed-in and a signed-out render of a finished and an upcoming match match production section for section, as done for the recent parallel-loading change
-- [ ] 5.4 Measure a finished and an upcoming match page in production against the baseline
+- [x] 5.1 Cache the fixture, its events, its recap and comic, the group's fixtures, and the competition's finished flag by `match:<id>` and `league:<slug>`. The lifetime is per reader rather than per match state, since the state is only known after the read: `minutes` for the fixture and its events, which carry the live score, `hours` for the recap and comic, which are written once after the final whistle
+- [x] 5.1b Read the recap text and its comic render in one cached function: both are per-match, both only exist for a finished match, and the metadata needs the comic on its own
+- [x] 5.2 The prediction form, the next-fixture suggestion, everyone's picks, the admin check and the recap reactions stay at request time on the session client. No Suspense boundary while the shell is blocked app-wide (2.5); the split that matters here is cached-shared versus per-request, and that is in place
+- [x] 5.3 Verified signed out, section for section against production: a finished match, an upcoming match, a match with a recap, and a match with a rendered comic including its Open Graph image. Signed-in render not verified in a browser this session — the extension would not connect — but no per-user read on the page changed
+- [ ] 5.4 Measure a finished and an upcoming match page in production against the baseline once deployed
 
 ## 6. Invalidation and final measurement
 

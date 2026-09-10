@@ -16,7 +16,6 @@ import { TeamCrest } from "@/components/team-crest";
 import { buttonVariants } from "@/components/ui/button";
 import { VenueImage } from "@/components/venue-image";
 import { isCurrentUserAdmin } from "@/lib/admin/current-user";
-import { getLeagueFromContext } from "@/lib/competition";
 import { getStageLabel, groupStageKey } from "@/lib/competition-schema";
 import { env } from "@/lib/env";
 import { type GroupTeamRow, simulateGroup } from "@/lib/group-standings";
@@ -31,16 +30,20 @@ import type {
   MatchEventType,
 } from "@/lib/matches/match-events";
 import { getNextPickableMatch } from "@/lib/next-pick";
+import {
+  getCachedCompetitionFinished,
+  getCachedGroupFixtures,
+  getCachedLeague,
+  getCachedMatch,
+  getCachedMatchEvents,
+  getCachedMatchRecap,
+} from "@/lib/public-data";
 import { emptyCounts, type ReactionType } from "@/lib/recap-reactions";
 import { getRecapReactionSummary } from "@/lib/recap-reactions-server";
 import { buildPickSharePath } from "@/lib/share";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { PredictionForm } from "./prediction-form";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
 
 const RECAP_BUCKET = "match-recap-images";
 
@@ -57,13 +60,10 @@ export async function generateMetadata({
   params: Promise<{ locale: string; league: string; matchId: string }>;
 }): Promise<Metadata> {
   const { locale, league, matchId } = await params;
-  const t = await getTranslations({ locale, namespace: "matchDetail" });
-  const supabase = await createServerSupabaseClient(league);
-  const { data: match } = await supabase
-    .from("matches")
-    .select("home_team, away_team, kickoff_at, venue, stage")
-    .eq("id", matchId)
-    .maybeSingle();
+  const [t, match] = await Promise.all([
+    getTranslations({ locale, namespace: "matchDetail" }),
+    getCachedMatch(league, matchId),
+  ]);
 
   if (!match) {
     return {
@@ -96,13 +96,8 @@ export async function generateMetadata({
 
   // Preview the active recap's comic when one has been rendered (active-only RLS
   // scopes this row; nothing for matches without a completed render).
-  const { data: renderRow } = await supabase
-    .from("match_summary_images")
-    .select("storage_path")
-    .eq("match_id", matchId)
-    .eq("status", "complete")
-    .maybeSingle();
-  const recapImage = renderRow?.storage_path ? recapImagePublicUrl(renderRow.storage_path) : null;
+  const { imagePath } = await getCachedMatchRecap(league, matchId);
+  const recapImage = imagePath ? recapImagePublicUrl(imagePath) : null;
 
   return {
     title,
@@ -146,17 +141,16 @@ export default async function MatchDetailPage({
       getTranslations("shareRecap"),
       getTranslations("liveFeed"),
       createServerSupabaseClient(league),
-      getLeagueFromContext({ slug: league }),
+      getCachedLeague(league),
     ]);
 
   // Level 2: the match and the viewer. Every remaining read needs one or both,
   // and neither needs the other.
-  const [matchRes, userRes] = await Promise.all([
-    supabase.from("matches").select("*").eq("id", matchId).single(),
+  const [match, userRes] = await Promise.all([
+    getCachedMatch(league, matchId),
     supabase.auth.getUser(),
   ]);
-  const { data: match, error } = matchRes;
-  if (error || !match) notFound();
+  if (!match) notFound();
   const user = userRes.data.user;
 
   // Lock state is a pure function of the match, so it gates the reads below
@@ -173,87 +167,50 @@ export default async function MatchDetailPage({
   // Level 3: every remaining read at once. This page used to walk them one at a
   // time — on a finished World Cup match that was eleven serial round trips to
   // Supabase, which is most of the page's time to first byte.
-  const [
-    isAdmin,
-    myPrediction,
-    comp,
-    groupFixtures,
-    allPicks,
-    nextMatch,
-    eventRows,
-    summaryRow,
-    renderRow,
-  ] = await Promise.all([
-    // Admins are operators, not contestants — the form renders but its submit
-    // is blocked (and the server action rejects them too).
-    user ? isCurrentUserAdmin(supabase) : Promise.resolve(false),
-    user
-      ? supabase
-          .from("predictions")
-          .select("home_goals, away_goals")
-          .eq("user_id", user.id)
-          .eq("match_id", matchId)
-          .maybeSingle()
-          .then((r) => r.data)
-      : Promise.resolve(null),
-    match.competition_id
-      ? supabase
-          .from("competitions")
-          .select("finished_at")
-          .eq("id", match.competition_id)
-          .maybeSingle()
-          .then((r) => r.data)
-      : Promise.resolve(null),
-    wantsGroupSim
-      ? supabase
-          .from("matches")
-          .select("id, home_team, away_team")
-          .eq("competition_id", match.competition_id)
-          .eq("stage", groupKey as string)
-          .eq("group_code", match.group_code as string)
-          .then((r) => r.data ?? [])
-      : Promise.resolve([]),
-    // Everyone's picks open up the moment the match locks (live, final, or
-    // kickoff passed). The SQL function re-checks the lock, so this is only a
-    // guard against a pointless round trip.
-    user && locked && confirmed ? getMatchPicks(match.id, league) : Promise.resolve([]),
-    // Suggestion offered after a pick saves. Only worth resolving while the
-    // match is still pickable — a locked match shows no form.
-    user && !locked && confirmed && match.competition_id
-      ? getNextPickableMatch(league, match.competition_id, user.id, match.id)
-      : Promise.resolve(null),
-    // Live feed events: mounted for non-terminal matches only.
-    isTerminalMatch
-      ? Promise.resolve([])
-      : supabase
-          .from("match_events")
-          .select("id, type, team, minute, extra_minute, sequence, player, detail")
-          .eq("match_id", match.id)
-          .order("sequence", { ascending: true })
-          .then((r) => r.data ?? []),
-    // AI recap: only finished matches ever have one.
-    match.status === "final"
-      ? supabase
-          .from("match_summaries")
-          .select("id, content")
-          .eq("match_id", match.id)
-          .eq("is_active", true)
-          .maybeSingle()
-          .then((r) => r.data)
-      : Promise.resolve(null),
-    // The active version's completed comic render (active-only RLS scopes this).
-    match.status === "final"
-      ? supabase
-          .from("match_summary_images")
-          .select("storage_path")
-          .eq("match_id", match.id)
-          .eq("status", "complete")
-          .maybeSingle()
-          .then((r) => r.data)
-      : Promise.resolve(null),
-  ]);
+  const [isAdmin, myPrediction, isFinished, groupFixtures, allPicks, nextMatch, eventRows, recap] =
+    await Promise.all([
+      // Admins are operators, not contestants — the form renders but its submit
+      // is blocked (and the server action rejects them too).
+      user ? isCurrentUserAdmin(supabase) : Promise.resolve(false),
+      user
+        ? supabase
+            .from("predictions")
+            .select("home_goals, away_goals")
+            .eq("user_id", user.id)
+            .eq("match_id", matchId)
+            .maybeSingle()
+            .then((r) => r.data)
+        : Promise.resolve(null),
+      match.competition_id
+        ? getCachedCompetitionFinished(league, match.competition_id)
+        : Promise.resolve(false),
+      wantsGroupSim
+        ? getCachedGroupFixtures(
+            league,
+            match.competition_id as string,
+            groupKey as string,
+            match.group_code as string,
+          )
+        : Promise.resolve([]),
+      // Everyone's picks open up the moment the match locks (live, final, or
+      // kickoff passed). The SQL function re-checks the lock, so this is only a
+      // guard against a pointless round trip.
+      user && locked && confirmed ? getMatchPicks(match.id, league) : Promise.resolve([]),
+      // Suggestion offered after a pick saves. Only worth resolving while the
+      // match is still pickable — a locked match shows no form.
+      user && !locked && confirmed && match.competition_id
+        ? getNextPickableMatch(league, match.competition_id, user.id, match.id)
+        : Promise.resolve(null),
+      // Live feed events: mounted for non-terminal matches only.
+      isTerminalMatch ? Promise.resolve([]) : getCachedMatchEvents(league, match.id),
+      // AI recap and its comic: only finished matches ever have one, and the two
+      // rows travel together in one cache entry.
+      match.status === "final"
+        ? getCachedMatchRecap(league, match.id)
+        : Promise.resolve({ summary: null, imagePath: null }),
+    ]);
 
-  const isFinished = Boolean(comp?.finished_at);
+  const summaryRow = recap.summary;
 
   // Level 4: the two reads that genuinely depend on level 3's results.
   const [groupPicks, reactionSummary] = await Promise.all([
@@ -333,9 +290,7 @@ export default async function MatchDetailPage({
   // English summary, the surrounding labels are localized. Reaction bar state is
   // seeded server-side so the first paint is correct without client JS.
   const matchSummary = summaryRow ? { content: summaryRow.content, id: summaryRow.id } : null;
-  const recapImageUrl = renderRow?.storage_path
-    ? recapImagePublicUrl(renderRow.storage_path)
-    : null;
+  const recapImageUrl = recap.imagePath ? recapImagePublicUrl(recap.imagePath) : null;
   const reactionCounts: Record<ReactionType, number> = reactionSummary?.counts ?? emptyCounts();
   const reactionMine: ReactionType[] = reactionSummary?.mine ?? [];
 

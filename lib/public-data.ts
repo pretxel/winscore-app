@@ -1,7 +1,7 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { type BracketResult, fetchBracket } from "@/lib/bracket";
-import { CATALOG_TAG, leagueTag, NEWS_TAG } from "@/lib/cache-tags";
+import { CATALOG_TAG, leagueTag, matchTag, NEWS_TAG } from "@/lib/cache-tags";
 import {
   fetchCatalogLeagues,
   fetchLeagueBySlug,
@@ -252,4 +252,122 @@ export async function getCachedLeagueFixtures(
     .eq("competition_id", competitionId)
     .order("kickoff_at", { ascending: true });
   return { matches: (data ?? []) as MatchRow[], error: error?.message ?? null };
+}
+
+// --- One match -------------------------------------------------------------
+// Everything on a match page that is the same for every visitor: the fixture
+// itself, its live feed, its AI recap and the recap's comic. Each is tagged
+// with both the match and its league, so a result sync can invalidate one
+// fixture without dropping the whole league.
+
+/** One fixture, by id. */
+export async function getCachedMatch(slug: string, matchId: string): Promise<MatchRow | null> {
+  "use cache: remote";
+  // Minutes, like the fixture list: this row carries the live score.
+  cacheLife("minutes");
+  cacheTag(leagueTag(slug), matchTag(matchId));
+  const { data } = await createPublicSupabaseClient(slug)
+    .from("matches")
+    .select("*")
+    .eq("id", matchId)
+    .maybeSingle();
+  return (data as MatchRow | null) ?? null;
+}
+
+export type MatchEventRow = {
+  id: string;
+  type: string;
+  team: string | null;
+  minute: number | null;
+  extra_minute: number | null;
+  sequence: number;
+  player: string | null;
+  detail: string | null;
+};
+
+/** A match's live feed events, in order. */
+export async function getCachedMatchEvents(
+  slug: string,
+  matchId: string,
+): Promise<MatchEventRow[]> {
+  "use cache: remote";
+  // The whole point of this feed is to follow a match as it happens.
+  cacheLife("minutes");
+  cacheTag(leagueTag(slug), matchTag(matchId));
+  const { data } = await createPublicSupabaseClient(slug)
+    .from("match_events")
+    .select("id, type, team, minute, extra_minute, sequence, player, detail")
+    .eq("match_id", matchId)
+    .order("sequence", { ascending: true });
+  return (data ?? []) as MatchEventRow[];
+}
+
+/**
+ * A finished match's active AI recap and its rendered comic.
+ *
+ * Hours rather than minutes: a recap is written once after the final whistle
+ * and then never changes, and the comic render that follows it invalidates the
+ * match tag when it completes.
+ */
+export async function getCachedMatchRecap(
+  slug: string,
+  matchId: string,
+): Promise<{ summary: { id: string; content: string } | null; imagePath: string | null }> {
+  "use cache: remote";
+  cacheLife("hours");
+  cacheTag(leagueTag(slug), matchTag(matchId));
+  const supabase = createPublicSupabaseClient(slug);
+  const [summaryRes, renderRes] = await Promise.all([
+    supabase
+      .from("match_summaries")
+      .select("id, content")
+      .eq("match_id", matchId)
+      .eq("is_active", true)
+      .maybeSingle(),
+    supabase
+      .from("match_summary_images")
+      .select("storage_path")
+      .eq("match_id", matchId)
+      .eq("status", "complete")
+      .maybeSingle(),
+  ]);
+  return {
+    summary: summaryRes.data ?? null,
+    imagePath: renderRes.data?.storage_path ?? null,
+  };
+}
+
+/** Whether a competition has been wrapped up, which freezes its pages. */
+export async function getCachedCompetitionFinished(
+  slug: string,
+  competitionId: string,
+): Promise<boolean> {
+  "use cache: remote";
+  cacheLife("hours");
+  cacheTag(leagueTag(slug));
+  const { data } = await createPublicSupabaseClient(slug)
+    .from("competitions")
+    .select("finished_at")
+    .eq("id", competitionId)
+    .maybeSingle();
+  return Boolean(data?.finished_at);
+}
+
+/** The fixtures of one group, for the personal group simulation. */
+export async function getCachedGroupFixtures(
+  slug: string,
+  competitionId: string,
+  stage: string,
+  groupCode: string,
+): Promise<{ id: string; home_team: string; away_team: string }[]> {
+  "use cache: remote";
+  cacheLife("hours");
+  cacheTag(leagueTag(slug));
+  const { data } = await createPublicSupabaseClient(slug)
+    .from("matches")
+    .select("id, home_team, away_team")
+    .eq("competition_id", competitionId)
+    .eq("stage", stage)
+    .eq("group_code", groupCode);
+  return data ?? [];
 }
