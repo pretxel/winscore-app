@@ -18,6 +18,7 @@ export const OPERATION_SCHEDULES: Partial<
   sync_news: { cron: "0 7 * * *", hourUtc: 7 },
   sync_matches: { cron: "0 9 * * *", hourUtc: 9 },
   prediction_reminders: { cron: "0 12 * * *", hourUtc: 12 },
+  round_reminders: { cron: "0 16 * * *", hourUtc: 16 },
   quiz_reminders: { cron: "0 13 * * *", hourUtc: 13 },
   results_digest: { cron: "0 11 * * *", hourUtc: 11 },
   // Runs a few times daily so completed comic renders are picked up shortly

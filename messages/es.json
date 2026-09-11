@@ -1224,6 +1224,7 @@
         "sync_matches": "Sincronización de resultados",
         "sync_news": "Sincronización de noticias",
         "prediction_reminders": "Recordatorios de pronósticos",
+        "round_reminders": "Recordatorios de jornada",
         "quiz_reminders": "Recordatorios del quiz",
         "results_digest": "Resumen de resultados",
         "recap_digest": "Resumen de recaps",
@@ -1237,6 +1238,7 @@
         "sync_matches": "Obtiene resultados y recalcula la tabla",
         "sync_news": "Actualiza las noticias de todas las ligas activas",
         "prediction_reminders": "Avisa a quienes tienen pronósticos abiertos",
+        "round_reminders": "Un día antes de la jornada, avisa a quien no ha pronosticado",
         "quiz_reminders": "Avisa a quienes no han respondido",
         "results_digest": "Resumen diario de la clasificación y los que más suben",
         "recap_digest": "Envía los cómics de partidos recién generados",
@@ -1624,6 +1626,18 @@
     "ctaLabel": "Hacer mis pronósticos",
     "footer": "Recibes esto porque participas en Winscore. Los pronósticos se cierran al inicio de cada partido.",
     "unsubscribeLabel": "Cancelar los recordatorios de pronósticos diarios"
+  },
+  "roundReminderEmail": {
+    "subject": "Llega {round} y te faltan pronósticos",
+    "preheader": "El primer partido de {round} es mañana. Deja tus marcadores puestos.",
+    "heading": "{name}, {round} espera tus pronósticos",
+    "headingNoName": "{round} espera tus pronósticos",
+    "intro": "{round} empieza mañana y aún no has pronosticado estos partidos. Ponlos ahora y tienes la jornada resuelta, porque cada partido se cierra en su propio inicio.",
+    "listLabel": "Te faltan",
+    "vs": "vs",
+    "ctaLabel": "Hacer mis pronósticos",
+    "footer": "Recibes esto porque juegas en Winscore. Los pronósticos se cierran al inicio de cada partido.",
+    "unsubscribeLabel": "Darse de baja de los recordatorios de pronósticos"
   },
   "resultsDigest": {
     "subject": "Tu resumen diario de Winscore",

@@ -1224,6 +1224,7 @@
         "sync_matches": "Ergebnisabgleich",
         "sync_news": "News-Abgleich",
         "prediction_reminders": "Tipp-Erinnerungen",
+        "round_reminders": "Spieltag-Erinnerungen",
         "quiz_reminders": "Quiz-Erinnerungen",
         "results_digest": "Ergebnisübersicht",
         "recap_digest": "Recap-Übersicht",
@@ -1237,6 +1238,7 @@
         "sync_matches": "Ruft Ergebnisse ab und berechnet die Tabelle neu",
         "sync_news": "Aktualisiert den News-Feed aller laufenden Ligen",
         "prediction_reminders": "Erinnert Spieler mit offenen Tipps",
+        "round_reminders": "Einen Tag vor dem Spieltag erinnert es alle ohne Tipp",
         "quiz_reminders": "Erinnert Spieler, die noch nicht geantwortet haben",
         "results_digest": "Tägliche Zusammenfassung von Tabelle und Aufsteigern",
         "recap_digest": "Versendet neu erstellte Spiel-Comics",
@@ -1624,6 +1626,18 @@
     "ctaLabel": "Tipps abgeben",
     "footer": "Du erhältst diese E-Mail, weil du bei Winscore teilnimmst. Die Tipps werden zum Anpfiff jedes Spiels gesperrt.",
     "unsubscribeLabel": "Tägliche Tipp-Erinnerungen abbestellen"
+  },
+  "roundReminderEmail": {
+    "subject": "{round} steht an — deine Tipps fehlen",
+    "preheader": "Das erste Spiel von {round} ist morgen. Trag deine Ergebnisse ein.",
+    "heading": "{name}, {round} wartet auf deine Tipps",
+    "headingNoName": "{round} wartet auf deine Tipps",
+    "intro": "{round} beginnt morgen und diese Spiele hast du noch nicht getippt. Tipp sie jetzt, dann ist der ganze Spieltag erledigt — jedes Spiel schließt zu seinem eigenen Anpfiff.",
+    "listLabel": "Noch zu tippen",
+    "vs": "vs",
+    "ctaLabel": "Tipps abgeben",
+    "footer": "Du bekommst das, weil du bei Winscore mitspielst. Tipps schließen zum Anpfiff jedes Spiels.",
+    "unsubscribeLabel": "Tipp-Erinnerungen abbestellen"
   },
   "resultsDigest": {
     "subject": "Deine tägliche Winscore-Zusammenfassung",

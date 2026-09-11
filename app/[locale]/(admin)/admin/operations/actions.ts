@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getActiveBranding } from "@/lib/competition";
+import { forEachLiveLeague, sumDispatch } from "@/lib/cron/for-each-league";
 import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n";
 import { runNewsSync } from "@/lib/news-sync";
 import { dispatchComebackEmails } from "@/lib/notifications/comeback-emails";
@@ -12,6 +13,7 @@ import { dispatchQuizReminders } from "@/lib/notifications/quiz-reminder-emails"
 import { dispatchRecapDigest } from "@/lib/notifications/recap-digest-emails";
 import { dispatchResultEmails } from "@/lib/notifications/result-emails";
 import { dispatchResultsDigest } from "@/lib/notifications/results-digest-emails";
+import { dispatchRoundReminders } from "@/lib/notifications/round-reminder-emails";
 import { dispatchScoreRulesEmail } from "@/lib/notifications/score-rules-emails";
 import { dispatchWinnersEmail } from "@/lib/notifications/winners-emails";
 import { OPERATION_KINDS, type OperationKind, recordRun } from "@/lib/operations/record-run";
@@ -62,6 +64,14 @@ const JOB: Record<OperationKind, () => Promise<object>> = {
   prediction_reminders: async () => {
     const { emailFromName } = await getActiveBranding();
     return dispatchPredictionReminders(emailFromName);
+  },
+  // Per live league, like the cron: the round to remind about is a fact of one
+  // competition, so there is no single unscoped pass that makes sense.
+  round_reminders: async () => {
+    const { results } = await forEachLiveLeague((ctx) =>
+      dispatchRoundReminders(ctx.branding.emailFromName, ctx.slug, ctx.competitionId),
+    );
+    return sumDispatch(results);
   },
   quiz_reminders: async () => {
     const { emailFromName } = await getActiveBranding();
@@ -157,6 +167,9 @@ export async function runSyncNews(formData: FormData) {
 }
 export async function runPredictionReminders(formData: FormData) {
   await trigger("prediction_reminders", formData);
+}
+export async function runRoundReminders(formData: FormData) {
+  await trigger("round_reminders", formData);
 }
 export async function runQuizReminders(formData: FormData) {
   await trigger("quiz_reminders", formData);

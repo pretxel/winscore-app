@@ -18,6 +18,10 @@
       "schedule": "0 12 * * *"
     },
     {
+      "path": "/api/cron/round-reminders",
+      "schedule": "0 16 * * *"
+    },
+    {
       "path": "/api/cron/results-digest",
       "schedule": "0 11 * * *"
     },

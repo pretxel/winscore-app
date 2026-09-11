@@ -8,6 +8,7 @@ export type OperationKind =
   | "sync_matches"
   | "sync_news"
   | "prediction_reminders"
+  | "round_reminders"
   | "quiz_reminders"
   | "results_digest"
   | "recap_digest"
@@ -21,6 +22,7 @@ export const OPERATION_KINDS: readonly OperationKind[] = [
   "sync_matches",
   "sync_news",
   "prediction_reminders",
+  "round_reminders",
   "quiz_reminders",
   "results_digest",
   "recap_digest",

@@ -1230,6 +1230,7 @@
         "sync_matches": "Score sync",
         "sync_news": "News sync",
         "prediction_reminders": "Prediction reminders",
+        "round_reminders": "Round reminders",
         "quiz_reminders": "Quiz reminders",
         "results_digest": "Results digest",
         "recap_digest": "Recap digest",
@@ -1243,6 +1244,7 @@
         "sync_matches": "Pulls results and recomputes standings",
         "sync_news": "Refreshes the news feed for every live league",
         "prediction_reminders": "Nudges players with open picks",
+        "round_reminders": "A day before a matchday, nudges players who haven't picked",
         "quiz_reminders": "Nudges players who haven't answered",
         "results_digest": "Daily recap of the leaderboard and movers",
         "recap_digest": "Emails newly-rendered match comics",
@@ -1624,6 +1626,18 @@
     "ctaLabel": "Make your predictions",
     "footer": "You're getting this because you're playing Winscore. Predictions lock at each match's kickoff.",
     "unsubscribeLabel": "Unsubscribe from daily prediction reminders"
+  },
+  "roundReminderEmail": {
+    "subject": "{round} is almost here — your picks are missing",
+    "preheader": "The first match of {round} kicks off tomorrow. Lock in your scores.",
+    "heading": "{name}, {round} needs your picks",
+    "headingNoName": "{round} needs your picks",
+    "intro": "{round} starts tomorrow and you haven't predicted these matches yet. Pick them now and you're set for the whole matchday — each one locks at its own kickoff.",
+    "listLabel": "Still to predict",
+    "vs": "vs",
+    "ctaLabel": "Make your predictions",
+    "footer": "You're getting this because you're playing Winscore. Predictions lock at each match's kickoff.",
+    "unsubscribeLabel": "Unsubscribe from prediction reminders"
   },
   "resultsDigest": {
     "subject": "Your daily Winscore recap",

@@ -1224,6 +1224,7 @@
         "sync_matches": "Synchro des scores",
         "sync_news": "Synchro des actus",
         "prediction_reminders": "Rappels de pronostics",
+        "round_reminders": "Rappels de journée",
         "quiz_reminders": "Rappels du quiz",
         "results_digest": "Résumé des résultats",
         "recap_digest": "Résumé des récaps",
@@ -1237,6 +1238,7 @@
         "sync_matches": "Récupère les résultats et recalcule le classement",
         "sync_news": "Actualise le fil d'actus de toutes les ligues en cours",
         "prediction_reminders": "Relance les joueurs aux pronostics ouverts",
+        "round_reminders": "La veille d'une journée, relance ceux qui n'ont pas pronostiqué",
         "quiz_reminders": "Relance les joueurs sans réponse",
         "results_digest": "Récapitulatif quotidien du classement et des plus fortes progressions",
         "recap_digest": "Envoie les BD de match nouvellement générées",
@@ -1624,6 +1626,18 @@
     "ctaLabel": "Faire mes pronostics",
     "footer": "Vous recevez ceci car vous jouez sur Winscore. Les pronostics se ferment au coup d'envoi de chaque match.",
     "unsubscribeLabel": "Se désabonner des rappels de pronostics quotidiens"
+  },
+  "roundReminderEmail": {
+    "subject": "{round} approche et il vous manque des pronostics",
+    "preheader": "Le premier match de {round} a lieu demain. Enregistrez vos scores.",
+    "heading": "{name}, {round} attend vos pronostics",
+    "headingNoName": "{round} attend vos pronostics",
+    "intro": "{round} commence demain et vous n'avez pas encore pronostiqué ces matchs. Faites-le maintenant et toute la journée est réglée : chaque match se ferme à son coup d'envoi.",
+    "listLabel": "À pronostiquer",
+    "vs": "vs",
+    "ctaLabel": "Faire mes pronostics",
+    "footer": "Vous recevez ce message parce que vous jouez à Winscore. Les pronostics se ferment au coup d'envoi de chaque match.",
+    "unsubscribeLabel": "Se désabonner des rappels de pronostics"
   },
   "resultsDigest": {
     "subject": "Votre récap quotidien Winscore",

@@ -1514,6 +1514,39 @@ export type Database = {
           },
         ];
       };
+      round_reminder_log: {
+        Row: {
+          round_id: string;
+          sent_at: string;
+          user_id: string;
+        };
+        Insert: {
+          round_id: string;
+          sent_at?: string;
+          user_id: string;
+        };
+        Update: {
+          round_id?: string;
+          sent_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "round_reminder_log_round_id_fkey";
+            columns: ["round_id"];
+            isOneToOne: false;
+            referencedRelation: "competition_rounds";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "round_reminder_log_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       score_rules_email_log: {
         Row: {
           sent_at: string;
