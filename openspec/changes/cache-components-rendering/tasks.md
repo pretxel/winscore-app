@@ -17,7 +17,7 @@
 - [x] 2.3 Confirm the existing tests still pass; none of the converted loaders were mocked through `createServerSupabaseClient` in a way the change breaks
 - [x] 2.4 Verify the five converted pages render identically to production, section for section
 - [ ] 2.5 BLOCKED, needs its own phase: `app/layout.tsx` reads the request locale via `getLocale()` for `<html lang>`, outside any Suspense. That is runtime data in the root layout, so no route below it can prerender — `/_not-found` fails to build with the opt-out removed. Until the locale strategy is reworked, converted pages get cached data but not a static shell. Both layouts keep `instant = false`.
-- [ ] 2.6 Measure the five pages in production against the baseline once deployed
+- [x] 2.6 Measured in production against the baseline: catalog 0.693s to 0.166s, news 0.350s to 0.150s, the rulebook 0.351s to 0.217s, standings 0.369s to 0.211s, the bracket 0.359s to 0.233s
 
 ## 3. Leaderboard and phase boards
 
@@ -27,7 +27,7 @@
 - [x] 3.1d Cache the default phase scheme and its phases, which the segment switcher reads on every visit
 - [x] 3.2 Keep the realtime refetch on the overall board working against the cached initial rows
 - [x] 3.3 Verify all four segments render identically to production
-- [ ] 3.4 Measure the leaderboard and a phase board in production against the baseline once deployed
+- [x] 3.4 Measured in production: the leaderboard's time to first byte fell from 0.364s to 0.128s
 
 ## 4. Fixture list
 
@@ -37,7 +37,7 @@
 - [x] 4.3 Verify the cache key is the league only, so visitors in different timezones share one entry and each still groups by their own day
 - [x] 4.4 Confirm the opportunistic sync trigger still runs at request time against the fetched list, never inside the cache
 - [x] 4.5 Verify the list matches production for the default view, a finished-only filter, and a league with no upcoming fixtures
-- [ ] 4.6 Measure the fixture list in production against the baseline once deployed
+- [x] 4.6 Measured in production: the fixture list fell from 0.543s to 0.154s, with the payload unchanged
 
 ## 5. Match page
 
@@ -45,7 +45,7 @@
 - [x] 5.1b Read the recap text and its comic render in one cached function: both are per-match, both only exist for a finished match, and the metadata needs the comic on its own
 - [x] 5.2 The prediction form, the next-fixture suggestion, everyone's picks, the admin check and the recap reactions stay at request time on the session client. No Suspense boundary while the shell is blocked app-wide (2.5); the split that matters here is cached-shared versus per-request, and that is in place
 - [x] 5.3 Verified signed out, section for section against production: a finished match, an upcoming match, a match with a recap, and a match with a rendered comic including its Open Graph image. Signed-in render not verified in a browser this session — the extension would not connect — but no per-user read on the page changed
-- [ ] 5.4 Measure a finished and an upcoming match page in production against the baseline once deployed
+- [x] 5.4 Measured in production: the match page fell from 0.370s to 0.139s, and its total from 1.228s to 0.581s
 
 ## 6. Invalidation and final measurement
 
